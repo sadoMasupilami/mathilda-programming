@@ -1,0 +1,93 @@
+<style>
+  .r-urk { padding: 12mm; }
+  .r-urk .rahmen {
+    flex: 1;
+    border: 2.4mm solid var(--akzent);
+    border-radius: 8mm;
+    outline: 0.6mm solid var(--akzent);
+    outline-offset: -5.5mm;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 14mm 16mm 12mm 16mm;
+    position: relative;
+  }
+  .r-urk .ecke { position: absolute; line-height: 0; }
+  .r-urk .wort { font-family: var(--text); font-weight: 1000; font-size: 44pt; letter-spacing: 0.12em; text-transform: uppercase; color: var(--akzent); margin: 6mm 0 0 0; line-height: 1; }
+  .r-urk .fuer { font-family: var(--kind); font-size: 18pt; margin: 6mm 0 1mm 0; }
+  .r-urk .name { font-family: var(--kind); font-weight: 700; font-size: 40pt; line-height: 1.1; margin: 0; }
+  .r-urk .ist { font-family: var(--kind); font-size: 18pt; margin: 4mm 0 0 0; }
+  .r-urk .titel { font-family: var(--text); font-weight: 1000; font-size: 30pt; line-height: 1.1; margin: 2mm 0 0 0; hyphens: manual; }
+  .r-urk .bild { margin: 7mm 0 5mm 0; display: flex; align-items: center; gap: 6mm; line-height: 0; }
+  .r-urk ul { list-style: none; padding: 0; margin: 0; font-family: var(--kind); font-size: 15pt; line-height: 1.3; text-align: left; }
+  .r-urk li { display: flex; align-items: center; gap: 3mm; margin-bottom: 2.2mm; }
+  .r-urk li svg { flex: none; }
+  .r-urk .unten { margin-top: auto; width: 100%; display: flex; justify-content: space-between; gap: 14mm; }
+  .r-urk .unten > div { flex: 1; border-top: 0.4mm solid var(--tinte); padding-top: 1.5mm; font-family: var(--text); font-size: 10pt; color: var(--grau); text-align: center; }
+</style>
+
+<section class="seite r-urk" id="urkunde-1" data-toc="Urkunde 1 (nach Einheit 10)" data-block="B">
+  <div class="rahmen">
+    <span class="ecke" style="left: 8mm; top: 8mm"><m-symbol name="stern" gr="12"></m-symbol></span>
+    <span class="ecke" style="right: 8mm; top: 8mm"><m-symbol name="stern" gr="12"></m-symbol></span>
+    <span class="ecke" style="left: 10mm; bottom: 34mm"><m-symbol name="edelstein" gr="11"></m-symbol></span>
+    <span class="ecke" style="right: 10mm; bottom: 34mm"><m-symbol name="edelstein" gr="11"></m-symbol></span>
+    <m-bild name="medaille" gr="30"></m-bild>
+    <div class="wort">Urkunde</div>
+    <p class="fuer">für</p>
+    <p class="name">{{KIND}}</p>
+    <p class="ist">Du bist jetzt</p>
+    <p class="titel">Drachen-Programmiererin</p>
+    <div class="bild">
+      <m-symbol name="drache" gr="30" blick="rechts"></m-symbol>
+      <m-symbol name="edelstein" gr="14"></m-symbol>
+      <m-symbol name="schatz" gr="22"></m-symbol>
+    </div>
+    <ul>
+      <li><m-symbol name="haken" gr="8"></m-symbol>Ich gebe genaue Befehle und schreibe Programme.</li>
+      <li><m-symbol name="haken" gr="8"></m-symbol>Ich finde den Fehler-Kobold.</li>
+      <li><m-symbol name="haken" gr="8"></m-symbol>Ich kenne den Wiederhol-Zauber.</li>
+      <li><m-symbol name="haken" gr="8"></m-symbol>Ich erkenne Muster und lese Geheimschrift.</li>
+      <li><m-symbol name="haken" gr="8"></m-symbol>Ich zähle mit Ja und Nein und suche mit Halbieren.</li>
+    </ul>
+    <div class="unten">
+      <div>Datum</div>
+      <div>Unterschrift</div>
+    </div>
+  </div>
+  <div class="fuss"><span>{{KIND}}s Denk-Werkstatt</span><span class="seitenzahl" data-ref="urkunde-1"></span><span>Urkunde nach Einheit 10</span></div>
+</section>
+
+<section class="seite r-urk" id="urkunde-2" data-toc="Urkunde 2 (nach Einheit 20)" data-block="D">
+  <div class="rahmen">
+    <span class="ecke" style="left: 8mm; top: 8mm"><m-bild name="krone" gr="14"></m-bild></span>
+    <span class="ecke" style="right: 8mm; top: 8mm"><m-bild name="krone" gr="14"></m-bild></span>
+    <span class="ecke" style="left: 10mm; bottom: 34mm"><m-symbol name="stern" gr="11"></m-symbol></span>
+    <span class="ecke" style="right: 10mm; bottom: 34mm"><m-symbol name="stern" gr="11"></m-symbol></span>
+    <m-bild name="medaille" gr="30"></m-bild>
+    <div class="wort">Urkunde</div>
+    <p class="fuer">für</p>
+    <p class="name">{{KIND}}</p>
+    <p class="ist">Du bist jetzt</p>
+    <p class="titel">Code-Meisterin</p>
+    <div class="bild">
+      <m-symbol name="kobold" gr="20"></m-symbol>
+      <m-bild name="roboter" gr="24"></m-bild>
+      <m-symbol name="drache" gr="28"></m-symbol>
+      <m-bild name="schloss" gr="22"></m-bild>
+    </div>
+    <ul>
+      <li><m-symbol name="haken" gr="8"></m-symbol>Ich denke mir Wenn-dann-Regeln aus.</li>
+      <li><m-symbol name="haken" gr="8"></m-symbol>Ich löse Logikrätsel und Formen-Quadrate.</li>
+      <li><m-symbol name="haken" gr="8"></m-symbol>Ich gewinne mit Plan.</li>
+      <li><m-symbol name="haken" gr="8"></m-symbol>Ich erfinde Zaubersprüche und eigene Spiele.</li>
+      <li><m-symbol name="haken" gr="8"></m-symbol>Ich habe das große Code-Fest geschafft.</li>
+    </ul>
+    <div class="unten">
+      <div>Datum</div>
+      <div>Unterschrift</div>
+    </div>
+  </div>
+  <div class="fuss"><span>{{KIND}}s Denk-Werkstatt</span><span class="seitenzahl" data-ref="urkunde-2"></span><span>Urkunde nach Einheit 20</span></div>
+</section>

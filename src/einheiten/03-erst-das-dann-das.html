@@ -1,0 +1,339 @@
+<!--
+  Einheit 3: Erst das, dann das (Block A)
+  Reihenfolge zählt: Abläufe aus dem Alltag als Programm, Ablauf-Karten ordnen,
+  falsche Reihenfolge finden, „Reihenfolge egal“ entdecken, Spiel Roboter-Koch.
+  Blätter: 3-1 Ablauf-Karten (Karten), 3-2 Was kommt zuerst? (Arbeitsblatt, QR e3),
+           3-3 Der Roboter-Koch (Arbeitsblatt)
+  Rätsel und Web-Paket: raetsel/e3.json · Bausteine: src/bausteine/e3-ablauf.js · Bilder: web/kern/bilder.js
+-->
+<style>
+  .e03-ablauf > li { break-inside: avoid; }
+  .e03-ganz > li { break-inside: auto; orphans: 2; widows: 2; }
+  .kasten.e03-schwerer { -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  table.tab.e03-tab { break-inside: auto; }
+  table.tab.e03-tab tr { break-inside: avoid; }
+  .e03-levels td:first-child, .e03-levels th:first-child { width: 13mm; white-space: nowrap; }
+  .kasten.e03-brechen { -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .e03-tab td:first-child { width: 30%; }
+  .e03-tab td:nth-child(2) { width: 38%; }
+  .e03-bilder { display: flex; gap: 3mm; align-items: flex-end; margin: 1mm 0 2mm 0; }
+  .e03-bilder > span { display: inline-flex; flex-direction: column; align-items: center; gap: 0.8mm; font-size: 8.5pt; color: var(--grau); }
+  /* Blätter */
+  .e03-hinweis { margin: 0; }
+  .e03-mitte { display: flex; justify-content: center; }
+  .e03-kobold-anw { display: flex; align-items: center; gap: 3mm; }
+  .e03-unten { display: flex; gap: 6mm; align-items: flex-end; justify-content: space-between; }
+  .e03-unten > .profi, .e03-unten > .knobel { flex: 1; }
+  .e03-belag { display: flex; gap: 4mm; align-items: center; margin: 1mm 0 2mm 0; }
+  .e03-belag > span { display: inline-flex; flex-direction: column; align-items: center; gap: 0.5mm; }
+  .e03-frage { display: flex; align-items: center; justify-content: space-between; gap: 3mm; margin: 0 0 2mm 0; }
+  .e03-paare { display: flex; justify-content: space-between; gap: 2mm; }
+  .e03-woerter { display: flex; flex-wrap: wrap; gap: 2.5mm; align-items: center; margin: 0 0 3mm 10mm; }
+  .e03-woerter > span { border: 0.5mm solid var(--akzent); background: var(--akzent-hell); border-radius: 2.5mm; padding: 0.8mm 3mm; font-size: 16pt; line-height: 1.2; }
+  .e03-woerter > b { font-family: var(--text); font-size: 14pt; color: var(--grau); }
+  .e03-paare-z { display: flex; flex-direction: column; align-items: center; gap: 2mm; }
+  .e03-prog { display: grid; grid-template-columns: 1fr; grid-auto-rows: 10.5mm; gap: 0; }
+  .e03-zeile { display: flex; align-items: flex-end; gap: 3mm; border-bottom: 0.45mm solid var(--tinte); padding-bottom: 1mm; }
+  .e03-znr { flex: none; width: 7mm; height: 7mm; border-radius: 50%; background: var(--akzent-hell); border: 0.4mm solid var(--akzent);
+    font-family: var(--text); font-weight: 900; font-size: 14pt; line-height: 6.4mm; text-align: center; color: var(--akzent); margin-bottom: 0.8mm; }
+  .e03-lz { font-size: 14pt; line-height: 1.1; white-space: nowrap; }
+  .e03-knobel-reihe { display: flex; gap: 8mm; align-items: center; }
+  .e03-knobel-reihe > p { margin: 0; display: flex; align-items: center; gap: 2mm; }
+  .e03-loes-text p { margin-bottom: 1.6mm; }
+  .e03-loes { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm 4mm; align-items: start; margin: 2mm 0 4mm 0; }
+  .e03-loes m-loesungen, .e03-loes .loesungen-raster { display: contents; }
+  .e03-loes > .kasten.loesung { margin: 5mm 0 0 0; font-size: 9pt; line-height: 1.35; }
+</style>
+
+<section class="anleitung" data-einheit="3" data-titel="Erst das, dann das">
+
+  <div class="kasten ziel">
+    <p>Heute entdeckt {{KIND}}: <b>Die Reihenfolge zählt.</b> Ein Programm ist nicht nur eine Sammlung von Befehlen, sondern eine Reihe: erst das, dann das. Aus dem Alltag kennt sie viele solche Programme, ohne es zu wissen: Zähne putzen, eine Jause machen, sich anziehen. Mit <span class="begriff">Ablauf-Karten</span> legt sie diese Abläufe in die richtige <span class="begriff">Reihenfolge</span>, findet heraus, was bei falscher Reihenfolge passiert (die Butter landet auf dem Schinken!), und entdeckt etwas Neues: Manchmal ist die <span class="begriff">Reihenfolge egal</span> (Socken oder Hose zuerst?). Höhepunkt ist der <span class="begriff">Roboter-Koch</span>: Du machst ein Butterbrot genau nach {{KIND}}s Programm und nimmst jeden Befehl wörtlich.</p>
+  </div>
+
+  <div class="kasten material">
+    <p><b>Vorher, ohne {{KIND}} (15 Min):</b></p>
+    <ul>
+      <li><b>Ausdrucken (2 Min):</b> <a class="blattref" href="#blatt-3-1"></a> (Ablauf-Karten) <b>zweimal</b>: einmal am besten auf dickerem Papier (160&nbsp;g) zum Ausschneiden, einmal auf normalem Papier. Das zweite Blatt bleibt ganz: Darauf löst {{KIND}} die Profi-Aufgabe und malt den Geschafft-Stern an. <a class="blattref" href="#blatt-3-2"></a> und <a class="blattref" href="#blatt-3-3"></a> auf normalem Papier.</li>
+      <li><b>Karten ausschneiden (8 Min):</b> Die 16 Karten vom dicken <a class="blattref" href="#blatt-3-1"></a> entlang der gestrichelten Linien ausschneiden. Das farbige Band oben zeigt, welcher Ablauf zusammengehört: <b>blau</b> Zähne putzen (4 Karten), <b>gelb</b> Jause (6 Karten und eine leere Karte „Dein Lieblings-Belag“), <b>grün</b> Anziehen (5 Karten). Jeden Ablauf in ein eigenes Kuvert oder mit einer Büroklammer zusammen. Leg die <b>Gurken-Karte</b> und die <b>leere Karte</b> extra, sie kommen erst später dazu.</li>
+      <li><b>Roboter-Koch herrichten (5 Min):</b> 2 Scheiben Brot offen auf einem Brettl (oder eine Semmel, die du schon aufgeschnitten hast), Butter in der <b>geschlossenen</b> Dose, Schinken in der <b>geschlossenen</b> Packung (oder Käse), ein paar <b>Gurkenscheiben, die du schon geschnitten hast</b>, in einer Schüssel, ein <b>stumpfes Buttermesser, das nur du verwendest</b>, eine Unterlage und Küchenrolle. Der Teller bleibt im Kasten, die Kastentür lässt du offen (sonst muss {{KIND}} auch noch „Mach den Kasten auf“ sagen).</li>
+    </ul>
+    <p><b>In der Einheit:</b> Bleistift, Buntstifte, eine Handvoll Muggelsteine (oder Zettel und Stift für Striche), ein Stempel oder Sticker für den Sammelpass. Für den Schwerer-Teil: ein Wollfaden (etwa 2&nbsp;m), eine Schere und 4 Wäschekluppen.</p>
+    <p><b>Extra, außerhalb der Einheit:</b> Wer gern bastelt, schneidet die Karten am Vortag gemeinsam aus und malt die leere Karte an (etwa 15 Minuten). Laminierte oder auf Karton geklebte Karten halten länger, falls ihr sie später wieder nehmen wollt (z. B. für ein eigenes Extra „Fehler im Rezept“).</p>
+  </div>
+
+  <h2>Ablauf Schritt für Schritt</h2>
+  <ol class="ablauf e03-ablauf">
+    <li data-min="3"><span class="schritt-titel">Hoppla-Anziehen</span>Zieh dich vor {{KIND}} absichtlich in falscher Reihenfolge an: zuerst die Hausschuhe, dann versuchst du, die Socken darüber zu ziehen. Oder die Jacke an und dann den Pullover darüber. {{KIND}} ruft „Halt, falsch!“ und sagt dir, was zuerst kommt. Dann fragst du: „Warum ist die Reihenfolge so wichtig?“ Damit ist das Thema da, ganz ohne Erklärung.</li>
+    <li data-min="5"><span class="schritt-titel">Ablauf-Karten legen</span>Zuerst die 4 blauen Karten (Zähne putzen), dann die gelben Jause-Karten <b>ohne</b> Gurke und leere Karte (5 Karten). {{KIND}} legt sie von links nach rechts, so wie man liest: Das ist ein Programm, die erste Karte ist Befehl 1. Danach legst du eine Reihe absichtlich falsch, und {{KIND}} spielt sie als Pantomime vor (Kasten „Bewegung“). Das Spiel „Durcheinander“ ist ein Extra für einen anderen Tag oder für den Schluss, wenn Zeit bleibt.</li>
+    <li data-min="5"><span class="schritt-titel">Wo ist es egal?</span>Jetzt kommt die Gurken-Karte dazu: „Wo kommt die Gurke hin?“ Vor oder nach dem Schinken, beides geht! Dann die 5 grünen Anzieh-Karten: {{KIND}} legt ihre Reihenfolge, du legst eine andere. Sind beide richtig? Hier fällt das Wort <b>„Reihenfolge egal“</b>: Zwei Karten, die <b>direkt nebeneinander</b> liegen, darf man tauschen, wenn keine vorher sein muss. Zum Schluss die Profi-Aufgabe auf dem ganzen (nicht zerschnittenen) <a class="blattref" href="#blatt-3-1"></a>: Welche Karte darf überall liegen, und wie viele Reihenfolgen gibt es mit dem Pullover ganz am Schluss? {{KIND}} legt dafür die grünen Karten aus.</li>
+    <li data-min="9"><span class="schritt-titel">Roboter-Koch</span>Das Hauptspiel (Kasten „Spiel: Roboter-Koch“). Runde 1: {{KIND}} sagt dir Befehl für Befehl, du machst genau das. Runde 2: {{KIND}} schreibt (oder sagt dir) ihr Programm auf <a class="blattref" href="#blatt-3-3"></a>, Aufgabe 2, und du führst das ganze Programm vom Blatt aus. Am Ende wird das Butterbrot gegessen.</li>
+    <li data-min="5"><span class="schritt-titel">Blätter</span><a class="blattref" href="#blatt-3-2"></a>: Drachen-Ei nummerieren und den Kobold-Tausch finden. Dann <a class="blattref" href="#blatt-3-3"></a>, Aufgabe 1 („Was ziehst du zuerst an?“). {{KIND}} liest die Anweisungen selbst. Die Profi-Aufgabe und die Knobel-Ecke sind freiwillig, aber genau das Richtige, wenn bis dahin alles leicht war.</li>
+    <li data-min="2"><span class="schritt-titel">Sammelpass</span>Feld „Einheit&nbsp;3“ stempeln oder bekleben, Sterne anmalen. Frag kurz: „Was war heute am lustigsten?“ (Meistens: der Roboter-Koch.) Die Antwort passt gut in den Rückmeldebogen.</li>
+  </ol>
+
+  <h3>Beispielsätze</h3>
+  <div class="sag">
+    <p class="du">„Hier sind die Karten vom Zähneputzen. Leg sie so hin, wie du es jeden Abend machst. Die erste Karte kommt ganz nach links.“</p>
+    <p class="sie">„Zuerst Zahnpasta auf die Bürste, dann Zähne putzen, dann ausspucken, dann Mund ausspülen.“</p>
+    <p class="du">„Das ist ein Programm mit 4 Befehlen! Und wenn ich die ersten zwei Karten tausche? Zuerst putzen, dann Zahnpasta?“</p>
+    <p class="sie">„Dann putzt du ohne Zahnpasta! Und die Zahnpasta kommt erst auf die Bürste, wenn du schon fertig bist.“</p>
+    <p class="dann">Genau das ist der Kern der Einheit: Dieselben Befehle in anderer Reihenfolge ergeben ein anderes Ergebnis. Lass {{KIND}} die falsche Reihenfolge vorspielen, das macht die Idee greifbar. Lob ihre Begründung („weil …“), nicht nur die richtige Reihe.</p>
+  </div>
+  <div class="sag">
+    <p class="du">„Ich ziehe mich an. Was kommt zuerst: die Socken oder die Hose?“</p>
+    <p class="sie">„Die Socken! … Oder nein, die Hose. Hm, eigentlich geht beides.“</p>
+    <p class="du">„Und die Socken oder die Schuhe?“</p>
+    <p class="sie">„Die Socken, sonst kommen die Socken ja über die Schuhe!“</p>
+    <p class="dann">So entdeckt {{KIND}} den Unterschied: Bei Socken und Schuhen <i>muss</i> eines zuerst kommen, bei Socken und Hose ist die Reihenfolge egal. Sagt sie bei allem „egal“, mach es vor: Zieh einen Socken über den Hausschuh. Sagt sie bei allem „muss zuerst“, frag: „Was passiert, wenn ich zuerst die Hose anziehe und dann die Socken? Klappt das?“</p>
+  </div>
+
+  <h2>Spiele, Bewegung und Basteln</h2>
+
+  <div class="kasten spiel darf-brechen e03-brechen" data-titel="Roboter-Koch">
+    <p class="spiel-meta">2 Personen · 9–10 Minuten · Zutaten und Teller (siehe Vorbereitung), <a class="blattref" href="#blatt-3-3"></a> · Du bist der Roboter-Koch, {{KIND}} ist die Programmiererin</p>
+    <ol class="regeln">
+      <li><b>Vorbereitung:</b> Alles liegt auf der Arbeitsfläche: die 2 Brotscheiben auf dem Brettl, die Butterdose zu, der Schinken in der geschlossenen Packung, die Gurkenscheiben in einer Schüssel. Der Teller steht noch im Kasten (Tür offen). {{KIND}} sitzt am Tisch und schaut zu. Du stellst dich daneben und sagst mit Roboterstimme: „Roboter-Koch bereit. Ich mache genau, was du sagst.“</li>
+      <li><b>Ziel:</b> Am Ende liegt ein Butterbrot mit Schinken auf einem Teller vor {{KIND}}. Dann darf sie es essen.</li>
+      <li><b>Ein Zug:</b> {{KIND}} sagt <b>einen</b> Befehl. Der Roboter-Koch macht genau diesen Befehl, wörtlich und nicht mehr, und wartet dann auf den nächsten. Er denkt nicht mit und rät nicht, was gemeint ist.</li>
+      <li><b>Piep!</b> Ist ein Befehl unklar oder unmöglich (unbekanntes Wort, etwas ist zu, etwas ist nicht da), sagt der Roboter-Koch „Piep! Geht nicht!“ und bleibt stehen. {{KIND}} gibt dann einen besseren Befehl. Statt zu piepen, darf der Roboter-Koch einen Befehl auch einmal lustig wörtlich nehmen (Tabelle unten). Beides ist richtig, Hauptsache, {{KIND}} merkt, welcher Befehl gefehlt hat oder ungenau war.</li>
+      <li><b>Sicherheit:</b> Das Buttermesser ist das Werkzeug des Roboter-Kochs: Bei „Streich“ nimmt er es selbst, und nur er hat es in der Hand. {{KIND}} gibt nur Befehle und fasst kein Messer an. Lustig ja, Sauerei nein: Nichts fällt auf den Boden, und nur so viel Unsinn, dass das Brot am Ende noch gut schmeckt.</li>
+      <li><b>Runde 1 (mündlich):</b> {{KIND}} sagt Befehl für Befehl. Zähl mit, wie viele Befehle es braucht.</li>
+      <li><b>Runde 2 (Programm):</b> {{KIND}} schreibt ihr Programm auf <a class="blattref" href="#blatt-3-3"></a>, Aufgabe 2. Ein Befehl pro Zeile, die Wörter oben helfen, kurz schreiben ist erlaubt („Butterdose auf“). Schreiben dauert lange? Dann sagt sie es dir an und du schreibst mit. Die 9 Zeilen reichen nicht? Auf der Rückseite weiterschreiben. Der Roboter-Koch liest nun das ganze Programm vom Blatt und führt es aus, ohne Fragen. Geht etwas schief, ruft {{KIND}} „Stopp!“. Ihr verbessert die Zeile (oder schreibt eine fehlende Zeile dazu), und der Roboter-Koch macht ab dieser Zeile weiter. Ein neues Brot ist nicht nötig.</li>
+      <li><b>Ende:</b> Das Butterbrot ist fertig und wird gegessen. Wer gewinnt? Beide, wenn es schmeckt.</li>
+    </ol>
+    <p><b>So nimmt der Roboter-Koch Befehle wörtlich</b> (dosieren: in Runde 1 ruhig zwei, drei lustige Missverständnisse, dann wieder mitspielen):</p>
+    <table class="tab e03-tab">
+      <tr><th>{{KIND}} sagt</th><th>Der Roboter-Koch macht</th><th>Was {{KIND}} dabei lernt</th></tr>
+      <tr><td>„Mach mir ein Butterbrot!“</td><td>„Piep! Unbekannter Befehl. Ich kenne kein Butterbrot. Ich kenne: nimm, leg, mach auf, mach zu, streich, gib.“</td><td>Ein großer Auftrag muss in kleine Befehle zerlegt werden.</td></tr>
+      <tr><td>„Nimm das Brot.“</td><td>Nimmt das ganze Brettl mit beiden Scheiben und hält es in die Luft.</td><td>Genau sagen, was gemeint ist: eine Scheibe Brot.</td></tr>
+      <tr><td>„Leg das Brot auf den Teller.“ (Der Teller ist noch im Kasten.)</td><td>Geht zum Kasten und legt das Brot auf den Teller im Stapel.</td><td>Reihenfolge: Zuerst muss der Teller auf den Tisch.</td></tr>
+      <tr><td>„Streich Butter drauf.“ (Die Dose ist noch zu.)</td><td>Streicht mit der geschlossenen Butterdose über das Brot. Oder: „Piep! Dose zu.“</td><td>Ein Befehl fehlt: Butterdose aufmachen.</td></tr>
+      <tr><td>„Leg den Schinken drauf.“</td><td>Legt die ganze, geschlossene Packung auf das Brot.</td><td>Packung aufmachen, eine Scheibe nehmen.</td></tr>
+      <tr><td>Schinken kommt vor der Butter</td><td>Streicht die Butter brav oben auf den Schinken.</td><td>Falsche Reihenfolge, komisches Ergebnis. Genau wie auf <a class="blattref" href="#blatt-3-2"></a>.</td></tr>
+      <tr><td>„Gib es mir.“</td><td>Gibt ihr die leere Schinkenpackung.</td><td>„Es“ ist unklar. Roboter brauchen genaue Namen: den Teller mit dem Brot.</td></tr>
+    </table>
+    <p><b>Varianten:</b></p>
+    <ul>
+      <li><b>Rollentausch:</b> {{KIND}} ist der Roboter-Koch und macht ein Joghurt mit Haferflocken (oder ein Müsli). Du gibst die Befehle und baust absichtlich ungenaue ein („Leg die Haferflocken ins Joghurt“, während der Becher noch zu ist). Kein Messer, nichts Heißes.</li>
+      <li><b>Wörter-Roboter (schwerer):</b> Der Roboter-Koch versteht nur die sechs Wörter auf <a class="blattref" href="#blatt-3-3"></a> (Nimm, Leg, Mach auf, Mach zu, Streich, Gib). Jeder Befehl muss mit einem davon anfangen.</li>
+      <li><b>Kobold im Rezept:</b> Du schreibst ein Butterbrot-Programm und vertauschst heimlich zwei Zeilen. {{KIND}} findet sie, bevor der Roboter-Koch loslegt. Das ist schon die Kobold-Jagd aus Einheit 4.</li>
+      <li><b>Andere Jause:</b> Statt Butterbrot geht auch Kakao (Häferl, Milch, Kakaopulver, umrühren), ein Topfenbrot oder Knäckebrot mit Aufstrich.</li>
+    </ul>
+  </div>
+
+  <div class="sag">
+    <p class="du">(mit Roboterstimme) „Roboter-Koch bereit. Was ist Befehl 1?“</p>
+    <p class="sie">„Nimm das Brot!“</p>
+    <p class="dann">Du nimmst das ganze Brettl mit beiden Scheiben und hältst es hoch. Warte. Nach dem ersten Lachen kommt meist: „Nein! Nur eine Scheibe!“ Dann sag: „Befehl 1 neu: Nimm eine Scheibe Brot. Ausgeführt. Befehl 2?“ So merkt {{KIND}}: Ein Roboter weiß nicht, was gemeint ist, sondern nur, was gesagt wird. Wird sie ungeduldig, mach den Roboter-Koch eine Stufe schlauer („Roboter-Koch 2.0 versteht jetzt: eine Scheibe“).</p>
+  </div>
+
+  <div class="kasten spiel darf-brechen e03-brechen" data-titel="Durcheinander">
+    <p class="spiel-meta">2 Personen · Extra, etwa 5 Minuten (wenn Zeit bleibt oder an einem anderen Tag) · die Ablauf-Karten vom dicken <a class="blattref" href="#blatt-3-1"></a> · Muggelsteine als Punkte</p>
+    <ol class="regeln">
+      <li><b>Vorbereitung:</b> Die 4 blauen Zähne-Karten oder die 5 gelben Jause-Karten (ohne Gurke und ohne leere Karte) liegen richtig in einer Reihe. Bei diesen beiden Abläufen gibt es genau <b>eine</b> richtige Reihenfolge, so ist immer klar, welche zwei Karten vertauscht wurden. Die Muggelsteine liegen als Punkte-Vorrat in der Mitte.</li>
+      <li><b>Ein Zug:</b> Die Ratende schließt die Augen. Die andere vertauscht <b>zwei</b> Karten, egal welche. Augen auf! Die Ratende zeigt auf die zwei vertauschten Karten und sagt, was jetzt passieren würde („Dann ist die Butter oben auf dem Schinken!“). Stimmt es, bekommt sie einen Muggelstein und tauscht die Karten zurück. Stimmt es nicht, zeigt die andere den Tausch und legt die Reihe wieder richtig.</li>
+      <li><b>Wechsel:</b> Nach jedem Zug wird getauscht, wer die Augen zu hat. Nach jeweils 2 Zügen (einer für jede) kommt der andere Ablauf dran.</li>
+      <li><b>Ende:</b> Wer zuerst 3 Muggelsteine hat, gewinnt.</li>
+    </ol>
+    <p><b>Profi-Runde mit den Anzieh-Karten:</b> Die 5 grünen Karten liegen in einer richtigen Reihe. Hier gibt es 15 richtige Reihenfolgen, deshalb zählt nicht, welche Karten vertauscht wurden, sondern ob die Reihe noch stimmt. Nach dem Tausch (Augen zu, zwei Karten tauschen, Augen auf) sagt die Ratende entweder „Das geht noch!“ (wenn alles noch richtig ist: 2 Muggelsteine) oder sie macht die Reihe mit <b>einem</b> Tausch wieder richtig und erklärt, was schiefgegangen wäre (1 Muggelstein). Jede richtige Reihe zählt, sie muss nicht die alte sein. Prüft gemeinsam mit den drei Regeln: Unterhose vor Hose, Hose vor Schuhen, Socken vor Schuhen.</p>
+    <p><b>Achtung, Falle:</b> Socken und Unterhose sind „egal“. Trotzdem kann ein Tausch der beiden schiefgehen, wenn sie <b>nicht nebeneinander</b> liegen: Aus Unterhose, Hose, Socken, Schuhe, Pullover wird Socken, Hose, Unterhose, Schuhe, Pullover, und jetzt kommt die Unterhose nach der Hose. „Egal“ heißt nur: Liegen die zwei direkt nebeneinander, darf man sie tauschen.</p>
+    <p><b>Varianten:</b> Profi: drei Karten verschieben statt zwei tauschen. Oder: eine Karte verschwindet (umdrehen), und die andere sagt, welche fehlt und was dann schiefgeht.</p>
+  </div>
+
+  <div class="kasten bewegung darf-brechen e03-brechen" data-titel="Ablauf-Pantomime">
+    <p>Eine Reihe Ablauf-Karten liegt am Boden. {{KIND}} geht die Reihe entlang, stellt sich zu jeder Karte und spielt sie vor (putzen, ausspucken, Hose anziehen …). Dann legst du die Karten falsch, und sie muss die falsche Reihenfolge genau so vorspielen: Zähne putzen ohne Zahnpasta, Schuhe anziehen und dann die Socken darüber stülpen. Lachen ist ausdrücklich erlaubt.</p>
+    <ul>
+      <li><b>Rückwärts-Film:</b> Spielt einen Ablauf wie einen Film, der rückwärts läuft: Das Butterbrot wird „ent-gessen“, der Schinken fliegt zurück in die Packung. Wer errät, welcher Ablauf rückwärts gespielt wurde?</li>
+      <li><b>Erst-das-dann-das-Parcours:</b> {{KIND}} legt drei bis fünf Bewegungskarten aus Zetteln (hüpfen, unter dem Tisch durchkriechen, um den Sessel laufen, auf einem Bein stehen) und du machst den Parcours genau in dieser Reihenfolge. Dann tauscht ihr zwei Zettel. Gibt es Tausche, bei denen der Parcours gleich bleibt?</li>
+    </ul>
+  </div>
+
+  <div class="kasten basteln" data-titel="Mein Ablauf-Leporello (Extra)">
+    <p>Außerhalb der Einheit, etwa 15 Minuten: Ein A4-Blatt längs halbieren, die zwei Streifen zusammenkleben und wie eine Ziehharmonika falten (6 bis 8 Felder). {{KIND}} malt einen eigenen Ablauf hinein, ein Bild pro Feld: „Mein Morgen“, „Wie man einen Schneemann baut“, „Wie die Raupe zum Schmetterling wird“. Vorne drauf kommt der Titel. Danach liest sie dir ihr Programm vor, und du spielst es vor. Wer mag, schneidet die Felder später auseinander, mischt sie und lässt die Oma ordnen.</p>
+  </div>
+
+  <h2>Wenn es hakt oder zu leicht ist</h2>
+
+  <div class="kasten stolper darf-brechen e03-brechen">
+    <ul>
+      <li><b>{{KIND}} legt die Karten von rechts nach links oder durcheinander auf dem Tisch:</b> Vereinbart: Ein Programm liest man wie ein Buch, von links nach rechts. Wer mag, legt eine Muggelstein-Spur darunter und tippt beim Vorlesen mit, wie bei den Programm-Reihen aus Einheit 2.</li>
+      <li><b>„Das ist doch babyleicht!“</b> Stimmt, die Zähne-Karten sind ein Aufwärmen. Dann gleich zur Gurke, zum Anziehen (15 richtige Reihenfolgen!) und in den Kasten „Schwerer machen“.</li>
+      <li><b>Sie streitet über das echte Leben</b> („Ich kann auch zuerst die Schuhe und dann die Hose anziehen, mit meiner Jogginghose geht das!“): Super, genau so denken Programmiererinnen! Probiert es aus. Dann einigt euch auf eine Regel für die Karten. Für die Blätter und die Web-App gelten die Regeln aus den Lösungen.</li>
+      <li><b>Sie verwechselt „egal“ und „falsch“:</b> „Egal“ heißt: beide Reihenfolgen gehen. „Falsch“ heißt: Es geht schief. Probe: Spielt beide Reihenfolgen als Pantomime. Geht beides gut, ist es egal.</li>
+      <li><b>Roboter-Koch frustriert sie</b> (der Roboter ist zu stur): Weniger wörtlich nehmen, öfter loben („Der Befehl war super genau!“), und den Roboter-Koch nach einem Fehler sofort weitermachen lassen. Der Spaß ist wichtiger als jedes Missverständnis.</li>
+      <li><b>Schreiben dauert ewig:</b> Ein Wort pro Zeile reicht („Teller“, „Brot“), oder sie malt ein kleines Bild. Oder du schreibst mit, was sie ansagt. Es geht ums Planen, nicht ums Schreiben.</li>
+      <li><b>Sie vergisst Zwischenschritte</b> (Dose aufmachen, Packung aufmachen): Das ist kein Fehler, sondern der eigentliche Lerninhalt. Frag nach dem Piep: „Was muss vorher passieren?“</li>
+      <li><b>Drachen-Ei auf <a class="blattref" href="#blatt-3-2"></a>:</b> Sie schreibt die Nummern in der Reihenfolge der Karten (1, 2, 3, 4, 5)? Dann zeig: „Welche Karte ist die erste? Die bekommt die 1.“ Ausgeschnittene Karten helfen, das Blatt bleibt aber ganz.</li>
+    </ul>
+  </div>
+
+  <div class="kasten leichter">
+      <ul>
+        <li>Mit 3 Karten anfangen: Zahnpasta, putzen, ausspülen.</li>
+        <li>Die erste Karte legst du hin, {{KIND}} legt den Rest.</li>
+        <li>Jede Karte zuerst vorspielen, dann legen.</li>
+        <li>Roboter-Koch nur mündlich spielen, Runde 2 an einem anderen Tag.</li>
+        <li>Statt Butterbrot ein Glas Wasser: Glas holen, Wasserhahn aufdrehen, Glas darunter, zudrehen, trinken.</li>
+        <li><a class="blattref" href="#blatt-3-2"></a>: nur Aufgabe 1. Aufgabe 2 mit den Karten nachlegen.</li>
+      </ul>
+    </div>
+
+  <div class="kasten schwerer darf-brechen e03-schwerer">
+    <p>Wenn die Karten ohne Zögern richtig liegen, wähle hier aus. Das ist kein Zusatz „für später“, sondern ein vollwertiger Hauptteil. Die Zahlen hat ein Programm nachgezählt (Löser), sie stimmen.</p>
+    <ol class="e03-ganz">
+      <li><b>Reihenfolgen zählen:</b> Mit Gurke gibt es <b>2</b> richtige Jause-Reihenfolgen (Schinken vor oder nach der Gurke). Kommt die leere Karte „Dein Lieblings-Belag“ dazu, sind es schon <b>6</b>: Die drei Beläge können in jeder Reihenfolge auf das Brot. „Wie viele findest du? Leg jede einmal hin und schreib sie auf.“ Ein Profi-Weg: Für den ersten Belag gibt es 3 Möglichkeiten, für den zweiten noch 2, für den letzten nur 1. 3 · 2 · 1 = 6.</li>
+      <li><b>Anziehen zählen:</b> Bei den 5 grünen Karten gibt es <b>15</b> richtige Reihenfolgen. Zuerst ohne Pullover: Es gibt nur 3 (Unterhose, Hose, Socken, Schuhe; Unterhose, Socken, Hose, Schuhe; Socken, Unterhose, Hose, Schuhe). Der Pullover darf dann an jeden der 5 Plätze. 3 · 5 = 15. Das ist auch die Profi-Aufgabe auf <a class="blattref" href="#blatt-3-1"></a>, nur andersherum (Pullover zum Schluss: 3).</li>
+      <li><b>Muss-vorher-Fäden:</b> Legt die 5 Anzieh-Karten verstreut auf den Boden. Für jede Regel „muss vorher“ legt {{KIND}} einen Wollfaden von der Karte, die vorher kommt, zur Karte, die danach kommt (Unterhose zur Hose, Hose zu den Schuhen, Socken zu den Schuhen). Am Ende jedes Fadens, bei der Karte „danach“, klemmt eine Wäschekluppe: Sie zeigt wie eine Pfeilspitze die Richtung. Der Pullover bekommt keinen Faden. Dann die Frage: „Kannst du von einer Karte aus den Fäden folgen, immer zur Wäschekluppe hin, und kommst bei der anderen Karte an? Dann muss sie vorher kommen.“ Beispiel: Unterhose zur Hose, Hose zu den Schuhen. Also muss die Unterhose vor den Schuhen kommen, obwohl kein Faden direkt dazwischen liegt. „Und wenn du in keine Richtung hinkommst?“ Dann ist die Reihenfolge egal: Socken und Hose, Socken und Unterhose, und der Pullover mit allen. Das ist echtes Informatik-Denken (siehe Hintergrund).</li>
+      <li><b>Zwei Roboter-Köche:</b> Ihr seid zwei Roboter und arbeitet gleichzeitig. Was kann der eine machen, während der andere etwas anderes macht? (Schinken und Gurke gleichzeitig drauflegen, während niemand auf den anderen warten muss.) Zählt Runden: Allein braucht man für die 6 Jause-Karten 6 Runden, zu zweit nur 5, weil Schinken und Gurke in derselben Runde gehen. Schneller als 5 geht es nicht, denn Teller, Brot, Butter, Belag und Essen müssen nacheinander kommen.</li>
+      <li><b>Eigener Ablauf mit 6 bis 8 Karten:</b> {{KIND}} erfindet einen Ablauf auf Zetteln (Schultasche packen, Pflanze gießen, Kuchen backen, Hasenstall putzen). Du ordnest ihn. Wo ist die Reihenfolge egal? Beim Schultasche-Packen ist fast alles egal, nur „Schultasche aufmachen“ muss zuerst und „zumachen“ zuletzt kommen.</li>
+      <li><b>Roboter-Koch mit Fehler:</b> Du schreibst ein Programm mit einem absichtlichen Fehler, z. B. steht „Streich Butter auf das Brot“ eine Zeile vor „Mach die Butterdose auf“. {{KIND}} findet den Fehler, <i>bevor</i> der Roboter-Koch anfängt, nur durch Lesen. Das ist die Kobold-Jagd aus Einheit 4.</li>
+      <li><b>Kürzestes Koch-Programm:</b> Wie wenige Befehle braucht der Wörter-Roboter (nur Nimm, Leg, Mach auf, Mach zu, Streich, Gib) für ein Butterbrot auf dem Teller vor {{KIND}}? Ein Beispiel mit 8 Befehlen steht in den Lösungen (rot auf <a class="blattref" href="#blatt-3-3"></a>). Schafft {{KIND}} es kürzer, ohne dass der Roboter piept? Tipp, wenn sie nicht weiterkommt: „Muss der Roboter-Koch zuerst ‚Nimm‘ hören, bevor er etwas hinlegen kann?“ Mit 6 Befehlen geht es: Leg einen Teller vor mich. Leg eine Scheibe Brot auf den Teller. Mach die Butterdose auf. Streich Butter auf das Brot. Mach die Schinkenpackung auf. Leg eine Scheibe Schinken auf das Brot. Noch kürzer geht es nur mit Riesen-Befehlen wie „Leg eine Scheibe Brot auf einen Teller vor mich“. Ob der Roboter-Koch so etwas versteht, entscheidet ihr gemeinsam: Das ist genau die Frage, wie groß ein Befehl sein darf.</li>
+      <li><b>Rückwärts denken:</b> Ausziehen ist Anziehen rückwärts (Knobel-Ecke auf <a class="blattref" href="#blatt-3-3"></a>). Was ist beim Ausziehen egal? (Genau dasselbe wie beim Anziehen: Socken und Hose, Socken und Unterhose, der Pullover überall.) Und Aufräumen ist Spielen rückwärts: Was kommt zuletzt aus der Kiste und zuerst wieder hinein?</li>
+      <li><b>Die Schummel-Karte:</b> Du mischst eine Karte aus einem anderen Ablauf in eine Reihe (die Socken mitten in die Jause). {{KIND}} findet den Eindringling und erklärt, warum er nicht dazugehört.</li>
+      <li><b>Wenn-dann-Vorschau:</b> „Wenn kein Schinken da ist, nimm Käse.“ {{KIND}} baut eine solche Zeile in ihr Koch-Programm ein, und der Roboter-Koch prüft die Packung. Wenn-dann-Regeln kommen in Einheit 11 richtig dran, hier ist es nur ein Ausblick.</li>
+    </ol>
+  </div>
+
+  <div class="kasten bonus" data-titel="Bonus-Knobelei">
+      <p class="klein"><i>Für zwischendurch: im Auto, im Wartezimmer, beim Abendessen.</i></p>
+      <p><b>Zuerst oder egal?</b> „Kerzen ausblasen oder Kuchen essen? Badeanzug anziehen oder ins Wasser springen? Hände waschen oder Gesicht waschen? Fahrkarte kaufen oder in den Zug einsteigen?“</p>
+      <p><b>Gummibärli-Frage:</b> „Ich habe ein rotes, ein grünes und ein gelbes Gummibärli. Auf wie viele Arten kann ich sie nacheinander essen?“</p>
+      <p><b>Rückwärts erzählt:</b> „Ich esse das Brot. Ich lege den Schinken drauf. Ich streiche Butter drauf. Ich nehme eine Scheibe Brot. Erzähl es richtig herum!“</p>
+      <p class="klein"><b>Kurz-Lösungen:</b> zuerst ausblasen, zuerst Badeanzug, egal, meist zuerst Fahrkarte; 6 Arten (für Profis mit 4 Farben: 24); umdrehen, also zuerst Brot nehmen. Erklärungen bei den Lösungen.</p>
+    </div>
+
+  <h2>Hintergrund</h2>
+  <div class="kasten warum darf-brechen e03-brechen">
+    <p>Ein Programm ist eine <b>Sequenz</b>: Befehle, die in einer festen Reihenfolge ausgeführt werden. Ein Computer macht genau das, was dasteht, in genau dieser Reihenfolge, so wie der Roboter-Koch. Er weiß nicht, was gemeint war. Deshalb müssen Programme vollständig sein (Dose aufmachen nicht vergessen) und in der richtigen Reihenfolge stehen. Eine genaue Schritt-für-Schritt-Anleitung, die immer zum Ziel führt, nennt man <b>Algorithmus</b>. Ein Kochrezept ist ein Algorithmus für Menschen.</p>
+    <p>Neu ist heute die Frage „Was muss vorher passieren?“. Informatiker nennen das <b>Abhängigkeiten</b>: Die Schuhe hängen von den Socken ab, der Pullover von nichts. Die Wollfäden aus dem Schwerer-Teil sind ein <b>Abhängigkeits-Graph</b>, und eine Reihenfolge zu finden, die alle Fäden beachtet, heißt <b>topologisches Sortieren</b>. Genau so arbeiten Programme, die Software bauen oder Pakete installieren: Erst wenn alles fertig ist, wovon ein Teil abhängt, kommt dieser Teil dran.</p>
+    <p>Wo die Reihenfolge egal ist, können Dinge auch <b>gleichzeitig</b> passieren (zwei Roboter-Köche). Das nennt man <b>Parallelität</b>: Moderne Computer haben mehrere Rechenkerne, die unabhängige Aufgaben gleichzeitig erledigen. Und was passiert, wenn die Reihenfolge falsch ist? Dann hat das Programm einen <b>Bug</b>, die Butter landet auf dem Schinken. Fehler finden und reparieren ist das Thema von Einheit 4 (Fehler-Kobold).</p>
+  </div>
+
+  <h2>Bildschirm-Bonus</h2>
+  <div class="kasten bildschirm darf-brechen e03-brechen">
+    <p><b>Paket 3 „Erst das, dann das“</b>, Schlüsselwort <b>JAUSE</b>. Den QR-Code findest du auf <a class="blattref" href="#blatt-3-2"></a>. Nur am Schluss und nur, wenn {{KIND}} mag: 5–10 Minuten. Die Einheit ist auch ohne Bildschirm vollständig.</p>
+    <p><b>So geht es:</b> Die Bildkarten liegen gemischt da. {{KIND}} tippt sie der Reihe nach an (kein Ziehen nötig). Jede angetippte Karte bekommt ihre Nummer und erscheint in der Nummern-Reihe. Eine Karte noch einmal antippen nimmt sie wieder heraus. Die Taste mit der Karte und dem roten X nimmt die letzte Karte zurück, „Nochmal“ nimmt alle Karten zurück. Erst wenn alle Karten liegen, geht „Los“: Dann prüft die App die Reihe mit denselben Regeln wie die Lösungen hier. Ist die Reihenfolge egal, zählt jede richtige Reihenfolge. Passt etwas nicht, steht da „Fast!“, und zwei Karten haben einen roten Rahmen: Diese zwei sind noch vertauscht. Ein Stern pro Level.</p>
+    <table class="tab e03-levels">
+      <tr><th>Level</th><th>Ablauf</th><th>Passt zu</th></tr>
+      <tr><td>1</td><td>Schneemann bauen (4 Karten)</td><td>Einstieg, ganz leicht</td></tr>
+      <tr><td>2</td><td>Zähne putzen (4 Karten)</td><td>genau die blauen Karten von <a class="blattref" href="#blatt-3-1"></a></td></tr>
+      <tr><td>3</td><td>Butterbrot machen (5 Karten)</td><td>genau die gelben Karten von <a class="blattref" href="#blatt-3-1"></a> ohne Gurke, wie beim Roboter-Koch</td></tr>
+      <tr><td>4</td><td>Das Drachen-Ei (5 Karten)</td><td>genau <a class="blattref" href="#blatt-3-2"></a>, Aufgabe 1 (lieber erst nach dem Blatt spielen)</td></tr>
+      <tr><td>5</td><td>Butterbrot mit Gurke (6 Karten)</td><td>2 richtige Reihenfolgen: Schinken und Gurke sind egal</td></tr>
+      <tr><td>6</td><td>Anziehen (5 Karten)</td><td>15 richtige Reihenfolgen. Frag danach: „Hättest du es auch anders legen können?“</td></tr>
+    </table>
+    <p><b>Wann weglegen:</b> Nach Level 6 erscheint „Super! Jetzt zurück zum Papier.“ Dann ist Schluss, das Gerät kommt weg. Hat {{KIND}} noch Lust, malt sie stattdessen die leere Karte „Dein Lieblings-Belag“ an und legt das Butterbrot mit ihrem Lieblings-Belag. Oder sie beginnt ein Ablauf-Leporello (Kasten „Basteln“).</p>
+  </div>
+
+  <h2>Lösungen</h2>
+  <div class="kasten loesung e03-loes-text">
+    <p><b>Blatt 3-1, Ablauf-Karten</b> (rote Zahl im Band = Platz in der Reihe): <b>Zähne putzen</b> (genau eine Reihenfolge): 1 Zahnpasta auf die Bürste, 2 Zähne putzen, 3 Ausspucken, 4 Mund ausspülen. <b>Jause ohne Gurke</b> (genau eine Reihenfolge): 1 Teller hinstellen, 2 Brot auf den Teller legen, 3 Butter streichen, 4 Schinken drauflegen, 5 Essen. <b>Mit Gurke</b>: 2 Reihenfolgen, Schinken und Gurke sind egal (Platz 4 oder 5), Essen ist dann Platz 6. <b>Mit Gurke und eigenem Belag</b> (wie die roten Zahlen auf den gelben Karten): 6 Reihenfolgen, die drei Beläge liegen auf Platz 4 bis 6, Essen ist Platz 7. <b>Anziehen</b>: 15 Reihenfolgen. Es muss nur gelten: Unterhose vor Hose, Hose vor Schuhen, Socken vor Schuhen. Der Pullover darf überall liegen.</p>
+    <p><b>Blatt 3-1, Profi:</b> Der Pullover darf überall liegen. Mit dem Pullover zum Schluss gibt es 3 Reihenfolgen: Unterhose, Hose, Socken, Schuhe, Pullover; Unterhose, Socken, Hose, Schuhe, Pullover; Socken, Unterhose, Hose, Schuhe, Pullover.</p>
+    <p><b>Blatt 3-2:</b> Aufgabe 1, von links nach rechts: 3, 5, 1, 4, 2 (das Ei liegt im Nest, wackelt, hat Risse, das Baby schlüpft, der kleine Drache fliegt). Aufgabe 2: Karte 3 (Schinken) und Karte 4 (Butter) sind vertauscht. Sonst wird die Butter oben auf den Schinken gestrichen. Profi: 6 Reihenfolgen (Schinken, Käse, Gurke; Schinken, Gurke, Käse; Käse, Schinken, Gurke; Käse, Gurke, Schinken; Gurke, Schinken, Käse; Gurke, Käse, Schinken).</p>
+  </div>
+  <div class="e03-loes">
+    <m-loesungen einheit="3"></m-loesungen>
+    <div class="kasten loesung e03-loes-text">
+    <p><b>Blatt 3-3:</b> Aufgabe 1: Socken zuerst (vor den Schuhen); Socken und Hose: egal; Unterhose zuerst (vor der Hose). Aufgabe 2: Viele Programme sind richtig. Ein Beispiel mit 8 Befehlen (genau das steht rot in der Lösungsansicht): 1 Nimm einen Teller. 2 Leg den Teller vor mich. 3 Nimm eine Scheibe Brot. 4 Leg das Brot auf den Teller. 5 Mach die Butterdose auf. 6 Streich Butter auf das Brot. 7 Mach die Schinkenpackung auf. 8 Leg eine Scheibe Schinken auf das Brot. Richtig ist jedes Programm, bei dem der Roboter-Koch nicht piept und das Butterbrot am Ende auf dem Teller vor {{KIND}} liegt (z. B. auch mit „Gib mir den Teller“ zum Schluss, oder mit „Mach die Dose zu“). Knobel-Ecke: zuerst die Schuhe (dann die Socken), zuerst die Hose (dann die Unterhose). Ausziehen geht rückwärts.</p>
+    <p><b>Bonus:</b> Kerzen zuerst ausblasen (sonst wird es heiß beim Essen), zuerst den Badeanzug anziehen, Hände und Gesicht waschen ist egal, die Fahrkarte kauft man meist vorher (es gibt aber auch Züge mit Fahrkarten-Automat drinnen: dann egal!). Gummibärli: 6 Arten (rot, grün, gelb; rot, gelb, grün; grün, rot, gelb; grün, gelb, rot; gelb, rot, grün; gelb, grün, rot). Mit 4 Farben: 4 · 3 · 2 · 1 = 24. Rückwärts erzählt: Ich nehme eine Scheibe Brot, ich streiche Butter drauf, ich lege den Schinken drauf, ich esse das Brot.</p>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 3-1: Ablauf-Karten zum Ausschneiden                        -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="3" data-titel="Ablauf-Karten" data-art="Karten">
+  <p class="e03-hinweis">Jede Farbe ist ein Ablauf. Leg die Karten der Reihe nach!</p>
+  <m-karten spalten="4" zeilen="4" hoehe="43" breite="176">
+    <div><m-ablaufkarte raetsel="e3-zaehne" karte="spucken" band="Zähne" gr="21" farbe="blau"></m-ablaufkarte></div>
+    <div><m-ablaufkarte raetsel="e3-zaehne" karte="pasta" band="Zähne" gr="21" farbe="blau"></m-ablaufkarte></div>
+    <div><m-ablaufkarte raetsel="e3-zaehne" karte="spuelen" band="Zähne" gr="21" farbe="blau"></m-ablaufkarte></div>
+    <div><m-ablaufkarte raetsel="e3-zaehne" karte="putzen" band="Zähne" gr="21" farbe="blau"></m-ablaufkarte></div>
+    <div><m-ablaufkarte raetsel="e3-jause-eigen" karte="butter" band="Jause" gr="21" farbe="gelb"></m-ablaufkarte></div>
+    <div><m-ablaufkarte raetsel="e3-jause-eigen" karte="essen" band="Jause" gr="21" farbe="gelb"></m-ablaufkarte></div>
+    <div><m-ablaufkarte raetsel="e3-jause-eigen" karte="teller" band="Jause" gr="21" farbe="gelb"></m-ablaufkarte></div>
+    <div><m-ablaufkarte raetsel="e3-jause-eigen" karte="schinken" band="Jause" gr="21" farbe="gelb"></m-ablaufkarte></div>
+    <div><m-ablaufkarte raetsel="e3-jause-eigen" karte="gurke" band="Jause" gr="21" farbe="gelb"></m-ablaufkarte></div>
+    <div><m-ablaufkarte raetsel="e3-jause-eigen" karte="brot" band="Jause" gr="21" farbe="gelb"></m-ablaufkarte></div>
+    <div><m-ablaufkarte raetsel="e3-jause-eigen" karte="eigen" band="Jause" gr="21" farbe="gelb"></m-ablaufkarte></div>
+    <div><m-ablaufkarte raetsel="e3-anziehen" karte="schuhe" band="Anziehen" gr="21" farbe="gruen"></m-ablaufkarte></div>
+    <div><m-ablaufkarte raetsel="e3-anziehen" karte="pullover" band="Anziehen" gr="21" farbe="gruen"></m-ablaufkarte></div>
+    <div><m-ablaufkarte raetsel="e3-anziehen" karte="hose" band="Anziehen" gr="21" farbe="gruen"></m-ablaufkarte></div>
+    <div><m-ablaufkarte raetsel="e3-anziehen" karte="socken" band="Anziehen" gr="21" farbe="gruen"></m-ablaufkarte></div>
+    <div><m-ablaufkarte raetsel="e3-anziehen" karte="unterhose" band="Anziehen" gr="21" farbe="gruen"></m-ablaufkarte></div>
+  </m-karten>
+  <div class="profi" data-titel="Profi-Aufgabe: Anzieh-Profi">
+    <p class="e03-frage"><span>{{KIND}}, leg die grünen Karten. Welche Karte darf überall liegen?</span> <m-feld l="Pullover" art="text"></m-feld></p>
+    <p class="e03-frage"><span>Jetzt kommt der Pullover ganz zum Schluss. Wie viele Reihenfolgen findest du?</span> <m-ablaufanzahl raetsel="e3-anziehen-pulli" l="3"></m-ablaufanzahl></p>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 3-2: Was kommt zuerst?                                     -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="3" data-titel="Was kommt zuerst?" data-art="Arbeitsblatt" data-verteilt>
+  <div class="aufg">
+    <p class="anw">{{KIND}}, aus dem Drachen-Ei schlüpft ein Baby. Was kommt zuerst? Schreib 1, 2, 3, 4, 5 in die Kästchen.</p>
+    <m-ablauf raetsel="e3-ei" gr="25" breite="33"></m-ablauf>
+  </div>
+
+  <div class="aufg">
+    <p class="anw e03-kobold-anw"><span>Der Fehler-Kobold hat zwei Karten vertauscht! Kreise die zwei Karten ein.</span> <m-symbol name="kobold" gr="14"></m-symbol></p>
+    <m-ablauf raetsel="e3-jause" modus="falsch" reihe="teller,brot,schinken,butter,essen" tausch="3,4" gr="25" breite="33"></m-ablauf>
+    <p class="e03-hinweis" style="margin-top:3mm">Was passiert mit dem Butterbrot? Erzähl es!</p>
+    <p class="lsg-nur">Die Butter kommt oben auf den Schinken.</p>
+  </div>
+
+  <div class="e03-unten">
+    <div class="profi" data-titel="Profi-Aufgabe: Drei Beläge">
+      <p>Auf dein Butterbrot kommen Schinken, Käse und Gurke. Die Reihenfolge ist egal. Wie viele verschiedene Reihenfolgen gibt es?</p>
+      <div class="e03-belag">
+        <span><m-ablaufbild name="schinken" gr="17"></m-ablaufbild><span class="klein">Schinken</span></span>
+        <span><m-ablaufbild name="kaese" gr="17"></m-ablaufbild><span class="klein">Käse</span></span>
+        <span><m-ablaufbild name="gurke" gr="17"></m-ablaufbild><span class="klein">Gurke</span></span>
+        <m-ablaufanzahl raetsel="e3-belag" l="6"></m-ablaufanzahl>
+      </div>
+    </div>
+    <m-qr paket="e3"></m-qr>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 3-3: Der Roboter-Koch                                      -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="3" data-titel="Der Roboter-Koch" data-art="Arbeitsblatt" data-verteilt>
+  <div class="aufg">
+    <p class="anw">{{KIND}}, was ziehst du zuerst an? Mach ein Kreuz neben das Bild. Ist es egal? Dann kreuze „egal“ an.</p>
+    <div class="e03-paare-z">
+      <m-ablaufpaar zeile raetsel="e3-anziehen" a="schuhe" b="socken" l="b" gr="13" breite="46"></m-ablaufpaar>
+      <m-ablaufpaar zeile raetsel="e3-anziehen" a="socken" b="hose" l="egal" gr="13" breite="46"></m-ablaufpaar>
+      <m-ablaufpaar zeile raetsel="e3-anziehen" a="unterhose" b="hose" l="a" gr="13" breite="46"></m-ablaufpaar>
+    </div>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">Schreib dein Programm für den Roboter-Koch: ein Butterbrot! Ein Befehl pro Zeile. Kurz schreiben ist erlaubt.</p>
+    <div class="e03-woerter"><b>Wörter:</b><span>Nimm</span><span>Leg</span><span>Mach auf</span><span>Mach zu</span><span>Streich</span><span>Gib</span></div>
+    <div class="e03-prog">
+      <div class="e03-zeile"><span class="e03-znr">1</span><span class="lsg e03-lz">Nimm einen Teller.</span></div>
+      <div class="e03-zeile"><span class="e03-znr">2</span><span class="lsg e03-lz">Leg den Teller vor mich.</span></div>
+      <div class="e03-zeile"><span class="e03-znr">3</span><span class="lsg e03-lz">Nimm eine Scheibe Brot.</span></div>
+      <div class="e03-zeile"><span class="e03-znr">4</span><span class="lsg e03-lz">Leg das Brot auf den Teller.</span></div>
+      <div class="e03-zeile"><span class="e03-znr">5</span><span class="lsg e03-lz">Mach die Butterdose auf.</span></div>
+      <div class="e03-zeile"><span class="e03-znr">6</span><span class="lsg e03-lz">Streich Butter auf das Brot.</span></div>
+      <div class="e03-zeile"><span class="e03-znr">7</span><span class="lsg e03-lz">Mach die Schinkenpackung auf.</span></div>
+      <div class="e03-zeile"><span class="e03-znr">8</span><span class="lsg e03-lz">Leg eine Scheibe Schinken auf das Brot.</span></div>
+      <div class="e03-zeile"><span class="e03-znr">9</span></div>
+    </div>
+  </div>
+
+  <div class="knobel" data-titel="Knobel-Ecke: Ausziehen geht rückwärts">
+    <p>Am Abend ziehst du dich aus. Was ziehst du zuerst aus?</p>
+    <div class="e03-knobel-reihe">
+      <p>Schuhe oder Socken? <m-ablaufzuerst raetsel="e3-ausziehen" zuerst="schuhe" dann="socken" l="Schuhe"></m-ablaufzuerst></p>
+      <p>Hose oder Unterhose? <m-ablaufzuerst raetsel="e3-ausziehen" zuerst="hose" dann="unterhose" l="Hose"></m-ablaufzuerst></p>
+    </div>
+  </div>
+</section>

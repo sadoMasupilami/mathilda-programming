@@ -1,0 +1,14 @@
+{
+ "paket": "e1",
+ "einheit": 1,
+ "titel": "Ich bin dein Roboter",
+ "raetsel": [
+  { "id": "e1-d1", "art": "lesen", "b": 1, "h": 1, "start": { "x": 0, "y": 0, "blick": "oben" }, "programm": "rechts" },
+  { "id": "e1-d2", "art": "lesen", "b": 1, "h": 1, "start": { "x": 0, "y": 0, "blick": "oben" }, "programm": "links" },
+  { "id": "e1-d3", "art": "lesen", "b": 1, "h": 1, "start": { "x": 0, "y": 0, "blick": "rechts" }, "programm": "links" },
+  { "id": "e1-d4", "art": "lesen", "b": 1, "h": 1, "start": { "x": 0, "y": 0, "blick": "oben" }, "programm": "rechts rechts" },
+  { "id": "e1-d5", "art": "lesen", "b": 1, "h": 1, "start": { "x": 0, "y": 0, "blick": "oben" }, "programm": "links links links" },
+  { "id": "e1-l1", "art": "lesen", "b": 2, "h": 2, "start": { "x": 1, "y": 1, "blick": "oben" }, "programm": "vor links vor" },
+  { "id": "e1-l2", "art": "lesen", "b": 3, "h": 2, "start": { "x": 0, "y": 1, "blick": "rechts" }, "programm": "vor links vor rechts vor" }
+ ]
+}

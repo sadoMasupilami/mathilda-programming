@@ -1,0 +1,119 @@
+<style>
+  .r-einl h1 { font-family: var(--text); font-weight: 900; font-size: 24pt; margin: 0 0 3mm 0; }
+  .r-einl { line-height: 1.34; }
+  .r-einl h2 { font-family: var(--text); font-weight: 900; font-size: 14pt; color: var(--akzent); margin: 5mm 0 1.8mm 0; break-after: avoid; }
+  .r-einl h3 { font-family: var(--text); font-weight: 800; font-size: 11.5pt; margin: 4mm 0 1.5mm 0; break-after: avoid; }
+  .r-einl p { margin: 0 0 2.2mm 0; }
+  .r-einl ul, .r-einl ol { margin: 0 0 2.5mm 0; padding-left: 6mm; }
+  .r-einl li { margin-bottom: 0.7mm; }
+  .r-einl .lead { font-size: 12pt; line-height: 1.45; color: var(--tinte); }
+  .r-befehle { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; margin: 2mm 0 3mm 0; break-inside: avoid; }
+  .r-befehle > div { border: 0.45mm solid var(--linie); border-radius: 3mm; padding: 3mm; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1.5mm; }
+  .r-befehle > div b { font-size: 12pt; }
+  .r-befehle > div.vor { border-color: var(--vor); }
+  .r-befehle > div.links { border-color: var(--links); }
+  .r-befehle > div.rechts { border-color: var(--rechts); }
+  /* Die Liste darf über die Seite brechen, nur das Bild bleibt zusammen */
+  .r-gitter { display: grid; grid-template-columns: 1fr 66mm; gap: 0 6mm; align-items: start; }
+  .r-gitter .bild { display: flex; flex-direction: column; align-items: center; gap: 1.5mm; font-size: 9pt; color: var(--grau); text-align: center; break-inside: avoid; }
+</style>
+
+<section class="fliess nur-buch r-einl" id="einleitung" data-toc="So funktioniert die Werkstatt" style="page: anleitung; break-before: page" data-block="A">
+  <h1>So funktioniert die Werkstatt</h1>
+  <p class="lead">Diese Werkstatt ist für dich und {{KIND}}: 20 bis 30 Minuten gemeinsame Zeit, zwei- bis dreimal pro Woche, fast nur mit Papier, Malerkrepp, Bastelzeug und Platz zum Bewegen. {{KIND}} lernt, was Programmieren im Kern ist: <b>genaue Befehle geben, Fehler finden, Muster erkennen, Wiederholungen nutzen und Entscheidungen treffen.</b> Es geht um Spaß, Neugier und darum, {{KIND}} zu <b>fordern</b>. Sie ist schnell. Deshalb hat jede Einheit einen starken Teil „Schwerer machen“ und jedes Blatt eine Profi-Aufgabe oder Knobel-Ecke.</p>
+
+  <h2>Erst der Körper, dann das Papier, dann (vielleicht) der Bildschirm</h2>
+  <p>Jede neue Idee erlebt {{KIND}} zuerst mit dem Körper: Du bist der Roboter, und sie programmiert dich durch die Wohnung. Oder sie ist selbst der Drache und geht über ein Gitter aus Malerkrepp am Boden. Dann kommt dasselbe aufs Papier, mit der ausgeschnittenen Drachen-Figur zum Schieben und Drehen. Ab Einheit 2 gibt es am Schluss einen kurzen, freiwilligen <b>Bildschirm-Bonus</b>. Es gibt keine durchgehende Geschichte, aber viel Fantasie: Ein Drache sucht seinen Schatz, ein Fehler-Kobold versteckt Fehler in Programmen, später schreibt eine Fee Geheimbriefe.</p>
+
+  <h2>Ablauf einer Einheit</h2>
+  <ul>
+    <li><b>Vorher, ohne {{KIND}} (10–25 Minuten, am längsten in Einheit 2 wegen des Boden-Gitters):</b> Anleitung lesen, Blätter ausdrucken, ausschneiden, Material hinlegen. Was genau zu tun ist, steht in jeder Anleitung im Kasten „Material &amp; Vorbereitung“ unter „Vorher, ohne {{KIND}}“, mit Minuten. Aufwändiges Basteln (Karten bemalen) ist dort als Extra außerhalb der Einheit gekennzeichnet.</li>
+    <li><b>Gemeinsam (20–30 Minuten):</b> Der Ablauf steht Schritt für Schritt mit Minuten in der Anleitung. Meist: kurz aufwärmen mit Bewegung, ein Spiel, ein Blatt, Sammelpass. Das ist ein Vorschlag. Läuft ein Spiel gut, bleibt dabei. Ein Blatt darf auch an einem anderen Tag fertig werden.</li>
+    <li><b>Zum Schluss</b> stempelt oder beklebt {{KIND}} das Feld der Einheit im Sammelpass und malt 1 bis 3 Sterne an.</li>
+  </ul>
+  <p>Jede Anleitung hat dieselben Kästen: Ziel, Material, Ablauf mit <b>Beispielsätzen</b> („Du“ ist dein Text, „{{KIND}}“ eine mögliche Antwort), Spiele für euch zwei, Stolpersteine mit den Hilfen für links und rechts, <b>Leichter machen</b> und <b>Schwerer machen</b> (bei {{KIND}} oft der wichtigste Teil), eine Bonus-Knobelei ohne Papier für Auto oder Abendessen, den Hintergrund mit den Fachwörtern und den Bildschirm-Bonus. Ganz am Ende stehen die <b>Lösungen</b>: alle Blätter verkleinert, die Lösungen rot eingetragen.</p>
+  <p>Manches wird einmal gebastelt und immer wieder gebraucht: die <b>Befehlskarten</b> von Blatt <a class="blattref" href="#blatt-1-1"></a> (in Einheit 2, 4 und 5 wieder), die <b>Drachen-Figur</b> mit den Plättchen von Blatt <a class="blattref" href="#blatt-2-3"></a>, die <b>Ablauf-Karten</b> von Blatt <a class="blattref" href="#blatt-3-1"></a> und der <b>Zauber-Kasten</b> von Blatt <a class="blattref" href="#blatt-5-3"></a>. Diese vier Blätter am besten auf dickeres Papier (160 g) drucken. Bewahrt alles in einem Kuvert oder einer Schachtel auf: eure „Werkzeugkiste“.</p>
+
+  <h2>{{KIND}}s Blätter</h2>
+  <p>Oben rechts ist ein <b>Stern</b>: Wenn {{KIND}} fertig ist, malt sie ihn an. Unten wartet eine <b>Profi-Aufgabe</b> (Krone) oder die <b>Knobel-Ecke</b> (Eule), freiwillig, aber meistens das Spannendste. Die Sätze sind kurz, damit {{KIND}} sie selbst lesen kann: Lass sie zuerst selbst lesen und hilf nur, wenn sie fragt. Gitterfelder sind mindestens 2 cm groß. Dafür beim Drucken <b>„Tatsächliche Größe“ / 100 %</b> wählen, nicht „An Seite anpassen“. Der <b>QR-Code</b> unten auf einem Blatt jeder Einheit mit Bildschirm-Bonus ist nur für dich.</p>
+
+  <h2>Fordern, ohne zu überfordern</h2>
+  <ul>
+    <li><b>Lass sie erklären.</b> „Warum hast du hier rechts drehen genommen?“ ist die wichtigste Frage der ganzen Werkstatt. Lob den Plan, nicht nur das Ergebnis.</li>
+    <li><b>Fehler sind Rätsel.</b> Statt „falsch“ lieber „Wo hat der Kobold zugeschlagen?“ oder „Probieren wir es mit der Drachen-Figur aus.“ Wer einen Fehler findet, hat gewonnen.</li>
+    <li><b>Du bist ein genauer Roboter.</b> Mach genau das, was {{KIND}} sagt, auch wenn es Unsinn ist. Das ist lustig und lehrt mehr als jede Erklärung.</li>
+    <li><b>Tempo nach {{KIND}}.</b> Ist sie schnell durch, geh direkt zu „Schwerer machen“. Ihr müsst nicht alles schaffen: Lieber mit einem Lieblingsspiel aufhören als mit einer Aufgabe zu viel.</li>
+  </ul>
+
+  <h2>Die drei Befehle</h2>
+  <p>In den Einheiten 1–5 gibt es genau drei Befehle. Sie heißen immer gleich und sehen überall gleich aus: auf den Blättern, auf den Befehlskarten, in der Anleitung und in der Web-App.</p>
+  <div class="r-befehle">
+    <div class="vor"><m-symbol name="vor" gr="16"></m-symbol><b>vor</b><span>ein Feld in Blickrichtung. Ohne Gitter: ein großer Schritt oder eine Fliese.</span></div>
+    <div class="links"><m-symbol name="links" gr="16"></m-symbol><b>links drehen</b><span>eine Vierteldrehung nach links auf der Stelle. Die Figur bleibt im Feld.</span></div>
+    <div class="rechts"><m-symbol name="rechts" gr="16"></m-symbol><b>rechts drehen</b><span>eine Vierteldrehung nach rechts auf der Stelle. Orange wie die rechte Pfote des Drachen.</span></div>
+  </div>
+  <p>Sag immer genau diese Wörter: nicht „geradeaus“, „geh“ oder „dreh dich“. Seitlich oder rückwärts gehen gibt es nicht. Die gebogenen Pfeile bedeuten <b>drehen</b>, nicht gehen. Ein <b>Programm</b> ist eine nummerierte Reihe von Befehlen, zum Beispiel <m-symbol name="vor" gr="4.5"></m-symbol> <m-symbol name="vor" gr="4.5"></m-symbol> <m-symbol name="rechts" gr="4.5"></m-symbol> <m-symbol name="vor" gr="4.5"></m-symbol>: zwei Felder vor, rechts drehen, noch ein Feld vor.</p>
+
+  <h2>Die Gitter-Regeln (kurz)</h2>
+  <div class="r-gitter">
+    <div>
+      <ul>
+        <li>Der <b>Drache</b> <m-symbol name="drache" gr="4.5"></m-symbol> steht immer <b>in einem Feld</b>, nie auf einer Linie. Seine Nase (mit kleinem Pfeil) zeigt die <b>Blickrichtung</b>. Seine rechte Vorderpfote ist orange.</li>
+        <li>Jedes Gitter zeigt das <b>Startfeld</b> (hellgrün) und die Blickrichtung. Ohne andere Angabe schaut der Drache nach oben. Die Schwierigkeit steigt in Stufen: zuerst Blick nach oben, dann nach links oder rechts, nach unten erst im Teil „Schwerer machen“.</li>
+        <li>Das Ziel ist meist der <b>Schatz</b> <m-symbol name="schatz" gr="4.5"></m-symbol>. Auf einen <b>Stein</b> <m-symbol name="hindernis" gr="4.5"></m-symbol> kann er nicht gehen.</li>
+        <li><b>Anstoßen:</b> Läuft der Drache an den Rand oder an einen Stein, bleibt er stehen und das Programm ist zu Ende: „Hier hat der Kobold zugeschlagen!“</li>
+        <li><b>Geschafft</b> heißt: Am Ende des Programms steht der Drache auf dem Schatz (und hat alle Edelsteine <m-symbol name="edelstein" gr="4.5"></m-symbol> eingesammelt, falls es welche gibt). Nur vorbeigehen zählt nicht.</li>
+        <li><b>Kürzestes Programm</b> heißt: die wenigsten Befehle. Drehungen zählen mit.</li>
+        <li>Ein Programm hat höchstens 12 Befehle. Beim Ausführen tippt {{KIND}} mit dem Finger oder einem Muggelstein jeden Befehl an.</li>
+        <li>Am Boden ist ein Feld etwa 40–50 cm groß (Malerkrepp oder Kreide). Die vier <b>Hilfen für links und rechts</b> stehen in jeder Gitter-Einheit im Kasten mit der Lupe.</li>
+      </ul>
+    </div>
+    <div class="bild">
+      <m-gitter deko b="3" h="3" start="0,2,oben" ziel="2,0" hindernisse="0,1" feld="20"></m-gitter>
+      <span>Start links unten (hellgrün), Blick nach oben. Der Stein direkt vor dem Drachen versperrt den geraden Weg. Das kürzeste Programm hat 6 Befehle, die Drehungen zählen mit:<br><m-symbol name="rechts" gr="4.5"></m-symbol> <m-symbol name="vor" gr="4.5"></m-symbol> <m-symbol name="vor" gr="4.5"></m-symbol> <m-symbol name="links" gr="4.5"></m-symbol> <m-symbol name="vor" gr="4.5"></m-symbol> <m-symbol name="vor" gr="4.5"></m-symbol></span>
+    </div>
+  </div>
+
+  <h2>Sammelpass, Sterne und Urkunden</h2>
+  <p>Nach jeder Einheit kommt ein Stempel oder Sticker in den <b>Sammelpass</b> (vorne im Heft und in den Kopiervorlagen). Dann malt {{KIND}} 1 bis 3 Sterne an: „Wie hat es dir gefallen?“ Diese Sterne helfen dir beim <b>Rückmeldebogen</b> hinten im Heft. Füll ihn nach jeder Einheit kurz aus (2 Minuten): Die Einheiten 1–5 sind auch ein Test, danach werden Tempo, Schwierigkeit, Länge und Bildschirm-Anteil angepasst. Nach Einheit 10 gibt es die Urkunde „Drachen-Programmiererin“, nach Einheit 20 die Urkunde „Code-Meisterin“ (beide hinten im Heft, im Sammelpass mit einer Medaille markiert). Sterne in der Web-App sind nur ein Extra: <b>Der Sammelpass am Papier zählt.</b></p>
+
+  <h2>Material für die Einheiten 1–5</h2>
+  <p>Zum Einkaufen für ganz Block A. Was eine Einheit genau braucht, steht in ihrem Kasten „Material &amp; Vorbereitung“.</p>
+  <ul>
+    <li><b>Immer:</b> Drucker und Papier, etwas dickeres Papier (160 g) oder Karton (leere Müslischachtel) für Befehlskarten, Drachen-Figur, Ablauf-Karten und Zauber-Kasten; Schere, Kleber, Bleistift, Radiergummi, Buntstifte (Blau, Grün, Orange, Lila, Rot, Gelb); Kuverts oder Sackerl zum Aufheben; ein Gummiringerl oder Sticker für die rechte Hand; etwa 15 Muggelsteine zum Mittippen und Punktezählen; Stempel oder Sticker für den Sammelpass.</li>
+    <li><b>Einheit 1:</b> Malerkrepp für ein Start-Kreuz im Gang, ein Kuscheltier als Ziel.</li>
+    <li><b>Einheit 2:</b> Malerkrepp (draußen Straßenkreide) und Maßband für das Boden-Gitter 3 · 3 mit Feldern von 40–50 cm (Schwerer 4 · 4: etwa doppelt so viel Malerkrepp, 4 Kuscheltiere oder Schuhe als Steine), ein Polster (zeigt, wo oben ist), 3 Becher (Plastik- oder Joghurtbecher) und ein Würfel für „Schatz-Versteck“, Zuckerl oder Rosinen als Schatz.</li>
+    <li><b>Einheit 3:</b> für den Roboter-Koch Brot oder Semmel, Butter, Schinken oder Käse, Gurke, Teller, ein stumpfes Buttermesser; für den Schwerer-Teil ein Wollfaden (etwa 2 m) und ein paar Wäschekluppen.</li>
+    <li><b>Einheit 4:</b> das Boden-Gitter aus Einheit 2 (oder das Start-Kreuz), ein Schatz (Kuscheltier oder Zuckerl), eine Wäschekluppe als Kobold-Kluppe, ein leeres Marmeladeglas als Fehler-Schatzglas, Musik (optional).</li>
+    <li><b>Einheit 5:</b> das Start-Kreuz und ein Kuscheltier als Ziel, Platz zum Tanzen, Musik (optional), Kästchenpapier (Rechenheft) für eigene Muster-Bilder.</li>
+    <li><b>Ab Einheit 2, optional:</b> Handy oder Tablet für den Bildschirm-Bonus.</li>
+  </ul>
+
+  <h2>Wörter, die wir verwenden</h2>
+  <p>Auf {{KIND}}s Blättern, in den Beispielsätzen und in der Web-App stehen immer die <b>Kinderwörter</b>. Die Fachwörter in Klammern sind nur für dich (Kasten „Was hat das mit echtem Programmieren zu tun?“). Für Block A: <b>Befehl</b> (Anweisung), <b>Programm</b> (Algorithmus, Sequenz), <b>Roboter</b> (Computer, Ausführender), <b>kürzestes Programm</b> (optimale Lösung), <b>Ablauf-Karten</b> (Sequenz), <b>Fehler-Kobold</b> und <b>Kobold-Jagd</b> (Bug, Debuggen), <b>Wiederhol-Zauber</b> und <b>Zauber-Kasten</b> „3-mal“ (Schleife), <b>Karten zählen</b> (Programmlänge: ein Befehl ist 1 Karte, ein Zauber-Kasten 1 Karte plus die Befehle darin). Die vollständige Begriffsliste und der Plan für alle 20 Einheiten stehen in <b>plan/lehrplan.md</b>.</p>
+
+  <h2>Die Rechen-Werkstatt nebenan</h2>
+  <p>Gedankenlese-Karten (dort Einheit 19), Zahl raten (dort Einheit 8), magische Quadrate (dort Einheit 17) und Nim kommen hier später aus Programmier-Sicht wieder (Einheit 9, 10, 14 und 15), mit einem Verweis statt einer Wiederholung. Am besten die Hefte abwechseln: zum Beispiel Montag rechnen, Mittwoch programmieren.</p>
+
+  <h2>Bildschirm-Bonus: die Web-App</h2>
+  <p>Ab Einheit 2 gibt es zu jeder Einheit ein kleines <b>Level-Paket</b> mit 5–7 Levels in einer Web-App für dein Handy oder Tablet. Die Levels passen zu den Blättern, einige sind genau die Rätsel vom Papier. Der Bildschirm ist ein <b>Bonus, nie Pflicht</b>: höchstens 5–10 Minuten, immer am Schluss, nie mittendrin. Am Ende des Pakets erscheint „Super! Jetzt zurück zum Papier.“ Dann wird das Gerät weggelegt. Sag das schon vorher an: „Wir spielen bis zum Ende-Bild.“ Die App ist ruhig: keine Werbung, keine Zeitlimits, kein Fehlerton, kein Leben-Verlieren.</p>
+  <p>Die App bewertet nach dem Ergebnis: Kommt der Drache mit {{KIND}}s Programm an, ist es geschafft, auch wenn ihr Weg anders ist als die Lösung im Heft. Für jedes Level gibt es einen Stern. Nur wenn ein Level ausdrücklich das <b>kürzeste Programm</b> sucht, gibt es den Stern erst mit dem kürzesten. Ein längeres Programm, das ankommt, zeigt dort „Fast geschafft!“ und sagt, mit wie vielen Befehlen es geht.</p>
+
+  <h3>Öffnen und freischalten</h3>
+  <p>Scanne den <b>QR-Code</b> unten auf einem Blatt der Einheit mit der Kamera deines Handys oder Tablets. Er führt direkt zum passenden Paket. Ohne QR-Code (zum Beispiel am Tablet ohne Kamera): Tipp die Adresse der Web-App ein. Sie steht absichtlich nicht im Heft, nur im QR-Code. Trag sie deshalb einmal in der <b>Gerätetest-Checkliste</b> hinten im Heft ein (woher sie kommt, steht in der README im Repo, Abschnitt „Veröffentlichen“).</p>
+  <p>Auf der Startseite stehen die vier Pakete. Jedes wird mit einem <b>Schlüsselwort</b> freigeschaltet. Es steht in der Anleitung der Einheit im Kasten „Bildschirm-Bonus“, nicht auf dem Blatt: Man kommt immer vom Papier zum Bildschirm. Lass {{KIND}} das Wort selbst eintippen, das ist gutes Lesetraining. Groß- und Kleinschreibung und Leerzeichen am Rand sind egal.</p>
+
+  <h3>So wird gespielt</h3>
+  <ul>
+    <li><b>Drachen-Pfade (Einheit 2 und 5):</b> Befehle antippen, dann „Los“: Der Drache läuft langsam los. Die Taste mit der Karte und dem roten X löscht den letzten Befehl. „Nochmal“ stellt den Drachen zurück an den Start, das Programm bleibt stehen. In Einheit 5 kommt der Zauber-Kasten dazu: antippen, Zahl wählen (2 bis 5), die Befehle für den Kasten antippen, „fertig“.</li>
+    <li><b>Abläufe (Einheit 3):</b> die Karten der Reihe nach antippen, dann „Los“. Vertauschte Karten zeigt die App freundlich an.</li>
+    <li><b>Kobold-Programme (Einheit 4):</b> Das kaputte Programm ist schon da. Einen Befehl antippen, um ihn zu tauschen oder zu löschen. Ein Plus zwischen zwei Befehlen antippen, um einen Befehl einzufügen. „Neu“ holt das Kobold-Programm wie am Anfang zurück.</li>
+  </ul>
+
+  <h3>Für Erwachsene, offline und am Home-Bildschirm</h3>
+  <ul>
+    <li><b>Für Erwachsene:</b> Der Knopf steht unten auf der Startseite, davor kommt eine Eltern-Frage (eine Malrechnung). Dort kannst du freiwillig einen <b>Namen</b> eingeben. Er bleibt nur in diesem Browser, und die Startseite sagt dann „Hallo“ mit diesem Namen. Sonst kennt die App keinen Namen und schickt nie Daten weg (keine Anmeldung, keine Tracker). Dort ist auch <b>„Fortschritt löschen“</b>: Nach „Ja, löschen“ sind alle Sterne und alle Schlüsselwörter weg, und alle Pakete sind wieder gesperrt. Mit den Schlüsselwörtern gehen sie wieder auf.</li>
+    <li><b>Offline, Home-Bildschirm, Sterne:</b> Einmal geöffnet, läuft die App auch ohne Internet. Wie du sie zum Home-Bildschirm hinzufügst, steht in der <b>Gerätetest-Checkliste</b> hinten im Heft (Schritt 6). Arbeite sie vor Einheit 1 ohne {{KIND}} ab. Sterne bleiben nur in diesem Browser. Safari löscht sie unter Umständen, wenn die Seite etwa eine Woche nicht benutzt wurde (nicht am Home-Bildschirm). Der Sammelpass am Papier zählt.</li>
+  </ul>
+
+</section>

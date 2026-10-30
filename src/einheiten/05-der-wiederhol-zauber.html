@@ -1,0 +1,440 @@
+<!--
+  Einheit 5: Der Wiederhol-Zauber (Block A)
+  Schleifen: Zauber-Kasten „3-mal: vor“ statt „vor, vor, vor“, Karten zählen,
+  Muster tanzen und malen, im Schwerer-Teil Gruppen von 2 bis 3 Befehlen.
+  Rätsel: raetsel/e5.json (Web-Paket e5, Schlüsselwort TANZ)
+  Eigener Baustein: src/bausteine/e5-muster.js (Muster-Bild, Kartenzahl)
+  Blätter: 5-1 Der Zauber-Kasten, 5-2 Drachen-Pfade mit Zauber-Kasten, 5-3 Mein Zauber-Kasten (Bastelvorlage)
+-->
+<style>
+  .e05-ablauf > li { break-inside: avoid; }
+  .e05-ganz > li { break-inside: auto; orphans: 2; widows: 2; }
+  .kasten.e05-bricht { -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .kasten.e05-bricht > .kasten-titel { break-after: avoid; }
+  .kasten.e05-bricht > .kasten-titel + p, .kasten.e05-bricht > .kasten-titel + ul > li:first-child { break-before: avoid; break-inside: avoid; }
+  .e05-beispiel { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 2mm 6mm; margin: 1.5mm 0 2.5mm 0; }
+  .e05-beispiel .e05-bl { font-size: 9.5pt; color: var(--grau); font-weight: 700; }
+  .e05-inline m-programm { vertical-align: middle; }
+  .e05-loes { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm 4mm; align-items: start; margin: 2mm 0 4mm 0; }
+  .e05-loes m-loesungen, .e05-loes .loesungen-raster { display: contents; }
+  .e05-loes > .kasten.loesung { margin: 5mm 0 0 0; font-size: 9.5pt; }
+  .e05-loes > .kasten.loesung p { margin-bottom: 1.6mm; }
+  .kasten.loesung.e05-weiter p { margin-bottom: 1.6mm; }
+  .e05-tab td:first-child { width: 13%; }
+  .e05-tab td:nth-child(3) { width: 14%; }
+  /* kleine Programm-Reihen im Fließtext der Anleitung */
+  .e05-mini .prog { gap: 0.8mm; vertical-align: middle; align-items: center; }
+  .e05-mini .prog .platz .nr { display: none; }
+  .e05-mini .prog .platz .box { border-width: 0.35mm; border-radius: 1mm; }
+  .e05-mini .prog .kasten-z { border-width: 0.5mm; border-radius: 1.6mm; padding: 0.5mm 1mm 0.9mm 1mm; gap: 0.4mm; }
+  .e05-mini .prog .kasten-z .mal { font-size: 8.5pt; }
+  .e05-mini .prog .kasten-z .innen { gap: 0.8mm; }
+
+  /* Bausteine aus src/bausteine/e5-muster.js */
+  m-e5-muster { display: block; line-height: 0; }
+  m-e5-karten { display: inline-block; vertical-align: middle; line-height: 1; }
+  .e05-muster { display: flex; align-items: center; gap: 6mm; line-height: 1.3; }
+  .e05-mprogs { display: flex; flex-direction: column; gap: 2.5mm; }
+  .e05-mzeile { display: flex; align-items: center; gap: 2mm; }
+  .e05-mnr { font-family: var(--text); font-weight: 800; font-size: 14pt; color: var(--grau); width: 4mm; text-align: center; }
+  .e05-mbild svg { display: block; }
+  .e05-finden { display: flex; flex-direction: column; align-items: flex-start; gap: 3mm; line-height: 1.3; }
+
+  /* Blätter */
+  .e05-paar { display: grid; grid-template-columns: auto auto; justify-content: start; align-items: end; gap: 1.5mm 16mm; }
+  .e05-etikett { font-size: 14pt; color: var(--grau); }
+  .e05-zahl { margin: 0; }
+  .e05-neben { display: flex; align-items: center; gap: 8mm; flex-wrap: wrap; }
+  .e05-profi-reihe { display: flex; align-items: flex-end; gap: 6mm; }
+  .e05-profi-reihe > .profi { flex: 1; }
+  .e05-hinweis { margin: 0 0 1mm 0; }
+  .e05-titel { font-family: var(--text); font-weight: 900; font-size: 14pt; margin: 0 0 4mm 0; }
+
+  /* Bastelvorlage: lila Streifen, Zahlenkarten, Tanz-Karten */
+  /* lila Fläche mit weißem Rand: so bleibt die Schnittlinie sichtbar */
+  .e05-lila { display: flex; align-items: center; gap: 3mm; width: calc(100% - 3mm); height: calc(100% - 3mm); background: var(--zauber); border-radius: 1.5mm; padding: 0 3mm; }
+  .e05-slot { border: 0.5mm dashed white; border-radius: 1.5mm; height: 13mm; width: 31mm; flex: none; display: flex; align-items: center; justify-content: center; color: white; font-family: var(--text); font-size: 9pt; font-weight: 800; }
+  /* kurze Streifen: oben Platz für die Schere der Schnittlinie */
+  /* Kopf-Streifen höher (Platz für die Zahlenkarte), Schere links neben die Streifen */
+  .e05-lang .karten-raster { grid-template-rows: 18mm 18mm 12mm 12mm; }
+  .e05-lang .karten-raster > .schere { left: -5.5mm; }
+  /* lange Streifen (3 Befehlskarten = 132 mm) links, daneben der Hinweis */
+  .e05-lang-reihe { display: flex; align-items: center; gap: 8mm; padding-left: 6mm; }
+  .e05-lang-reihe m-karten { margin: 0; flex: none; }
+  .e05-lang-reihe .karten-raster { margin: 0; }
+  .e05-lang-info { font-family: var(--kind); font-size: 15pt; line-height: 1.25; color: var(--zauber); font-weight: 700; margin: 0; }
+  .e05-kurz .e05-lila { height: calc(100% - 5mm); margin-top: 2mm; }
+  .e05-sterne { display: flex; gap: 6mm; margin-left: auto; }
+  .e05-reihe-teile { display: flex; gap: 6mm; align-items: flex-end; justify-content: space-between; }
+  .e05-reihe-teile m-karten { margin: 0; }
+  .e05-reihe-teile .karten-raster { margin: 0; }
+  .e05-knobel-reihe { display: flex; align-items: center; justify-content: space-between; gap: 6mm; }
+  .e05-knobel-reihe .e05-fragen { flex-direction: column; margin-top: 0; }
+  .karte .e05-mal { font-family: var(--kind); font-weight: 700; font-size: 24pt; color: var(--zauber); }
+  .karte.e05-zahlkarte { border-color: var(--grau); }
+  .karte .e05-tanz { font-size: 19pt; font-weight: 700; line-height: 1.05; }
+  .karte .e05-tanz-klein { font-size: 11pt; color: var(--grau); }
+  .e05-tanzprog { display: inline-flex; align-items: flex-end; gap: 2mm; font-family: var(--kind); }
+  .e05-tanzprog .kasten-z { display: inline-flex; flex-direction: column; gap: 0.8mm; border: 0.8mm solid var(--zauber); background: var(--zauber-hell); border-radius: 3mm; padding: 1.2mm 2mm 1.6mm 2mm; }
+  .e05-tanzprog .mal { font-weight: 700; font-size: 16pt; color: var(--zauber); line-height: 1; }
+  .e05-tanzprog .innen { display: inline-flex; gap: 1.6mm; }
+  .e05-tk { border: 0.55mm solid var(--tinte); border-radius: 2mm; background: white; padding: 1.5mm 2.5mm; font-size: 15pt; line-height: 1.1; }
+  .e05-fragen { display: flex; flex-wrap: wrap; gap: 2mm 10mm; margin-top: 2.5mm; }
+  .e05-fragen > span { white-space: nowrap; }
+</style>
+
+<section class="anleitung" data-einheit="5" data-titel="Der Wiederhol-Zauber">
+
+  <div class="kasten ziel">
+    <p>{{KIND}} lernt den <span class="begriff">Wiederhol-Zauber</span>: Statt <m-symbol name="vor" gr="4.5"></m-symbol> <m-symbol name="vor" gr="4.5"></m-symbol> <m-symbol name="vor" gr="4.5"></m-symbol> legt sie einen lila <span class="begriff">Zauber-Kasten</span> mit „3-mal“ und nur einer <m-symbol name="vor" gr="4.5"></m-symbol> vor-Karte darin. Der Roboter macht alles, was im Kasten liegt, so oft, wie die Zahl sagt. Dazu kommt eine neue Frage: Wie viele <span class="begriff">Karten</span> braucht ein Programm? Kürzer schreiben ist schlauer, und das Zählen zeigt, wann sich der Zauber-Kasten lohnt (und wann nicht).</p>
+    <p>Danach entdeckt {{KIND}} den Wiederhol-Zauber überall: in einem Tanz (Wiederhol-Tanz), in einem Muster-Bild auf Kästchenpapier und in Drachen-Pfaden, die nur mit wenigen Karten gehen. Im Schwerer-Teil liegt eine ganze <b>Gruppe</b> von 2 oder 3 Befehlen im Kasten, z. B. „4-mal: vor, vor, rechts drehen“: Damit läuft der Roboter ein Quadrat. Das ist die letzte Einheit von Block A.</p>
+  </div>
+
+  <div class="kasten tipp" data-titel="Die Spielregeln des Zauber-Kastens (für euch beide gleich)">
+    <ul>
+      <li class="e05-mini"><b>So sieht er aus:</b> ein lila Rahmen, links oben steht groß die Zahl, z. B. „3-mal“. Im Kasten liegen die Befehle, die wiederholt werden. So steht er auch auf den Blättern und in der Web-App: <m-programm befehle="3[vor]" gr="6" nummern="nein"></m-programm> (statt <m-programm befehle="vor vor vor" gr="6" nummern="nein"></m-programm>).</li>
+      <li><b>So läuft er ab:</b> Der Roboter macht alle Befehle im Kasten der Reihe nach, das ist eine <span class="begriff">Runde</span>. Dann die nächste Runde, bis die Zahl erreicht ist. Erst danach kommt die Karte hinter dem Kasten dran. Laut mitzählen hilft: „Runde 1: vor. Runde 2: vor. Runde 3: vor. Fertig!“</li>
+      <li><b>Karten zählen:</b> Jede Befehlskarte ist 1 Karte. Ein Zauber-Kasten ist 1 Karte (die Zahlenkarte) <b>plus</b> die Befehle darin. Die lila Streifen zählen nicht, sie sind nur der Rahmen. Also: „3-mal: vor“ sind 2 Karten, „vor, vor, vor“ sind 3 Karten.</li>
+      <li><b>Erlaubt sind 2-mal bis 5-mal</b> (so viele Zahlenkarten gibt es). Im Kasten liegen <b>1 bis 3 Befehle</b>: Der lange lila Streifen ist genau 3 Befehlskarten lang, und auch die App lässt höchstens 3 Befehle in den Kasten. Das gilt auch für Tanz-Karten. Kein Kasten im Kasten, und ein leerer Kasten gilt nicht.</li>
+    </ul>
+  </div>
+
+  <div class="kasten material darf-brechen e05-bricht">
+    <p><b>Vorher, ohne {{KIND}} (etwa 15 Minuten):</b></p>
+    <ul>
+      <li><b>Drucken (2 Minuten):</b> <a class="blattref" href="#blatt-5-1"></a> und <a class="blattref" href="#blatt-5-2"></a> (Arbeitsblätter) und <a class="blattref" href="#blatt-5-3"></a> (Bastelvorlage) <b>in Farbe</b>. Die Bastelvorlage am besten auf dickerem Papier (160&nbsp;g).</li>
+      <li><b>Ausschneiden (10 Minuten):</b> Von <a class="blattref" href="#blatt-5-3"></a> die 4 langen und die 4 kurzen lila Streifen, die 8 Zahlenkarten („2-mal“ bis „5-mal“, jede zweimal) und die 8 Tanz-Karten. Zuerst immer die langen geraden Linien schneiden, dann geht es schnell. Die Knobel-Ecke unten bleibt am Rest des Blatts, sie kommt in Schritt 3 dran. Alles zusammen mit den Befehlskarten ins Kuvert.</li>
+      <li><b>Kuvert mit den Befehlskarten</b> aus Einheit 1 (<a class="blattref" href="#blatt-1-1"></a>: 8 Karten vor, 4 links drehen, 4 rechts drehen) und die <b>Drachen-Figur</b> aus Einheit 2 (<a class="blattref" href="#blatt-2-3"></a>) bereitlegen.</li>
+      <li><b>Ziel aussuchen (2 Minuten):</b> Klebe das Malerkrepp-Kreuz aus Einheit 1 im Gang wieder auf (oder nimm das alte) und such ein Ziel, das <b>genau 10 große Roboter-Schritte</b> in einer geraden Linie vor dem Kreuz liegt, z. B. die Wohnungstür. Leg dort ein Kuscheltier hin. 9 Schritte gehen auch, Hauptsache mehr als 8, denn es gibt nur 8 vor-Karten. <b>Weniger Platz?</b> Dann such ein Ziel 7 Schritte weit weg und nimm vorher heimlich 3 vor-Karten aus dem Kuvert (5 bleiben). Alles Weitere geht genauso, nur mit 7 statt 10 Schritten.</li>
+    </ul>
+    <p><b>Material in der Einheit:</b> Buntstifte <b>rot, grün, blau, gelb</b> und ein Bleistift, ein Muggelstein zum Mittippen, Platz zum Tanzen (Gang oder Wohnzimmer), Musik ist schön, aber nicht nötig. Stempel oder Sticker für den Sammelpass.</p>
+    <p><b>Extra, außerhalb der Einheit:</b> Die lila Streifen mit Glitzer, Sternen oder Stickern verzieren und die Zahlenkarten auf Karton kleben (etwa 15 Minuten). Klebt das Malerkrepp-Gitter aus Einheit 2 (3 · 3 Felder) noch am Boden, lasst es liegen: Der Schwerer-Teil verwendet es.</p>
+  </div>
+
+  <h2>Ablauf Schritt für Schritt</h2>
+  <ol class="ablauf e05-ablauf">
+    <li data-min="3"><span class="schritt-titel">Die Karten reichen nicht!</span>Du bist wieder der Roboter und stehst auf dem Kreuz. {{KIND}} soll dich mit Befehlskarten zum Kuscheltier bringen: 10 Schritte nach vorne. Sie legt die vor-Karten in eine Reihe… und irgendwann ist der Stapel leer. Lass sie kurz überlegen (Beispielsätze). Bei weniger Platz ist das Ziel 7 Schritte weit weg und es liegen nur 5 vor-Karten im Kuvert (Material): Dann ist schon bei „fünf“ Schluss.</li>
+    <li data-min="5"><span class="schritt-titel">Der Zauber-Kasten</span>Leg aus den lila Streifen einen Rahmen auf den Boden (Kasten „Basteln“), oben links die Zahlenkarte „5-mal“, hinein eine vor-Karte. Erklär die Regel: „Alles im Kasten macht der Roboter 5-mal.“ Du gehst und zählst laut die Runden. Wie viele Karten waren das? (2.) Für die 10 Schritte legt {{KIND}} jetzt zwei Kästen hintereinander: „5-mal: vor“ und noch einmal „5-mal: vor“, das sind 4 Karten statt 10 (bei 9 Schritten „5-mal“ und „4-mal“, bei 7 Schritten „4-mal“ und „3-mal“). Legt sie von selbst zwei vor-Karten in einen einzigen Kasten, „5-mal: vor, vor“, sind es sogar nur 3 Karten: super, das ist schon der Schwerer-Teil. Zum Schluss darf sie dich mit „4-mal: links drehen“ einmal ganz im Kreis drehen lassen. Danach legt sie selbst ein langes Programm kürzer, z. B. das aus dem Kasten unter dem Ablauf.</li>
+    <li data-min="7"><span class="schritt-titel">Wiederhol-Tanz</span>Zum Aufwärmen die Knobel-Ecke unten auf <a class="blattref" href="#blatt-5-3"></a>: erst Karten und Bewegungen zählen, dann den Tanz wirklich tanzen und nachzählen. Danach das Spiel mit den Tanz-Karten und dem Zauber-Kasten (Kasten „Spiel: Wiederhol-Tanz“). Zuerst erfindest du einen Tanz und {{KIND}} tanzt ihn, dann umgekehrt. Hier merkt sie: Mit dem Zauber-Kasten wird ein Tanz mit wenigen Karten lang.</li>
+    <li data-min="7"><span class="schritt-titel">Blatt „Der Zauber-Kasten“</span><a class="blattref" href="#blatt-5-1"></a>. Bei Aufgabe 1 darf sie zuerst mit echten Karten legen. Bei Aufgabe 2 (Muster-Bild) liest sie jede Zeile wie ein Programm und tippt die Kästchen der Reihe nach an: „rot, leer, leer“ ist eine Runde. Das Bild ist fertig, wenn alle 3 Zeilen gemalt sind. Was ist es? (Wir dachten an einen Drachen-Rücken mit roten Zacken. Jede passende Idee gilt: Krone, Säge, Zaun, Berge …) Die Profi-Aufgabe dreht es um: Zuerst ist das Muster da, sie findet den Kasten dazu.</li>
+    <li data-min="6"><span class="schritt-titel">Blatt „Drache und Zauber-Kasten“</span><a class="blattref" href="#blatt-5-2"></a>. Bei Aufgabe 1 tippt sie mit dem Muggelstein mit und zählt die Runden laut. Die Drachen-Figur aus Einheit 2 (<a class="blattref" href="#blatt-2-3"></a>) darf mitlaufen. Aufgabe 2 hat eine <b>Kartengrenze</b>: Nur 4 Karten. Ohne Zauber-Kasten geht es nicht. Die Profi-Aufgabe (eine Gruppe im Kasten) ist freiwillig. Passt das Blatt heute nicht mehr hinein, kommt es beim nächsten Mal dran.</li>
+    <li data-min="2"><span class="schritt-titel">Sammelpass</span>Feld „Einheit&nbsp;5“ stempeln oder bekleben, Sterne anmalen. Frag: „Was war heute am lustigsten?“ Damit ist Block A geschafft. Jetzt ist ein guter Moment für den Rückmeldebogen hinten im Heft, dazu gehören die Mini-Fragen 5 und 7 aus Einheit 1 (Kasten „Nebenbei einschätzen“).</li>
+  </ol>
+
+  <div class="kasten tipp e05-mini" data-titel="Zum Kürzer-Legen in Schritt 2">
+    <p>Leg dieses Programm mit Befehlskarten hin: <m-programm raetsel="e5-k2" teil="lang" gr="6"></m-programm>. {{KIND}} macht es kürzer: <m-programm raetsel="e5-k2" teil="kurz" zeige gr="6"></m-programm>. Aus 6 Karten werden 3 Karten. Lass sie zählen, bevor du die Zahl sagst.</p>
+  </div>
+
+  <div class="kasten einschaetzung">
+    <p>Im Kuvert mit den Befehlskarten liegt der Zettel „Mini-Fragen 5 und 7“ aus Einheit 1. Stell die beiden Fragen jetzt noch einmal, nach dem Sammelpass oder beim Abendessen, nicht mitten im Spiel:</p>
+    <ul>
+      <li><b>Frage 5, der Roboter schaut dich an:</b> Du stehst ihr gegenüber: „Ich mache gleich rechts drehen. Zeig, wohin ich mich drehe!“ Richtig ist zu ihrer linken Seite.</li>
+      <li><b>Frage 7, Pfeil-Roboter:</b> Eine <m-symbol name="vor" gr="4.5"></m-symbol> vor-Karte zeigt mit dem Pfeil auf sie: „Er macht links drehen. Wohin zeigt der Pfeil jetzt?“ Richtig ist zu ihrer rechten Seite.</li>
+    </ul>
+    <p>Kreuz im Rückmeldebogen in der Zeile „Links und rechts aus Sicht des Roboters“ an, wie in Einheit 1 beschrieben (sicher: beide ohne Hilfe; teilweise: mit Hinter-den-Roboter-Stellen oder Mitdrehen). Schreib ins Feld „Einschätzen in Einheit 1“ hinter die Notiz von damals „E5: …“, z. B. „E5: 5 und 7 ohne Hilfe“. Hat sich etwas verändert? Klappt es noch nicht, ist das ganz normal: Blatt drehen und hinter den Roboter stellen bleiben erlaubt.</p>
+  </div>
+
+  <h3>Beispielsätze</h3>
+  <div class="sag">
+    <p class="du">„Piep. Ich bin dein Roboter. Bring mich zum Kuscheltier. Das sind 10 große Schritte nach vorne.“</p>
+    <p class="sie">(legt vor-Karten) „Sechs, sieben, acht… Oh. Die Karten sind aus!“</p>
+    <p class="du">„Piep. Ich kann nur machen, was auf den Karten steht. Was machen wir jetzt?“</p>
+    <p class="sie">„Ich nehm die Karten einfach nochmal und leg sie wieder hin!“ oder „Ich mal mir noch zwei Karten.“</p>
+    <p class="dann">Beides ist eine richtig gute Idee. „Noch einmal dieselben Karten“ ist schon fast der Wiederhol-Zauber. Sag: „Genau dieses Problem haben echte Programmierer auch. Sie haben einen Trick dafür, den Wiederhol-Zauber.“ Dann kommt der Kasten.</p>
+  </div>
+  <div class="sag">
+    <p class="du">(legt den Rahmen, „5-mal“ oben links, eine vor-Karte hinein) „Das ist ein Zauber-Kasten. Alles, was drin liegt, mache ich 5-mal. Wie viele Schritte gehe ich?“</p>
+    <p class="sie">„Fünf!“</p>
+    <p class="du">„Und wie viele Karten hast du dafür gebraucht?“</p>
+    <p class="sie">„Eine! … Nein, zwei. Die Zahl ist ja auch eine Karte.“</p>
+    <p class="dann">Sagt sie „eine“, zeig auf die Zahlenkarte: „Liegt die auch auf dem Boden?“ Die Regel ist immer dieselbe: Zahlenkarte plus alles im Kasten. Danach: „Lohnt sich das? 5 Schritte mit 2 Karten statt mit 5 Karten.“</p>
+  </div>
+  <div class="sag">
+    <p class="du">„Und wie wäre es mit ‚2-mal: vor‘? Ist das auch kürzer als vor, vor?“</p>
+    <p class="sie">„Ja, klar! … Moment. Das sind auch zwei Karten. Das ist gleich!“</p>
+    <p class="dann">Genau. Bei 2-mal mit einem Befehl spart der Kasten nichts, ab 3-mal schon. Bei 5-mal spart er 3 Karten. Das ist eine wichtige Entdeckung: Der Zauber-Kasten ist ein Werkzeug, kein Muss. Falsch ist „2-mal: vor“ aber nicht, der Roboter macht genau dasselbe.</p>
+  </div>
+  <div class="sag">
+    <p class="du">(<a class="blattref" href="#blatt-5-2"></a>, Aufgabe 1) „Wo steht der Drache, wenn der Zauber-Kasten fertig ist?“</p>
+    <p class="sie">„Rechts unten in der Ecke. Er schaut immer noch nach rechts.“</p>
+    <p class="du">„Und jetzt kommt die Karte nach dem Kasten.“</p>
+    <p class="sie">„Links drehen, dann schaut er nach oben. Und dann 2-mal vor: ganz nach oben!“</p>
+    <p class="dann">Wenn sie den Kasten 3-mal abläuft und dann <b>noch einmal</b> von vorne beginnt, ist das der häufigste Fehler (Stolpersteine). Die Runden laut zählen hilft.</p>
+  </div>
+
+  <h2>Spiele, Bewegung und Basteln</h2>
+
+  <div class="kasten spiel darf-brechen e05-bricht" data-titel="Wiederhol-Tanz">
+    <p class="spiel-meta">2 Personen · 5–10 Minuten · die 8 Tanz-Karten, die lila Streifen und die Zahlenkarten von <a class="blattref" href="#blatt-5-3"></a>, Platz zum Tanzen, Musik nach Wunsch</p>
+    <ol class="regeln">
+      <li><b>Vorbereitung:</b> Tanz-Karten offen auf den Tisch oder Boden: klatschen (2 Karten), hüpfen (2 Karten), stampfen, Kreisel (einmal ganz um sich selbst herum), Arme hoch, verbeugen. Daneben die lila Streifen und die Zahlenkarten. Ein Zettel für die Punkte.</li>
+      <li><b>Rollen:</b> Eine Person ist die <b>Tanz-Erfinderin</b>, die andere der <b>Tänzer</b>. Ihr tauscht nach jedem Tanz.</li>
+      <li><b>Ein Zug:</b> Die Erfinderin legt einen Tanz, höchstens <b>5 Karten</b>. Es zählen wie immer Zahlenkarten und Tanz-Karten, die Streifen nicht. In einem Zauber-Kasten liegen höchstens 3 Tanz-Karten, wie bei den Befehlskarten. Der Tänzer schaut den Tanz an und sagt zuerst, <b>wie viele Bewegungen</b> es werden. Dann liest er den Tanz laut vor und tanzt ihn. Im Zauber-Kasten zählt er die Runden laut: „Runde 1: klatschen, hüpfen. Runde 2: …“ Die Erfinderin zählt die Bewegungen mit.</li>
+      <li><b>Punkte:</b>
+        <ul>
+          <li>Stimmt die Zahl, die der Tänzer vorher gesagt hat: 1 Punkt für den Tänzer.</li>
+          <li>Tanzt er alles richtig: noch 1 Punkt für den Tänzer. Macht er einen Fehler (eine Runde zu viel oder zu wenig, eine Bewegung vergessen): 1 Punkt für die Erfinderin.</li>
+          <li>Hat der Tanz <b>mindestens 10 Bewegungen</b>: 1 Punkt für die Erfinderin. Mit 5 Karten ohne Zauber-Kasten geht das nicht, mit Kasten schon: „5-mal: klatschen, hüpfen“ sind 3 Karten und 10 Bewegungen.</li>
+        </ul>
+        So muss die Erfinderin abwägen: Ein langer Tanz bringt ihr einen Punkt, ein kniffliger Tanz macht Fehler wahrscheinlicher. Knifflig sind Karten vor und hinter dem Kasten, z. B. „hüpfen“, dann „3-mal: klatschen, stampfen, Arme hoch“ (5 Karten, 10 Bewegungen).</li>
+      <li><b>Ende:</b> Nach 6 Tänzen (jede Person 3-mal Erfinderin) gewinnt, wer mehr Punkte hat. Bei Gleichstand tanzt ihr den längsten Tanz zusammen, als Finale. Tipp für dich als Erfinder: Mal knifflig, mal machbar, damit {{KIND}} oft ihre Punkte holt.</li>
+    </ol>
+    <p><b>Varianten:</b></p>
+    <ul>
+      <li><b>Tanz-Detektivin (schwerer):</b> Du tanzt etwas vor, ohne Karten, z. B. hüpfen, klatschen, hüpfen, klatschen, hüpfen, klatschen, verbeugen. {{KIND}} legt das Programm mit möglichst wenigen Karten: „3-mal: hüpfen, klatschen“ und dann verbeugen, das sind 4 Karten für 7 Bewegungen. Dann tauscht ihr.</li>
+      <li><b>Kobold-Tanz:</b> Der Tänzer macht absichtlich einen Fehler, z. B. eine Runde zu viel oder ein Klatschen zu wenig. Wer den Fehler findet, bekommt den Punkt. Das ist die Kobold-Jagd aus Einheit&nbsp;4.</li>
+      <li><b>Spiegel-Tanz:</b> Ihr steht euch gegenüber und tanzt dasselbe Programm gleichzeitig. Wer zuerst aus dem Takt kommt, sagt „Kobold!“ und ihr beginnt von vorne.</li>
+      <li><b>Eigene Tanz-Karten:</b> Auf leere Zettel schreibt {{KIND}} eigene Bewegungen (Einhorn-Galopp, Feen-Flattern, Drachen-Brüller). Wichtig ist nur: Jede Karte ist genau eine Bewegung.</li>
+    </ul>
+  </div>
+
+  <div class="sag">
+    <p class="sie">(legt „5-mal: Kreisel“) „Ha! Das sind nur 2 Karten und 5 Bewegungen. Und dir wird schwindlig!“</p>
+    <p class="du">„Fünf Kreisel, puh. Aber für deinen Extra-Punkt braucht der Tanz mindestens 10 Bewegungen.“</p>
+    <p class="sie">„Dann leg ich noch was in den Kasten. 5-mal: Kreisel, klatschen. Das sind 10!“</p>
+    <p class="dann">Genau so soll es laufen: {{KIND}} entdeckt selbst, dass eine Gruppe im Kasten noch mehr bringt (hier 3 Karten für 10 Bewegungen). Das ist schon der Schwerer-Teil, ganz nebenbei.</p>
+  </div>
+
+  <div class="kasten bewegung darf-brechen e05-bricht" data-titel="Roboter-Lauf mit Zauber-Kasten">
+    <p>Wie in Einheit 1, aber jetzt mit Zauber-Kasten: {{KIND}} programmiert dich vom Kreuz zu einem Ziel mit einer Ecke, z. B. 4 Schritte nach vorne, rechts drehen, 3 Schritte. Mit Kasten: „4-mal: vor“, rechts drehen, „3-mal: vor“, das sind 5 Karten statt 8. Dann wird {{KIND}} der Roboter und du legst das Programm. Lustige Aufgaben für den Roboter:</p>
+    <ul>
+      <li><b>Schwindel-Kasten:</b> „5-mal: rechts drehen“. Wohin schaut der Roboter danach? (Eine Vierteldrehung weiter als am Anfang, denn 4 Drehungen sind einmal ganz herum.)</li>
+      <li><b>Hin und zurück:</b> „3-mal: vor“, rechts drehen, rechts drehen, „3-mal: vor“. Der Roboter steht wieder am Kreuz, schaut aber in die andere Richtung. Das sind 6 Karten statt 8, und es reichen die Streifen für 2 Kästen.</li>
+      <li><b>Boden-Gitter:</b> Klebt das Malerkrepp-Gitter aus Einheit 2 noch, ist {{KIND}} der Drache. Im 3 · 3-Gitter passen höchstens „2-mal: vor“ hintereinander. Das ist der Moment für den Quadrat-Tanz aus dem Schwerer-Teil.</li>
+    </ul>
+  </div>
+
+  <div class="kasten basteln" data-titel="Zauber-Kasten legen">
+    <ol>
+      <li>Ein Zauber-Kasten besteht aus 4 lila Streifen von <a class="blattref" href="#blatt-5-3"></a>: oben der <b>Kopf-Streifen</b> (mit dem gestrichelten Platz für die Zahlenkarte), unten ein langer Streifen, links und rechts je ein kurzer Streifen. Es gibt Streifen für 2 Kästen.</li>
+      <li>Leg zuerst die Befehlskarten in eine Reihe. Dann den Rahmen außen herum: die kurzen Streifen links und rechts direkt an die Karten, die langen oben und unten. Eine Befehlskarte ist 44 mm breit, die langen Streifen sind genau 3 Karten lang (132 mm). Mehr als 3 Befehle passen nicht in einen Kasten. Bei weniger Karten steht der lange Streifen rechts über den kurzen hinaus: einfach liegen lassen oder das Ende nach hinten umknicken.</li>
+      <li>Die Zahlenkarte passt genau auf den gestrichelten Platz links im Kopf-Streifen, wie die Zahl auf den Blättern.</li>
+      <li><b>Kein Farbdrucker?</b> Eine lila Wollschnur oder ein Gummiringerl-Kreis um die Karten geht auch, die Zahl schreibt ihr auf einen Zettel.</li>
+    </ol>
+  </div>
+
+  <h2>Wenn es hakt oder zu leicht ist</h2>
+
+  <div class="zwei">
+    <div class="kasten leichter">
+      <ul>
+        <li>Nur „vor“ in den Kasten und nur 3-mal bis 5-mal. Drehungen kommen erst später in den Kasten.</li>
+        <li>Alles mit echten Karten legen und den Roboter laufen lassen, erst dann am Papier.</li>
+        <li>Muster-Bild: zuerst nur Zeile 3 (alles grün), dann Zeile 2, zuletzt Zeile 1.</li>
+        <li><a class="blattref" href="#blatt-5-2"></a>: Die Drachen-Figur aus Einheit 2 läuft mit, für jede Runde ein Strich.</li>
+        <li>Beim Tanz die Punkte-Regel weglassen, einfach abwechselnd tanzen.</li>
+      </ul>
+    </div>
+    <div class="kasten bonus" data-titel="Bonus-Knobelei">
+      <p class="klein"><i>Für zwischendurch: im Auto, beim Abendessen, beim Zähneputzen.</i></p>
+      <p><b>Klatsch-Kasten:</b> „3-mal: klatschen, klatschen, stampfen. Wie oft klatsche ich? Und wie oft stampfe ich?“</p>
+      <p><b>Dreh-Kasten:</b> „Der Roboter schaut zum Fenster und macht 4-mal: rechts drehen. Wohin schaut er dann?“</p>
+      <p><b>Karten-Rätsel:</b> „5-mal: vor, vor. Wie viele Schritte? Wie viele Karten?“</p>
+      <p><b>Für Profis:</b> „Ich will 12-mal klatschen und habe nur Zahlenkarten bis 5. Wie geht das mit 4 Karten?“</p>
+      <p class="klein"><b>Kurz-Lösungen:</b> 6-mal klatschen, 3-mal stampfen; wieder zum Fenster; 10 Schritte mit 3 Karten; „4-mal: klatschen, klatschen, klatschen“. Mehr bei den Lösungen am Ende.</p>
+    </div>
+  </div>
+
+  <div class="kasten stolper darf-brechen e05-bricht">
+    <ul>
+      <li><b>Sie wiederholt das ganze Programm</b> statt nur den Kasten (bei „3-mal: vor, dann rechts drehen“ dreht sie sich auch 3-mal): Fahr mit dem Finger den lila Rahmen entlang. „Nur was <b>drin</b> ist, wird wiederholt. Was draußen liegt, kommt einmal dran, wenn der Kasten fertig ist.“</li>
+      <li><b>Sie macht eine Runde zu viel oder zu wenig:</b> Runden laut zählen und die Finger dazu heben. Bei „3-mal“ sind am Ende 3 Finger oben. Am Papier darf sie für jede Runde einen Strich neben den Kasten machen.</li>
+      <li><b>Sie vergisst die Zahlenkarte beim Zählen</b> („3-mal: vor“ ist für sie 1 Karte): Die Regel lautet immer „Zahl plus alles im Kasten“. Lass sie die Karten wirklich vom Boden aufheben und in die Hand zählen.</li>
+      <li><b>Sie zählt die lila Streifen mit:</b> Die Streifen sind nur der Rahmen, wie ein Bilderrahmen um ein Bild. Gezählt werden die Karten mit etwas drauf.</li>
+      <li><b>Sie findet: „Der Zauber-Kasten ist immer besser.“</b> Bei „2-mal: vor“ stimmt das nicht (gleich viele Karten), und bei einem einzelnen Befehl braucht es keinen Kasten. Kürzer heißt: weniger Karten. Der Roboter macht trotzdem gleich viele Schritte.</li>
+      <li><b>Beim Muster-Bild verrutscht sie in der Zeile:</b> Mit dem Bleistift über jede Runde einen kleinen Bogen machen (3 Kästchen), erst dann malen. Oder die Kästchen mit Muggelsteinen vorlegen.</li>
+      <li><b>Sie verwechselt rot und grün im Muster-Bild:</b> Kein Problem fürs Programmieren. Die Farbe steht im Kasten, sie darf nachschauen, so oft sie will.</li>
+      <li><b>Der Drache stößt an:</b> Wie immer: „Hier hat der Kobold zugeschlagen!“ Das Programm ist an dieser Stelle zu Ende. Meist war die Zahl im Kasten um 1 zu groß.</li>
+    </ul>
+  </div>
+
+  <m-linksrechts></m-linksrechts>
+
+  <div class="kasten schwerer darf-brechen e05-bricht">
+    <p>Sitzt der Kasten mit einem Befehl nach wenigen Minuten, wähle hier aus. Das ist kein Zusatz „für später“, sondern ein vollwertiger Hauptteil. Der Kern: Im Kasten liegt eine <b>Gruppe von 2 oder 3 Befehlen</b>. Kein Kasten im Kasten, das kommt erst in einer späteren Einheit.</p>
+    <ol class="e05-ganz">
+      <li><b>Erste Gruppe im Kasten:</b> „2-mal: vor, rechts drehen“. Bevor der Roboter losgeht, sagt {{KIND}} voraus, wo er landet und wohin er schaut. Dann prüft ihr es. (Vom Kreuz aus: ein Schritt vor, Vierteldrehung, ein Schritt, Vierteldrehung. Er steht schräg vor dem Kreuz und schaut genau in die andere Richtung als am Anfang.) Mit „4-mal: vor, rechts drehen“ läuft er ein kleines Quadrat und steht wieder auf dem Kreuz, Nase in die alte Richtung.</li>
+      <li><b>Quadrat-Tanz am Boden-Gitter:</b> {{KIND}} steht als Drache im 3 · 3-Gitter in der Ecke links unten und schaut nach vorne (oben). Programm: „4-mal: vor, vor, rechts drehen“. Sie läuft einmal außen herum und steht wieder am Start, Nase nach oben. Lang aufgeschrieben wären das 12 Karten, mit Kasten nur 4:
+        <div class="e05-beispiel"><m-programm raetsel="e5-k3" teil="lang" gr="8.5"></m-programm></div>
+        <div class="e05-beispiel e05-mini"><span class="e05-bl">kürzer:</span><m-programm raetsel="e5-k3" teil="kurz" zeige gr="7"></m-programm></div>
+        Frag danach: „Was passiert bei 3-mal statt 4-mal?“ (Sie steht in der Ecke rechts unten und schaut nach links.) „Und bei 4-mal: vor, vor, links drehen?“ (Sie will links aus dem Gitter laufen: Der Kobold schlägt beim ersten Schritt nach der Drehung zu. Mit einem Start in der Ecke rechts unten klappt es.)</li>
+      <li><b>Das kürzeste mit Kasten:</b> Profi-Aufgabe auf <a class="blattref" href="#blatt-5-2"></a> (der Drache muss um die Steine herum). Ohne Kasten braucht man 8 Karten, mit „3-mal: vor, vor, rechts drehen“ nur 4. Wer es geschafft hat: Am Ende schaut der Drache nach links. Macht das etwas? (Nein, er steht auf dem Schatz. Eine Drehung am Schluss ist egal.)</li>
+      <li><b>Zwei Kästen hintereinander:</b> Am Boden-Gitter (Start in der Ecke links unten, Nase nach oben) oder im Gang: „2-mal: vor“, rechts drehen, „2-mal: vor“. Wo steht der Drache? (In der Ecke rechts oben, Nase nach rechts.) Lohnt sich das? (Nein! Ein Kasten mit 2-mal vor spart nichts: 5 Karten, genau wie vor, vor, rechts drehen, vor, vor.) Ein einziger Kasten mit einer Gruppe ist kürzer: „2-mal: vor, vor, rechts drehen“, nur 4 Karten. Der Drache landet im selben Feld, schaut am Ende aber nach unten. Macht das etwas? (Nein, wenn dort der Schatz liegt: Eine Drehung am Schluss ist egal, wie bei der Profi-Aufgabe.)</li>
+      <li><b>Lang gegen kurz:</b> Du legst ein langes Programm mit Befehlskarten (z. B. vor, links drehen, vor, links drehen, vor, links drehen, vor, links drehen), {{KIND}} schreibt es kürzer. (Hier: „4-mal: vor, links drehen“, 3 Karten statt 8.) Dann legt sie ein langes Programm für dich. Schafft sie eines, das man nicht kürzer machen kann? (Ja, z. B. vor, rechts drehen, vor, links drehen, vor: Da kommt nie zweimal hintereinander dasselbe. Auch bei vor, vor, rechts drehen hilft der Kasten nicht: „2-mal: vor“ und rechts drehen sind wieder 3 Karten.)</li>
+      <li><b>Wie viele Bewegungen?</b> Mit Tanz-Karten: „4-mal: klatschen, klatschen, hüpfen“. Wie oft klatscht man, wie oft hüpft man, wie viele Bewegungen sind es? Sie darf Runden mit Strichen zählen: 8-mal klatschen, 4-mal hüpfen, 12 Bewegungen. Wer schon „mal“ kennt (in der Rechen-Werkstatt kommt es später): 4 · 3 = 12.</li>
+      <li><b>Rekord-Tanz:</b> Wer schafft den längsten Tanz mit genau 4 Karten? (Ein Kasten „5-mal“ mit 3 Tanz-Karten darin: 15 Bewegungen. Mehr geht mit 4 Karten nicht.) Und mit 5 Karten? (Der Kasten „5-mal“ mit 3 Tanz-Karten und eine Karte davor oder danach: 16 Bewegungen. 4 Tanz-Karten passen nicht in den Kasten, und zwei Kästen „5-mal“ mit 1 und 2 Tanz-Karten darin bringen nur 15.)</li>
+      <li><b>Muster selbst erfinden:</b> Auf Kästchenpapier schreibt {{KIND}} für jede Zeile einen Zauber-Kasten, du malst das Bild nach ihrem Programm, ohne zu schauen, was sie sich gedacht hat. Stimmt dein Bild mit ihrem überein? Ideen: Zaun (Zeile 1 „4-mal: blau, leer, leer“, Zeile 2 „4-mal: blau, blau, blau“), Schachbrett (Zeile 1 „5-mal: rot, leer“, Zeile 2 „5-mal: leer, rot“), Regenbogen-Streifen (jede Zeile „4-mal“ mit einer Farbe drei Mal).</li>
+      <li><b>Fehler im Kasten:</b> Der Kobold hat die Zahl vertauscht: Du legst „4-mal: vor“, aber bis zum Kuscheltier sind es 5 Schritte. {{KIND}} findet den Fehler und tauscht die Zahlenkarte. Merke: Ein Fehler im Kasten passiert in jeder Runde, der Kobold richtet dort gleich mehrfach Unsinn an.</li>
+      <li><b>Kasten im Kopf:</b> „Ich denke an einen Zauber-Kasten. Danach steht der Roboter wieder am Kreuz und schaut genau wie am Anfang. Welcher kann es sein?“ (Viele Lösungen: „4-mal: rechts drehen“, „2-mal: links drehen, links drehen“, „4-mal: vor, rechts drehen“, „4-mal: vor, vor, links drehen“ …) Wer findet einen, der wirklich läuft und nicht nur dreht?</li>
+    </ol>
+  </div>
+
+  <h2>Hintergrund</h2>
+  <div class="kasten warum darf-brechen e05-bricht">
+    <p>Der Zauber-Kasten ist eine <span class="begriff">Schleife</span>, eines der wichtigsten Werkzeuge beim Programmieren. Computer sind gut darin, dasselbe tausendmal zu machen, ohne müde zu werden. Aber niemand schreibt dafür tausend gleiche <span class="begriff">Anweisungen</span> hin. In echten Programmiersprachen sieht der Zauber-Kasten etwa so aus: „wiederhole 3-mal { vor }“. Kinder-Programmiersprachen zeigen ihn genau wie hier als farbigen Rahmen um die Befehle.</p>
+    <p>Warum ist kürzer schlauer? Ein kurzes Programm ist schneller geschrieben, leichter zu lesen und leichter zu ändern: Soll der Roboter 4 statt 3 Schritte gehen, tauscht man eine Zahl, statt eine Karte dazuzulegen. Und Fehler passieren seltener. Das Karten-Zählen ist eine einfache Form davon, wie man die <span class="begriff">Länge eines Programms</span> misst. Gleichzeitig lernt {{KIND}}: Für den Roboter ändert sich nichts. „3-mal: vor“ und „vor, vor, vor“ machen genau dasselbe.</p>
+    <p>Muster erkennen ist der Schlüssel: Nur wer sieht, dass sich etwas wiederholt, kann einen Zauber-Kasten verwenden. Das Muster-Bild zeigt das am Papier, so speichern Computer auch Bilder platzsparend („12-mal Grün“ statt zwölf einzelne Kästchen). Darauf bauen die nächsten Einheiten auf: Muster-Detektivin (Einheit 6), Bilder aus Kästchen (Einheit 8) und die Zaubersprüche (Einheit 17), bei denen eine Befehlsgruppe einen eigenen Namen bekommt.</p>
+  </div>
+
+  <h2>Bildschirm-Bonus</h2>
+  <div class="kasten bildschirm darf-brechen e05-bricht">
+    <p><b>Paket 5 „Wiederhol-Zauber“</b>, Schlüsselwort <b>TANZ</b>. Den QR-Code findest du auf <a class="blattref" href="#blatt-5-1"></a> unten rechts. Nur am Schluss, nach den Blättern, höchstens 10 Minuten. Die Einheit funktioniert auch ganz ohne Bildschirm.</p>
+    <p><b>6 Levels:</b> Drachen-Pfade mit Zauber-Kasten und <b>Kartengrenze</b>. Die App zeigt, wie viele Karten erlaubt sind, und zählt genauso wie am Papier. Level 1 bis 4 gehen mit einem Befehl im Kasten, Level 5 und 6 brauchen eine Gruppe. <b>Level 2 ist Aufgabe 2 von <a class="blattref" href="#blatt-5-2"></a>, Level 6 ist die Profi-Aufgabe von diesem Blatt.</b> Am besten spielt {{KIND}} sie nach dem Blatt: Dann sieht sie ihr eigenes Programm laufen.</p>
+    <p><b>So geht der Zauber-Kasten in der App:</b> Zauber-Kasten antippen, Zahl wählen (2 bis 5), die Befehle für den Kasten antippen (höchstens 3, wie am Papier), „fertig“ tippen. Dann „Los“. Der Drache läuft langsam, der laufende Befehl leuchtet auf. Die Taste mit der Karte und dem roten X löscht den letzten Befehl, „Nochmal“ stellt den Drachen zurück an den Start (das Programm bleibt). Einen Stern gibt es, sobald der Drache mit erlaubter Kartenzahl beim Schatz ankommt.</p>
+    <p><b>Wann weglegen:</b> Nach Level 6 kommt „Super! Jetzt zurück zum Papier.“ Dann ist Schluss, auch wenn noch Zeit wäre. Wer beim Tanz noch Energie hat: lieber ein Rekord-Tanz als ein weiteres Level.</p>
+  </div>
+
+  <h2>Lösungen</h2>
+  <div class="e05-loes">
+    <m-loesungen einheit="5" skala="0.39"></m-loesungen>
+    <div class="kasten loesung">
+      <p><b><a class="blattref" href="#blatt-5-1"></a>, Aufgabe 1:</b> „4-mal: vor“. Lang 4 Karten, kurz 2 Karten.</p>
+      <p><b>Aufgabe 2 (Muster-Bild):</b> gedacht als Drachen-Rücken mit 4 roten Zacken. Jede passende Idee gilt (Krone, Säge, Zaun, Berge …), wichtig ist, dass das Muster stimmt. Zeile 1: Kästchen 1, 4, 7 und 10 rot. Zeile 2: immer 2 rot, 1 leer. Zeile 3: alle 12 grün. Jede Zeile braucht 4 Karten statt 12.</p>
+      <p><b>Profi:</b> „3-mal: blau, gelb, gelb“. Das sind 4 Karten statt 9. Ein anderer einzelner Kasten passt nicht.</p>
+      <p><b><a class="blattref" href="#blatt-5-3"></a>, Knobel-Ecke:</b> 4 Karten (Zahlenkarte, klatschen, hüpfen, verbeugen). 7 Bewegungen: 3 Runden mit je 2 Bewegungen und dann die Verbeugung. Dabei klatscht man 3-mal.</p>
+    </div>
+  </div>
+  <div class="kasten loesung darf-brechen e05-bricht e05-weiter e05-mini">
+    <p class="e05-inline"><b><a class="blattref" href="#blatt-5-2"></a>, Aufgabe 1:</b> Der Drache landet im Feld <b>rechts oben</b> und schaut nach oben. Nach dem Zauber-Kasten steht er rechts unten (3 Felder nach rechts), nach links drehen schaut er nach oben, dann 2 Felder hinauf. Der Stein liegt nicht im Weg.</p>
+    <p class="e05-inline"><b>Aufgabe 2:</b> <m-programm befehle="vor rechts 4[vor]" gr="6" nummern="nein"></m-programm> Das ist das einzige Programm mit 4 Karten (vom Löser geprüft). Ohne Zauber-Kasten wäre das kürzeste vor, rechts drehen, vor, vor, vor, vor: 6 Karten, zu viele.</p>
+    <p class="e05-inline"><b>Profi:</b> <m-programm befehle="3[vor vor rechts]" gr="6" nummern="nein"></m-programm> Das ist das einzige Programm mit 4 Karten. Ohne Kasten braucht der Weg um die Steine herum 8 Karten (vor, vor, rechts drehen, vor, vor, rechts drehen, vor, vor). Am Ende schaut der Drache nach links, er steht aber auf dem Schatz: geschafft.</p>
+    <p><b>Bonus-Knobelei:</b> Klatsch-Kasten: 3 Runden mit je 2-mal klatschen, also 6-mal klatschen und 3-mal stampfen. Dreh-Kasten: 4 Vierteldrehungen sind einmal ganz herum, er schaut wieder zum Fenster. Karten-Rätsel: 5 Runden mit je 2 Schritten sind 10 Schritte, mit 3 Karten (Zahlenkarte und zwei vor-Karten). Für Profis: „4-mal: klatschen, klatschen, klatschen“, das sind 4 Karten (4 Runden mit je 3 Klatschern sind 12). Mit „5-mal“ geht es nicht genau: 2 Klatscher pro Runde sind 10, 3 sind 15. „3-mal“ mit 4 Klatschern geht nicht, denn mehr als 3 Karten passen nicht in den Kasten. „6-mal“ gibt es nicht, und zwei Kästen mit je einer Klatsch-Karte (4 Karten) schaffen höchstens 5 und 5, also 10.</p>
+    <p><b>Bildschirm-Levels (zum Nachschauen):</b> Jedes Level geht mit genau einem Programm mit der erlaubten Kartenzahl (vom Löser geprüft, mit höchstens 3 Befehlen im Kasten wie in der App). Bei Level 3 wäre „2-mal: vor, vor, vor, rechts drehen“ auch 5 Karten lang, aber 4 Befehle passen nicht in den Kasten. Die App prüft aber nur, ob der Drache mit der erlaubten Kartenzahl ankommt.</p>
+    <table class="tab e05-tab">
+      <tr><th>Level</th><th>Was ist neu?</th><th>Karten</th><th>Lösung</th></tr>
+      <tr><td>1</td><td>nur nach vorne zum Schatz</td><td>2</td><td><m-programm befehle="3[vor]" gr="6" nummern="nein"></m-programm></td></tr>
+      <tr><td>2</td><td><a class="blattref" href="#blatt-5-2"></a>, Aufgabe 2</td><td>4</td><td><m-programm befehle="vor rechts 4[vor]" gr="6" nummern="nein"></m-programm></td></tr>
+      <tr><td>3</td><td>zwei Kästen</td><td>5</td><td><m-programm befehle="3[vor] rechts 3[vor]" gr="6" nummern="nein"></m-programm></td></tr>
+      <tr><td>4</td><td>Drache schaut nach links</td><td>5</td><td><m-programm befehle="4[vor] rechts 3[vor]" gr="6" nummern="nein"></m-programm></td></tr>
+      <tr><td>5</td><td>Gruppe, zwei Edelsteine</td><td>3</td><td><m-programm befehle="3[vor rechts]" gr="6" nummern="nein"></m-programm></td></tr>
+      <tr><td>6</td><td><a class="blattref" href="#blatt-5-2"></a>, Profi</td><td>4</td><td><m-programm befehle="3[vor vor rechts]" gr="6" nummern="nein"></m-programm></td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 5-1: Der Zauber-Kasten (kürzer schreiben, Muster-Bild)     -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="5" data-titel="Der Zauber-Kasten" data-art="Arbeitsblatt" data-verteilt>
+  <div class="aufg">
+    <p class="anw">{{KIND}}, schreib das Programm kürzer mit dem Zauber-Kasten. Zähl die Karten!</p>
+    <div class="e05-paar">
+      <span class="e05-etikett">lang</span>
+      <span class="e05-etikett">kurz</span>
+      <m-programm raetsel="e5-k1" teil="lang"></m-programm>
+      <m-programm raetsel="e5-k1" teil="kurz"></m-programm>
+      <p class="e05-zahl">Karten: <m-e5-karten raetsel="e5-k1" teil="lang"></m-e5-karten></p>
+      <p class="e05-zahl">Karten: <m-e5-karten raetsel="e5-k1" teil="kurz"></m-e5-karten></p>
+    </div>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">Mal das Muster-Bild. Jede Zeile hat einen Zauber-Kasten. Weiß bleibt leer. Was siehst du?</p>
+    <m-e5-muster art="malen" gr="9" zeilen="4[rot leer leer]; 4[rot rot leer]; 4[gruen gruen gruen]"></m-e5-muster>
+    <p class="lsg-nur">Z. B. ein Drachen-Rücken mit 4 roten Zacken. Jede passende Idee gilt.</p>
+  </div>
+
+  <div class="e05-profi-reihe">
+    <div class="profi" data-titel="Profi-Aufgabe: Welcher Zauber-Kasten?">
+      <p>Welcher Zauber-Kasten malt dieses Muster? Schreib die Zahl und mal an.</p>
+      <m-e5-muster art="finden" gr="10" programm="3[blau gelb gelb]"></m-e5-muster>
+    </div>
+    <m-qr paket="e5"></m-qr>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 5-2: Drache und Zauber-Kasten (lesen, Kartengrenze)       -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="5" data-titel="Drache und Zauber-Kasten" data-art="Arbeitsblatt" data-verteilt>
+  <div class="aufg">
+    <p class="anw">{{KIND}}, wo landet der Drache? Tipp mit dem Finger mit. Mal ein Kreuz in das Feld.</p>
+    <div class="e05-neben">
+      <m-gitter raetsel="e5-l1" feld="20" loesung="ende"></m-gitter>
+      <m-programm raetsel="e5-l1"></m-programm>
+    </div>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">Bring den Drachen zum Schatz. Du hast nur 4 Karten! Ohne Zauber-Kasten geht es nicht.</p>
+    <div class="e05-neben">
+      <m-gitter raetsel="e5-p1" feld="20"></m-gitter>
+      <m-programm raetsel="e5-p1" teil="zauber"></m-programm>
+    </div>
+  </div>
+
+  <div class="profi" data-titel="Drachen-Profi: Rund um die Steine">
+    <p>Wieder nur 4 Karten! Diesmal liegen 3 Befehle im Zauber-Kasten.</p>
+    <div class="e05-neben">
+      <m-gitter raetsel="e5-p2" feld="20"></m-gitter>
+      <m-programm raetsel="e5-p2" teil="zauber"></m-programm>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 5-3: Bastelvorlage Zauber-Kasten, Zahlenkarten, Tanz-Karten -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="5" data-titel="Mein Zauber-Kasten" data-art="Bastelvorlage">
+  <p class="e05-hinweis">{{KIND}}, leg die lila Streifen um deine Befehlskarten.</p>
+
+  <div>
+    <p class="e05-titel">Streifen für 2 Kästen</p>
+    <div class="e05-lang-reihe">
+    <m-karten class="e05-lang" spalten="1" zeilen="4" hoehe="12" breite="132">
+      <div><span class="e05-lila"><span class="e05-slot">Zahl</span><span class="e05-sterne"><m-symbol name="stern" gr="6"></m-symbol><m-symbol name="stern" gr="6"></m-symbol><m-symbol name="stern" gr="6"></m-symbol></span></span></div>
+      <div><span class="e05-lila"><span class="e05-slot">Zahl</span><span class="e05-sterne"><m-symbol name="stern" gr="6"></m-symbol><m-symbol name="stern" gr="6"></m-symbol><m-symbol name="stern" gr="6"></m-symbol></span></span></div>
+      <div><span class="e05-lila"></span></div>
+      <div><span class="e05-lila"></span></div>
+    </m-karten>
+    <p class="e05-lang-info">So lang wie<br>3 Karten.<br>Mehr passen<br>nicht hinein.</p>
+    </div>
+  </div>
+
+  <div class="e05-reihe-teile">
+    <m-karten class="e05-kurz" spalten="4" zeilen="1" hoehe="50" breite="52">
+      <div><span class="e05-lila"></span></div>
+      <div><span class="e05-lila"></span></div>
+      <div><span class="e05-lila"></span></div>
+      <div><span class="e05-lila"></span></div>
+    </m-karten>
+    <div>
+      <p class="e05-titel">Zahlenkarten</p>
+      <m-karten spalten="4" zeilen="2" hoehe="13" breite="124">
+        <div class="e05-zahlkarte"><span class="e05-mal">2-mal</span></div>
+        <div class="e05-zahlkarte"><span class="e05-mal">3-mal</span></div>
+        <div class="e05-zahlkarte"><span class="e05-mal">4-mal</span></div>
+        <div class="e05-zahlkarte"><span class="e05-mal">5-mal</span></div>
+        <div class="e05-zahlkarte"><span class="e05-mal">2-mal</span></div>
+        <div class="e05-zahlkarte"><span class="e05-mal">3-mal</span></div>
+        <div class="e05-zahlkarte"><span class="e05-mal">4-mal</span></div>
+        <div class="e05-zahlkarte"><span class="e05-mal">5-mal</span></div>
+      </m-karten>
+    </div>
+  </div>
+
+  <div>
+    <p class="e05-titel">Tanz-Karten</p>
+    <m-karten spalten="4" zeilen="2" hoehe="18" breite="176">
+      <div><span class="e05-tanz">klatschen</span></div>
+      <div><span class="e05-tanz">klatschen</span></div>
+      <div><span class="e05-tanz">hüpfen</span></div>
+      <div><span class="e05-tanz">hüpfen</span></div>
+      <div><span class="e05-tanz">stampfen</span></div>
+      <div><span class="e05-tanz">Kreisel</span><span class="e05-tanz-klein">einmal ganz herum</span></div>
+      <div><span class="e05-tanz">Arme hoch</span></div>
+      <div><span class="e05-tanz">verbeugen</span></div>
+    </m-karten>
+  </div>
+
+  <div class="knobel" data-titel="Knobel-Ecke: Wiederhol-Tanz">
+    <p>{{KIND}}, schau dir diesen Tanz an.</p>
+    <div class="e05-knobel-reihe">
+      <span class="e05-tanzprog"><span class="kasten-z"><span class="mal">3-mal</span><span class="innen"><span class="e05-tk">klatschen</span><span class="e05-tk">hüpfen</span></span></span><span class="e05-tk">verbeugen</span></span>
+      <div class="e05-fragen">
+        <span>Wie viele Karten? <m-feld l="4" art="k"></m-feld></span>
+        <span>Wie viele Bewegungen? <m-feld l="7" art="k"></m-feld></span>
+      </div>
+    </div>
+  </div>
+</section>

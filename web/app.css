@@ -1,0 +1,481 @@
+/* =====================================================================
+   Denk-Werkstatt – Web-App
+   Handy und Tablet, hoch und quer. Kleinstes Ziel 375 · 667 und 667 · 375:
+   Spielfeld und Tasten gleichzeitig sichtbar, ohne Scrollen.
+   Hoch: Gitter oben, Tasten unten. Quer: Gitter links, Tasten rechts.
+   Das Gitter dreht sich nie mit (oben bleibt oben).
+   ===================================================================== */
+@font-face {
+  font-family: "Andika";
+  src: url("fonts/andika-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Andika";
+  src: url("fonts/andika-bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --tinte: #1f2340;
+  --grau: #5d6280;
+  --papier: #fffdf8;
+  --flaeche: #f3efe6;
+  --linie: #d9d3c4;
+  --akzent: #3d5ccc;
+  --akzent-hell: #e9eefc;
+  --gruen: #1f9d55;
+  --gruen-dunkel: #157a41;
+  --rot: #d1335b;
+  --gold: #f2b705;
+  --gold-hell: #fff4cc;
+  --vor: #2b6fd6;
+  --links: #1f9d55;
+  --rechts: #e8731a;
+  --zauber: #7a4fd1;
+  --zauber-hell: #f1ebff;
+
+  --t: 54px;          /* Tastengröße (mindestens 48) */
+  --abst: 10px;       /* Abstand zwischen Tasten (mindestens 8) */
+  --k: 38px;          /* Karte im Programm (nur Anzeige) */
+  --kk: 48px;         /* Karte im Kobold-Programm (zum Antippen) */
+  --rand: 10px;
+  --tempo: 450ms;
+  font-size: 18px;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+@media (min-width: 700px) and (min-height: 700px) {
+  :root { --t: 68px; --abst: 14px; --k: 52px; --kk: 60px; --rand: 18px; font-size: 22px; }
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--papier);
+  color: var(--tinte);
+  font-family: "Andika", "Comic Sans MS", sans-serif;
+  line-height: 1.3;
+  touch-action: manipulation;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+}
+h1, h2, p { margin: 0; }
+svg { display: block; }
+.ohne-js { padding: 24px; font-size: 20px; }
+
+/* Spielelemente: kein Markieren, kein Lupen-/Kontextmenü beim langen Drücken */
+.ansicht, button {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+input { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
+
+/* Eine Ansicht füllt genau den Bildschirm (dvh), mit Platz für die Notch */
+.ansicht {
+  height: 100vh;
+  height: 100dvh;
+  width: 100%;
+  padding:
+    max(var(--rand), env(safe-area-inset-top))
+    max(var(--rand), env(safe-area-inset-right))
+    max(var(--rand), env(safe-area-inset-bottom))
+    max(var(--rand), env(safe-area-inset-left));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ---------------------------------------------------------------------
+   Tasten
+   --------------------------------------------------------------------- */
+button { font: inherit; color: inherit; touch-action: manipulation; }
+.taste {
+  min-width: var(--t);
+  min-height: var(--t);
+  padding: 0 14px;
+  border: 3px solid var(--tinte);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--tinte);
+  font-weight: 700;
+  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 3px 0 rgba(31, 35, 64, 0.22);
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+.taste:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(31, 35, 64, 0.22); }
+.taste:disabled, .taste[aria-disabled="true"] { opacity: 0.35; box-shadow: none; transform: none; }
+.taste:focus-visible, .kachel:focus-visible, .level-knopf:focus-visible, .ablauf-karte:focus-visible, .stelle:focus-visible, .kobold-karte:focus-visible { outline: 4px solid var(--gold); outline-offset: 2px; }
+.taste svg { width: calc(var(--t) * 0.5); height: calc(var(--t) * 0.5); flex: none; }
+.taste.rund { width: var(--t); height: var(--t); padding: 0; border-radius: 50%; }
+.taste.rund svg { width: 70%; height: 70%; }
+.taste.befehl { width: var(--t); height: var(--t); padding: 0; }
+.taste.befehl svg { width: 78%; height: 78%; }
+.taste.befehl-vor { border-color: var(--vor); }
+.taste.befehl-links { border-color: var(--links); }
+.taste.befehl-rechts { border-color: var(--rechts); }
+.taste.breit { min-width: calc(var(--t) * 2); }
+.taste.los { background: var(--gruen); border-color: var(--gruen-dunkel); color: #fff; }
+.taste.los svg { width: calc(var(--t) * 0.36); height: calc(var(--t) * 0.36); }
+.taste.haupt { background: var(--akzent); border-color: #2a3f99; color: #fff; }
+.taste.warnung { border-color: var(--rot); color: var(--rot); }
+.taste.warnung svg { width: calc(var(--t) * 0.55); height: calc(var(--t) * 0.55); }
+.taste.gross { min-height: calc(var(--t) * 1.15); font-size: 1.2rem; padding: 0 26px; }
+.taste.zahl { border-color: var(--zauber); background: var(--zauber-hell); color: var(--zauber); font-size: 1.4rem; }
+.taste.zauber, .taste.zauber-fertig { border-color: var(--zauber); background: var(--zauber-hell); color: var(--zauber); }
+.taste.zauber-fertig { width: auto; padding: 0 10px; font-size: 0.95rem; }
+.taste.zurueck { padding: 0 12px; font-size: 0.95rem; }
+.taste.klein-taste { font-size: 0.9rem; font-weight: 400; min-height: 48px; }
+
+/* Zauber-Kasten-Taste: kleiner lila Kasten mit „?-mal“ */
+.zk-icon {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+  border: 2.5px solid var(--zauber); border-radius: 6px; background: #fff;
+  padding: 2px 4px 4px; line-height: 1;
+}
+.zk-icon b { font-size: 11px; color: var(--zauber); }
+.zk-icon i { display: block; width: 18px; height: 12px; border: 2px dashed var(--zauber); border-radius: 3px; }
+
+/* ---------------------------------------------------------------------
+   Kopf
+   --------------------------------------------------------------------- */
+.kopf { display: flex; align-items: center; gap: 10px; min-height: var(--t); flex: none; }
+.kopf-mitte { display: flex; flex-direction: column; min-width: 0; flex: 1; gap: 4px; }
+.kopf-titel { font-weight: 700; font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kopf > .kopf-titel { flex: 1; }
+.kopf-nr { font-weight: 700; color: var(--grau); font-size: 1rem; flex: none; }
+.punkte { display: flex; gap: 6px; }
+.punkt { width: 12px; height: 12px; border-radius: 50%; background: var(--linie); }
+.punkt.voll { background: var(--gold); box-shadow: inset 0 0 0 2px #c79500; }
+.punkt.jetzt { outline: 2.5px solid var(--akzent); outline-offset: 2px; }
+
+/* ---------------------------------------------------------------------
+   Startseite
+   --------------------------------------------------------------------- */
+.start { gap: 12px; }
+.start-kopf { display: flex; align-items: center; gap: 12px; flex: none; }
+.start-drache { width: 64px; height: 64px; flex: none; }
+.start-drache svg { width: 100%; height: 100%; }
+.start h1 { font-size: 1.6rem; line-height: 1.1; }
+.gruss { color: var(--grau); }
+.kacheln {
+  flex: 1 1 auto; min-height: 0;
+  display: grid; gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: minmax(0, 1fr);
+}
+.kachel {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  min-height: 48px; min-width: 48px; padding: 10px 8px;
+  border: 3px solid var(--tinte); border-radius: 18px; background: #fff;
+  box-shadow: 0 4px 0 rgba(31, 35, 64, 0.18);
+  cursor: pointer; overflow: hidden;
+}
+.kachel:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(31, 35, 64, 0.18); }
+.kachel.zu { background: var(--flaeche); }
+.kachel.offen { border-color: var(--akzent); background: var(--akzent-hell); }
+.kachel-nr {
+  position: absolute; top: 8px; left: 8px;
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--akzent); color: #fff; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; font-size: 0.95rem;
+}
+.kachel-bild { width: min(92px, 40%); aspect-ratio: 1; display: flex; align-items: center; justify-content: center; flex: 0 1 auto; min-height: 0; }
+.kachel-bild > svg { width: 100%; height: 100%; }
+.kachel.zu .kachel-bild { opacity: 0.55; }
+.kachel-titel { font-weight: 700; font-size: 1rem; text-align: center; line-height: 1.15; }
+.kachel-stand { display: flex; align-items: center; gap: 6px; color: var(--grau); font-size: 0.9rem; }
+.mini-stern { width: 24px; height: 24px; display: inline-block; flex: none; }
+.mini-stern svg { width: 100%; height: 100%; }
+.leer-hinweis { grid-column: 1 / -1; align-self: center; text-align: center; color: var(--grau); }
+.start-fuss { display: flex; justify-content: flex-end; flex: none; }
+
+.zk-gross { display: flex; flex-direction: column; align-items: flex-start; width: 100%; height: 100%; border: 3px solid var(--zauber); border-radius: 12px; background: var(--zauber-hell); padding: 3px 4px 4px; }
+.zk-gross b { font-size: 12px; color: var(--zauber); line-height: 1; white-space: nowrap; flex: none; }
+.zk-gross svg { flex: 1 1 0; min-height: 0; width: 100%; height: auto; }
+
+@media (orientation: landscape) {
+  .kacheln { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .kacheln[data-n="1"], .kacheln[data-n="2"], .kacheln[data-n="3"] { grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); }
+  .start-drache { width: 52px; height: 52px; }
+  .start h1 { font-size: 1.4rem; }
+}
+
+/* ---------------------------------------------------------------------
+   Formulare: Schlüsselwort, Eltern-Frage, Für Erwachsene
+   --------------------------------------------------------------------- */
+.formular-inhalt { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; }
+.formular-bild { width: 96px; height: 96px; flex: none; display: flex; align-items: center; justify-content: center; }
+.formular-bild > svg, .formular-bild > span { width: 100%; height: 100%; }
+.formular-feld { display: flex; flex-direction: column; gap: 10px; width: min(100%, 460px); }
+.formular-feld h1 { font-size: 1.4rem; }
+.formular-feld label { font-size: 1.05rem; }
+.rechnung { font-size: 1.3rem; white-space: nowrap; }
+.eingabe-reihe { display: flex; gap: 10px; align-items: stretch; flex-wrap: wrap; }
+.eingabe-reihe input {
+  flex: 1 1 140px; min-width: 0;
+  min-height: var(--t);
+  font: inherit; font-size: 22px;   /* mindestens 16 px: sonst zoomt Safari */
+  padding: 6px 14px;
+  border: 3px solid var(--tinte); border-radius: 14px; background: #fff; color: var(--tinte);
+}
+.eingabe-reihe input:focus { outline: 4px solid var(--gold); outline-offset: 1px; }
+.hinweis { color: var(--grau); min-height: 1.3em; }
+.hinweis.falsch { color: var(--rot); font-weight: 700; }
+.klein { font-size: 0.85rem; color: var(--grau); }
+.frage { font-weight: 700; }
+.eltern .formular-inhalt { justify-content: center; gap: 22px; }
+.loeschen-feld { align-items: flex-start; }
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .formular-inhalt { flex-direction: row; gap: 24px; }
+  .formular-bild { width: 80px; height: 80px; }
+  .eltern .formular-inhalt { flex-direction: row; align-items: center; }
+  .eltern .formular-feld { width: min(48%, 420px); }
+}
+
+/* ---------------------------------------------------------------------
+   Paket: Levels auswählen
+   --------------------------------------------------------------------- */
+.paket-inhalt { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; }
+.paket-bild { width: 110px; height: 110px; flex: none; }
+.paket-bild > svg, .paket-bild > span { width: 100%; height: 100%; }
+.paket-rechts { display: flex; flex-direction: column; align-items: center; gap: 22px; }
+.level-knoepfe { display: grid; grid-template-columns: repeat(4, auto); gap: 12px; justify-content: center; }
+.level-knoepfe[data-n="5"], .level-knoepfe[data-n="6"] { grid-template-columns: repeat(3, auto); }
+.level-knopf {
+  width: calc(var(--t) * 1.25); height: calc(var(--t) * 1.25);
+  border: 3px solid var(--tinte); border-radius: 16px; background: #fff;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  box-shadow: 0 3px 0 rgba(31, 35, 64, 0.2); cursor: pointer; padding: 0;
+}
+.level-knopf.geschafft { border-color: #c79500; background: var(--gold-hell); }
+.level-zahl { font-weight: 700; font-size: 1.3rem; line-height: 1; }
+.level-stern { width: 24px; height: 24px; }
+.level-stern svg { width: 100%; height: 100%; }
+@media (orientation: landscape) {
+  .paket-inhalt { flex-direction: row; gap: 36px; }
+  .level-knoepfe, .level-knoepfe[data-n="5"], .level-knoepfe[data-n="6"] { grid-template-columns: repeat(4, auto); }
+  .level-knoepfe[data-n="5"], .level-knoepfe[data-n="6"], .level-knoepfe[data-n="7"] { grid-template-columns: repeat(4, auto); }
+}
+
+/* ---------------------------------------------------------------------
+   Paket-Ende
+   --------------------------------------------------------------------- */
+.ende { align-items: center; justify-content: center; text-align: center; gap: 22px; }
+.ende-bild { display: flex; gap: 10px; align-items: flex-end; }
+.ende-bild span { width: 96px; height: 96px; display: block; }
+.ende-bild span svg { width: 100%; height: 100%; }
+.ende-text { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.ende h1 { font-size: 1.6rem; line-height: 1.2; max-width: 16em; }
+.ende-sterne { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.ende-stern { width: 34px; height: 34px; }
+.ende-stern svg { width: 100%; height: 100%; }
+.ende p { color: var(--grau); }
+@media (orientation: landscape) and (max-height: 500px) {
+  .ende { flex-direction: row; gap: 30px; }
+  .ende-bild span { width: 84px; height: 84px; }
+  .ende h1 { font-size: 1.4rem; }
+}
+
+/* ---------------------------------------------------------------------
+   Level: Spielfeld, Meldung, Programm, Tasten
+   Hoch:  Kopf / Feld / Meldung / Programm / Tasten (untereinander)
+   Quer:  links Kopf, Feld, Meldung – rechts Programm und Tasten
+   --------------------------------------------------------------------- */
+.spiel { gap: 8px; }
+.spalte-links, .spalte-rechts { display: contents; }
+.spiel .kopf { order: 1; }
+.spiel .feld { order: 2; flex: 1 1 0; min-height: 0; }
+.spiel .meldung { order: 3; }
+.spiel .programm { order: 4; }
+.spiel .tasten { order: 5; }
+
+.feld { display: flex; align-items: center; justify-content: center; position: relative; }
+.gitter-box { position: relative; width: 100%; height: 100%; max-width: 760px; }
+.gitter-basis, .gitter-basis > svg, .drache-ebene { position: absolute; inset: 0; width: 100%; height: 100%; }
+.drache-ebene { pointer-events: none; overflow: visible; }
+.d-pos, .d-dreh { transition: transform var(--tempo) ease-in-out; transform-origin: 0 0; transform-box: view-box; }
+.drache-ebene.sofort .d-pos, .drache-ebene.sofort .d-dreh { transition: none; }
+@media (prefers-reduced-motion: reduce) { .d-pos, .d-dreh { transition: none; } }
+
+.meldung {
+  display: flex; align-items: center; gap: 10px;
+  min-height: 2.7em; flex: none;
+  padding: 4px 12px; border-radius: 14px; background: var(--flaeche);
+  font-size: 1rem; line-height: 1.2;
+}
+.meldung-bild { width: 34px; height: 34px; flex: none; }
+.meldung-bild svg { width: 100%; height: 100%; }
+.meldung.stoss { background: #fde7ec; color: #8f1d3b; font-weight: 700; }
+.meldung.gut { background: var(--gold-hell); font-weight: 700; }
+.meldung.hinweis { background: var(--akzent-hell); }
+.meldung.zauber-meldung { background: var(--zauber-hell); color: #4b2a9a; }
+
+.programm { flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: calc(var(--k) * 2 + 8px); }
+.prog-zeile { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: flex-end; max-width: 100%; }
+.karte {
+  width: var(--k); height: var(--k); flex: none;
+  border: 2.5px solid var(--tinte); border-radius: 8px; background: #fff;
+  display: flex; align-items: center; justify-content: center; position: relative;
+}
+.karte svg { width: 80%; height: 80%; }
+/* Nummerierte Reihe wie am Blatt: kleine Nummer über jedem Befehl (ein Zauber-Kasten hat eine Nummer) */
+.teil { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.teil-nr { font-size: 12px; font-weight: 700; color: var(--grau); line-height: 1; }
+.karte.platzhalter { border-style: dashed; border-color: #a9a39a; background: transparent; }
+.karte.aktiv, .kasten-z.aktiv > .mal { background: var(--gold-hell); }
+.karte.aktiv { border-color: #c79500; box-shadow: 0 0 0 4px var(--gold); }
+.karte.stoss { border-color: var(--rot); box-shadow: 0 0 0 4px var(--rot); background: #fde7ec; }
+.kasten-z {
+  display: inline-flex; flex-direction: column; gap: 3px;
+  border: 3px solid var(--zauber); background: var(--zauber-hell); border-radius: 10px;
+  padding: 2px 6px 6px;
+}
+.kasten-z.offen { border-style: dashed; }
+.kasten-z.aktiv { box-shadow: 0 0 0 3px #c9b4f5; }
+.kasten-z .mal { font-weight: 700; color: var(--zauber); font-size: 0.95rem; line-height: 1.1; display: flex; gap: 8px; align-items: baseline; border-radius: 4px; }
+.kasten-z .runde { font-weight: 400; font-size: 0.75rem; color: #4b2a9a; }
+.kasten-z .innen { display: flex; gap: 6px; align-items: center; }
+.zaehler { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--grau); }
+.zaehler-karten { display: flex; gap: 3px; }
+.zaehler-karten i { width: 10px; height: 14px; border: 2px solid var(--zauber); border-radius: 2px; }
+.zaehler-karten i.voll { background: var(--zauber); }
+
+/* Kobold: Befehle und Einfüge-Stellen zum Antippen */
+.kobold-zeile { gap: 8px; align-items: center; }
+.kobold-karte, .stelle { width: var(--kk); height: var(--kk); padding: 0; cursor: pointer; }
+.kobold-karte { border-width: 3px; }
+.kobold-karte.befehl-vor { border-color: var(--vor); }
+.kobold-karte.befehl-links { border-color: var(--links); }
+.kobold-karte.befehl-rechts { border-color: var(--rechts); }
+.kobold-karte svg { width: 74%; height: 74%; }
+.kobold-karte .nr { position: absolute; top: -2px; left: 2px; font-size: 11px; font-weight: 700; color: var(--grau); line-height: 1; }
+.kobold-karte.gewaehlt { box-shadow: 0 0 0 4px var(--akzent); background: var(--akzent-hell); }
+.kobold-karte:disabled { opacity: 1; }
+.stelle {
+  border: 2px dashed #b7b1a6; border-radius: 10px; background: transparent; color: #8b867c;
+  display: flex; align-items: center; justify-content: center;
+}
+.stelle svg { width: 58%; height: 58%; }
+.stelle.gewaehlt { border: 3px solid var(--akzent); color: var(--akzent); background: var(--akzent-hell); }
+.stelle:disabled { opacity: 0.4; }
+
+.tasten { flex: none; display: flex; flex-direction: column; align-items: center; gap: var(--abst); }
+.tasten .reihe { display: flex; gap: var(--abst); justify-content: center; flex-wrap: wrap; }
+.tasten-frage { font-weight: 700; color: var(--zauber); margin-bottom: -2px; }
+.art-kobold .tasten-frage { color: var(--akzent); }
+
+/* Ablauf-Karten */
+.karten-feld {
+  --sp: 3;
+  width: 100%; height: 100%;
+  display: grid; gap: 10px;
+  grid-template-columns: repeat(var(--sp), minmax(0, 1fr));
+  grid-auto-rows: minmax(0, 1fr);
+}
+.karten-feld[data-n="2"] { --sp: 2; }
+.karten-feld[data-n="4"] { --sp: 2; }
+.karten-feld[data-n="7"], .karten-feld[data-n="8"] { --sp: 4; }
+.ablauf-karte {
+  position: relative; min-width: 48px; min-height: 48px;
+  border: 3px solid var(--tinte); border-radius: 14px; background: #fff;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  padding: 6px 4px; cursor: pointer; overflow: hidden;
+  box-shadow: 0 3px 0 rgba(31, 35, 64, 0.18);
+}
+.ablauf-karte .bild { flex: 1 1 auto; min-height: 0; width: 100%; max-width: 260px; display: flex; align-items: center; justify-content: center; }
+.ablauf-karte .bild svg { width: 100%; height: 100%; max-height: 100%; }
+.ablauf-karte .text { font-size: 0.85rem; line-height: 1.12; text-align: center; flex: none; max-width: 100%; overflow-wrap: break-word; hyphens: manual; }
+.ablauf-karte.ohne-bild .text { font-size: 1rem; }
+.ablauf-karte .nummer {
+  position: absolute; top: 4px; left: 4px; z-index: 1;
+  width: 30px; height: 30px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 1.05rem;
+}
+.ablauf-karte.gesetzt { border-color: var(--akzent); background: var(--akzent-hell); }
+.ablauf-karte.gesetzt .nummer { background: var(--akzent); color: #fff; }
+.ablauf-karte.vertauscht { border-color: var(--rot); box-shadow: 0 0 0 4px var(--rot); }
+.ablauf-karte.vertauscht .nummer { background: var(--rot); }
+.ablauf-karte.gewaehlt { border-color: var(--gold); box-shadow: 0 0 0 5px var(--gold); background: var(--gold-hell); }
+.ablauf-karte .tausch { position: absolute; top: 3px; right: 3px; width: 28px; height: 28px; background: #fff; border-radius: 50%; }
+.ablauf-karte .tausch svg { width: 100%; height: 100%; }
+.ablauf-karte:disabled { opacity: 1; }
+.art-ablauf .programm { min-height: 0; }
+.ablauf-reihe { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.ablauf-platz {
+  position: relative; width: 36px; height: 36px; border-radius: 8px;
+  border: 2px dashed #b7b1a6; display: flex; align-items: center; justify-content: center;
+}
+.ablauf-platz.voll { border: 2px solid var(--akzent); background: var(--akzent-hell); }
+.platz-nr { font-size: 0.8rem; font-weight: 700; color: var(--grau); }
+.ablauf-platz.voll .platz-nr { position: absolute; top: -7px; left: -6px; background: var(--akzent); color: #fff; border-radius: 50%; width: 18px; height: 18px; font-size: 11px; display: flex; align-items: center; justify-content: center; }
+.platz-bild { width: 28px; height: 28px; }
+.platz-bild svg { width: 100%; height: 100%; }
+
+/* Quer: Spielfeld links, Programm und Tasten rechts */
+@media (orientation: landscape) {
+  .spiel { flex-direction: row; gap: 14px; }
+  .spalte-links, .spalte-rechts { display: flex; flex-direction: column; min-width: 0; min-height: 0; gap: 8px; }
+  .spalte-links { flex: 1 1 0; }
+  .spalte-rechts { flex: 0 0 clamp(330px, 50%, 600px); justify-content: center; gap: 12px; }
+  .spiel .programm { flex: 1 1 auto; min-height: 0; }
+  .art-ablauf .spalte-links { flex: 1 1 0; }
+  .art-ablauf .spalte-rechts { flex: 0 0 clamp(250px, 34%, 420px); }
+  .karten-feld[data-n="4"] { --sp: 4; }
+  .karten-feld[data-n="5"], .karten-feld[data-n="6"] { --sp: 3; }
+}
+/* Kleine Handys quer: Kopf und Meldung kompakter */
+@media (orientation: landscape) and (max-height: 500px) {
+  .spiel .kopf { min-height: 48px; }
+  .spiel .kopf .taste.rund { width: 48px; height: 48px; min-width: 48px; min-height: 48px; }
+  .meldung { min-height: 2.5em; font-size: 0.92rem; padding: 3px 10px; }
+  .meldung-bild { width: 28px; height: 28px; }
+  .punkte { display: none; }
+  /* 4 Ablauf-Karten in einer Reihe wären zu schmal für Wörter wie „draufsetzen“: 2 · 2 */
+  .karten-feld[data-n="4"] { --sp: 2; }
+}
+
+/* ---------------------------------------------------------------------
+   Geschafft-Fenster (ruhig, ohne Blinken)
+   --------------------------------------------------------------------- */
+.dialog-hintergrund {
+  position: fixed; inset: 0; z-index: 10;
+  background: rgba(31, 35, 64, 0.2);
+  /* Hoch unten angedockt, quer rechts: das Gitter mit dem Drachen am Ziel bleibt sichtbar */
+  display: flex; align-items: flex-end; justify-content: center;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+}
+.dialog {
+  background: #fff; border: 3px solid var(--tinte); border-radius: 22px;
+  padding: 14px 18px 18px; width: min(100%, 420px);
+  display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center;
+  box-shadow: 0 6px 24px rgba(31, 35, 64, 0.25);
+}
+.dialog-kopf { display: flex; align-items: center; justify-content: center; gap: 12px; }
+.dialog-stern { width: 64px; height: 64px; flex: none; }
+.dialog-stern svg { width: 100%; height: 100%; }
+.dialog h2 { font-size: 1.6rem; }
+.dialog .reihe { display: flex; gap: var(--abst); flex-wrap: wrap; justify-content: center; }
+@media (orientation: landscape) {
+  .dialog-hintergrund { align-items: center; justify-content: flex-end; }
+  .dialog { width: min(100%, 48%, 420px); }
+}
+@media (orientation: landscape) and (max-height: 500px) {
+  .dialog { padding: 12px 14px 14px; gap: 8px; }
+  .dialog-stern { width: 52px; height: 52px; }
+  .dialog h2 { font-size: 1.35rem; }
+}

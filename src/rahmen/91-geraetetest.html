@@ -1,0 +1,47 @@
+<style>
+  .r-test h1 { font-family: var(--text); font-weight: 900; font-size: 22pt; margin: 0 0 1.5mm 0; }
+  .r-test h2 { font-family: var(--text); font-weight: 900; font-size: 12.5pt; color: var(--akzent); margin: 3mm 0 1.2mm 0; break-after: avoid; }
+  .r-test p { margin: 0 0 1.8mm 0; font-size: 9.8pt; }
+  .r-test ul { margin: 0 0 1.5mm 0; padding-left: 5.5mm; font-size: 9.3pt; }
+  .r-test li { margin-bottom: 0.6mm; }
+  .r-test table { border-collapse: collapse; width: 100%; font-size: 8.8pt; line-height: 1.33; break-inside: avoid; }
+  .r-test th, .r-test td { border: 0.35mm solid var(--linie); padding: 0.95mm 1.7mm; vertical-align: top; text-align: left; }
+  .r-test th { background: var(--akzent-hell); font-weight: 800; line-height: 1.2; }
+  .r-test td.k { text-align: center; vertical-align: middle; }
+  .r-test .box { display: inline-block; width: 4.5mm; height: 4.5mm; border: 0.4mm solid var(--tinte); border-radius: 0.9mm; vertical-align: -0.8mm; }
+  .r-test .kbox { display: inline-block; width: 3.6mm; height: 3.6mm; border: 0.35mm solid var(--tinte); border-radius: 0.8mm; vertical-align: -0.6mm; margin-right: 1.2mm; }
+  .r-test .schritt { font-weight: 900; }
+  .r-test .nr { display: inline-flex; width: 5mm; height: 5mm; border-radius: 50%; background: var(--akzent); color: white; font-weight: 900; font-size: 8pt; align-items: center; justify-content: center; margin-right: 1.2mm; vertical-align: 0.1mm; }
+  .r-test .kl { font-size: 8pt; color: var(--grau); }
+  .r-test .linie { display: inline-block; width: 32mm; border-bottom: 0.3mm solid var(--tinte); }
+  .r-test .linie.lang { width: 128mm; height: 7mm; }
+  .r-test .adresse { margin: 0 0 2.5mm 0; }
+</style>
+
+<section class="fliess nur-buch r-test" id="geraetetest" data-toc="Gerätetest-Checkliste (vor Einheit 1)" style="page: anleitung; break-before: page" data-block="A">
+  <h1>Gerätetest-Checkliste</h1>
+  <p><b>Vor Einheit 1 abarbeiten, ohne {{KIND}}</b>, etwa 10 Minuten pro Gerät. Fehlt ein Gerät, bleibt die Spalte leer. Das Ergebnis kommt in den Rückmeldebogen (Teil „Allgemein“, Frage „Gerätetest“).</p>
+  <p><b>Du brauchst:</b> einen QR-Code von einem Blatt der Einheit 2 oder die Adresse der Web-App, und das Schlüsselwort von Paket 2: <b>SCHATZ</b>. Die Adresse steht absichtlich nirgends im Heft. Wer die Werkstatt eingerichtet hat, findet sie in der README im Repo (Abschnitt „Veröffentlichen“). Trag sie hier ein (für Geräte ohne Kamera):</p>
+  <p class="adresse"><b>Adresse der Web-App:</b> <span class="linie lang"></span></p>
+
+  <table>
+    <tr><th>Was du tust und was passieren soll</th><th style="width: 18mm">iPhone<br><span class="kl">Safari</span></th><th style="width: 18mm">iPad<br><span class="kl">Safari</span></th><th style="width: 18mm">Android<br><span class="kl">Chrome</span></th></tr>
+    <tr><td><span class="schritt">Gerät und Version</span> <span class="kl">(z. B. iPhone 13, iOS 18)</span></td><td></td><td></td><td></td></tr>
+    <tr><td><span class="schritt"><span class="nr">1</span>Öffnen.</span> QR-Code mit der Kamera scannen oder die Adresse eintippen. Die Web-App erscheint ohne Fehlermeldung, mit großer Schrift. Nirgends steht ein Name.</td><td class="k"><i class="box"></i></td><td class="k"><i class="box"></i></td><td class="k"><i class="box"></i></td></tr>
+    <tr><td><span class="schritt"><span class="nr">2</span>Schlüsselwort.</span> Paket 2 wählen und <b>schatz</b> klein und mit einem Leerzeichen am Ende eintippen: Das Paket geht trotzdem auf. Die Tastatur macht keine Großbuchstaben und keine Autokorrektur, die Seite zoomt beim Tippen nicht.</td><td class="k"><i class="box"></i></td><td class="k"><i class="box"></i></td><td class="k"><i class="box"></i></td></tr>
+    <tr><td><span class="schritt"><span class="nr">3</span>Ein Level spielen.</span> Befehle antippen, „Los“: Der Drache läuft langsam Schritt für Schritt, der laufende Befehl leuchtet auf. Die Taste mit Karte und rotem X löscht den letzten Befehl. „Nochmal“ stellt den Drachen zurück an den Start, das Programm bleibt stehen. Einmal absichtlich gegen den Rand oder einen Stein laufen lassen: Der Drache bleibt freundlich stehen, der Befehl wird markiert, kein Fehlerton. Dann das Level schaffen.</td><td class="k"><i class="box"></i></td><td class="k"><i class="box"></i></td><td class="k"><i class="box"></i></td></tr>
+    <tr><td><span class="schritt"><span class="nr">4</span>Gerät drehen.</span> Von hoch auf quer und zurück: Das <b>Gitter bleibt gleich</b> (oben bleibt oben, wie am Papier), nur die <b>Tasten ordnen sich um</b>. Spielfeld und Tasten sind in beiden Lagen ganz sichtbar, ohne Scrollen. Doppelt tippen zoomt nicht.</td><td class="k"><i class="box"></i></td><td class="k"><i class="box"></i></td><td class="k"><i class="box"></i></td></tr>
+    <tr><td><span class="schritt"><span class="nr">5</span>Im Flugmodus nochmal öffnen.</span> App bzw. Tab ganz schließen, Flugmodus ein (WLAN und mobile Daten aus), Web-App wieder öffnen: Sie lädt trotzdem, ein Level ist spielbar. Danach Flugmodus wieder aus.</td><td class="k"><i class="box"></i></td><td class="k"><i class="box"></i></td><td class="k"><i class="box"></i></td></tr>
+    <tr><td><span class="schritt"><span class="nr">6</span>Zum Home-Bildschirm hinzufügen.</span> iPhone und iPad: in Safari Teilen-Knopf, dann „Zum Home-Bildschirm“. Android: in Chrome Menü (drei Punkte), dann „Zum Startbildschirm hinzufügen“ bzw. „App installieren“. Das Symbol erscheint und öffnet die App ohne Adressleiste. <span class="kl">Am iPhone und iPad hat die App dort einen eigenen Speicher: Schlüsselwort einmal neu eingeben.</span></td><td class="k"><i class="box"></i></td><td class="k"><i class="box"></i></td><td class="k"><i class="box"></i></td></tr>
+    <tr><td><span class="schritt"><span class="nr">7</span>Fortschritt löschen.</span> Unten auf der Startseite „Für Erwachsene“ antippen, die Malrechnung lösen, „Fortschritt löschen“ und dann „Ja, löschen“ antippen. Danach sind alle Sterne und Schlüsselwörter weg und alle Pakete wieder gesperrt. Paket 2 geht mit <b>SCHATZ</b> wieder auf.</td><td class="k"><i class="box"></i></td><td class="k"><i class="box"></i></td><td class="k"><i class="box"></i></td></tr>
+    <tr><td><span class="schritt"><span class="nr">8</span>Ende des Pakets</span> <span class="kl">(wenn du Zeit hast)</span>. Alle Levels von Paket 2 schaffen: Am Ende erscheint „Super! Jetzt zurück zum Papier.“ und kein „Noch ein Level?“.</td><td class="k"><i class="box"></i></td><td class="k"><i class="box"></i></td><td class="k"><i class="box"></i></td></tr>
+  </table>
+
+  <h2>Wenn etwas hakt</h2>
+  <ul>
+    <li>Kurz aufschreiben: <b>welches Gerät</b>, <b>welcher Schritt</b>, <b>was passiert ist</b> (am besten mit Bildschirmfoto). Das kommt in den Rückmeldebogen und wird vor dem nächsten Paket behoben.</li>
+    <li>Nach einem Update noch alte Levels? Die App einmal ganz schließen und mit Internet wieder öffnen. Die neue Fassung kommt dann von selbst.</li>
+    <li>Sterne verschwunden? Safari löscht Daten von Seiten, die etwa eine Woche nicht benutzt wurden (nicht am Home-Bildschirm). Kein Problem: Der Sammelpass am Papier zählt, Schlüsselwörter gehen jederzeit neu.</li>
+  </ul>
+  <p style="margin-top: 2mm"><span class="kbox"></span>Gerätetest erledigt am <span class="linie"></span><span style="display: inline-block; width: 10mm"></span><span class="kbox"></span>Ergebnis in den Rückmeldebogen eingetragen</p>
+</section>

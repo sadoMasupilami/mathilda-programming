@@ -1,0 +1,7 @@
+Schrift: Andika (Regular und Bold), Copyright SIL International.
+Lizenz: SIL Open Font License 1.1, vollständiger Text in OFL.txt.
+
+Die Dateien andika-regular.woff2 und andika-bold.woff2 sind auf die Zeichen in zeichen.txt
+gekürzt (pyftsubset aus fontTools) und ins Format WOFF2 umgewandelt. Erzeugt mit
+werkzeuge/schriften.mjs aus src/fonts/Andika-Regular.ttf und src/fonts/Andika-Bold.ttf.
+Die Schrift wird nur lokal mit der Web-App ausgeliefert, nicht von fremden Servern geladen.

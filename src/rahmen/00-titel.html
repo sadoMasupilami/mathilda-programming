@@ -1,0 +1,77 @@
+<style>
+  .r-titel { justify-content: space-between; align-items: center; text-align: center; padding-top: 18mm; padding-bottom: 15mm; }
+  .r-titel .ober { font-family: var(--text); font-weight: 800; font-size: 12.5pt; letter-spacing: 0.16em; text-transform: uppercase; color: var(--akzent); }
+  .r-titel h1 { font-family: var(--text); font-weight: 1000; font-size: 40pt; line-height: 1.04; margin: 4mm 0 0 0; color: var(--tinte); hyphens: manual; }
+  .r-titel h1 span { color: var(--akzent); }
+  .r-titel .unter { font-family: var(--text); font-size: 14pt; color: var(--grau); margin-top: 5mm; line-height: 1.4; }
+  .r-titel .buehne { position: relative; width: 176mm; height: 112mm; }
+  .r-titel .buehne > * { position: absolute; line-height: 0; }
+  .r-titel .band { display: inline-block; background: var(--akzent); color: white; font-family: var(--text); font-weight: 900; font-size: 13pt; border-radius: 30mm; padding: 2.5mm 8mm; }
+  .r-titel .befehle { display: flex; gap: 3mm; align-items: center; }
+  .r-titel .fuer { font-family: var(--kind); font-size: 15pt; margin-top: 5mm; }
+  .r-titel .stand { font-family: var(--text); font-size: 9pt; color: var(--grau); margin-top: 4mm; }
+  .r-vorlagen-deck { justify-content: center; align-items: center; text-align: center; gap: 7mm; }
+  .r-vorlagen-deck h1 { font-family: var(--text); font-weight: 1000; font-size: 32pt; margin: 0; line-height: 1.06; hyphens: manual; }
+  .r-vorlagen-deck h1 span { color: var(--akzent); }
+  .r-vorlagen-deck .band { display: inline-block; background: var(--akzent); color: white; font-family: var(--text); font-weight: 900; font-size: 13pt; border-radius: 30mm; padding: 2.5mm 8mm; }
+  .r-vorlagen-deck .bilder { display: flex; gap: 5mm; align-items: center; justify-content: center; line-height: 0; }
+  .r-vorlagen-deck .hinweis { font-family: var(--text); font-size: 12pt; max-width: 140mm; line-height: 1.5; color: var(--tinte); margin: 0; }
+  .r-vorlagen-deck .hinweis b { color: var(--akzent); }
+  /* Im Kopiervorlagen-PDF stehen keine Seitenzahlen: Blatt-Verweise nur mit Nummer (wie in der Fußzeile der Blätter) */
+  .r-vorlagen-deck .seitenzahl-inline { display: none; }
+</style>
+
+<section class="seite r-titel nur-buch" id="titel" data-block="A">
+  <div>
+    <div class="ober">Logisch denken und programmieren</div>
+    <h1>{{KIND}}s<br><span>Denk- und<br>Programmier-Werkstatt</span></h1>
+    <div class="unter">mit Befehlen, Rätseln, Bewegung und Basteln<br>für {{KIND}} und Mama oder Papa</div>
+  </div>
+
+  <div class="buehne" aria-hidden="true">
+    <m-gitter deko b="4" h="3" start="0,2,oben" ziel="3,0" hindernisse="1,1;2,2" feld="20" style="left: 47mm; top: 24mm"></m-gitter>
+    <m-bild name="fee" gr="28" style="left: 4mm; top: 6mm"></m-bild>
+    <m-bild name="einhorn" gr="34" style="left: 2mm; top: 62mm"></m-bild>
+    <m-symbol name="kobold" gr="24" style="right: 6mm; top: 70mm"></m-symbol>
+    <m-bild name="mond" gr="17" style="right: 10mm; top: 4mm"></m-bild>
+    <m-symbol name="stern" gr="9" style="right: 36mm; top: 26mm"></m-symbol>
+    <m-symbol name="stern" gr="7" style="left: 36mm; top: 4mm"></m-symbol>
+    <m-symbol name="edelstein" gr="10" style="right: 26mm; top: 46mm"></m-symbol>
+    <m-symbol name="edelstein" gr="8" style="left: 30mm; top: 46mm"></m-symbol>
+    <m-bild name="krone" gr="14" style="right: 2mm; top: 34mm"></m-bild>
+    <!-- Ein Programm, das im Gitter darunter wirklich zum Schatz führt (nachgerechnet mit dem Ausführer) -->
+    <div class="befehle" style="left: 42mm; top: 2mm">
+      <m-symbol name="vor" gr="13"></m-symbol>
+      <m-symbol name="vor" gr="13"></m-symbol>
+      <m-symbol name="rechts" gr="13"></m-symbol>
+      <m-symbol name="vor" gr="13"></m-symbol>
+      <m-symbol name="vor" gr="13"></m-symbol>
+      <m-symbol name="vor" gr="13"></m-symbol>
+    </div>
+    <div class="befehle" style="left: 58mm; top: 94mm">
+      <m-bild name="roboter" gr="16"></m-bild>
+      <m-bild name="zauberhut" gr="15"></m-bild>
+      <m-bild name="eule" gr="15"></m-bild>
+      <m-bild name="schloss" gr="16"></m-bild>
+    </div>
+  </div>
+
+  <div>
+    <div class="band">Block A · Einheiten 1–5 · Befehle, Programme, Fehler</div>
+    <div class="fuer">Diese Werkstatt gehört {{KIND}}.</div>
+    <div class="stand">Stand: Oktober 2026 · Anleitung und Kopiervorlagen · A4 in Originalgröße drucken</div>
+  </div>
+</section>
+
+<section class="seite r-vorlagen-deck nur-vorlagen" id="vorlagen-deckblatt" data-block="A">
+  <div class="bilder">
+    <m-symbol name="kobold" gr="20"></m-symbol>
+    <m-symbol name="drache" gr="30"></m-symbol>
+    <m-symbol name="schatz" gr="22"></m-symbol>
+  </div>
+  <h1>{{KIND}}s<br><span>Denk- und<br>Programmier-Werkstatt</span></h1>
+  <div class="band">Kopiervorlagen · Einheiten 1–5</div>
+  <p class="hinweis">Hier sind nur {{KIND}}s Seiten: „Hallo {{KIND}}“, der <b>Sammelpass</b>, alle <b>Blätter</b> der Einheiten 1–5 und die beiden <b>Urkunden</b>. Die Anleitungen und Lösungen stehen im großen PDF.</p>
+  <p class="hinweis">Beim Drucken <b>„Tatsächliche Größe“ bzw. 100 %</b> wählen, nicht „An Seite anpassen“. Dann sind die Gitterfelder mindestens 2 cm groß, wie es in den Anleitungen steht.</p>
+  <p class="hinweis">Die Befehlskarten (<a class="blattref" href="#blatt-1-1"></a>), die Drachen-Figur (<a class="blattref" href="#blatt-2-3"></a>), die Ablauf-Karten (<a class="blattref" href="#blatt-3-1"></a>) und den Zauber-Kasten (<a class="blattref" href="#blatt-5-3"></a>) am besten auf <b>dickeres Papier</b> (160 g) drucken. Sie werden in mehreren Einheiten gebraucht.</p>
+</section>

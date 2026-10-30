@@ -1,0 +1,20 @@
+{
+  "teile": [
+    "rahmen/00-titel.html",
+    "rahmen/01-inhalt.html",
+    "rahmen/02-einleitung.html",
+    "rahmen/03-hallo.html",
+    "rahmen/04-sammelpass.html",
+    "einheiten/01-ich-bin-dein-roboter.html",
+    "einheiten/02-drachen-pfade.html",
+    "einheiten/03-erst-das-dann-das.html",
+    "einheiten/04-der-fehler-kobold.html",
+    "einheiten/05-der-wiederhol-zauber.html",
+    "rahmen/80-urkunden.html",
+    "rahmen/90-rueckmeldebogen.html",
+    "rahmen/91-geraetetest.html"
+  ],
+  "extras": [
+    "einheiten/00-muster.html"
+  ]
+}

@@ -1,0 +1,36 @@
+<!--
+  Muster mit allen Programmier-Bausteinen (nicht im Buch). Bauen: ./baue.sh --nur 00 --png
+  Rätsel: raetsel/e0-muster.json
+-->
+<section class="anleitung" data-einheit="0" data-titel="Muster: alle Bausteine">
+  <div class="kasten ziel"><p>Zeigt alle Bausteine. {{KIND}} lernt hier nichts, das ist nur für Autoren. Schlüsselwort: MUSTER.</p></div>
+  <div class="kasten material"><p>Nichts.</p></div>
+  <m-linksrechts></m-linksrechts>
+  <h2>Ablauf Schritt für Schritt</h2>
+  <ol class="ablauf"><li data-min="20"><span class="schritt-titel">Ansehen</span>Die Befehle <m-symbol name="vor" gr="5"></m-symbol> vor, <m-symbol name="links" gr="5"></m-symbol> links drehen und <m-symbol name="rechts" gr="5"></m-symbol> rechts drehen. 3 + 4 = 7.</li></ol>
+  <div class="sag"><p class="du">„Wohin schaut der Drache?“</p><p class="sie">„Nach oben!“</p></div>
+  <div class="kasten stolper"><p>Keine.</p></div>
+  <div class="kasten leichter"><p>Nichts.</p></div>
+  <div class="kasten schwerer"><p>Nichts.</p></div>
+  <div class="kasten bonus"><p>Nichts.</p></div>
+  <div class="kasten warum"><p>Ein Programm ist eine genaue Folge von Befehlen.</p></div>
+  <div class="kasten bildschirm"><p>Paket 0, Schlüsselwort MUSTER.</p></div>
+  <p>Programm mit Wiederhol-Zauber: <m-programm befehle="vor 3[vor rechts] links" gr="9"></m-programm></p>
+  <h2>Lösungen</h2>
+  <m-loesungen einheit="0"></m-loesungen>
+</section>
+
+<section class="blatt" data-einheit="0" data-titel="Alle Bausteine">
+  <div class="aufg"><p class="anw">{{KIND}}, programmiere den Drachen zum Schatz. Nimm das kürzeste Programm!</p>
+    <div class="reihe"><m-gitter raetsel="e0-pfad" feld="20"></m-gitter> <m-programm raetsel="e0-pfad" plaetze="6"></m-programm></div>
+  </div>
+  <div class="aufg"><p class="anw">Der Fehler-Kobold war da! Finde den falschen Befehl.</p>
+    <m-programm raetsel="e0-kobold"></m-programm>
+  </div>
+  <div class="aufg"><p class="anw">Schreib es kürzer mit dem Zauber-Kasten.</p>
+    <m-programm raetsel="e0-kuerzer" teil="kurz" gr="12"></m-programm>
+  </div>
+  <div class="reihe" style="justify-content:space-between;align-items:flex-end">
+    <div class="profi" style="flex:1"><p>Wie viele Befehle hat das kürzeste Programm bei Aufgabe 1? <m-feld l="5"></m-feld></p></div>
+    <m-qr paket="e0"></m-qr></div>
+</section>

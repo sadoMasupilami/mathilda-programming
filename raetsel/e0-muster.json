@@ -1,0 +1,119 @@
+{
+ "paket": "e0",
+ "einheit": 0,
+ "titel": "Muster (nicht im Buch)",
+ "raetsel": [
+  {
+   "id": "e0-pfad",
+   "art": "pfad",
+   "aufgabe": "kuerzestes",
+   "b": 3,
+   "h": 3,
+   "start": {
+    "x": 0,
+    "y": 2,
+    "blick": "oben"
+   },
+   "ziel": {
+    "x": 2,
+    "y": 0
+   }
+  },
+  {
+   "id": "e0-hindernis",
+   "art": "pfad",
+   "aufgabe": "ankommen",
+   "b": 4,
+   "h": 3,
+   "start": {
+    "x": 0,
+    "y": 2,
+    "blick": "rechts"
+   },
+   "ziel": {
+    "x": 3,
+    "y": 0
+   },
+   "hindernisse": [
+    [
+     1,
+     2
+    ],
+    [
+     2,
+     1
+    ]
+   ]
+  },
+  {
+   "id": "e0-lesen",
+   "art": "lesen",
+   "b": 3,
+   "h": 3,
+   "start": {
+    "x": 1,
+    "y": 2,
+    "blick": "oben"
+   },
+   "programm": "vor rechts vor",
+   "fragen": [
+    2
+   ]
+  },
+  {
+   "id": "e0-kobold",
+   "art": "kobold",
+   "b": 3,
+   "h": 3,
+   "start": {
+    "x": 0,
+    "y": 2,
+    "blick": "oben"
+   },
+   "ziel": {
+    "x": 2,
+    "y": 0
+   },
+   "programm": "vor vor links vor vor",
+   "reparatur": {
+    "art": "tauschen",
+    "stelle": 3,
+    "befehl": "rechts"
+   }
+  },
+  {
+   "id": "e0-kuerzer",
+   "art": "kuerzer",
+   "lang": "vor vor vor rechts vor vor vor",
+   "kurz": "3[vor] rechts 3[vor]"
+  },
+  {
+   "id": "e0-ablauf",
+   "art": "ablauf",
+   "karten": [
+    {
+     "id": "a",
+     "text": "Socken"
+    },
+    {
+     "id": "b",
+     "text": "Schuhe"
+    }
+   ],
+   "regeln": [
+    [
+     "a",
+     "b"
+    ]
+   ]
+  }
+ ],
+ "schluesselwort": "MUSTER",
+ "web": {
+  "titel": "Muster",
+  "art": "pfad",
+  "levels": [
+   "e0-pfad"
+  ]
+ }
+}

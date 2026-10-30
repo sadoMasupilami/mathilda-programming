@@ -1,0 +1,116 @@
+{
+ "paket": "e5",
+ "einheit": 5,
+ "titel": "Der Wiederhol-Zauber",
+ "schluesselwort": "TANZ",
+ "web": {
+  "titel": "Wiederhol-Zauber",
+  "art": "pfad",
+  "levels": ["e5-w1", "e5-p1", "e5-w2", "e5-w3", "e5-w4", "e5-p2"]
+ },
+ "raetsel": [
+  {
+   "id": "e5-k1",
+   "art": "kuerzer",
+   "lang": "vor vor vor vor",
+   "kurz": "4[vor]"
+  },
+  {
+   "id": "e5-k2",
+   "art": "kuerzer",
+   "lang": "rechts vor vor vor vor vor",
+   "kurz": "rechts 5[vor]"
+  },
+  {
+   "id": "e5-k3",
+   "art": "kuerzer",
+   "b": 3,
+   "h": 3,
+   "start": { "x": 0, "y": 2, "blick": "oben" },
+   "lang": "vor vor rechts vor vor rechts vor vor rechts vor vor rechts",
+   "kurz": "4[vor vor rechts]"
+  },
+  {
+   "id": "e5-l1",
+   "art": "lesen",
+   "b": 4,
+   "h": 3,
+   "start": { "x": 0, "y": 2, "blick": "rechts" },
+   "hindernisse": [[1, 1]],
+   "programm": "3[vor] links 2[vor]"
+  },
+  {
+   "id": "e5-p1",
+   "art": "pfad",
+   "aufgabe": "ankommen",
+   "b": 5,
+   "h": 2,
+   "start": { "x": 0, "y": 1, "blick": "oben" },
+   "ziel": { "x": 4, "y": 0 },
+   "hindernisse": [[2, 1], [3, 1]],
+   "zauber": true,
+   "maxKarten": 4
+  },
+  {
+   "id": "e5-p2",
+   "art": "pfad",
+   "aufgabe": "ankommen",
+   "b": 3,
+   "h": 3,
+   "start": { "x": 0, "y": 2, "blick": "oben" },
+   "ziel": { "x": 2, "y": 2 },
+   "hindernisse": [[1, 1], [1, 2]],
+   "zauber": true,
+   "maxKarten": 4
+  },
+  {
+   "id": "e5-w1",
+   "art": "pfad",
+   "aufgabe": "ankommen",
+   "b": 3,
+   "h": 4,
+   "start": { "x": 1, "y": 3, "blick": "oben" },
+   "ziel": { "x": 1, "y": 0 },
+   "hindernisse": [[0, 1], [2, 2]],
+   "zauber": true,
+   "maxKarten": 2
+  },
+  {
+   "id": "e5-w2",
+   "art": "pfad",
+   "aufgabe": "ankommen",
+   "b": 4,
+   "h": 4,
+   "start": { "x": 0, "y": 3, "blick": "oben" },
+   "ziel": { "x": 3, "y": 0 },
+   "hindernisse": [[1, 1], [2, 2]],
+   "zauber": true,
+   "maxKarten": 5
+  },
+  {
+   "id": "e5-w3",
+   "art": "pfad",
+   "aufgabe": "ankommen",
+   "b": 5,
+   "h": 4,
+   "start": { "x": 4, "y": 3, "blick": "links" },
+   "ziel": { "x": 0, "y": 0 },
+   "hindernisse": [[1, 1], [2, 2], [3, 1]],
+   "zauber": true,
+   "maxKarten": 5
+  },
+  {
+   "id": "e5-w4",
+   "art": "pfad",
+   "aufgabe": "ankommen",
+   "b": 3,
+   "h": 3,
+   "start": { "x": 1, "y": 2, "blick": "oben" },
+   "ziel": { "x": 2, "y": 2 },
+   "edelsteine": [[1, 1], [2, 1]],
+   "hindernisse": [[0, 0]],
+   "zauber": true,
+   "maxKarten": 3
+  }
+ ]
+}

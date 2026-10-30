@@ -1,0 +1,370 @@
+<!--
+  Einheit 4: Der Fehler-Kobold (Block A: Befehle, Programme, Fehler)
+  Fehler finden und reparieren (falscher, fehlender, überzähliger Befehl), Programme im Kopf durchgehen.
+  Blätter: 4-1 Kobold-Jagd, 4-2 Wo ist der Drache?, 4-3 Kobold-Profi (Schwerer-Teil)
+  Rätsel und Web-Paket e4: raetsel/e4.json, eigene Bausteine: src/bausteine/e4-kobold.js
+-->
+<style>
+  .e04-ablauf > li { break-inside: avoid; }
+  .e04-ganz > li { break-inside: auto; orphans: 2; widows: 2; }
+  .kasten.e04-schwerer, .kasten.e04-bricht { -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .e04-nw { white-space: nowrap; }
+  .e04-tab td:first-child { width: 24%; }
+  .e04-inline { vertical-align: middle; }
+
+  /* Blätter */
+  /* Aufgabe mit Gitter links, Anweisung und Programm rechts daneben */
+  .aufg.e04-neben { display: grid; grid-template-columns: max-content 1fr; column-gap: 6mm; row-gap: 2.5mm; align-items: start; align-content: start; }
+  .aufg.e04-neben > * { grid-column: 2; }
+  .aufg.e04-neben > m-gitter { grid-column: 1; grid-row: 1 / span 5; }
+  .aufg.e04-neben > .anw { margin: 0; }
+  .aufg.e04-neben > .e04-breit { grid-column: 1 / -1; }
+  .e04-frage { margin: 0; }
+  .e04-wahlzeile { display: flex; align-items: center; gap: 3mm; margin-top: 1.5mm; }
+  .e04-unter { margin-top: 3mm; }
+  .e04-wahl { display: inline-flex; gap: 2mm; align-items: center; }
+  .e04-opt { display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; border: 0.8mm solid transparent; border-radius: 50%; }
+  .e04-opt svg { display: block; }
+  .e04-box { display: flex; align-items: center; justify-content: center; box-sizing: border-box; border: 0.55mm solid var(--tinte); border-radius: 2mm; background: white; }
+  .e04-box svg { width: 82%; height: 82%; }
+  .e04-arten { display: flex; flex-direction: column; gap: 3mm; align-items: flex-start; }
+  .e04-opt.e04-art { border-radius: 4mm; border: 0.5mm solid var(--linie); padding: 1.8mm 4mm; font-size: 16pt; line-height: 1.2; background: white; }
+  .loesungsmodus .e04-opt.e04-richtig { border: 0.9mm solid var(--rot); }
+  .e04-fuss { display: flex; justify-content: space-between; align-items: flex-end; gap: 6mm; }
+  .e04-fuss > .profi, .e04-fuss > .knobel { flex: 1; }
+  .e04-rechtsbild { float: right; margin: -9mm 0 0 4mm; }
+
+  /* Lösungen */
+  .e04-loes { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm 4mm; align-items: start; margin: 2mm 0 4mm 0; }
+  .e04-loes m-loesungen, .e04-loes .loesungen-raster { display: contents; }
+  .e04-loes > .kasten.loesung { margin: 0; font-size: 9.5pt; }
+  /* Reihenfolge: Bild 4-1 und 4-2, darunter ihre Text-Lösung über die ganze Breite, dann Bild 4-3 mit Text daneben */
+  .e04-loes .loesung-mini:nth-child(3) { order: 2; }
+  .e04-loes > .e04-l12 { order: 1; grid-column: 1 / -1; }
+  .e04-loes > .e04-l3 { order: 3; }
+  .kasten.loesung p { margin-bottom: 1.6mm; }
+</style>
+
+<section class="anleitung" data-einheit="4" data-titel="Der Fehler-Kobold">
+
+  <div class="kasten ziel">
+    <p>Heute zieht der <span class="begriff">Fehler-Kobold</span> ein: ein frecher, lustiger Kerl, der in Programme heimlich <b>genau einen Fehler</b> schmuggelt. Mal ist ein Befehl <b>falsch</b> (links drehen statt rechts drehen), mal <b>fehlt</b> einer, mal ist einer <b>zu viel</b>. {{KIND}} wird zur <span class="begriff">Kobold-Jägerin</span>: Sie geht ein Programm Befehl für Befehl im Kopf durch („Wo ist der Drache nach Befehl 3?“), findet die Stelle, an der es schiefgeht, repariert sie und probiert es noch einmal aus.</p>
+    <p>Die wichtigste Botschaft ist keine Technik, sondern eine Haltung: <b>Fehler sind normal und gut.</b> Jeder gefundene Fehler macht ein Programm besser. Wer programmiert, sucht ständig Fehler, auch in den eigenen Programmen, und freut sich, wenn er einen erwischt.</p>
+  </div>
+
+  <div class="kasten tipp" data-titel="Der Ton macht's: Der Kobold ist kein Bösewicht">
+    <ul>
+      <li>Der Kobold ist ein <b>Spaßvogel</b>, kein Feind. Er kichert („Hihi!“), versteckt sich und ärgert sich lautstark, wenn er erwischt wird („Menno! Schon wieder gefunden!“). Gib ihm ruhig eine eigene Stimme.</li>
+      <li>Macht {{KIND}} selbst einen Fehler, war es eben der Kobold: „Aha, der Kobold hat sich in deinen Kopf geschlichen. Fangen wir ihn!“ So wird aus einem Fehler ein Spiel statt einer Niederlage.</li>
+      <li>Mach auch du absichtlich Fehler und freu dich, wenn {{KIND}} dich erwischt. Kinder lieben es, Erwachsene zu korrigieren, und lernen dabei genau hinzuschauen.</li>
+    </ul>
+  </div>
+
+  <div class="kasten material darf-brechen e04-bricht">
+    <ul>
+      <li><a class="blattref" href="#blatt-4-1"></a> und <a class="blattref" href="#blatt-4-2"></a> (Arbeitsblätter) ausdrucken, dazu Bleistift, Radiergummi und einen roten Stift. <a class="blattref" href="#blatt-4-3"></a> (Kobold-Profi) gehört zum Kasten „Schwerer machen“: nur ausdrucken, wenn {{KIND}} die ersten zwei Blätter flott schafft.</li>
+      <li>Die <b>Befehlskarten aus Einheit 1</b> (<a class="blattref" href="#blatt-1-1"></a>: 8 Karten vor, 4 Karten links drehen, 4 Karten rechts drehen) und die <b>Drachen-Figur aus Einheit 2</b> (<a class="blattref" href="#blatt-2-3"></a>) zum Mitschieben am Blatt.</li>
+      <li>Für die Kobold-Jagd am Boden: das <b>Boden-Gitter aus Einheit 2</b> (3&nbsp;·&nbsp;3 Felder aus Malerkrepp), falls es noch klebt. Sonst reicht ein Malerkrepp-Kreuz als Startfeld im Gang. Dazu ein <b>Schatz</b> (Kuscheltier oder Zuckerl) und eine <b>Wäschekluppe</b> als Kobold-Kluppe.</li>
+      <li>Etwa <b>12 Muggelsteine</b> als Spielpunkte für die Kobold-Jagd. Dazu ein leeres <b>Marmeladeglas</b> als Fehler-Schatzglas (Kasten „Basteln“) und ein eigener Vorrat von etwa <b>30 Muggelsteinen oder Perlen</b> dafür. Das Glas füllt sich über mehrere Einheiten.</li>
+      <li><b>Vorher, ohne {{KIND}} (10 Min):</b>
+        <ul>
+          <li>Anleitung lesen, besonders „Spiel: Kobold-Jagd“ und den Kasten „So jagt man Kobolde“ (5 Min).</li>
+          <li>Blätter drucken, Befehlskarten nach Sorten ordnen (2 Min).</li>
+          <li>Startfeld im Gang markieren oder das Boden-Gitter prüfen, Schatz, Spielpunkte und Glas-Vorrat bereitlegen, dein erstes Kobold-Programm auf einen Zettel schreiben, z. B. das Beispiel aus dem Kasten „Spiel“ (3 Min).</li>
+        </ul>
+      </li>
+      <li><b>Extra, außerhalb der Einheit (10 Min, gemeinsam):</b> Kobold-Kluppe bemalen und Fehler-Schatzglas bekleben (Kasten „Basteln“). Ohne Basteln geht es auch: Dann ist die Kluppe einfach eine Kluppe.</li>
+    </ul>
+  </div>
+
+  <h2>Ablauf Schritt für Schritt</h2>
+  <ol class="ablauf e04-ablauf">
+    <li data-min="3"><span class="schritt-titel">Der Kobold stellt sich vor</span>Erzähl kurz vom Kobold (Beispielsätze unten) und zeig seine drei Streiche mit Befehlskarten am Tisch. Leg <m-programm befehle="vor vor rechts" gr="5.5" nummern="nein" class="e04-inline"></m-programm> hin: „Das ist ein richtiges Programm.“ Dann spielst du den Kobold, und {{KIND}} schaut zu: <b>Streich 1:</b> rechts drehen gegen links drehen tauschen (ein Befehl ist <b>falsch</b>). Zurücklegen. <b>Streich 2:</b> ein vor wegnehmen (ein Befehl <b>fehlt</b>). Zurücklegen. <b>Streich 3:</b> ein vor dazulegen (ein Befehl ist <b>zu viel</b>). Wichtig ist die <b>Kobold-Regel</b>: Er macht immer genau <b>einen</b> Streich.</li>
+    <li data-min="4"><span class="schritt-titel">Stopp, Kobold!</span>Bewegung zum Aufwärmen (Kasten „Bewegung“): Du bist der Roboter und läufst ein Karten-Programm im Gang, machst aber irgendwo einen Fehler. {{KIND}} ruft „Stopp, Kobold!“ und sagt, was richtig gewesen wäre. Nach 2 Programmen tauscht ihr.</li>
+    <li data-min="8"><span class="schritt-titel">Kobold-Jagd am Boden</span>Das Hauptspiel (Kasten „Spiel: Kobold-Jagd“). Du fängst als Kobold an, damit {{KIND}} sieht, wie es geht. Spielt 2 Runden, jede ist einmal Kobold. Eine Runde dauert etwa 4 Minuten, denn der Kobold muss erst ein richtiges Programm legen. Bei viel Lust und Zeit spielt ihr 4 Runden, dann lasst ihr Blatt 4-2 heute weg. Wenn {{KIND}} Kobold ist, hilf ihr beim ersten Mal leise: „Leg zuerst das richtige Programm, dann mach genau einen Streich.“</li>
+    <li data-min="6"><span class="schritt-titel">Blatt „Kobold-Jagd“</span><a class="blattref" href="#blatt-4-1"></a>. Die Drachen-Figur liegt bereit. Bei Aufgabe 1 geht {{KIND}} das Programm nur bis Befehl 3 durch: Finger auf Befehl 1, Figur ziehen, Finger auf Befehl 2, Figur drehen … Bei Aufgabe 2 und 3 kreist sie den falschen Befehl rot ein und daneben bei „Was ist richtig?“ den richtigen. Frag nach jeder Aufgabe: „Probier's aus: Kommt der Drache jetzt an?“ Die Profi-Aufgabe ist freiwillig.</li>
+    <li data-min="6"><span class="schritt-titel">Blatt „Wo ist der Drache?“</span><a class="blattref" href="#blatt-4-2"></a>. Jetzt kommen die anderen zwei Kobold-Streiche: Bei Aufgabe 2 <b>fehlt</b> ein Befehl. {{KIND}} malt einen Strich in die Lücke zwischen zwei Kästchen und kreist ein, welcher Befehl dorthin gehört. Bei Aufgabe 3 ist einer <b>zu viel</b>: durchstreichen. Ist {{KIND}} nach dem ersten Blatt müde, kommt dieses Blatt an einem anderen Tag dran.</li>
+    <li data-min="2"><span class="schritt-titel">Sammelpass und Schatzglas</span>Feld „Einheit&nbsp;4“ im Sammelpass stempeln oder bekleben, Sterne anmalen. Zählt gemeinsam, wie viele Kobolde ihr heute gefangen habt (bei „Stopp, Kobold!“, bei der Kobold-Jagd und auf den Blättern). Für jeden wandert genau ein Muggelstein aus dem Glas-Vorrat ins Fehler-Schatzglas. Frag: „Welcher Kobold-Streich war am schwersten zu finden?“</li>
+  </ol>
+
+  <div class="kasten tipp" data-titel="So jagt man Kobolde (für dich und für {{KIND}})">
+    <p>Diese vier Schritte sind der Kern der Einheit. Sag sie immer wieder in denselben Worten, bis {{KIND}} sie selbst sagt:</p>
+    <ol>
+      <li><b>Ausprobieren:</b> Wo landet der Drache? Kommt er beim Schatz an, stößt er an, oder bleibt er woanders stehen?</li>
+      <li><b>Mitgehen:</b> Befehl für Befehl, mit dem Finger auf dem Kästchen und der Figur im Gitter. Laut sagen: „Befehl 1: vor. Jetzt steht er hier.“</li>
+      <li><b>Die Stelle finden:</b> Wo geht es schief? Der Fehler steckt genau dort <b>oder kurz davor</b>. Auf <a class="blattref" href="#blatt-4-1"></a>, Aufgabe 2 stößt der Drache bei Befehl 4 an den Rand, der Kobold steckt aber in Befehl 3.</li>
+      <li><b>Reparieren und nochmal ausprobieren:</b> Erst wenn der Drache am Schatz steht, ist der Kobold wirklich gefangen.</li>
+    </ol>
+    <p>Merksatz für {{KIND}}: „Ausprobieren, mitgehen, finden, reparieren.“</p>
+  </div>
+
+  <h3>Beispielsätze</h3>
+  <div class="sag">
+    <p class="du">„Weißt du, wer heute bei uns wohnt? Der Fehler-Kobold! Er ist ganz klein, kichert die ganze Zeit und hat nur Unsinn im Kopf. Wenn wir nicht aufpassen, schleicht er sich in unsere Programme und versteckt einen Fehler. Aber immer nur einen, das ist seine Regel.“</p>
+    <p class="sie">„Ist der böse?“</p>
+    <p class="du">„Nein, nur frech. Und er ärgert sich furchtbar, wenn ihn jemand erwischt. Glaubst du, du kannst ihn fangen?“</p>
+    <p class="sie">„Klar! Ich bin die Kobold-Jägerin!“</p>
+    <p class="dann">Wenn {{KIND}} mag, darf der Kobold einen Namen bekommen. Ab jetzt ist jeder Fehler ein Kobold, auch deine und ihre eigenen.</p>
+  </div>
+  <div class="sag">
+    <p class="du">(bei Aufgabe 1 auf <a class="blattref" href="#blatt-4-1"></a>, Finger auf Befehl 3) „Stopp! Wo ist der Drache jetzt, nach Befehl 3?“</p>
+    <p class="sie">„In der Mitte. Er schaut nach links.“</p>
+    <p class="du">„Woher weißt du das?“</p>
+    <p class="sie">„Er ist einmal vor gegangen, dann hat er links gedreht und ist noch einmal vor.“</p>
+    <p class="dann">Genau dieses „Anhalten und nachschauen“ ist das Werkzeug der Kobold-Jagd. Sagt sie „rechts unten“ oder hat sie die Drehung vergessen, nicht korrigieren, sondern gemeinsam mit der Figur von vorn mitgehen.</p>
+  </div>
+  <div class="sag">
+    <p class="du">(bei Aufgabe 2 auf <a class="blattref" href="#blatt-4-1"></a>) „Probier mal das Kobold-Programm aus. Was passiert?“</p>
+    <p class="sie">„Er geht rauf bis ganz oben, dreht links und dann … bumm, an den Rand!“</p>
+    <p class="du">„Bei welchem Befehl hat es bumm gemacht?“</p>
+    <p class="sie">„Bei Befehl 4. Also ist Befehl 4 falsch!“</p>
+    <p class="du">„Hm. Befehl 4 ist ein vor. Ist vor dort falsch, oder schaut der Drache schon vorher in die falsche Richtung?“</p>
+    <p class="sie">„Ah! Er hätte rechts drehen müssen, nicht links. Befehl 3!“</p>
+    <p class="dann">Der Ort des Anstoßens ist nicht immer der Ort des Fehlers. Diese Entdeckung ist der wichtigste Aha-Moment der Einheit. Lass {{KIND}} ihn selbst finden.</p>
+  </div>
+  <div class="sag">
+    <p class="du">(wenn {{KIND}} sich ärgert, weil sie danebenlag) „Der Kobold hat dich kurz ausgetrickst. Das passiert den besten Kobold-Jägerinnen. Gehen wir nochmal mit?“</p>
+    <p class="sie">„Na gut. Aber diesmal erwisch ich ihn!“</p>
+    <p class="dann">Lob das Suchen, nicht nur das Finden: „Super, wie genau du mitgegangen bist!“</p>
+  </div>
+
+  <h2>Spiele, Bewegung und Basteln</h2>
+
+  <div class="kasten spiel darf-brechen e04-bricht" data-titel="Kobold-Jagd">
+    <p class="spiel-meta">2 Personen · 2 Runden etwa 8 Minuten, 4 Runden etwa 15 Minuten · Befehlskarten von <a class="blattref" href="#blatt-1-1"></a> (8 Karten vor, 4 Karten links drehen, 4 Karten rechts drehen), Startfeld, Schatz, Wäschekluppe, etwa 12 Muggelsteine als Spielpunkte</p>
+    <ol class="regeln">
+      <li><b>Spielfeld:</b> Am besten das Boden-Gitter aus Einheit 2 (3&nbsp;·&nbsp;3 Felder). Der Schatz liegt in einem Feld, das Startfeld ist ein anderes. Ohne Gitter: Startkreuz im Gang, Schatz 3 bis 6 große Schritte entfernt, gern um eine Ecke. Ein vor ist dann ein großer Schritt.</li>
+      <li><b>Rollen:</b> Einer ist der <b>Kobold</b>, der andere die <b>Jägerin</b> (oder der Jäger). Der Kobold ist gleichzeitig der <b>Roboter</b>, der das Programm abläuft.</li>
+      <li><b>Kobold-Zeit:</b> Die Jägerin dreht sich um und wartet. Es gibt keine Zeitgrenze, summen oder bis 20 zählen ist nur Spaß. Der Kobold legt neben das Startfeld eine Reihe Befehlskarten, die den Roboter zum Schatz bringen würde, und macht dann <b>genau einen Streich</b>: eine Karte gegen eine andere tauschen, eine Karte wegnehmen oder eine Karte dazulegen. Erst dann ruft er: „Hihi, fertig! Genau ein Fehler!“, und die Jägerin darf sich umdrehen.</li>
+      <li><b>Jagen ohne Probelauf:</b> Die Jägerin liest das Programm, geht es im Kopf oder mit dem Finger durch und klemmt die Kobold-Kluppe an die verdächtige Karte. Fehlt eine Karte, legt sie die Kluppe in die Lücke, in die die Karte gehört, auch wenn das ganz am Ende ist. Dann repariert sie das Programm. <b>Reparieren heißt: genau eine Karte tauschen, wegnehmen oder dazulegen.</b></li>
+      <li><b>Probelauf (wenn sie unsicher ist):</b> Die Jägerin sagt „Probelauf, bitte!“. Der Kobold läuft als Roboter das kaputte Programm, genau wie es daliegt, auch wenn er gegen die Wand marschiert. Stößt er an, bleibt er stehen: „Hier hat der Kobold zugeschlagen!“ Danach repariert die Jägerin.</li>
+      <li><b>Prüfen:</b> Der Roboter läuft das reparierte Programm. Steht er am Ende auf dem Schatz, ist der Kobold gefangen. Die Jägerin bekommt <b>2 Muggelsteine</b>, wenn sie ohne Probelauf repariert hat, sonst <b>1 Muggelstein</b>. Jede Reparatur mit genau einer Änderung gilt, wenn der Roboter damit ankommt, auch eine andere als die des Kobolds.</li>
+      <li><b>Daneben:</b> Kommt der Roboter nicht an, bekommt der Kobold 1 Muggelstein, auch wenn es mehrere Versuche braucht, höchstens einen pro Runde. Die Jägerin repariert noch einmal (ohne Punkte), bis es klappt. So endet jede Runde mit einem Programm, das funktioniert.</li>
+      <li><b>Rollentausch</b> nach jeder Runde.</li>
+      <li><b>Ende:</b> nach 2 Runden (jede ist einmal Kobold), bei viel Lust nach 4. Wer mehr Muggelsteine hat, gewinnt. Gleich viele: Ihr seid ein Kobold-Jäger-Team. Danach kommen die Spielpunkte zurück in den Vorrat. Ins Fehler-Schatzglas wandert für jeden gefangenen Kobold genau ein Stein, denn gefangen habt ihr ihn zusammen.</li>
+    </ol>
+    <p><b>Kobold-Ehrenwort:</b> Der Roboter macht beim Laufen genau, was die Karten sagen. Hat der Kobold aus Versehen zwei Fehler oder keinen eingebaut, gibt es für ihn keinen Stein: zugeben, lachen, neu legen. Damit die Karten für jeden Streich reichen, nimm Programme mit höchstens 7 vor und je 3 Drehungen.</p>
+    <p><b>Varianten:</b></p>
+    <ul>
+      <li><b>Ansage-Kobold (leichter):</b> Der Kobold verrät die Sorte: „Ich habe etwas getauscht“ (oder „weggenommen“, „dazugelegt“).</li>
+      <li><b>Kopf-Jagd (schwerer):</b> Probelauf verboten. Dafür gibt es 3 Muggelsteine.</li>
+      <li><b>Doppel-Kobold (schwerer):</b> Der Kobold macht zwei Streiche und sagt das an. Die Jägerin darf dann zwei Änderungen machen. Für jeden gefangenen Kobold gibt es 2 Muggelsteine, mit Probelauf 1. Damit die Karten für zwei Streiche reichen, nimm Programme mit höchstens 6 vor und je 2 Drehungen.</li>
+      <li><b>Stein-Kobold:</b> Ein Polster liegt als Stein in einem Feld. Der Roboter darf nicht hinein, er stößt an und bleibt stehen.</li>
+      <li><b>Verkehrt-Start (Profi):</b> Der Roboter startet mit Blick zur Jägerin. Dann ist sein links von ihr aus rechts.</li>
+    </ul>
+  </div>
+
+  <div class="sag">
+    <p class="du">(Boden-Gitter 3&nbsp;·&nbsp;3, Start links unten, der Roboter schaut nach oben, der Schatz liegt rechts oben. Das richtige Programm wäre vor, vor, rechts drehen, vor, vor. Du als Kobold nimmst ein vor weg.) „Hihi, fertig! Genau ein Fehler!“ (Es liegt: vor, rechts drehen, vor, vor.)</p>
+    <p class="sie">„Probelauf, bitte!“</p>
+    <p class="du">(läufst als Roboter: einen Schritt hinauf, rechts drehen, zwei Schritte nach rechts) „Ich bin fertig. Aber wo ist mein Schatz?“</p>
+    <p class="sie">„Der ist ein Feld über dir! Du bist zu früh abgebogen. Da fehlt ein vor am Anfang!“</p>
+    <p class="dann">Richtig: Mit dem Kobold-Programm steht der Roboter genau ein Feld unter dem Schatz. Das zweite vor gehört an den Anfang, dann kommt er an. Andere Reparaturen gibt es hier nicht. 1 Muggelstein für {{KIND}}. Beim nächsten Mal versucht sie es bestimmt ohne Probelauf.</p>
+  </div>
+
+  <div class="kasten bewegung" data-titel="Stopp, Kobold!">
+    <p>Leg 5 bis 7 Befehlskarten als Programm in den Gang. Du bist der Roboter und läufst es langsam ab, Karte für Karte. Irgendwo machst du einen Kobold-Fehler: zwei Schritte statt einem, falsch drehen, eine Karte überspringen. {{KIND}} ruft sofort „Stopp, Kobold!“. Du erstarrst wie eine Statue. Sie sagt, was richtig gewesen wäre, und du gehst zurück auf das letzte richtige Feld und machst weiter.</p>
+    <ul>
+      <li>Nach 2 Programmen tauscht ihr: {{KIND}} ist der Roboter und baut beim Laufen absichtlich einen Fehler ein. Du rufst „Stopp, Kobold!“. Ruf ruhig auch einmal zu spät, dann darf sie dich lachend verbessern.</li>
+      <li><b>Kobold-Musik:</b> Mit Musik im Hintergrund. Wenn die Musik stoppt, muss der Roboter sofort sagen, bei welchem Befehl er gerade ist.</li>
+      <li><b>Flüster-Kobold:</b> Der Roboter macht alles richtig, behauptet aber einmal: „Fehler!“ {{KIND}} muss erklären, warum das gar kein Fehler war.</li>
+    </ul>
+  </div>
+
+  <div class="kasten basteln" data-titel="Kobold-Kluppe und Fehler-Schatzglas">
+    <ol>
+      <li><b>Kobold-Kluppe:</b> Eine Holz-Wäschekluppe mit Filzstift grün anmalen, Augen und ein freches Grinsen draufmalen. Zwei spitze Ohren aus Papier ausschneiden und mit Tixo seitlich ankleben, ein paar Wollfäden als Haare. Bei der Kobold-Jagd zwickt die Kluppe an die verdächtige Karte.</li>
+      <li><b>Fehler-Schatzglas:</b> Ein leeres Marmeladeglas mit Papier bekleben und beschriften: „Gefangene Kobolde“. Jeder gefangene Kobold, am Papier, am Boden oder im Alltag, bringt genau einen Muggelstein ins Glas. Die Spielpunkte aus der Kobold-Jagd zählen nicht extra, sie bleiben im Spiel-Vorrat. Bei 20 Steinen gibt es einen Extra-Sticker im Sammelpass.</li>
+    </ol>
+    <p>Das Glas macht sichtbar, worum es geht: Gefundene Fehler sind etwas Wertvolles, das man sammelt. Es bleibt auch für die nächsten Einheiten stehen.</p>
+  </div>
+
+  <h2>Wenn es hakt oder zu leicht ist</h2>
+
+  <m-linksrechts></m-linksrechts>
+
+  <div class="kasten stolper darf-brechen e04-bricht">
+    <ul>
+      <li><b>Sie rät, statt mitzugehen</b> („Der da ist falsch!“): Frag „Zeig mir, wo der Drache nach Befehl 2 steht.“ Bestehe auf Finger und Figur, mindestens bis zur verdächtigen Stelle. Raten ist kein Fehler, aber Mitgehen ist das Werkzeug.</li>
+      <li><b>Sie repariert dort, wo der Drache anstößt,</b> statt davor: siehe Beispielsätze. Frag: „Schaut der Drache schon vorher in die falsche Richtung?“ Bei <a class="blattref" href="#blatt-4-1"></a>, Aufgabe 2 stößt er bei Befehl 4 an, der Fehler ist Befehl 3.</li>
+      <li><b>Sie verliert beim Mitgehen den Faden:</b> Ein Muggelstein wandert von Kästchen zu Kästchen mit. Die Figur bleibt nach jedem Befehl stehen, erst dann kommt der nächste.</li>
+      <li><b>Links und rechts verwechselt,</b> wenn der Drache nach links oder unten schaut: Blatt drehen, bis die Nase der Figur nach oben zeigt, oder selbst hinter die Figur stellen (Kasten „Hilfen für links und rechts“).</li>
+      <li><b>Sie ändert mehrere Befehle</b> oder will das Programm neu schreiben: Erinnere an die Kobold-Regel: „Der Kobold macht nur einen Streich. Schaffst du es mit einer einzigen Änderung?“ Klappt ihr neues Programm, ist das trotzdem eine Leistung, lob es.</li>
+      <li><b>Sie findet eine andere Reparatur</b> als in den Lösungen: Probiert sie mit der Figur aus. Kommt der Drache an, gilt sie. Bei den Blättern gibt es keine anderen Reparaturen (siehe Lösungen), am Boden manchmal schon.</li>
+      <li><b>Beim „zu viel“ streicht sie ein anderes vor</b> als in der Lösung: Von drei vor hintereinander ist es egal, welches weg ist. Genau das fragt die Profi-Aufgabe auf <a class="blattref" href="#blatt-4-2"></a>.</li>
+      <li><b>„vor“ als Wort stiftet Verwirrung</b> („Der Befehl fehlt vor Befehl 3“): Sag lieber „zwischen Befehl 2 und 3 fehlt etwas“ oder „nach Befehl 2“.</li>
+      <li><b>Als Kobold baut sie zwei Fehler ein</b> oder gar keinen: Normal! Ein Programm absichtlich kaputt zu machen ist schwerer, als es scheint. Hilf mit dem Trick „Erst richtig legen, dann ein Streich“.</li>
+      <li><b>Frust:</b> Sofort in den Kasten „Leichter machen“ wechseln und den Kobold herrlich laut jammern lassen, wenn sie ihn fängt.</li>
+    </ul>
+  </div>
+
+  <div class="zwei">
+    <div class="kasten leichter">
+      <ul>
+        <li>Der Kobold sagt die Sorte an (Ansage-Kobold).</li>
+        <li>Nur kurze Programme: 3 bis 4 Karten am Boden.</li>
+        <li>Fehler eingrenzen: „Der Kobold steckt in den ersten drei Befehlen.“</li>
+        <li>Am Papier die Drachen-Figur immer mitschieben und jedes Feld, durch das der Drache geht, mit einem Punkt markieren.</li>
+        <li><a class="blattref" href="#blatt-4-1"></a> reicht für heute. <a class="blattref" href="#blatt-4-2"></a> an einem anderen Tag.</li>
+        <li>Erst „Stopp, Kobold!“ öfter spielen. Fehler beim Laufen zu sehen ist leichter als im Programm.</li>
+      </ul>
+    </div>
+    <div class="kasten bonus" data-titel="Bonus-Knobelei">
+      <p class="klein"><i>Für zwischendurch: im Auto, im Wartezimmer, beim Abendessen.</i></p>
+      <p><b>Anzieh-Kobold:</b> „Mein Anzieh-Programm: Unterhose, Hose, Hose, Socken, Schuhe. Wo ist der Kobold?“</p>
+      <p><b>Zahnputz-Kobold:</b> „Zahnpasta auf die Bürste, Mund ausspülen, fertig. Welcher Befehl fehlt?“</p>
+      <p><b>Dreh-Kobold:</b> „Der Drache schaut nach oben. Ich wollte, dass er nach unten schaut. Mein Programm war: rechts drehen. Wo ist der Kobold?“</p>
+      <p><b>Für Profis:</b> „Der Drache schaut nach unten. Er macht dreimal hintereinander rechts drehen. Welcher eine Befehl macht dasselbe?“</p>
+      <p class="klein"><b>Kurz-Lösungen:</b> eine Hose zu viel; Zähne putzen fehlt; ein rechts drehen fehlt; links drehen. Erklärungen bei den Lösungen am Ende.</p>
+    </div>
+  </div>
+
+  <div class="kasten schwerer darf-brechen e04-schwerer">
+    <p>{{KIND}} ist schnell. Wenn die ersten Kobolde ohne Zögern fallen, wähle hier aus. Das ist kein Zusatz „für später“, sondern ein vollwertiger Hauptteil.</p>
+    <ol class="e04-ganz">
+      <li><b>Kobold-Profi (<a class="blattref" href="#blatt-4-3"></a>):</b> Ein Gitter mit 4&nbsp;·&nbsp;4 Feldern, der Drache startet mit Blick nach unten, das Programm hat 12 Befehle, und {{KIND}} muss selbst herausfinden, welche Sorte Streich es war. Bei Aufgabe 2 schaut der Drache auch am Anfang nach unten: Dann ist sein links von ihr aus rechts. Erlaubt: Blatt umdrehen oder die Figur mitdrehen.</li>
+      <li><b>Kopf-Jagd am Papier:</b> Ohne Figur und ohne Finger, nur mit den Augen. Klappt das bei <a class="blattref" href="#blatt-4-1"></a>? Danach mit der Figur kontrollieren.</li>
+      <li><b>Wie viele Reparaturen gibt es?</b> Nimm das Gitter von <a class="blattref" href="#blatt-4-1"></a>, Aufgabe 2 und dieses Kobold-Programm: <m-programm raetsel="e4-s1" gr="5.5" nummern="nein" class="e04-inline"></m-programm>. Der Kobold hat ein links drehen dazugelegt. „Finde drei verschiedene Reparaturen mit je einer Änderung!“ Lösung: Befehl 1 streichen, oder ein rechts drehen direkt vor oder direkt nach dem links drehen einfügen. Zwei Drehungen in entgegengesetzte Richtung heben sich auf. Frag danach: „Welche Reparatur ist die beste?“ (Die kürzeste: streichen.)</li>
+      <li><b>Mittendrin-Probe:</b> Bei langen Programmen (10 Karten am Boden) nicht von vorn bis hinten suchen. Zuerst fragen: „Steht der Drache nach Befehl 5 noch richtig?“ Ja: Der Kobold steckt in der zweiten Hälfte. Nein: in der ersten. So halbiert {{KIND}} die Suche. Das ist ein echter Profi-Trick, er kommt in Einheit 10 (Suchen durch Halbieren) wieder.</li>
+      <li><b>Doppel-Kobold:</b> Zwei Fehler in einem Programm. Wichtig: den ersten Fehler reparieren, dann wieder ausprobieren, bevor man den zweiten sucht.</li>
+      <li><b>Großes Boden-Gitter:</b> Kobold-Jagd auf 4&nbsp;·&nbsp;4 Feldern mit einem Polster als Stein und Programmen bis 12 Karten. Wer Kobold ist, schreibt das Programm vorher auf einen Zettel und legt erst dann die Karten.</li>
+      <li><b>Verkehrt-Start:</b> Der Roboter startet mit Blick zu {{KIND}}. Sie programmiert und jagt aus ihrer Sicht. Hilfe: hinter den Roboter stellen.</li>
+      <li><b>Selbst Kobold am Papier:</b> {{KIND}} nimmt ein gelöstes Programm aus Einheit 2, schreibt es mit genau einem Fehler ab und gibt es dir. Sie muss mit der Figur prüfen, dass der Drache wirklich nicht ankommt. Gemeiner Profi-Trick: ein Fehler, bei dem der Drache nicht anstößt, sondern nur woanders stehen bleibt (wie auf <a class="blattref" href="#blatt-4-1"></a>, Aufgabe 3).</li>
+      <li><b>Wo ist der Drache am Ende?</b> Wie Aufgabe 1 auf den Blättern, aber nur im Kopf: Du liest ein Programm mit 5 bis 7 Befehlen langsam vor, {{KIND}} schließt die Augen und sagt am Ende Feld und Blickrichtung. Profi-Stufe: Du hörst mittendrin auf („Stopp nach Befehl 4!“). Am Boden-Gitter darf sie danach nachlaufen.</li>
+      <li><b>Kobolde im Alltag:</b> Schreib ein Rezept oder eine Bastelanleitung mit einem Fehler (Kakao: Milch in den Becher, umrühren, Kakaopulver hinein). {{KIND}} findet ihn und begründet, was dann passieren würde. Das passt auch zu den Abläufen aus Einheit 3.</li>
+    </ol>
+  </div>
+
+  <h2>Hintergrund</h2>
+  <div class="kasten warum">
+    <p>Ein Fehler in einem Programm heißt auf Englisch <span class="begriff">Bug</span> (Käfer), das Fehlersuchen <span class="begriff">Debuggen</span> („entkäfern“). Unser Fehler-Kobold ist also ein Bug, die Kobold-Jagd ist Debuggen. Das Wort ist älter als Computer, berühmt wurde es aber 1947: Am Großrechner Harvard Mark II, an dem die Programmiererin Grace Hopper arbeitete, fand das Team eine echte Motte in einem Schaltrelais. Sie klebten sie ins Logbuch, mit dem Vermerk, das sei der erste echte Fall eines gefundenen Bugs.</p>
+    <p>Fehler sind beim Programmieren völlig normal. Profis verbringen einen großen Teil ihrer Arbeitszeit damit, Fehler zu suchen, auch in ihren eigenen Programmen. Die drei Kobold-Streiche entsprechen echten Fehlerarten: eine falsche <span class="begriff">Anweisung</span>, eine fehlende und eine überzählige. „Ein vor zu viel oder zu wenig“ heißt bei Profis <i>Off-by-one-Fehler</i> und gehört zu den häufigsten Fehlern überhaupt.</p>
+    <p>„Wo ist der Drache nach Befehl 3?“ ist genau das, was Profis mit einem <i>Debugger</i> machen: Sie halten das Programm an einer bestimmten Stelle an (ein <i>Haltepunkt</i>) und schauen nach, ob alles so ist, wie es sein soll. Das Programm von Hand durchzugehen heißt <i>Schreibtischtest</i>. Und dass es oft mehrere Reparaturen gibt („Auch richtig“), ist auch in der echten Welt so: Die beste ist meist die kleinste und die, die man am leichtesten versteht.</p>
+  </div>
+
+  <h2>Bildschirm-Bonus</h2>
+  <div class="kasten bildschirm darf-brechen e04-bricht">
+    <p><b>Paket 4 „Kobold-Jagd“, Schlüsselwort: KOBOLD.</b> Den QR-Code auf <a class="blattref" href="#blatt-4-2"></a> mit dem Handy oder Tablet scannen, das Wort KOBOLD eingeben (groß oder klein ist egal). Nur am Schluss, nur wenn noch Lust da ist, höchstens 5 bis 10 Minuten. Die Einheit ist auch ohne Bildschirm vollständig.</p>
+    <p>Das Paket hat 6 Levels. In jedem steckt ein Kobold-Programm mit genau einem Fehler, das schon fertig dasteht. {{KIND}} repariert es und lässt den Drachen laufen. Die App prüft nur, ob der Drache am Schatz ankommt, so wie ihr am Papier: Jede Reparatur, die ankommt, zählt. Für jedes reparierte Level gibt es einen Stern.</p>
+    <p><b>So repariert man in der App</b> (zeig es beim ersten Level einmal vor):</p>
+    <ul>
+      <li><b>Falscher oder überzähliger Befehl:</b> den Befehl antippen. Unten erscheinen vor, links drehen und rechts drehen zum Ersetzen und die Taste mit Karte und rotem X zum Löschen.</li>
+      <li><b>Fehlender Befehl:</b> auf das Plus in der Lücke tippen (zwischen zwei Befehlen, ganz am Anfang oder ganz am Ende) und den fehlenden Befehl wählen.</li>
+      <li><b>„Los“</b> lässt den Drachen laufen. <b>„Nochmal“</b> stellt nur den Drachen zurück an den Start, das reparierte Programm bleibt. <b>„Neu“</b> holt das Kobold-Programm wieder so her, wie es am Anfang war. Das hilft, wenn sich {{KIND}} verbastelt hat.</li>
+    </ul>
+    <p><b>Die Levels:</b></p>
+    <ul>
+      <li><b>Level 1</b> ist Aufgabe 2 von <a class="blattref" href="#blatt-4-1"></a> und <b>Level 4</b> ist Aufgabe 3 von <a class="blattref" href="#blatt-4-2"></a>. Die kennt {{KIND}} schon, das gibt Sicherheit.</li>
+      <li>Level 2 (falscher Befehl), Level 3 (ein vor fehlt, der Drache startet nach rechts), Level 5 (4&nbsp;·&nbsp;4 Felder, Start nach links, ein vor fehlt) und Level 6 (4&nbsp;·&nbsp;4 Felder, Start nach rechts, falsche Drehung gleich am Anfang) sind neu.</li>
+      <li>Nach Level 6 kommt „Super! Jetzt zurück zum Papier.“ <b>Dann wird das Gerät weggelegt</b>, auch wenn {{KIND}} noch möchte: „Der Kobold schläft jetzt. Komm, wir stempeln den Sammelpass.“</li>
+      <li><b>Wann?</b> Mit beiden Blättern dauert die Einheit schon knapp 30 Minuten. Der Bildschirm-Bonus passt deshalb meist besser an einen eigenen kurzen Tag, nach Blatt 4-2: eine Runde „Stopp, Kobold!“ zum Aufwärmen, dann die Levels. Nur wenn ihr heute flott wart und {{KIND}} noch frisch ist, gleich im Anschluss.</li>
+    </ul>
+  </div>
+
+  <h2>Lösungen</h2>
+  <div class="e04-loes">
+    <m-loesungen einheit="4"></m-loesungen>
+    <div class="kasten loesung e04-l12" data-titel="In Worten: Blatt 4-1 und 4-2">
+      <p><b><span class="e04-nw">Blatt 4-1</span>, Aufgabe 1:</b> Nach Befehl 3 steht der Drache im mittleren Feld und schaut nach links (vor, links drehen, vor). Am Ende des Programms steht er auf dem Schatz links oben.</p>
+      <p><b><span class="e04-nw">Blatt 4-1</span>, Aufgabe 2:</b> Befehl 3 (links drehen) ist falsch, richtig ist rechts drehen. Mit dem Kobold-Programm geht der Drache bis ganz nach oben, dreht nach links und stößt bei Befehl 4 an den Rand. <b>Auch richtig:</b> keine andere Reparatur, nur diese eine.</p>
+      <p><b><span class="e04-nw">Blatt 4-1</span>, Aufgabe 3:</b> Befehl 5 (rechts drehen) ist falsch, richtig ist links drehen. Mit dem Kobold-Programm stößt der Drache nirgends an, landet aber rechts oben statt beim Schatz links oben. <b>Auch richtig:</b> keine andere Reparatur.</p>
+      <p><b><span class="e04-nw">Blatt 4-1</span>, Profi:</b> bei Befehl 4.</p>
+      <p><b><span class="e04-nw">Blatt 4-2</span>, Aufgabe 1:</b> Nach Befehl 5 steht der Drache in der mittleren Reihe ganz rechts und schaut nach rechts. Am Ende steht er auf dem Schatz rechts oben.</p>
+      <p><b><span class="e04-nw">Blatt 4-2</span>, Aufgabe 2:</b> Zwischen Befehl 2 und Befehl 3 fehlt links drehen. Mit dem Kobold-Programm geht der Drache bis rechts oben und stößt bei Befehl 3 an den Rand. <b>Auch richtig:</b> keine andere Reparatur.</p>
+      <p><b><span class="e04-nw">Blatt 4-2</span>, Aufgabe 3:</b> Ein vor ist zu viel. Befehl 2, 3 oder 4 streichen ist dasselbe: Danach stehen genau zwei vor hintereinander. Mit dem Kobold-Programm stößt der Drache rechts unten bei Befehl 4 an den Rand. <b>Auch richtig:</b> keine andere Reparatur.</p>
+      <p><b><span class="e04-nw">Blatt 4-2</span>, Profi:</b> Befehl 2, 3 oder 4, die drei vor hintereinander. Jedes davon kann weg. Die Reihenfolge der drei Zahlen ist egal.</p>
+    </div>
+    <div class="kasten loesung e04-l3" data-titel="In Worten: Blatt 4-3, Bildschirm, Bonus">
+      <p><b><span class="e04-nw">Blatt 4-3</span>, Aufgabe 1:</b> Ein Befehl ist zu viel: Von den Befehlen 4, 5 und 6 (vor, vor, vor) eines streichen. Mit dem Kobold-Programm dreht der Drache zuerst nach links (von {{KIND}} aus gesehen), geht ein Feld, dreht nach oben, geht zwei Felder hinauf und stößt bei Befehl 6 an den Stein. <b>Auch richtig:</b> keine andere Reparatur. <b>Knobel-Ecke:</b> 11 Befehle.</p>
+      <p><b><span class="e04-nw">Blatt 4-3</span>, Aufgabe 2:</b> Nach Befehl 4 steht der Drache in der untersten Reihe im mittleren Feld und schaut nach rechts (von {{KIND}} aus). Sein links drehen bei Befehl 3 zeigt nämlich, wenn er nach unten schaut, von uns aus nach rechts. Am Ende steht er auf dem Schatz.</p>
+      <p><b>Bildschirm-Levels:</b> Level 2: Befehl 2 (links drehen) ist falsch, richtig ist vor. Level 3: Am Anfang fehlt ein zweites vor. Level 5: Nach der zweiten Drehung fehlt ein drittes vor. Level 6: Befehl 1 (rechts drehen) ist falsch, richtig ist links drehen. Level 1 und 4 wie auf den Blättern. <b>Auch richtig:</b> bei keinem Level eine andere Reparatur.</p>
+      <p><b>Bonus:</b> Eine Hose ist zu viel (zwei Hosen übereinander!). „Zähne putzen“ fehlt nach der Bürste. Dreh-Kobold: Ein rechts drehen fehlt. Mit einem rechts drehen schaut der Drache nach rechts, erst mit zwei (eine halbe Drehung) nach unten. Ob das neue davor oder danach kommt, ist egal. Für Profis: Dreimal rechts drehen ist wie einmal links drehen. Der Drache schaut danach (von uns aus) nach rechts.</p>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 4-1: Kobold-Jagd (Stand nach Befehl 3, falsche Befehle)     -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="4" data-titel="Kobold-Jagd" data-art="Arbeitsblatt" data-verteilt>
+  <div class="aufg e04-neben">
+    <m-gitter raetsel="e4-l1" feld="20" loesung="nach:3"></m-gitter>
+    <p class="anw">{{KIND}}, wo ist der Drache nach Befehl 3? Male ein Kreuz in das Feld.</p>
+    <m-programm raetsel="e4-l1"></m-programm>
+    <div class="e04-wahlzeile"><span class="e04-frage">Wohin schaut er?</span><m-e4-blick raetsel="e4-l1" nach="3"></m-e4-blick></div>
+  </div>
+
+  <div class="aufg e04-neben">
+    <m-gitter raetsel="e4-k1" feld="20"></m-gitter>
+    <p class="anw">Der Kobold war da! Ein Befehl ist falsch. Kreise ihn rot ein.</p>
+    <m-programm raetsel="e4-k1"></m-programm>
+    <div class="e04-wahlzeile"><span class="e04-frage">Was ist richtig?</span><m-e4-befehl raetsel="e4-k1"></m-e4-befehl></div>
+  </div>
+
+  <div class="aufg e04-neben">
+    <m-gitter raetsel="e4-k2" feld="20"></m-gitter>
+    <p class="anw">Hier auch! Finde den falschen Befehl.</p>
+    <m-programm raetsel="e4-k2"></m-programm>
+    <div class="e04-wahlzeile"><span class="e04-frage">Was ist richtig?</span><m-e4-befehl raetsel="e4-k2"></m-e4-befehl></div>
+  </div>
+
+  <div class="profi">
+    <p><m-symbol name="kobold" gr="15" class="e04-rechtsbild"></m-symbol>Aufgabe 2 mit Kobold-Programm: Bei welchem Befehl stößt der Drache an? <m-feld l="4" art="k"></m-feld></p>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 4-2: Wo ist der Drache? (Stand nach Befehl 5, fehlt, zu viel) -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="4" data-titel="Wo ist der Drache?" data-art="Arbeitsblatt" data-verteilt>
+  <div class="aufg e04-neben">
+    <m-gitter raetsel="e4-l2" feld="20" loesung="nach:5"></m-gitter>
+    <p class="anw">{{KIND}}, wo ist der Drache nach Befehl 5? Male ein Kreuz in das Feld.</p>
+    <m-programm raetsel="e4-l2"></m-programm>
+    <div class="e04-wahlzeile"><span class="e04-frage">Wohin schaut er?</span><m-e4-blick raetsel="e4-l2" nach="5"></m-e4-blick></div>
+  </div>
+
+  <div class="aufg e04-neben">
+    <m-gitter raetsel="e4-k3" feld="20"></m-gitter>
+    <p class="anw">Ein Befehl fehlt! Male einen Strich in die Lücke.</p>
+    <m-programm raetsel="e4-k3"></m-programm>
+    <div class="e04-wahlzeile"><span class="e04-frage">Was fehlt?</span><m-e4-befehl raetsel="e4-k3"></m-e4-befehl></div>
+  </div>
+
+  <div class="aufg e04-neben">
+    <m-gitter raetsel="e4-k4" feld="20"></m-gitter>
+    <p class="anw">Ein Befehl ist zu viel! Streiche ihn durch und probier es aus.</p>
+    <m-programm raetsel="e4-k4"></m-programm>
+  </div>
+
+  <div class="e04-fuss">
+    <div class="profi">
+      <p>Bei Aufgabe 3 gibt es drei Lösungen.</p>
+      <p>Streiche Befehl <m-feld l="2" art="k"></m-feld>, <m-feld l="3" art="k"></m-feld> oder <m-feld l="4" art="k"></m-feld>.</p>
+    </div>
+    <m-qr paket="e4"></m-qr>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 4-3: Kobold-Profi (4·4, Start nach unten, bis 12 Befehle)  -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="4" data-titel="Kobold-Profi" data-art="Arbeitsblatt" data-verteilt>
+  <div class="aufg e04-neben">
+    <m-gitter raetsel="e4-k5" feld="20"></m-gitter>
+    <p class="anw">{{KIND}}, der Kobold hat wieder genau einen Fehler versteckt. Was hat er gemacht? Kreise ein. Dann repariere das Programm.</p>
+    <m-e4-art raetsel="e4-k5"></m-e4-art>
+    <div class="e04-breit e04-unter"><m-programm raetsel="e4-k5" gr="13"></m-programm></div>
+  </div>
+
+  <div class="aufg e04-neben">
+    <m-gitter raetsel="e4-l3" feld="20" loesung="nach:4"></m-gitter>
+    <p class="anw">Achtung, der Drache schaut nach unten! Wo ist er nach Befehl 4? Male ein Kreuz.</p>
+    <m-programm raetsel="e4-l3" gr="13"></m-programm>
+    <div class="e04-wahlzeile"><span class="e04-frage">Wohin schaut er?</span><m-e4-blick raetsel="e4-l3" nach="4"></m-e4-blick></div>
+  </div>
+
+  <div class="knobel">
+    <p>Wie viele Befehle hat das Programm von Aufgabe 1, wenn du es repariert hast? <m-feld l="11"></m-feld></p>
+  </div>
+</section>

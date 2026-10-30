@@ -1,0 +1,67 @@
+<style>
+  .r-rueck h1 { font-family: var(--text); font-weight: 900; font-size: 24pt; margin: 0 0 2mm 0; }
+  .r-rueck h2 { font-family: var(--text); font-weight: 900; font-size: 13.5pt; color: var(--akzent); margin: 5mm 0 2mm 0; break-after: avoid; }
+  .r-rueck p { margin: 0 0 2mm 0; }
+  .r-rueck table { border-collapse: collapse; width: 100%; font-size: 8.8pt; }
+  .r-rueck th, .r-rueck td { border: 0.35mm solid var(--linie); padding: 1.5mm 1.6mm; vertical-align: top; text-align: left; }
+  .r-rueck th { background: var(--akzent-hell); font-weight: 800; line-height: 1.2; }
+  .r-rueck tr.e { height: 36mm; break-inside: avoid; }
+  .r-rueck .nr { font-weight: 900; font-size: 11pt; }
+  .r-rueck .kl { font-size: 8pt; color: var(--grau); display: block; margin-top: 1mm; line-height: 1.2; hyphens: manual; }
+  .r-rueck .wahl { display: flex; flex-direction: column; gap: 1.6mm; white-space: nowrap; }
+  .r-rueck .box { display: inline-block; width: 3.6mm; height: 3.6mm; border: 0.35mm solid var(--tinte); border-radius: 0.8mm; vertical-align: -0.6mm; margin-right: 1.2mm; }
+  .r-rueck .sterne { display: flex; gap: 0.5mm; line-height: 0; }
+  .r-rueck .strich { font-size: 14pt; font-weight: 800; color: var(--grau); }
+  .r-rueck .minuten { display: block; margin-top: 3mm; border-bottom: 0.3mm solid var(--linie); height: 5mm; font-size: 8pt; color: var(--grau); }
+  .r-rueck .frage { display: grid; grid-template-columns: 62mm 1fr; gap: 2mm 4mm; align-items: baseline; margin-bottom: 3.2mm; break-inside: avoid; }
+  .r-rueck .frage .opts { display: flex; gap: 2mm 5mm; flex-wrap: wrap; }
+  .r-rueck .frage .kl { margin-top: 0.5mm; font-weight: 400; }
+  .r-rueck .linien { border-bottom: 0.3mm solid var(--linie); height: 8mm; }
+  .r-rueck .geraet { display: grid; grid-template-columns: 20mm 1fr; gap: 0 3mm; align-items: end; }
+  .r-rueck .geraet b { font-weight: 700; font-size: 9.5pt; padding-bottom: 1mm; }
+</style>
+
+<section class="fliess nur-buch r-rueck" id="rueckmeldebogen" data-toc="Rückmeldebogen (nach jeder Einheit ausfüllen)" style="page: anleitung; break-before: page" data-block="A">
+  <h1>Rückmeldebogen</h1>
+  <p>Am besten direkt nach jeder Einheit kurz ausfüllen (2 Minuten). Die Sterne aus {{KIND}}s Sammelpass helfen bei „Spaß“. Wenn alle 5 Einheiten fertig sind: abfotografieren oder abtippen und zurückmelden. Danach werden Plan, Schwierigkeit, Stil, Länge und Bildschirm-Anteil angepasst. Den Gerätetest (letzte Seite) bitte vor Einheit 1 machen und das Ergebnis unten bei „Allgemein“ eintragen.</p>
+
+  <h2>Pro Einheit</h2>
+  <table>
+    <tr>
+      <th style="width: 22mm">Einheit</th>
+      <th style="width: 21mm">Spaß</th>
+      <th style="width: 23mm">Schwierigkeit</th>
+      <th style="width: 13mm">Dauer</th>
+      <th style="width: 20mm">Bildschirm genutzt?</th>
+      <th>Was war super?</th>
+      <th>Was hat nicht funktioniert?</th>
+    </tr>
+    <tr class="e"><td><span class="nr">1</span><span class="kl">Ich bin dein Roboter</span></td><td><div class="sterne"><m-stern gr="6"></m-stern><m-stern gr="6"></m-stern><m-stern gr="6"></m-stern></div></td><td><div class="wahl"><span><i class="box"></i>zu leicht</span><span><i class="box"></i>passt</span><span><i class="box"></i>zu schwer</span></div></td><td><span class="kl">Min</span></td><td><span class="strich">–</span><span class="kl">heute kein Bildschirm</span></td><td></td><td></td></tr>
+    <tr class="e"><td><span class="nr">2</span><span class="kl">Drachen-Pfade</span></td><td><div class="sterne"><m-stern gr="6"></m-stern><m-stern gr="6"></m-stern><m-stern gr="6"></m-stern></div></td><td><div class="wahl"><span><i class="box"></i>zu leicht</span><span><i class="box"></i>passt</span><span><i class="box"></i>zu schwer</span></div></td><td><span class="kl">Min</span></td><td><div class="wahl"><span><i class="box"></i>ja</span><span><i class="box"></i>nein</span></div><span class="minuten">Min</span></td><td></td><td></td></tr>
+    <tr class="e"><td><span class="nr">3</span><span class="kl">Erst das, dann das</span></td><td><div class="sterne"><m-stern gr="6"></m-stern><m-stern gr="6"></m-stern><m-stern gr="6"></m-stern></div></td><td><div class="wahl"><span><i class="box"></i>zu leicht</span><span><i class="box"></i>passt</span><span><i class="box"></i>zu schwer</span></div></td><td><span class="kl">Min</span></td><td><div class="wahl"><span><i class="box"></i>ja</span><span><i class="box"></i>nein</span></div><span class="minuten">Min</span></td><td></td><td></td></tr>
+    <tr class="e"><td><span class="nr">4</span><span class="kl">Der Fehler-Kobold</span></td><td><div class="sterne"><m-stern gr="6"></m-stern><m-stern gr="6"></m-stern><m-stern gr="6"></m-stern></div></td><td><div class="wahl"><span><i class="box"></i>zu leicht</span><span><i class="box"></i>passt</span><span><i class="box"></i>zu schwer</span></div></td><td><span class="kl">Min</span></td><td><div class="wahl"><span><i class="box"></i>ja</span><span><i class="box"></i>nein</span></div><span class="minuten">Min</span></td><td></td><td></td></tr>
+    <tr class="e"><td><span class="nr">5</span><span class="kl">Der Wiederhol-Zauber</span></td><td><div class="sterne"><m-stern gr="6"></m-stern><m-stern gr="6"></m-stern><m-stern gr="6"></m-stern></div></td><td><div class="wahl"><span><i class="box"></i>zu leicht</span><span><i class="box"></i>passt</span><span><i class="box"></i>zu schwer</span></div></td><td><span class="kl">Min</span></td><td><div class="wahl"><span><i class="box"></i>ja</span><span><i class="box"></i>nein</span></div><span class="minuten">Min</span></td><td></td><td></td></tr>
+  </table>
+
+  <h2 style="break-before: page">Allgemein</h2>
+  <div class="frage"><b>Tempo insgesamt</b><span class="opts"><span><i class="box"></i>langsamer</span><span><i class="box"></i>passt</span><span><i class="box"></i>schneller</span></span></div>
+  <div class="frage"><b>Anleitung</b><span class="opts"><span><i class="box"></i>zu lang</span><span><i class="box"></i>passt</span><span><i class="box"></i>mehr Details</span></span></div>
+  <div class="frage"><b>Blätter</b><span class="opts"><span><i class="box"></i>zu viele Aufgaben</span><span><i class="box"></i>passt</span><span><i class="box"></i>mehr</span></span></div>
+  <div class="frage"><b>Profi-Aufgaben und „Schwerer machen“</b><span class="opts"><span><i class="box"></i>zu leicht</span><span><i class="box"></i>passt</span><span><i class="box"></i>zu schwer</span><span><i class="box"></i>kaum gemacht</span></span></div>
+  <div class="frage"><b>Bildschirm-Teil</b><span class="opts"><span><i class="box"></i>zu wenig</span><span><i class="box"></i>passt</span><span><i class="box"></i>zu viel</span></span></div>
+  <div class="frage"><b>Konnte sie gut aufhören?</b><span class="opts"><span><i class="box"></i>ja, beim Ende-Bild</span><span><i class="box"></i>meistens</span><span><i class="box"></i>schwer</span></span></div>
+  <div class="frage" style="align-items: start"><b>Gerätetest: Was hat funktioniert, was hat gehakt?<span class="kl">Checkliste auf der letzten Seite</span></b>
+    <div>
+      <div class="geraet"><b>iPhone</b><div class="linien"></div></div>
+      <div class="geraet"><b>iPad</b><div class="linien"></div></div>
+      <div class="geraet"><b>Android</b><div class="linien"></div></div>
+    </div>
+  </div>
+  <div class="frage"><b>Links und rechts aus Sicht des Roboters</b> <span class="kl">(Mini-Fragen 5 und 7 aus Einheit 1, nach Einheit 5 nochmal)</span><span class="opts"><span><i class="box"></i>sicher</span><span><i class="box"></i>teilweise</span><span><i class="box"></i>noch schwer</span></span></div>
+  <div class="frage"><b>Lieblingsspiel von {{KIND}}</b><span class="linien"></span></div>
+  <div class="frage"><b>Was soll öfter vorkommen?</b><span class="opts"><span><i class="box"></i>Bewegung</span><span><i class="box"></i>Basteln</span><span><i class="box"></i>Geheimcodes</span><span><i class="box"></i>Rätsel</span><span><i class="box"></i>Roboter-Spiele</span><span><i class="box"></i>Boden-Gitter</span><span><i class="box"></i>Bildschirm</span><span><i class="box"></i>Anderes:</span></span></div>
+  <div class="frage"><b>Was soll weg?</b><span class="linien"></span></div>
+  <div class="frage"><b>Funktionieren Sammelpass und Sterne als Motivation?</b><span class="opts"><span><i class="box"></i>ja, sehr</span><span><i class="box"></i>geht so</span><span><i class="box"></i>nein</span></span></div>
+  <div class="frage"><b>Einschätzen in Einheit 1: Was ist aufgefallen?</b><span class="linien"></span></div>
+  <div class="frage" style="align-items: start"><b style="padding-top: 3mm">Sonst noch etwas?</b><div><div class="linien"></div><div class="linien"></div><div class="linien"></div><div class="linien"></div></div></div>
+</section>

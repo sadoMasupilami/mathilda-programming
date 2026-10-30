@@ -1,0 +1,18 @@
+{
+  "name": "denk-werkstatt",
+  "private": true,
+  "type": "module",
+  "description": "Denk- und Programmier-Werkstatt: druckbarer Guide (HTML/CSS → PDF) und kleine Web-App",
+  "scripts": {
+    "build": "node build.mjs",
+    "png": "node build.mjs --png",
+    "raetsel": "node werkzeuge/raetsel.mjs",
+    "web": "node werkzeuge/web-bauen.mjs",
+    "test:kern": "node --test tests/kern.test.mjs",
+    "test:web": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0",
+    "playwright-core": "^1.56.0"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "Denk-Werkstatt",
+  "short_name": "Werkstatt",
+  "description": "Drachen-Pfade, Ablauf-Karten, Kobold-Jagd und Wiederhol-Zauber zu den Blättern der Denk- und Programmier-Werkstatt.",
+  "lang": "de-AT",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fffdf8",
+  "theme_color": "#3d5ccc",
+  "icons": [
+    { "src": "icons/symbol-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/symbol-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/symbol-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/symbol.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

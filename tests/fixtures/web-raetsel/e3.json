@@ -1,0 +1,28 @@
+{
+  "paket": "e3",
+  "einheit": 3,
+  "titel": "Erst das, dann das (Test)",
+  "schluesselwort": "JAUSE",
+  "web": { "titel": "Erst das, dann das", "art": "ablauf", "levels": ["t3-1", "t3-2", "t3-3", "t3-4", "t3-5"] },
+  "raetsel": [
+    { "id": "t3-1", "art": "ablauf", "karten": [
+        { "id": "a", "text": "Socken an", "bild": "socken" }, { "id": "b", "text": "Schuhe an", "bild": "schuhe" }, { "id": "c", "text": "Masche binden", "bild": "masche" } ],
+      "regeln": [["a", "b"], ["b", "c"]] },
+    { "id": "t3-2", "art": "ablauf", "karten": [
+        { "id": "a", "text": "Semmel aufschneiden", "bild": "semmel" }, { "id": "b", "text": "Butter drauf", "bild": "butter" },
+        { "id": "c", "text": "Käse drauf", "bild": "kaese" }, { "id": "d", "text": "Zuklappen", "bild": "semmel-zu" } ],
+      "regeln": [["a", "b"], ["b", "c"], ["c", "d"]] },
+    { "id": "t3-3", "art": "ablauf", "karten": [
+        { "id": "a", "text": "Zahnpasta auf die Bürste" }, { "id": "b", "text": "Zähne putzen" }, { "id": "c", "text": "Mund ausspülen" },
+        { "id": "d", "text": "Bürste waschen" }, { "id": "e", "text": "Ins Bett" } ],
+      "regeln": [["a", "b"], ["b", "c"], ["b", "d"], ["c", "e"], ["d", "e"]], "mehrereLoesungen": true },
+    { "id": "t3-4", "art": "ablauf", "karten": [
+        { "id": "a", "text": "Ei holen" }, { "id": "b", "text": "Wasser kochen" }, { "id": "c", "text": "Ei ins Wasser" },
+        { "id": "d", "text": "Warten" }, { "id": "e", "text": "Ei raus" }, { "id": "f", "text": "Ei schälen" } ],
+      "regeln": [["a", "b"], ["b", "c"], ["c", "d"], ["d", "e"], ["e", "f"]] },
+    { "id": "t3-5", "art": "ablauf", "karten": [
+        { "id": "a", "text": "Unterhemd" }, { "id": "b", "text": "Pulli" }, { "id": "c", "text": "Jacke" }, { "id": "d", "text": "Haube" },
+        { "id": "e", "text": "Unterhose" }, { "id": "f", "text": "Hose" }, { "id": "g", "text": "Stiefel" }, { "id": "h", "text": "Tür auf" } ],
+      "regeln": [["a", "b"], ["b", "c"], ["c", "d"], ["d", "e"], ["e", "f"], ["f", "g"], ["g", "h"]] }
+  ]
+}

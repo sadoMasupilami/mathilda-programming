@@ -1,0 +1,43 @@
+<style>
+  .r-hallo { font-family: var(--kind); font-size: 18pt; line-height: 1.32; }
+  .r-hallo h1 { font-family: var(--text); font-weight: 1000; font-size: 34pt; margin: 2mm 0 4mm 0; color: var(--akzent); }
+  .r-hallo p { margin: 0 0 4mm 0; }
+  .r-hallo .zeile { display: flex; align-items: center; gap: 5mm; margin: 0 0 4mm 0; }
+  .r-hallo .zeile > :first-child { flex: none; width: 18mm; display: flex; justify-content: center; line-height: 0; }
+  .r-hallo .befehle { display: flex; gap: 6mm; margin: 0 0 5mm 23mm; }
+  .r-hallo .befehle > span { display: flex; flex-direction: column; align-items: center; gap: 1mm; font-size: 14pt; line-height: 1.1; }
+  .r-hallo .rahmen-ich {
+    margin-top: auto;
+    border: 0.8mm dashed var(--akzent);
+    border-radius: 6mm;
+    height: 66mm;
+    position: relative;
+    padding: 4mm 6mm;
+    font-size: 16pt;
+  }
+  .r-hallo .stempel { display: block; width: 14mm; height: 14mm; border-radius: 50%; border: 0.6mm dashed var(--grau); }
+  .r-hallo .rahmen-ich .ecke { position: absolute; right: 5mm; bottom: 4mm; line-height: 0; }
+</style>
+
+<section class="seite r-hallo" id="hallo" data-toc="Hallo {{KIND}}!" data-block="A">
+  <h1>Hallo {{KIND}}!</h1>
+  <p>Das ist deine Denk- und Programmier-Werkstatt.<br>Hier gibst du Befehle, findest Fehler und knackst Rätsel.<br>Du spielst, bewegst dich und bastelst.</p>
+
+  <div class="zeile"><span><m-symbol name="drache" gr="17"></m-symbol></span><span>Der Drache sucht seinen Schatz.<br>Er macht genau, was du ihm sagst.<br>Er kennt nur drei Befehle:</span></div>
+  <div class="befehle">
+    <span><m-symbol name="vor" gr="14"></m-symbol>vor</span>
+    <span><m-symbol name="links" gr="14"></m-symbol>links drehen</span>
+    <span><m-symbol name="rechts" gr="14"></m-symbol>rechts drehen</span>
+  </div>
+  <div class="zeile"><span><m-symbol name="kobold" gr="16"></m-symbol></span><span>Der Fehler-Kobold versteckt Fehler.<br>Du findest sie alle!</span></div>
+  <div class="zeile"><span><m-stern gr="15"></m-stern></span><span>Oben auf jedem Blatt ist ein Stern.<br>Bist du fertig? Dann mal den Stern an!</span></div>
+  <div class="zeile"><span><m-bild name="krone" gr="14"></m-bild></span><span>Die Krone zeigt eine Profi-Aufgabe.</span></div>
+  <div class="zeile"><span><m-bild name="eule" gr="14"></m-bild></span><span>Die Eule hat ein Rätsel für dich.</span></div>
+  <div class="zeile"><span><span class="stempel"></span></span><span>Nach jeder Einheit bekommst du<br>einen Stempel in deinen Sammelpass.</span></div>
+
+  <div class="rahmen-ich">
+    Mal hier deinen eigenen Drachen!<br>Wie heißt er?
+    <span class="ecke"><m-symbol name="schatz" gr="20"></m-symbol></span>
+  </div>
+  <div class="fuss"><span>{{KIND}}s Denk-Werkstatt</span><span class="seitenzahl" data-ref="hallo"></span><span>Hallo {{KIND}}</span></div>
+</section>

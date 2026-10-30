@@ -1,0 +1,170 @@
+{
+ "paket": "e4",
+ "einheit": 4,
+ "titel": "Der Fehler-Kobold (Test)",
+ "schluesselwort": "KOBOLD",
+ "web": {
+  "titel": "Der Fehler-Kobold",
+  "art": "kobold",
+  "levels": [
+   "t4-1",
+   "t4-2",
+   "t4-3",
+   "t4-4",
+   "t4-6",
+   "t4-5"
+  ]
+ },
+ "raetsel": [
+  {
+   "id": "t4-1",
+   "art": "kobold",
+   "b": 3,
+   "h": 3,
+   "start": {
+    "x": 0,
+    "y": 2,
+    "blick": "oben"
+   },
+   "ziel": {
+    "x": 2,
+    "y": 0
+   },
+   "programm": "vor vor links vor vor",
+   "reparatur": {
+    "art": "tauschen",
+    "stelle": 3,
+    "befehl": "rechts"
+   }
+  },
+  {
+   "id": "t4-2",
+   "art": "kobold",
+   "b": 3,
+   "h": 3,
+   "start": {
+    "x": 1,
+    "y": 2,
+    "blick": "oben"
+   },
+   "ziel": {
+    "x": 1,
+    "y": 0
+   },
+   "programm": "vor vor vor",
+   "reparatur": {
+    "art": "loeschen",
+    "stelle": 3
+   }
+  },
+  {
+   "id": "t4-3",
+   "art": "kobold",
+   "b": 4,
+   "h": 3,
+   "start": {
+    "x": 0,
+    "y": 2,
+    "blick": "rechts"
+   },
+   "ziel": {
+    "x": 3,
+    "y": 0
+   },
+   "programm": "vor vor vor links vor",
+   "reparatur": {
+    "art": "einfuegen",
+    "stelle": 5,
+    "befehl": "vor"
+   }
+  },
+  {
+   "id": "t4-4",
+   "art": "kobold",
+   "b": 4,
+   "h": 4,
+   "start": {
+    "x": 0,
+    "y": 3,
+    "blick": "oben"
+   },
+   "ziel": {
+    "x": 3,
+    "y": 0
+   },
+   "hindernisse": [
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     2
+    ]
+   ],
+   "programm": "vor vor vor vor rechts vor vor vor",
+   "reparatur": {
+    "art": "loeschen",
+    "stelle": 4
+   }
+  },
+  {
+   "id": "t4-6",
+   "art": "kobold",
+   "b": 5,
+   "h": 4,
+   "start": {
+    "x": 0,
+    "y": 3,
+    "blick": "rechts"
+   },
+   "ziel": {
+    "x": 4,
+    "y": 0
+   },
+   "hindernisse": [
+    [
+     2,
+     3
+    ],
+    [
+     3,
+     1
+    ]
+   ],
+   "programm": "vor links vor vor rechts vor vor vor",
+   "reparatur": {
+    "art": "einfuegen",
+    "stelle": 5,
+    "befehl": "vor"
+   }
+  },
+  {
+   "id": "t4-5",
+   "art": "kobold",
+   "b": 5,
+   "h": 5,
+   "start": {
+    "x": 0,
+    "y": 4,
+    "blick": "oben"
+   },
+   "ziel": {
+    "x": 4,
+    "y": 0
+   },
+   "hindernisse": [
+    [
+     3,
+     3
+    ]
+   ],
+   "programm": "vor vor rechts vor vor rechts vor vor rechts vor vor",
+   "reparatur": {
+    "art": "tauschen",
+    "stelle": 6,
+    "befehl": "links"
+   }
+  }
+ ]
+}

@@ -1,0 +1,459 @@
+<!--
+  Einheit 1: Ich bin dein Roboter (Block A, Befehle, Programme, Fehler)
+  Befehle müssen genau sein. Drei Befehle: vor, links drehen, rechts drehen.
+  Das Kind programmiert Mama oder Papa durch die Wohnung, dann Rollentausch.
+  Kein Bildschirm (Körper zuerst).
+  Blätter: 1-1 Befehlskarten (werden in Einheit 2, 4, 5 wieder gebraucht),
+           1-2 Wohin schaut der Drache? (Drehen und Blickrichtung),
+           1-3 Roboter-Programme (Programme lesen, eigenes Programm schreiben)
+  Rätsel: raetsel/e1.json (nur "lesen", kein Web-Paket)
+  Eigener Baustein: src/bausteine/e1-blick.js (<m-e1-wahl>, <m-e1-befehlwahl>)
+-->
+<style>
+  .e01-ablauf > li { break-inside: avoid; }
+  .e01-ganz > li { break-inside: auto; orphans: 2; widows: 2; }
+  .kasten.e01-schwerer { -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .e01-tab td:first-child { width: 33%; }
+  .e01-tab td:nth-child(2) { width: 33%; }
+  .e01-falsch td:first-child { width: 30%; }
+  /* lange Kästen und Tabellen dürfen über die Seite brechen (sonst große Lücken) */
+  .anleitung .kasten.e01-bricht { break-inside: auto; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .anleitung .kasten.e01-bricht > .kasten-titel, .anleitung .e01-vor-tab { break-after: avoid; }
+  .anleitung table.tab.e01-bricht { break-inside: auto; }
+  .anleitung .sag.e01-sag { break-inside: auto; }
+  .anleitung .sag.e01-sag > p { break-inside: avoid; }
+  .anleitung .sag.e01-sag > p.dann { break-before: avoid; }
+  .anleitung table.tab.e01-bricht tr, .anleitung .kasten.e01-bricht li { break-inside: avoid; }
+
+  /* Bausteine aus src/bausteine/e1-blick.js */
+  m-e1-wahl, m-e1-befehlwahl { display: inline-block; vertical-align: middle; line-height: 0; }
+  .e01-wahl, .e01-befehlwahl { display: inline-flex; gap: 3mm; align-items: center; }
+  .e01-wahl-feld { display: inline-flex; line-height: 0; border-radius: 2mm; }
+  .e01-wahl-feld svg { display: block; }
+  .e01-befehl { align-items: center; justify-content: center; border: 0.55mm solid var(--tinte); border-radius: 2mm; background: white; }
+  .loesungsmodus .e01-richtig { outline: 1.3mm solid var(--rot); outline-offset: 1.2mm; }
+
+  /* Blatt 1-1: Befehlskarten */
+  .e01-hinweis { margin: 0; }
+  .karten-raster > .karte.e01-karte { gap: 3mm; }
+  .e01-kwort { font-family: var(--kind); font-weight: 700; font-size: 18pt; line-height: 1.05; }
+  .e01-knobel-reihe { display: flex; align-items: center; gap: 6mm; }
+  .e01-knobel-text { flex: 1; }
+
+  /* Blatt 1-2 */
+  .e01-leg { display: flex; gap: 10mm; align-items: center; margin: 1mm 0 0 0; }
+  .e01-leg > span { display: inline-flex; align-items: center; gap: 2.5mm; }
+  .e01-intro > p { margin: 0 0 1.5mm 0; }
+  .e01-zeile { display: flex; align-items: center; justify-content: space-between; gap: 5mm; }
+  .e01-vorher { display: flex; align-items: center; gap: 4mm; }
+  .e01-nachher { border-left: 0.6mm dashed var(--linie); padding-left: 5mm; }
+  .e01-profi-reihe { display: flex; align-items: center; gap: 5mm; flex-wrap: wrap; margin-bottom: 2mm; }
+
+  /* Blatt 1-3 */
+  .e01-lesen { display: flex; flex-direction: column; align-items: flex-start; gap: 3mm; }
+  .e01-lsg-box { position: relative; }
+  /* Lösungshinweis deckt die leeren Kästchen ganz ab (sonst laufen die Linien durch den Text) */
+  .loesungsmodus .e01-lsg-box > .lsg-nur { position: absolute; inset: -2mm -1.5mm -1.5mm -1.5mm; margin: 0; display: flex; align-items: center; font-size: 17pt; font-weight: 700; line-height: 1.15; background: white; padding: 1mm 3mm; border: 0.5mm dashed var(--rot); border-radius: 2mm; }
+  .e01-raster2 { display: grid; grid-template-columns: 1fr 1.25fr; gap: 4mm 8mm; align-items: start; }
+
+  /* Lösungen: verkleinerte Blätter und Text-Kasten in einem Raster */
+  .e01-loes { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm 4mm; align-items: start; margin: 2mm 0 4mm 0; }
+  .e01-loes m-loesungen, .e01-loes .loesungen-raster { display: contents; }
+  .e01-loes > .kasten.loesung { margin: 5mm 0 0 0; font-size: 9.5pt; }
+  .e01-loes > .kasten.loesung p { margin-bottom: 1.6mm; }
+</style>
+
+<section class="anleitung" data-einheit="1" data-titel="Ich bin dein Roboter">
+
+  <div class="kasten ziel">
+    <p>{{KIND}} entdeckt die wichtigste Regel des Programmierens: <b>Ein Roboter macht genau, was man ihm sagt. Nicht, was man meint.</b> Du bist heute der <span class="begriff">Roboter</span>. Er kennt nur drei <span class="begriff">Befehle</span>: <m-symbol name="vor" gr="4.5"></m-symbol> <b>vor</b> (ein großer Schritt), <m-symbol name="links" gr="4.5"></m-symbol> <b>links drehen</b> und <m-symbol name="rechts" gr="4.5"></m-symbol> <b>rechts drehen</b> (je eine Vierteldrehung auf der Stelle). {{KIND}} steuert dich damit durch die Wohnung, zum Kühlschrank und zum Kuscheltier. Danach legt sie ein ganzes <span class="begriff">Programm</span> aus Befehlskarten, bevor der Roboter losgeht, und zum Schluss wird sie selbst zum Roboter.</p>
+    <p>Nebenbei schätzt du ein, wie sicher {{KIND}} links und rechts schon kann und ob sie <b>aus Sicht des Roboters</b> denken kann, wenn er ihr gegenüber steht (Kasten „Nebenbei einschätzen“). Das brauchen alle weiteren Einheiten.</p>
+  </div>
+
+  <div class="kasten tipp" data-titel="Die erste Einheit: So läuft eine Einheit">
+    <ul>
+      <li><b>Vorher (etwa 30 Minuten ohne {{KIND}}, dazu das Lesen dieser Anleitung):</b> Blätter ausdrucken, die Befehlskarten ausschneiden, das Start-Kreuz kleben und die Wege in der Wohnung ausprobieren (Kasten „Material &amp; Vorbereitung“). {{KIND}}s Blätter folgen nach der Anleitung, die Lösungen stehen am Ende der Anleitung.</li>
+      <li><b>Der Ablauf (20–30 Minuten)</b> ist ein Vorschlag. Läuft das Roboter-Spiel gut, bleibt dabei. Das Blatt darf auch an einem anderen Tag drankommen.</li>
+      <li><b><a class="blattref" href="#blatt-1-3"></a></b> ist für ein zweites kurzes Treffen (10 Minuten) gedacht, gleich am nächsten Tag (Abschnitt „Zweites Treffen“ nach dem Ablauf). Ist {{KIND}} heute schnell fertig, passt es auch gleich im Anschluss.</li>
+      <li><b>Zu leicht?</b> Dann sofort in den Kasten „Schwerer machen“ springen. {{KIND}} ist schnell, dafür sind diese Kästen da.</li>
+      <li><b>Zum Schluss</b> stempelt oder beklebt {{KIND}} im Sammelpass (vorne im Heft) das Feld „Einheit&nbsp;1“ und malt 1 bis 3 Sterne an: Wie hat es dir gefallen?</li>
+      <li><b>Heute gibt es keinen Bildschirm</b>, mit Absicht (Kasten „Bildschirm-Bonus“ am Ende).</li>
+    </ul>
+  </div>
+
+  <div class="kasten material e01-bricht">
+    <p><b>Vorher, ohne {{KIND}} (etwa 30 Minuten):</b></p>
+    <ul>
+      <li><b>Befehlskarten (15 Minuten):</b> <a class="blattref" href="#blatt-1-1"></a> ausdrucken, am besten auf dickerem Papier (160&nbsp;g), sonst vor dem Ausschneiden auf Karton kleben (eine leere Müslischachtel reicht). Schneide zuerst den ganzen Karten-Block heraus, dann die 16 Karten: 8 Karten <m-symbol name="vor" gr="4.5"></m-symbol> vor, 4 Karten <m-symbol name="links" gr="4.5"></m-symbol> links drehen, 4 Karten <m-symbol name="rechts" gr="4.5"></m-symbol> rechts drehen. Ein Kuvert mit „Befehlskarten“ beschriften. <b>Die Karten werden in Einheit 2, 4 und 5 wieder gebraucht.</b> Die beiden Reste nicht wegwerfen, sie kommen mit ins Kuvert: oben der Streifen mit „Geschafft?“-Stern und {{KIND}}s Namen, unten die Knobel-Ecke (sie kommt in Schritt 5 dran).</li>
+      <li><b>Blätter (2 Minuten):</b> <a class="blattref" href="#blatt-1-2"></a> und <a class="blattref" href="#blatt-1-3"></a> ausdrucken, dazu einen Bleistift und Buntstifte.</li>
+      <li><b>Start-Kreuz und Wege ausprobieren (10 Minuten):</b> Klebe mit Malerkrepp ein Kreuz auf den Boden, am besten beim Sofa (dort steht der Roboter am Anfang). An einen Arm des Kreuzes klebst du zwei kurze Streifen als Pfeilspitze: Das ist die <b>Nase</b>. Sie zeigt die <span class="begriff">Blickrichtung</span> am Start, z. B. den Gang entlang oder zum Fenster. <b>Der Roboter startet immer auf dem Kreuz und schaut dorthin, wohin die Nase zeigt.</b> Nur so bleibt ein richtiges Programm auch beim zweiten Start richtig. Dann geh beide Wege einmal als Roboter ab:
+        <ul>
+          <li><b>Zum Kühlschrank:</b> Gut ist ein Weg mit <b>höchstens 8 großen Schritten und 1 oder 2 Ecken</b>, dann reichen die Karten. Ist der Kühlschrank zu weit weg, klebe das Kreuz näher hin.</li>
+          <li><b>Zum Kuscheltier</b> (das zweite Ziel, an einer anderen Stelle, z. B. neben dem Kasten oder hinter einer offenen Tür): ebenfalls <b>höchstens 8 große Schritte und höchstens 4 Drehungen in jede Richtung</b>. Das ist der Weg für das Karten-Programm in Schritt 3, die Karten müssen also sicher reichen. Liegt eine Tür am Weg, bleibt sie offen (der Roboter hat keinen Hände-Befehl).</li>
+        </ul></li>
+      <li><b>Kleinigkeiten (3 Minuten):</b> ein Gummiringerl für {{KIND}}s rechte Hand, ein Sticker, den du auf den Kühlschrank klebst (der „Schatz“, den der Roboter holt; er kommt danach in den Sammelpass), ein Stempel oder Sticker für den Sammelpass. Räume im Gang Stolperfallen weg: Der Roboter läuft auch gegen Wände, wenn es so im Programm steht (sanft, mit den Händen voran).</li>
+    </ul>
+    <p><b>Extra, außerhalb der Einheit:</b> Karten bemalen und Kuvert verzieren, Roboter-Antenne basteln (Kasten „Basteln“). Das ist schön, aber nicht nötig: Die Einheit funktioniert mit weißen Karten genauso.</p>
+  </div>
+
+  <div class="kasten tipp" data-titel="Was die drei Befehle genau heißen (für euch beide gleich)">
+    <ul>
+      <li><m-symbol name="vor" gr="4.5"></m-symbol> <b>vor:</b> ein großer Roboter-Schritt in Blickrichtung: ein Fuß weit nach vorne, den anderen dazuholen, Füße zusammen, stehen bleiben. So ist jeder Schritt gleich groß, und der Roboter steht zwischen zwei Befehlen still.</li>
+      <li><m-symbol name="links" gr="4.5"></m-symbol> <b>links drehen</b> und <m-symbol name="rechts" gr="4.5"></m-symbol> <b>rechts drehen:</b> eine Vierteldrehung auf der Stelle. Die Füße bleiben am selben Platz. Merkhilfe: „von einer Wand zur nächsten Wand“. Nie seitlich oder rückwärts gehen, das kann der Roboter nicht.</li>
+      <li><b>Angekommen</b> ist der Roboter, wenn er das Ziel mit der Hand berühren kann, ohne noch einen Schritt zu machen.</li>
+      <li><b>Bumm:</b> Steht im Weg eine Wand oder ein Möbelstück, bleibt der Roboter davor stehen, sagt „Bumm! Piep!“, und das Programm ist zu Ende. Das kommt in allen Gitter-Einheiten genauso vor: „Hier hat der Kobold zugeschlagen!“</li>
+    </ul>
+  </div>
+
+  <h2>Ablauf Schritt für Schritt</h2>
+  <ol class="ablauf e01-ablauf">
+    <li data-min="3"><span class="schritt-titel">Der Roboter wacht auf</span>Du stehst steif auf dem Kreuz, Blick wie die Nase, Roboter-Stimme: „Piep. Ich bin dein Roboter. Ich kann nur drei Befehle. Hier fange ich immer an, und ich schaue immer dorthin, wohin die Nase zeigt.“ {{KIND}} liest den Streifen aus dem Kuvert vor („{{KIND}}, das sind deine Befehlskarten“), legt die drei Sorten aus und probiert jeden Befehl einmal, du führst ihn übertrieben genau aus. Dazu die Mini-Fragen 1 und 3 (Kasten „Nebenbei einschätzen“) als Spiel: „Bevor du mich steuern darfst: Zeig mir deine rechte Hand!“ Dann kommt das Gummiringerl auf ihre rechte Hand.</li>
+    <li data-min="6"><span class="schritt-titel">Genau-Roboter im Gang</span>Das Hauptspiel (Kasten „Spiel: Genau-Roboter“). {{KIND}} sagt die Befehle laut, einen nach dem anderen, du führst jeden sofort aus. Ziel ist der Kühlschrank mit dem Sticker. Der Roboter macht <b>genau</b> was gesagt wird, auch Unsinn (Tabelle „Falsch richtig“). Steht er einmal an der Wand, geht es vom Kreuz neu los, wieder mit Blick wie die Nase. Danach dasselbe zum Kuscheltier. Komm mindestens einmal auf {{KIND}} zu (Roboter schaut sie an), dann stellt sich Mini-Frage 5 von selbst.</li>
+    <li data-min="6"><span class="schritt-titel">Erst das ganze Programm, dann los</span>Jetzt wird es echtes Programmieren (Kasten „Spiel: Karten-Programm“): {{KIND}} legt den <b>ganzen</b> Weg zum Kuscheltier mit Befehlskarten in eine Reihe auf den Boden, <b>bevor</b> der Roboter losgeht. Dann sagt sie „Start!“, tippt Karte für Karte mit dem Finger an und liest vor, du führst aus. Kommt der Roboter nicht an, sucht sie die falsche Karte, tauscht sie, und es geht vom Kreuz neu los.</li>
+    <li data-min="5"><span class="schritt-titel">Rollentausch: {{KIND}} ist der Roboter</span>Du legst ein Programm mit Karten, {{KIND}} liest es selbst und führt es aus. Leg einmal absichtlich einen Unsinn hinein (z. B. eine <m-symbol name="vor" gr="4.5"></m-symbol> vor-Karte zu viel, sodass sie sanft am Sofa anstößt), damit sie „falsch richtig“ sein darf. Frag nebenbei Mini-Frage 8: „Wo stehst du, wenn du vor, rechts drehen, rechts drehen, vor machst?“</li>
+    <li data-min="7"><span class="schritt-titel">Blatt „Wohin schaut der Drache?“</span><a class="blattref" href="#blatt-1-2"></a>. Jetzt kommt der Drache aufs Papier: Er dreht sich wie der Roboter auf der Stelle. {{KIND}} liest die Anweisungen selbst und kreuzt an. Bei Aufgabe 1 und 2 steht sie auf und dreht sich mit: Ihre Nase schaut zum Fenster („nach oben am Blatt“), dann dreht sie sich, dann zeigt sie auf den richtigen Drachen. Das Blatt drehen ist erlaubt. Die Profi-Aufgabe ist freiwillig, aber genau richtig, wenn es bis dahin leicht war. Danach holst du die Knobel-Ecke aus dem Kuvert: „Wie viele rechts-drehen-Karten, bis der Roboter wieder schaut wie am Anfang?“ Sie darf die echten Karten legen und sich dabei mitdrehen. Die zweite Frage passt genau zur Profi-Aufgabe (drei links drehen). Zum Schluss malt sie den „Geschafft?“-Stern auf dem Streifen im Kuvert an.</li>
+    <li data-min="2"><span class="schritt-titel">Sammelpass</span>Der Sticker vom Kühlschrank kommt in das Feld „Einheit&nbsp;1“ (oder du stempelst), {{KIND}} malt die Sterne an. Frag kurz: „Was war heute am lustigsten?“ Die Antwort passt gut in den Rückmeldebogen. Die Karten wandern ins Kuvert.</li>
+  </ol>
+
+  <h3>Beispielsätze</h3>
+  <div class="sag e01-sag">
+    <p class="du">(steif, Roboter-Stimme) „Piep. Ich bin dein Roboter. Ich kann nur drei Befehle: vor, links drehen, rechts drehen. Sonst nichts. Piep.“</p>
+    <p class="sie">„Roboter, geh zum Kühlschrank!“</p>
+    <p class="du">(bleibt stehen, blinkt mit den Augen) „Piep. Befehl unbekannt. Ich kenne kein ‚Kühlschrank‘. Piep.“</p>
+    <p class="sie">„Na gut. Vor!“</p>
+    <p class="du">(ein großer Roboter-Schritt, Füße zusammen, stehen bleiben) „Piep. Fertig. Nächster Befehl?“</p>
+    <p class="dann">Genau darum geht es: {{KIND}} merkt, dass der Roboter nicht mitdenkt. Er weiß nicht, wo der Kühlschrank ist, er kennt nur seine drei Befehle. Bleib konsequent, aber freundlich. Nach zwei, drei solchen Momenten sagt sie die Befehle von selbst richtig.</p>
+  </div>
+  <div class="sag e01-sag">
+    <p class="sie">„Vor, vor, vor, vor!“ (vor dir ist nach drei Schritten die Wand)</p>
+    <p class="du">(drei Schritte, beim vierten die Hände sanft an die Wand) „Bumm! Piep. Wand. Programm zu Ende.“</p>
+    <p class="sie">„Neeein! Du hättest doch abbiegen sollen!“</p>
+    <p class="du">„Abbiegen stand nicht da. Ich mache genau, was du sagst. Was hätte ich vor der Wand machen sollen?“</p>
+    <p class="sie">„Rechts drehen! Und dann vor.“</p>
+    <p class="dann">Das ist der Kernsatz der Einheit, sag ihn ruhig laut: „Der Roboter ist nicht dumm, er ist genau.“ Der Fehler war im Befehl, nicht im Roboter. Zurück zum Kreuz und neu starten. Das Neu-Starten gehört dazu und ist kein Versagen. In Einheit 4 heißt es dann Kobold-Jagd.</p>
+  </div>
+  <div class="sag e01-sag">
+    <p class="du">(du stehst {{KIND}} gegenüber und schaust sie an; das Kuscheltier liegt rechts neben ihr) „Piep. Ich will zum Kuscheltier.“</p>
+    <p class="sie">„Rechts drehen!“ (sie meint ihre rechte Seite)</p>
+    <p class="du">(dreht sich zur eigenen rechten Seite, also von ihr aus gesehen nach links, weg vom Kuscheltier) „Piep. Erledigt.“</p>
+    <p class="sie">„Falsch! Die andere Seite!“</p>
+    <p class="du">„Ich habe rechts gedreht. Mein Rechts. Schau, wo mein Gummiringerl wäre. Stell dich hinter mich, dann siehst du, was ich sehe.“</p>
+    <p class="dann">Das ist die schwierigste Stelle der Einheit und genau die Mini-Frage 5: Wenn der Roboter sie anschaut, ist sein Rechts von ihr aus gesehen links. Viele Kinder in der 1. Klasse können das noch nicht, das ist völlig normal. Die Hilfe ist immer dieselbe: hinter den Roboter stellen und in dieselbe Richtung schauen. Notiere dir, ob sie es ohne diese Hilfe schafft.</p>
+  </div>
+  <div class="sag e01-sag">
+    <p class="du">(beim Blatt) „Steh mal auf. Du bist der Drache. Deine Nase schaut zum Fenster, das ist am Blatt oben. Jetzt: rechts drehen! Wohin schaust du?“</p>
+    <p class="sie">„Zur Tür. Am Blatt ist das rechts. Ich kreuz den Drachen an, der nach rechts schaut.“</p>
+    <p class="dann">„Zur Tür“ ist hier nur ein Beispiel: Sie nennt, was in eurem Zimmer rechts vom Fenster ist. Auf dem Blatt ist „oben“ die Richtung, in die sie beim Hinschauen blickt. Sitzt sie am Tisch, liegt das Blatt so vor ihr, dass oben von ihr weg zeigt. Dann ist der Drache, der nach oben schaut, genauso gedreht wie sie selbst: Sein Rechts ist ihr Rechts. Schwer wird es erst, wenn der Drache nach unten schaut (das kommt im Schwerer-Teil).</p>
+  </div>
+
+  <h3>Zweites Treffen: <a class="blattref" href="#blatt-1-3"></a> (etwa 10 Minuten)</h3>
+  <div class="kasten tipp e01-bricht" data-titel="So führst du Blatt 1-3 ein">
+    <p>Auf <a class="blattref" href="#blatt-1-3"></a> läuft der Drache zum ersten Mal mit <m-symbol name="vor" gr="4.5"></m-symbol> vor über ein Gitter. Das Wort Gitter braucht {{KIND}} heute noch nicht, es kommt in Einheit 2. Wichtig ist nur: <b>Am Papier ist ein vor genau ein Feld weiter, nicht ein großer Schritt.</b> Das Kreuz mit der Nase bleibt bis nach diesem Treffen kleben, weil Aufgabe 4 und die Profi-Aufgabe in der Wohnung getestet werden.</p>
+    <ol>
+      <li><b>Aufgabe 1 (3 Minuten): ein vor ist ein Feld.</b> Zuerst liest {{KIND}} das ganze Programm laut vor. Dann legt sie einen Muggelstein (oder einen Radiergummi) als Drachen ins hellgrüne Feld und führt aus: Finger auf Befehl 1, Stein ein Feld weiter, Finger auf Befehl 2, Stein dreht sich im Feld, und so weiter. Erst lesen, dann mittippen. Am Ende malt sie das Feld an, in dem der Stein steht.</li>
+      <li><b>Aufgabe 2 und 3 (3 Minuten): Start nach rechts.</b> Hier schaut der Drache am Anfang nach rechts. Sie darf das Blatt drehen, bis seine Nase von ihr weg zeigt, oder aufstehen und sich mitdrehen. Aufgabe 3 fragt nach der Blickrichtung am Ende von Aufgabe 2. Wer bei den Drehungen mitgedreht hat, weiß es sofort, sonst einfach noch einmal ausführen.</li>
+      <li><b>Aufgabe 4 und Profi (4 Minuten und mehr): planen, dann testen.</b> Sie malt ihr Programm vom Kreuz zum Kühlschrank in die Kästchen (Pfeile wie auf den Karten, gern in den Farben blau, grün, orange; die Befehlskarten dürfen als Vorlage daneben liegen). Hinschauen und Schritte zählen ist erlaubt, aber der Roboter bewegt sich erst, wenn das Programm fertig ist. Dann testet ihr: Du stellst dich aufs Kreuz, Blick wie die Nase, und sie liest Kästchen für Kästchen vor. Bumm oder nicht angekommen? Kobold suchen, Kästchen ausradieren, neu malen, neu starten. Für die Profi-Aufgabe bleibt der Roboter beim Kühlschrank genau so stehen, wie er angekommen ist. Von dort und mit dieser Blickrichtung startet das Rück-Programm.</li>
+    </ol>
+  </div>
+  <div class="sag e01-sag">
+    <p class="du">„Am Papier steht der Drache in einem Feld. Ein vor ist genau ein Feld weiter. Wo ist er nach Befehl 1?“</p>
+    <p class="sie">„Da!“ (tippt auf das Feld darüber)</p>
+    <p class="du">„Und jetzt Befehl 2, links drehen. Geht er dabei in ein anderes Feld?“</p>
+    <p class="sie">„Nein, er dreht sich nur. Jetzt schaut er nach links.“</p>
+    <p class="dann">Wenn sie bei einem Drehbefehl den Stein weiterschiebt, frag: „Was macht der Roboter bei rechts drehen mit seinen Füßen?“ Dann weiß sie es wieder.</p>
+  </div>
+  <div class="sag e01-sag">
+    <p class="du">(bei Aufgabe 4) „Dein Roboter steht auf dem Kreuz und schaut wie die Nase. Was ist sein erster Befehl?“</p>
+    <p class="sie">„Vor, vor, vor. Und dann rechts drehen, weil da die Küche ist.“</p>
+    <p class="du">„Mal es in die Kästchen. Ich bewege mich erst, wenn das ganze Programm fertig ist.“</p>
+    <p class="dann">Stimmt es beim ersten Test nicht, ist das kein Fehler von ihr, sondern ganz normales Programmieren: testen, Kobold finden, verbessern.</p>
+  </div>
+
+  <div class="kasten einschaetzung e01-bricht">
+    <p>Diese Mini-Fragen sind <b>kein Test</b>. Verteile sie auf den Anfang, das Roboter-Spiel und das nächste Abendessen, nie mehr als drei auf einmal. Wichtig ist nicht nur, <i>ob</i> sie richtig antwortet, sondern <i>wie</i>: Kommt es sofort, oder schaut sie erst auf eine Merkhilfe (Gummiringerl, Schreibhand)? Merkhilfen sind erlaubt. Bei einer falschen Antwort nicht sofort verbessern, sondern fragen: „Wie hast du das herausgefunden?“</p>
+    <table class="tab e01-tab e01-bricht">
+      <thead><tr><th>So fragst du</th><th>Worauf achten</th><th>Was es fürs Tempo heißt</th></tr></thead>
+      <tr><td><b>1. Rechte Hand:</b> „Heb deine rechte Hand! Jetzt die linke! Den rechten Fuß!“ Schnell abwechseln.</td><td>Kommt es sofort und ohne Nachdenken? Oder schaut sie erst auf die Hände?</td><td>Sofort: Das Gummiringerl braucht sie nur noch bei den Drehungen. Unsicher: Gummiringerl rechts in jeder Gitter-Einheit.</td></tr>
+      <tr><td><b>2. Über Kreuz:</b> „Fass mit der linken Hand dein rechtes Ohr an!“</td><td>Kreuzt sie richtig über die Körpermitte?</td><td>Klappt es: Links und rechts am eigenen Körper sind sicher.</td></tr>
+      <tr><td><b>3. Vierteldrehung:</b> „Schau zum Fenster. Rechts drehen! Wohin schaust du jetzt?“</td><td>Genau eine Vierteldrehung, auf der Stelle, zur richtigen Seite? Typisch sind eine halbe Drehung oder ein ganzer Kreis.</td><td>Genau: In Einheit 2 gleich mit Drehungen am Boden-Gitter starten. Zu weit: vorher öfter das Dreh-Spiel spielen (Kasten „Bewegung“).</td></tr>
+      <tr><td><b>4. Dinge im Raum:</b> „Ist das Sofa links oder rechts von dir?“ Dann: „Mach rechts drehen, rechts drehen. Und jetzt?“</td><td>Merkt sie, dass das Sofa nach der halben Drehung auf der anderen Seite ist?</td><td>Sicher: Sie denkt schon „von sich aus“. Das ist die Vorstufe zur Sicht des Roboters.</td></tr>
+      <tr><td><b>5. Der Roboter schaut dich an:</b> Du stehst ihr gegenüber: „Ich mache gleich rechts drehen. Zeig, wohin ich mich drehe!“</td><td><b>Die Schlüsselfrage.</b> Zeigt sie auf ihre eigene rechte Seite (das wäre falsch), oder denkt sie aus deiner Sicht?</td><td>Ohne Hilfe richtig: Sie kann aus Sicht des Roboters denken. Einheit 2 und 4 dürfen schneller gehen.</td></tr>
+      <tr><td><b>6. Hand am Gegenüber:</b> Du stehst ihr gegenüber, beide Hände locker: „Welche ist meine rechte Hand?“</td><td>Zeigt sie auf die Hand gegenüber ihrer eigenen rechten Hand (Spiegel-Fehler)?</td><td>Spiegel-Fehler: ganz normal. Zeig „hinter mich stellen“ und frag nochmal.</td></tr>
+      <tr><td><b>7. Pfeil-Roboter:</b> Leg eine <m-symbol name="vor" gr="4.5"></m-symbol> vor-Karte so hin, dass der Pfeil auf {{KIND}} zeigt: „Der Pfeil ist ein Roboter. Er schaut dich an. Er macht links drehen. Wohin zeigt der Pfeil jetzt?“ Sie darf die Karte drehen.</td><td>Richtig ist: zu ihrer rechten Seite. Dreht sie die Karte zur richtigen Seite, ohne um den Tisch zu gehen?</td><td>Sicher: In Einheit 2 bald den Schwerer-Teil mit dem Drachen, der nach unten schaut.</td></tr>
+      <tr><td><b>8. Programm im Kopf:</b> „Ich mache vor, rechts drehen, rechts drehen, vor. Wo stehe ich dann?“ (ohne vorzumachen)</td><td>Richtig: wieder am Start, aber umgekehrt (er schaut in die andere Richtung). Merkt sie auch das Umgekehrt?</td><td>Sicher: Programme im Kopf ausführen klappt schon. Einheit 4 (Fehler finden) wird ihr leicht fallen.</td></tr>
+    </table>
+    <p><b>So kommt das Ergebnis in den Rückmeldebogen:</b> Bei „Links und rechts aus Sicht des Roboters: sicher / teilweise / noch schwer“ kreuzt du an:</p>
+    <ul>
+      <li><b>sicher:</b> Fragen 5, 6 und 7 klappen ohne Hilfe.</li>
+      <li><b>teilweise:</b> Fragen 1 bis 4 sind sicher, bei 5 bis 7 braucht sie noch das Hinter-den-Roboter-Stellen oder das Mitdrehen.</li>
+      <li><b>noch schwer:</b> Schon bei Frage 1 bis 3 ist sie unsicher.</li>
+    </ul>
+    <p>Schreib dazu ins Feld „Einschätzen in Einheit 1“, welche Fragen sicher waren, z. B. „E1: Fragen 1–4 und 8“, und lass in der Zeile Platz. Stell die Fragen 5 und 7 nach Einheit 5 noch einmal und schreib dahinter „E5: …“: Hat sich etwas verändert? Damit du es nicht vergisst: Leg einen Zettel „Mini-Fragen 5 und 7“ ins Kuvert mit den Befehlskarten. Das Kuvert kommt in Einheit 5 wieder auf den Tisch. Bei „noch schwer“ ist nichts verloren: In den nächsten Einheiten schaut der Drache am Start einfach länger nach oben, und Blatt drehen ist immer erlaubt.</p>
+  </div>
+
+  <h2>Spiele, Bewegung und Basteln</h2>
+
+  <div class="kasten spiel e01-bricht" data-titel="Genau-Roboter">
+    <p class="spiel-meta">2 Personen · 5–10 Minuten · Malerkrepp-Kreuz als Start, ein Ziel (Kühlschrank mit Sticker, Kuscheltier), Befehlskarten zum Nachschauen</p>
+    <ol class="regeln">
+      <li><b>Rollen:</b> {{KIND}} ist die Programmiererin, du bist der Roboter. Die Programmiererin darf neben oder hinter ihm gehen, ihn aber nicht schieben oder drehen.</li>
+      <li><b>Start:</b> Der Roboter steht auf dem Kreuz und schaut dorthin, wohin die Nase zeigt. So fängt jede Runde an, auch nach einem Bumm.</li>
+      <li><b>Ziel:</b> Der Roboter soll so beim Ziel ankommen, dass er es mit der Hand berühren kann, ohne noch einen Schritt zu machen.</li>
+      <li><b>Ein Zug:</b> Die Programmiererin sagt genau einen Befehl. Der Roboter führt ihn aus, sagt „Piep. Fertig.“ und wartet. Es gelten nur „vor“, „links drehen“ und „rechts drehen“. Alles andere beantwortet der Roboter mit „Piep. Befehl unbekannt.“ und bleibt stehen.</li>
+      <li><b>Bumm:</b> Führt ein „vor“ gegen eine Wand oder ein Möbelstück, bleibt der Roboter davor stehen: „Bumm! Piep!“ Dann geht es vom Kreuz neu los.</li>
+      <li><b>Ende:</b> Kann der Roboter das Ziel berühren, holt er den Sticker, und beide jubeln. Gewonnen habt ihr zusammen.</li>
+      <li><b>Rekord:</b> Zählt die Befehle (am Finger oder mit Strichen am Malerkrepp). In der nächsten Runde zum selben Ziel: Geht es mit weniger Befehlen? Drehungen zählen mit.</li>
+    </ol>
+    <p><b>Varianten:</b></p>
+    <ul>
+      <li><b>Kuscheltier-Rettung:</b> Das Kuscheltier sitzt „gefangen“ hinter einer Tür (sie bleibt offen) oder unter dem Tisch. Der Roboter muss es berühren, dann ist es befreit.</li>
+      <li><b>Langsam-Roboter:</b> Nach jedem Befehl zählt der Roboter laut „Piep, piep, piep“, erst dann darf der nächste kommen. Gut, wenn {{KIND}} sehr schnell Befehle ruft und du nicht mitkommst.</li>
+      <li><b>Zwei Ziele hintereinander:</b> zuerst zum Kuscheltier, es berühren, dann ohne neuen Start weiter zum Kühlschrank.</li>
+    </ul>
+  </div>
+
+  <p class="e01-vor-tab"><b>„Falsch richtig“: So führt der Roboter lustig genau aus.</b> Das ist das Salz des Spiels. Wichtig: Der Roboter ist dabei nie frech oder gemein, er ist nur sehr, sehr genau. Nach zwei oder drei lustigen Pannen soll es wieder klappen, sonst kippt der Spaß.</p>
+  <table class="tab e01-falsch e01-bricht">
+    <thead><tr><th>{{KIND}} sagt</th><th>Der Roboter macht</th></tr></thead>
+    <tr><td>„Geh zum Kühlschrank!“</td><td>bleibt stocksteif stehen: „Piep. Befehl unbekannt. Ich kenne nur vor, links drehen, rechts drehen.“</td></tr>
+    <tr><td>„Vor!“ (sie meint: bis zur Tür)</td><td>macht genau einen Roboter-Schritt, Füße zusammen, und friert mitten im Gang ein. „Fertig. Nächster Befehl?“</td></tr>
+    <tr><td>„Rechts!“ (ohne „drehen“)</td><td>hebt feierlich die rechte Hand: „Das ist rechts. Piep. Und jetzt?“</td></tr>
+    <tr><td>„Dreh dich!“</td><td>„Piep. Links drehen oder rechts drehen? Ich kann nicht raten.“</td></tr>
+    <tr><td>„Vor, vor, vor, vor!“ (Wand nach drei Schritten)</td><td>drei Schritte, beim vierten die Hände sanft an die Wand: „Bumm! Piep. Programm zu Ende.“</td></tr>
+    <tr><td>„Ein bisschen vor!“</td><td>„Piep. Wie viel ist ein bisschen?“ und macht einen winzigen Trippelschritt.</td></tr>
+    <tr><td>„Geh rückwärts!“ oder „Geh seitlich!“</td><td>„Piep. Ich habe nur Augen vorne. Ich kann nur vor. Rückwärts und seitlich kann ich nicht.“</td></tr>
+    <tr><td>„Mach den Kühlschrank auf!“</td><td>„Piep. Ich habe keinen Hände-Befehl.“ (Nach dem Ankommen darfst du ausnahmsweise den Sticker holen.)</td></tr>
+    <tr><td>„Links drehen!“, gemeint ist aber ihr Links, und du schaust sie an</td><td>dreht sich korrekt zur eigenen linken Seite, also für sie „falsch“. Danach fragen: „War das falsch oder genau?“</td></tr>
+  </table>
+
+  <div class="kasten spiel e01-bricht" data-titel="Karten-Programm">
+    <p class="spiel-meta">2 Personen · 5–10 Minuten · die 16 Befehlskarten von <a class="blattref" href="#blatt-1-1"></a>, Kreuz mit Nase, Kuscheltier</p>
+    <ol class="regeln">
+      <li><b>Vorbereitung:</b> Der Roboter steht auf dem Kreuz und schaut wie die Nase. Die Karten liegen sortiert daneben: 8 vor, 4 links drehen, 4 rechts drehen.</li>
+      <li><b>Programm legen:</b> {{KIND}} legt den ganzen Weg zum Kuscheltier als Reihe auf den Boden, von links nach rechts, so wie man liest. Sie darf dabei durch die Wohnung schauen und überlegen, aber der Roboter bewegt sich noch nicht.</li>
+      <li><b>Start:</b> {{KIND}} ruft „Start!“, tippt die erste Karte an und liest sie vor. Der Roboter führt aus. Dann die nächste Karte. Sie tippt mit, damit beide wissen, wo das Programm gerade ist.</li>
+      <li><b>Kobold!</b> Kommt der Roboter nicht an oder macht er „Bumm“, ruft {{KIND}} „Kobold!“. Sie sucht die Karte, ab der es schiefgegangen ist, und darf das Programm ändern. Dann geht es vom Kreuz neu los.</li>
+      <li><b>Ende:</b> Kann der Roboter das Kuscheltier berühren, wenn die letzte Karte dran war, ist das Programm fertig. Ein Strich für jeden Start: Wie viele Starts hat es gebraucht? Beim ersten Start angekommen ist ein Profi-Programm.</li>
+    </ol>
+    <p><b>Varianten:</b> Nur 8 Karten erlaubt (dann muss der Weg kurz sein oder das Ziel näher). Ein Programm für einen anderen Roboter legen (Geschwister, Oma, Papa), der das Ziel nicht kennt. Er führt aus, und alle schauen: Wo landet er?</p>
+  </div>
+
+  <div class="kasten bewegung" data-titel="Dreh-Spiel">
+    <p>Gebt den vier Wänden des Zimmers Namen, und zwar der Reihe nach rechts herum, so wie man sich mit rechts drehen von Wand zu Wand dreht, z. B. Fenster, Tür, Sofa, Kasten. {{KIND}} steht in der Mitte und schaut zum Fenster. Du rufst Dreh-Befehle, sie dreht sich auf der Stelle und ruft, wohin sie jetzt schaut: „Rechts drehen!“ „Tür!“ „Rechts drehen!“ „Sofa!“ Nach fünf Befehlen tauscht ihr. Wenn du dich drehst, mach ab und zu absichtlich die falsche Drehung. {{KIND}} liebt es, dich zu erwischen.</p>
+    <ul>
+      <li><b>Turbo:</b> immer schneller rufen. Wer sich vertut, macht eine Roboter-Pause (dreimal „Piep“ sagen).</li>
+      <li><b>Doppel-Befehl:</b> „Rechts drehen, rechts drehen!“ Wohin schaust du? (zur Wand gegenüber)</li>
+      <li><b>Mit Augen zu</b> (nur auf freier Fläche): Sie dreht sich mit geschlossenen Augen, dann Augen auf: Stimmt die Wand?</li>
+    </ul>
+  </div>
+
+  <div class="kasten basteln" data-titel="Karten verschönern und Roboter-Antenne (Extra, nicht in der Einheit)">
+    <ul>
+      <li><b>Karten:</b> {{KIND}} bemalt die Rückseiten der Befehlskarten (Sterne, Drachenschuppen, Roboter-Schrauben). Die Vorderseiten mit den Pfeilen bleiben, wie sie sind, damit vor, links drehen und rechts drehen überall gleich aussehen. Mit Tixo überkleben hält länger.</li>
+      <li><b>Kuvert:</b> mit „Befehlskarten“ und {{KIND}}s Namen beschriften und verzieren.</li>
+      <li><b>Roboter-Antenne:</b> ein Haarreif mit zwei Pfeifenputzern oder Strohhalmen, oben je eine Kugel aus Alufolie. Wer die Antenne trägt, ist der Roboter. Beim Rollentausch wandert sie zu {{KIND}}.</li>
+    </ul>
+    <p>Etwa 15–20 Minuten, gern am Wochenende oder während du kochst.</p>
+  </div>
+
+  <h2>Wenn es hakt oder zu leicht ist</h2>
+
+  <m-linksrechts></m-linksrechts>
+
+  <div class="kasten stolper e01-bricht">
+    <ul>
+      <li><b>„Geh nach links!“</b> (sie meint: seitlich gehen): Der Roboter kann nur vorwärts. Frag: „Was muss ich zuerst machen, damit meine Nase nach links zeigt?“ Erst links drehen, dann vor.</li>
+      <li><b>Sie verwechselt links und rechts:</b> Gummiringerl rechts, hinter den Roboter stellen (Kasten oben). Nicht schimpfen, nicht seufzen: Mit 6 Jahren ist das ganz normal und wird mit der Zeit von selbst sicher.</li>
+      <li><b>Der Roboter kommt auf sie zu, und alles ist verkehrt:</b> Das ist keine Schwäche, sondern die schwierigste Denkaufgabe der Einheit. Sie darf jederzeit hinter dich laufen. Vermerke im Rückmeldebogen, ob sie die Hilfe braucht.</li>
+      <li><b>Sie dreht sich zu weit</b> (halbe Drehung oder im Kreis) oder geht beim Drehen einen Bogen: Mach die Vierteldrehung langsam vor, „von Wand zu Wand“, Füße bleiben am Platz. Das Dreh-Spiel spielen.</li>
+      <li><b>Sie wird ungeduldig und ruft „vor vor vor vor“ ganz schnell:</b> Langsam-Roboter-Variante. Oder „Genau-Roboter“ ein paar Runden nur mit Karten zeigen statt sagen.</li>
+      <li><b>Deine Schritte und ihre Schritte sind verschieden groß:</b> Absicht! Beim Rollentausch braucht ein Programm für sie mehr „vor“ als eines für dich. Frag: „Warum funktioniert mein Programm bei dir nicht?“ Antwort: Derselbe Befehl, aber ein anderer Roboter.</li>
+      <li><b>Sie will den Roboter schieben oder selbst vorlaufen:</b> Die Programmiererin darf hinter dem Roboter gehen, aber nicht anfassen. Sonst wird es Fernsteuern mit der Hand.</li>
+      <li><b>Frust, weil der Roboter so oft „falsch richtig“ macht:</b> weniger Pannen einbauen, Ziel näher legen. Der Roboter darf auch einmal sagen: „Piep. Super Befehl!“</li>
+      <li><b>Sie findet die falsche Karte im Karten-Programm nicht:</b> Noch einmal starten, und diesmal bleibt der Roboter nach jeder Karte stehen: „Stehe ich noch richtig?“ So findet sie die Stelle, an der es schiefgeht.</li>
+      <li><b>Am Blatt kreuzt sie den Drachen an, der in ihre Blickrichtung zeigt, nicht in die des Drachen:</b> aufstehen und mitdrehen lassen oder das Blatt drehen, bis die Nase des Drachen von ihr weg zeigt.</li>
+    </ul>
+  </div>
+
+  <div class="zwei">
+    <div class="kasten leichter">
+      <ul>
+        <li>Nur zwei Befehle: vor und rechts drehen. Ziel mit einer einzigen Ecke.</li>
+        <li>Das Ziel ganz nah legen (3 Schritte geradeaus, dann eine Drehung).</li>
+        <li>Zeigen statt sagen: {{KIND}} hält die passende Karte hoch, der Roboter führt aus.</li>
+        <li>Sie geht immer hinter dem Roboter und schaut in dieselbe Richtung wie er.</li>
+        <li>Karten-Programm mit höchstens 4 Karten.</li>
+        <li><a class="blattref" href="#blatt-1-2"></a>: Aufgabe 1 und 2 reichen, mit Aufstehen und Mitdrehen. Der Rest an einem anderen Tag.</li>
+      </ul>
+    </div>
+    <div class="kasten bonus" data-titel="Bonus-Knobelei">
+      <p class="klein"><i>Für zwischendurch: im Auto, im Wartezimmer, beim Abendessen.</i></p>
+      <p><b>Roboter im Kopf:</b> „Ein Roboter schaut zum Fenster. Er macht rechts drehen, rechts drehen. Wohin schaut er?“</p>
+      <p><b>Im Auto:</b> „Du schaust nach vorne, wie das Auto. Links drehen, links drehen, links drehen. Aus welchem Fenster schaust du jetzt?“</p>
+      <p><b>Für Profis:</b> „Der Roboter macht: vor, links drehen, vor, links drehen, vor, links drehen, vor, links drehen. Wo ist er dann?“</p>
+      <p class="klein"><b>Kurz-Lösungen:</b> zur Wand gegenüber vom Fenster; aus dem rechten Fenster; wieder am Start und er schaut wie am Anfang (er ist einmal ein Quadrat gegangen). Erklärungen bei den Lösungen.</p>
+    </div>
+  </div>
+
+  <div class="kasten schwerer darf-brechen e01-schwerer">
+    <p>Wenn das Genau-Roboter-Spiel nach zwei Runden sitzt, wähle hier aus. Das ist kein Zusatz „für später“, sondern ein vollwertiger Hauptteil. Die ersten vier Punkte passen gut statt Schritt 2 oder 3 im Ablauf.</p>
+    <ol class="e01-ganz">
+      <li><b>Kürzestes Programm:</b> Zum selben Ziel mit möglichst wenigen Befehlen. Drehungen zählen mit. Frag: „Gibt es einen Weg mit einer Ecke weniger?“ Lass sie zwei Programme legen und die Karten zählen. Das kürzeste wird in Einheit 2 auf dem Boden-Gitter wichtig.</li>
+      <li><b>Nur 16 Karten:</b> Ein weiter entferntes Ziel (Bad, Kinderzimmer). Reichen die 8 vor-Karten? Wenn nicht, muss sie einen anderen Weg oder einen neuen Start suchen. Wichtig: Vorher nachdenken, nicht ausprobieren. Das ist Planen wie beim echten Programmieren.</li>
+      <li><b>Programm ganz im Kopf:</b> {{KIND}} sitzt auf dem Sofa und darf nicht aufstehen. Sie legt das Programm zum Kuscheltier nur durch Hinschauen und Vorstellen. Erst dann läuft der Roboter. Klappt es beim ersten Start?</li>
+      <li><b>Der Roboter kommt entgegen:</b> Leg das Ziel hinter {{KIND}}. Der Roboter startet ihr gegenüber und schaut sie an. Sie darf nicht hinter den Roboter laufen, sondern muss aus seiner Sicht denken. Das ist Mini-Frage 5 als Spiel.</li>
+      <li><b>Das Rück-Programm:</b> Der Roboter ist beim Kühlschrank angekommen. Wie kommt er mit einem Programm zurück zum Kreuz? Lass sie zuerst selbst probieren. Wer es durchschaut, findet den Trick: <b>zuerst umdrehen</b> (rechts drehen, rechts drehen), dann das Hin-Programm <b>von hinten nach vorne</b> ausführen und dabei <b>links und rechts tauschen</b>. Beispiel: Hin „vor, vor, rechts drehen, vor, vor, vor, links drehen, vor“ (8 Befehle). Zurück „rechts drehen, rechts drehen, vor, rechts drehen, vor, vor, vor, links drehen, vor, vor“ (10 Befehle). Der Roboter steht dann wieder am Kreuz, schaut aber in die andere Richtung als am Anfang. Der Trick klappt bei jedem Programm, denn der Roboter geht genau denselben Weg zurück. Profi-Frage: „Wie muss er am Schluss noch drehen, damit er wieder genauso schaut wie am Anfang?“ (zweimal drehen, also das Rück-Programm wird 2 Befehle länger.)</li>
+      <li><b>Drei Linke sind ein Rechts:</b> „Ich darf nur links drehen. Wie komme ich trotzdem dazu, nach rechts zu schauen?“ (dreimal links drehen). Und umgekehrt: dreimal rechts drehen ist dasselbe wie einmal links drehen. Das ist auch die Profi-Aufgabe auf <a class="blattref" href="#blatt-1-2"></a> und die Knobel-Ecke auf <a class="blattref" href="#blatt-1-1"></a>. Wer zählen mag: Viermal dieselbe Drehung ist einmal ganz herum, der Roboter schaut wieder wie am Anfang.</li>
+      <li><b>Der Verdreh-Roboter:</b> Der Roboter hat einen Wackelkontakt: Bei „links drehen“ dreht er rechts und umgekehrt (immer, nicht nur manchmal). {{KIND}} muss ihn trotzdem zum Ziel bringen. Danach tauscht ihr. Das ist sehr schwer und sehr lustig.</li>
+      <li><b>Hindernis-Parcours:</b> Polster auf den Boden legen. Das sind Felsen, der Roboter darf sie nicht betreten (sonst „Bumm“). Ein Weg mit zwei Felsen braucht mehr Drehungen.</li>
+      <li><b>Blind-Roboter</b> (nur in einem freien Gang, langsam): Der Roboter macht die Augen zu und streckt die Hände vor. Jetzt kann er wirklich nicht schummeln. {{KIND}} ist verantwortlich und darf jederzeit „Stopp!“ rufen. Noch schwerer: {{KIND}} schaut sich den Weg genau an, macht dann selbst die Augen zu und sagt das ganze Programm aus dem Gedächtnis.</li>
+      <li><b>Programm als Nachricht:</b> {{KIND}} schreibt auf <a class="blattref" href="#blatt-1-3"></a> ein Programm zu einem geheimen Ziel. Ein anderer Roboter (du oder jemand aus der Familie) führt es aus, ohne das Ziel zu kennen. Landet er beim Geheimnis? Ein Programm ist eine Nachricht, die ohne Erklärung funktionieren muss.</li>
+      <li><b>Der Drache schaut nach unten:</b> Am Papier oder mit der vor-Karte als Pfeil-Roboter (Mini-Frage 7): Der Pfeil zeigt auf {{KIND}}. „Rechts drehen: Wohin zeigt er jetzt?“ (zu ihrer linken Seite). „Links drehen?“ (zu ihrer rechten Seite). Das ist die schwerste Stufe der Hilfen für links und rechts. Wenn das sitzt, darf der Drache in Einheit 2 auch am Start nach unten schauen.</li>
+      <li><b>Zähl-Knobelei:</b> „Wie viele große Schritte sind es vom Kreuz zum Kühlschrank? Schätz zuerst!“ Dann zählen. Und: „Wie viele Befehle hat dein Programm, wenn du die Drehungen mitzählst?“ Bei 6 Schritten und 2 Drehungen sind es 6 + 2 = 8 Befehle.</li>
+    </ol>
+  </div>
+
+  <h2>Hintergrund</h2>
+  <div class="kasten warum e01-bricht">
+    <p>Ein Computer macht genau, was in seinem Programm steht. Er weiß nicht, was jemand gemeint hat, und er rät nicht. Genau das hat {{KIND}} heute am Roboter erlebt. Ein einzelner Befehl heißt in der Fachsprache <b>Anweisung</b>. Eine feste Reihenfolge von Anweisungen ist ein <b>Programm</b> (auch <b>Sequenz</b>). Und ein genauer Plan, der ein Problem Schritt für Schritt löst, heißt <b>Algorithmus</b>, egal ob ihn ein Mensch oder ein Computer ausführt: Ein Kochrezept oder eine Bastelanleitung sind auch Algorithmen. Der Roboter ist das, was Informatiker den <b>Ausführenden</b> nennen.</p>
+    <p>Dass der Roboter nur drei Befehle kennt, ist kein Spiel-Trick: Jeder Computer hat einen festen Vorrat an Befehlen, und alles andere muss daraus zusammengesetzt werden. „Geh zum Kühlschrank“ gibt es nicht, aber es lässt sich aus vor, links drehen und rechts drehen bauen. Die drei Befehle sind übrigens <b>relativ</b>: Links und rechts hängen davon ab, wohin der Roboter gerade schaut. Genau so steuert man die Schildkröte der Kinder-Programmiersprache Logo, die es seit den 1960er-Jahren gibt (vorwärts, links drehen, rechts drehen), und heute viele Lern-Roboter.</p>
+    <p>Zwei Arten zu steuern habt ihr heute auch erlebt: Beim Genau-Roboter kam ein Befehl nach dem anderen, das ist <b>Fernsteuern</b>. Beim Karten-Programm stand alles vorher fest, und dann lief der Roboter alleine. Das ist <b>Programmieren</b>. Raumsonden und Mars-Roboter werden so gesteuert, weil ein Funksignal zum Mars je nach Stand der Planeten mehrere Minuten braucht: Fernsteuern Schritt für Schritt ginge viel zu langsam. Und wenn etwas schiefgeht, liegt der Fehler fast immer im Programm, nicht im Roboter. Ihn zu finden heißt <b>Debuggen</b>, das kommt in Einheit 4.</p>
+  </div>
+
+  <h2>Bildschirm-Bonus</h2>
+  <div class="kasten bildschirm">
+    <p><b>Heute gibt es bewusst keinen Bildschirm.</b> Es gibt kein Level-Paket und kein Schlüsselwort für Einheit 1, das Handy bleibt weg.</p>
+    <p><b>Warum:</b> Körper zuerst. Wie sich „rechts drehen“ anfühlt, weiß {{KIND}} erst, wenn sie es selbst gemacht und an dir gesehen hat. Ein Drache, der sich am Bildschirm dreht, ist danach leicht zu verstehen, umgekehrt nicht. Dazu kommt die Sicht des Roboters: Am Bildschirm ist sie nie gefragt, im Gang sofort. Und wer heute den Roboter genau ausführen lässt, versteht später, warum die Web-App ein Programm „falsch richtig“ abspielt.</p>
+    <p><b>Ausblick:</b> In Einheit 2 (Drachen-Pfade) läuft {{KIND}} als Drache über ein Malerkrepp-Gitter am Boden und schreibt Programme am Papier. Dort gibt es danach das erste kleine Level-Paket am Handy oder Tablet, mit einem Schlüsselwort aus der Anleitung von Einheit 2.</p>
+  </div>
+
+  <h2>Lösungen</h2>
+  <div class="e01-loes">
+    <m-loesungen einheit="1" skala="0.39"></m-loesungen>
+    <div class="kasten loesung">
+      <p><b>Blatt 1-1, Knobel-Ecke:</b> 4 rechts-drehen-Karten sind einmal ganz herum, dann schaut der Roboter wieder wie am Anfang (mit links drehen genauso). Dreimal links drehen ist dasselbe wie einmal rechts drehen: Drei Viertel herum nach links landet dort, wo ein Viertel nach rechts hinführt. Zum Nachprüfen mit dem eigenen Körper drehen. Alle Karten zusammen: 8 + 4 + 4 = 16.</p>
+      <p><b>Blatt 1-2:</b> Aufgabe 1 nach rechts, Aufgabe 2 nach links, Aufgabe 3 nach oben (von rechts eine Vierteldrehung zurück), Aufgabe 4 nach unten (zweimal rechts drehen ist eine halbe Drehung). Profi: Nach dreimal links drehen schaut der Drache nach rechts. Das passt zur Knobel-Ecke auf <a class="blattref" href="#blatt-1-1"></a>: Ein einziges rechts drehen macht dasselbe.</p>
+      <p><b>Blatt 1-3:</b> Aufgabe 1 endet im Feld links oben, Aufgabe 2 im Feld rechts oben (roter Weg in den Bildern). Aufgabe 3: In Aufgabe 2 schaut der Drache am Ende nach rechts. Aufgabe 4 und Profi: Mehrere Lösungen möglich. Richtig ist jedes Programm, mit dem der Roboter wirklich ankommt. Ausprobieren ist die Kontrolle! Für das Rück-Programm hilft der Trick aus „Schwerer machen“ (umdrehen, von hinten lesen, links und rechts tauschen). Hat das Hin-Programm mehr als 10 Befehle, passt das Rück-Programm nicht mehr in die 12 Kästchen. Dann darf sie eine zweite Zeile darunter zeichnen.</p>
+      <p><b>Bonus:</b> Rechts drehen, rechts drehen ist eine halbe Drehung, also schaut er zur Wand gegenüber vom Fenster. Im Auto: dreimal links drehen ist dasselbe wie einmal rechts drehen, also schaut sie aus dem rechten Fenster. Profi: Vier gleiche Stücke „vor, links drehen“ gehen einmal ein Quadrat ab. Der Roboter steht wieder am Start und schaut wie am Anfang. In Einheit 5 schreibt man das kürzer mit dem Wiederhol-Zauber.</p>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 1-1: Befehlskarten (8 vor, 4 links drehen, 4 rechts drehen) -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="1" data-titel="Meine Befehlskarten" data-art="Karten">
+  <p class="e01-hinweis">{{KIND}}, das sind deine Befehlskarten. Heb sie im Kuvert auf!</p>
+  <m-karten spalten="4" zeilen="4" hoehe="42" breite="176">
+    <div class="e01-karte"><m-symbol name="vor" gr="25"></m-symbol><span class="e01-kwort">vor</span></div>
+    <div class="e01-karte"><m-symbol name="vor" gr="25"></m-symbol><span class="e01-kwort">vor</span></div>
+    <div class="e01-karte"><m-symbol name="vor" gr="25"></m-symbol><span class="e01-kwort">vor</span></div>
+    <div class="e01-karte"><m-symbol name="vor" gr="25"></m-symbol><span class="e01-kwort">vor</span></div>
+    <div class="e01-karte"><m-symbol name="vor" gr="25"></m-symbol><span class="e01-kwort">vor</span></div>
+    <div class="e01-karte"><m-symbol name="vor" gr="25"></m-symbol><span class="e01-kwort">vor</span></div>
+    <div class="e01-karte"><m-symbol name="vor" gr="25"></m-symbol><span class="e01-kwort">vor</span></div>
+    <div class="e01-karte"><m-symbol name="vor" gr="25"></m-symbol><span class="e01-kwort">vor</span></div>
+    <div class="e01-karte"><m-symbol name="links" gr="25"></m-symbol><span class="e01-kwort">links<br>drehen</span></div>
+    <div class="e01-karte"><m-symbol name="links" gr="25"></m-symbol><span class="e01-kwort">links<br>drehen</span></div>
+    <div class="e01-karte"><m-symbol name="links" gr="25"></m-symbol><span class="e01-kwort">links<br>drehen</span></div>
+    <div class="e01-karte"><m-symbol name="links" gr="25"></m-symbol><span class="e01-kwort">links<br>drehen</span></div>
+    <div class="e01-karte"><m-symbol name="rechts" gr="25"></m-symbol><span class="e01-kwort">rechts<br>drehen</span></div>
+    <div class="e01-karte"><m-symbol name="rechts" gr="25"></m-symbol><span class="e01-kwort">rechts<br>drehen</span></div>
+    <div class="e01-karte"><m-symbol name="rechts" gr="25"></m-symbol><span class="e01-kwort">rechts<br>drehen</span></div>
+    <div class="e01-karte"><m-symbol name="rechts" gr="25"></m-symbol><span class="e01-kwort">rechts<br>drehen</span></div>
+  </m-karten>
+  <div class="knobel" data-titel="Knobel-Ecke: Dreh-Karten">
+    <p>Der Roboter macht immer wieder rechts drehen, bis er wieder schaut wie am Anfang. Wie viele Karten braucht er? <m-feld l="4"></m-feld></p>
+    <div class="e01-knobel-reihe">
+      <span class="e01-knobel-text">Drei Karten links drehen machen dasselbe wie eine einzige Karte. Welche? Kreuze an!</span>
+      <m-e1-befehlwahl raetsel="e1-d5" gr="13"></m-e1-befehlwahl>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 1-2: Wohin schaut der Drache? (Drehen und Blickrichtung)    -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="1" data-titel="Wohin schaut der Drache?" data-art="Arbeitsblatt" data-verteilt>
+  <div class="e01-intro">
+    <p>{{KIND}}, der Drache dreht sich auf der Stelle. Seine Nase zeigt, wohin er schaut.</p>
+    <div class="e01-leg">
+      <span><m-symbol name="links" gr="10"></m-symbol> links drehen</span>
+      <span><m-symbol name="rechts" gr="10"></m-symbol> rechts drehen</span>
+      <span>Blatt drehen ist erlaubt!</span>
+    </div>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">Er macht rechts drehen. Wohin schaut er jetzt? Kreuze an!</p>
+    <div class="e01-zeile">
+      <div class="e01-vorher"><m-gitter raetsel="e1-d1" feld="22" loesung="keine"></m-gitter><m-programm raetsel="e1-d1"></m-programm></div>
+      <div class="e01-nachher"><m-e1-wahl raetsel="e1-d1" reihe="unten rechts links oben"></m-e1-wahl></div>
+    </div>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">Er schaut wieder nach oben. Links drehen! Wohin jetzt?</p>
+    <div class="e01-zeile">
+      <div class="e01-vorher"><m-gitter raetsel="e1-d2" feld="22" loesung="keine"></m-gitter><m-programm raetsel="e1-d2"></m-programm></div>
+      <div class="e01-nachher"><m-e1-wahl raetsel="e1-d2" reihe="links oben rechts unten"></m-e1-wahl></div>
+    </div>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">Achtung, er schaut nach rechts! Links drehen. Wohin jetzt?</p>
+    <div class="e01-zeile">
+      <div class="e01-vorher"><m-gitter raetsel="e1-d3" feld="22" loesung="keine"></m-gitter><m-programm raetsel="e1-d3"></m-programm></div>
+      <div class="e01-nachher"><m-e1-wahl raetsel="e1-d3" reihe="unten rechts oben links"></m-e1-wahl></div>
+    </div>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">Zwei Befehle! Wohin schaut der Drache am Ende?</p>
+    <div class="e01-zeile">
+      <div class="e01-vorher"><m-gitter raetsel="e1-d4" feld="22" loesung="keine"></m-gitter><m-programm raetsel="e1-d4"></m-programm></div>
+      <div class="e01-nachher"><m-e1-wahl raetsel="e1-d4" reihe="oben links rechts unten"></m-e1-wahl></div>
+    </div>
+  </div>
+
+  <div class="profi" data-titel="Profi-Aufgabe: Drei Drehungen">
+    <p>Drei Befehle! Wohin schaut der Drache am Ende? Kreuze an!</p>
+    <div class="e01-zeile">
+      <div class="e01-vorher"><m-gitter raetsel="e1-d5" feld="20" loesung="keine"></m-gitter><m-programm raetsel="e1-d5" gr="11"></m-programm></div>
+      <div class="e01-nachher"><m-e1-wahl raetsel="e1-d5" reihe="rechts links oben unten"></m-e1-wahl></div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 1-3: Roboter-Programme (lesen und selbst schreiben)         -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="1" data-titel="Roboter-Programme" data-art="Arbeitsblatt" data-verteilt>
+  <div class="e01-raster2">
+    <div class="aufg">
+      <p class="anw">{{KIND}}, tipp mit dem Finger mit. Wo steht der Drache am Ende? Male das Feld an!</p>
+      <div class="e01-lesen"><m-gitter raetsel="e1-l1" feld="22"></m-gitter><m-programm raetsel="e1-l1"></m-programm></div>
+    </div>
+    <div class="aufg">
+      <p class="anw">Hier schaut der Drache am Anfang nach rechts. Wo steht er am Ende? Male das Feld an!</p>
+      <div class="e01-lesen"><m-gitter raetsel="e1-l2" feld="22"></m-gitter><m-programm raetsel="e1-l2"></m-programm></div>
+    </div>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">Wohin schaut der Drache am Ende von Aufgabe 2? Kreuze an!</p>
+    <m-e1-wahl raetsel="e1-l2" reihe="unten rechts oben links"></m-e1-wahl>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">Vom Kreuz zum Kühlschrank: Male dein Programm in die Kästchen. Der Roboter schaut zuerst wie die Nase. Dann probiert es aus!</p>
+    <div class="e01-lsg-box"><m-programm leer="12" gr="13"></m-programm>
+      <p class="lsg-nur">Mehrere Lösungen möglich: jedes Programm, mit dem der Roboter wirklich ankommt.</p></div>
+  </div>
+
+  <div class="profi" data-titel="Profi-Aufgabe: Wieder zurück">
+    <p>Jetzt steht dein Roboter beim Kühlschrank. Schreib ein Programm, mit dem er zurück zum Kreuz kommt!</p>
+    <div class="e01-lsg-box"><m-programm leer="12" gr="13"></m-programm>
+      <p class="lsg-nur">Zweimal rechts drehen, dann Aufgabe 4 von hinten lesen, links und rechts tauschen.</p></div>
+  </div>
+</section>

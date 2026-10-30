@@ -1,0 +1,564 @@
+{
+ "paket": "e3",
+ "einheit": 3,
+ "titel": "Erst das, dann das",
+ "schluesselwort": "JAUSE",
+ "web": {
+  "titel": "Erst das, dann das",
+  "art": "ablauf",
+  "levels": [
+   "e3-schneemann",
+   "e3-zaehne",
+   "e3-jause",
+   "e3-ei",
+   "e3-jause-gurke",
+   "e3-anziehen"
+  ]
+ },
+ "raetsel": [
+  {
+   "id": "e3-zaehne",
+   "art": "ablauf",
+   "titel": "Zähne putzen",
+   "karten": [
+    {
+     "id": "pasta",
+     "text": "Zahnpasta auf die Bürste",
+     "bild": "zahnpasta"
+    },
+    {
+     "id": "putzen",
+     "text": "Zähne putzen",
+     "bild": "putzen"
+    },
+    {
+     "id": "spucken",
+     "text": "Ausspucken",
+     "bild": "ausspucken"
+    },
+    {
+     "id": "spuelen",
+     "text": "Mund ausspülen",
+     "bild": "ausspuelen"
+    }
+   ],
+   "regeln": [
+    [
+     "pasta",
+     "putzen"
+    ],
+    [
+     "putzen",
+     "spucken"
+    ],
+    [
+     "spucken",
+     "spuelen"
+    ]
+   ],
+   "gemischt": [
+    "spucken",
+    "pasta",
+    "spuelen",
+    "putzen"
+   ]
+  },
+  {
+   "id": "e3-jause",
+   "art": "ablauf",
+   "titel": "Butterbrot machen",
+   "karten": [
+    {
+     "id": "teller",
+     "text": "Teller hinstellen",
+     "bild": "teller"
+    },
+    {
+     "id": "brot",
+     "text": "Brot auf den Teller legen",
+     "bild": "brot"
+    },
+    {
+     "id": "butter",
+     "text": "Butter streichen",
+     "bild": "butter"
+    },
+    {
+     "id": "schinken",
+     "text": "Schinken drauflegen",
+     "bild": "schinken"
+    },
+    {
+     "id": "essen",
+     "text": "Essen!",
+     "bild": "essen"
+    }
+   ],
+   "regeln": [
+    [
+     "teller",
+     "brot"
+    ],
+    [
+     "brot",
+     "butter"
+    ],
+    [
+     "butter",
+     "schinken"
+    ],
+    [
+     "schinken",
+     "essen"
+    ]
+   ],
+   "gemischt": [
+    "butter",
+    "essen",
+    "teller",
+    "schinken",
+    "brot"
+   ]
+  },
+  {
+   "id": "e3-jause-gurke",
+   "art": "ablauf",
+   "titel": "Butterbrot mit Gurke",
+   "mehrereLoesungen": true,
+   "karten": [
+    {
+     "id": "teller",
+     "text": "Teller hinstellen",
+     "bild": "teller"
+    },
+    {
+     "id": "brot",
+     "text": "Brot auf den Teller legen",
+     "bild": "brot"
+    },
+    {
+     "id": "butter",
+     "text": "Butter streichen",
+     "bild": "butter"
+    },
+    {
+     "id": "schinken",
+     "text": "Schinken drauflegen",
+     "bild": "schinken"
+    },
+    {
+     "id": "gurke",
+     "text": "Gurken drauflegen",
+     "bild": "gurke"
+    },
+    {
+     "id": "essen",
+     "text": "Essen!",
+     "bild": "essen"
+    }
+   ],
+   "regeln": [
+    [
+     "teller",
+     "brot"
+    ],
+    [
+     "brot",
+     "butter"
+    ],
+    [
+     "butter",
+     "schinken"
+    ],
+    [
+     "butter",
+     "gurke"
+    ],
+    [
+     "schinken",
+     "essen"
+    ],
+    [
+     "gurke",
+     "essen"
+    ]
+   ],
+   "gemischt": [
+    "gurke",
+    "brot",
+    "essen",
+    "butter",
+    "teller",
+    "schinken"
+   ]
+  },
+  {
+   "id": "e3-jause-eigen",
+   "art": "ablauf",
+   "titel": "Butterbrot mit Gurke und Lieblings-Belag",
+   "mehrereLoesungen": true,
+   "karten": [
+    {
+     "id": "teller",
+     "text": "Teller hinstellen",
+     "bild": "teller"
+    },
+    {
+     "id": "brot",
+     "text": "Brot auf den Teller legen",
+     "bild": "brot"
+    },
+    {
+     "id": "butter",
+     "text": "Butter streichen",
+     "bild": "butter"
+    },
+    {
+     "id": "schinken",
+     "text": "Schinken drauflegen",
+     "bild": "schinken"
+    },
+    {
+     "id": "gurke",
+     "text": "Gurken drauflegen",
+     "bild": "gurke"
+    },
+    {
+     "id": "eigen",
+     "text": "Dein Lieblings-Belag"
+    },
+    {
+     "id": "essen",
+     "text": "Essen!",
+     "bild": "essen"
+    }
+   ],
+   "regeln": [
+    [
+     "teller",
+     "brot"
+    ],
+    [
+     "brot",
+     "butter"
+    ],
+    [
+     "butter",
+     "schinken"
+    ],
+    [
+     "butter",
+     "gurke"
+    ],
+    [
+     "butter",
+     "eigen"
+    ],
+    [
+     "schinken",
+     "essen"
+    ],
+    [
+     "gurke",
+     "essen"
+    ],
+    [
+     "eigen",
+     "essen"
+    ]
+   ]
+  },
+  {
+   "id": "e3-anziehen",
+   "art": "ablauf",
+   "titel": "Anziehen",
+   "mehrereLoesungen": true,
+   "karten": [
+    {
+     "id": "unterhose",
+     "text": "Unterhose anziehen",
+     "bild": "unterhose"
+    },
+    {
+     "id": "hose",
+     "text": "Hose anziehen",
+     "bild": "hose"
+    },
+    {
+     "id": "socken",
+     "text": "Socken anziehen",
+     "bild": "socken"
+    },
+    {
+     "id": "schuhe",
+     "text": "Schuhe anziehen",
+     "bild": "schuhe"
+    },
+    {
+     "id": "pullover",
+     "text": "Pullover anziehen",
+     "bild": "pullover"
+    }
+   ],
+   "regeln": [
+    [
+     "unterhose",
+     "hose"
+    ],
+    [
+     "hose",
+     "schuhe"
+    ],
+    [
+     "socken",
+     "schuhe"
+    ]
+   ],
+   "gemischt": [
+    "schuhe",
+    "pullover",
+    "hose",
+    "socken",
+    "unterhose"
+   ]
+  },
+  {
+   "id": "e3-anziehen-pulli",
+   "art": "ablauf",
+   "titel": "Anziehen, Pullover zum Schluss",
+   "mehrereLoesungen": true,
+   "karten": [
+    {
+     "id": "unterhose",
+     "text": "Unterhose anziehen",
+     "bild": "unterhose"
+    },
+    {
+     "id": "hose",
+     "text": "Hose anziehen",
+     "bild": "hose"
+    },
+    {
+     "id": "socken",
+     "text": "Socken anziehen",
+     "bild": "socken"
+    },
+    {
+     "id": "schuhe",
+     "text": "Schuhe anziehen",
+     "bild": "schuhe"
+    },
+    {
+     "id": "pullover",
+     "text": "Pullover anziehen",
+     "bild": "pullover"
+    }
+   ],
+   "regeln": [
+    [
+     "unterhose",
+     "hose"
+    ],
+    [
+     "hose",
+     "schuhe"
+    ],
+    [
+     "socken",
+     "schuhe"
+    ],
+    [
+     "unterhose",
+     "pullover"
+    ],
+    [
+     "hose",
+     "pullover"
+    ],
+    [
+     "socken",
+     "pullover"
+    ],
+    [
+     "schuhe",
+     "pullover"
+    ]
+   ]
+  },
+  {
+   "id": "e3-ausziehen",
+   "art": "ablauf",
+   "titel": "Ausziehen",
+   "mehrereLoesungen": true,
+   "karten": [
+    {
+     "id": "unterhose",
+     "text": "Unterhose ausziehen",
+     "bild": "unterhose"
+    },
+    {
+     "id": "hose",
+     "text": "Hose ausziehen",
+     "bild": "hose"
+    },
+    {
+     "id": "socken",
+     "text": "Socken ausziehen",
+     "bild": "socken"
+    },
+    {
+     "id": "schuhe",
+     "text": "Schuhe ausziehen",
+     "bild": "schuhe"
+    },
+    {
+     "id": "pullover",
+     "text": "Pullover ausziehen",
+     "bild": "pullover"
+    }
+   ],
+   "regeln": [
+    [
+     "hose",
+     "unterhose"
+    ],
+    [
+     "schuhe",
+     "hose"
+    ],
+    [
+     "schuhe",
+     "socken"
+    ]
+   ]
+  },
+  {
+   "id": "e3-ei",
+   "art": "ablauf",
+   "titel": "Das Drachen-Ei",
+   "karten": [
+    {
+     "id": "nest",
+     "text": "Das Ei liegt im Nest",
+     "bild": "ei"
+    },
+    {
+     "id": "wackeln",
+     "text": "Das Ei wackelt",
+     "bild": "eiwackelt"
+    },
+    {
+     "id": "risse",
+     "text": "Das Ei hat Risse",
+     "bild": "eirisse"
+    },
+    {
+     "id": "schluepfen",
+     "text": "Das Baby schlüpft",
+     "bild": "schluepfen"
+    },
+    {
+     "id": "fliegen",
+     "text": "Der kleine Drache fliegt",
+     "bild": "drachenbaby"
+    }
+   ],
+   "regeln": [
+    [
+     "nest",
+     "wackeln"
+    ],
+    [
+     "wackeln",
+     "risse"
+    ],
+    [
+     "risse",
+     "schluepfen"
+    ],
+    [
+     "schluepfen",
+     "fliegen"
+    ]
+   ],
+   "gemischt": [
+    "risse",
+    "fliegen",
+    "nest",
+    "schluepfen",
+    "wackeln"
+   ]
+  },
+  {
+   "id": "e3-belag",
+   "art": "ablauf",
+   "titel": "Drei Beläge",
+   "mehrereLoesungen": true,
+   "karten": [
+    {
+     "id": "schinken",
+     "text": "Schinken",
+     "bild": "schinken"
+    },
+    {
+     "id": "kaese",
+     "text": "Käse",
+     "bild": "kaese"
+    },
+    {
+     "id": "gurke",
+     "text": "Gurke",
+     "bild": "gurke"
+    }
+   ],
+   "regeln": []
+  },
+  {
+   "id": "e3-schneemann",
+   "art": "ablauf",
+   "titel": "Schneemann bauen",
+   "karten": [
+    {
+     "id": "kugel",
+     "text": "Große Kugel rollen",
+     "bild": "schneekugel"
+    },
+    {
+     "id": "bauch",
+     "text": "Zweite Kugel draufsetzen",
+     "bild": "schneezwei"
+    },
+    {
+     "id": "kopf",
+     "text": "Kopf draufsetzen",
+     "bild": "schneedrei"
+    },
+    {
+     "id": "hut",
+     "text": "Hut aufsetzen",
+     "bild": "schneehut"
+    }
+   ],
+   "regeln": [
+    [
+     "kugel",
+     "bauch"
+    ],
+    [
+     "bauch",
+     "kopf"
+    ],
+    [
+     "kopf",
+     "hut"
+    ]
+   ],
+   "gemischt": [
+    "kopf",
+    "kugel",
+    "hut",
+    "bauch"
+   ]
+  }
+ ]
+}

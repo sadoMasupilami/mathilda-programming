@@ -1,0 +1,150 @@
+{
+ "paket": "e2",
+ "einheit": 2,
+ "titel": "Drachen-Pfade",
+ "schluesselwort": "SCHATZ",
+ "web": {
+  "titel": "Drachen-Pfade",
+  "art": "pfad",
+  "levels": ["e2-w1", "e2-w2", "e2-a2", "e2-b1", "e2-b2", "e2-w6"]
+ },
+ "raetsel": [
+  {
+   "id": "e2-l1",
+   "art": "lesen",
+   "b": 3, "h": 3,
+   "start": { "x": 0, "y": 2, "blick": "oben" },
+   "programm": "vor vor rechts vor"
+  },
+  {
+   "id": "e2-l2",
+   "art": "lesen",
+   "b": 3, "h": 3,
+   "start": { "x": 2, "y": 2, "blick": "oben" },
+   "programm": "links vor vor rechts vor"
+  },
+  {
+   "id": "e2-a2",
+   "art": "pfad",
+   "aufgabe": "ankommen",
+   "b": 3, "h": 3,
+   "start": { "x": 0, "y": 2, "blick": "oben" },
+   "ziel": { "x": 2, "y": 0 },
+   "maxBefehle": 8
+  },
+  {
+   "id": "e2-p1",
+   "art": "lesen",
+   "b": 3, "h": 3,
+   "start": { "x": 0, "y": 2, "blick": "oben" },
+   "ziel": { "x": 2, "y": 0 },
+   "programm": "rechts vor vor links vor vor"
+  },
+  {
+   "id": "e2-b1",
+   "art": "pfad",
+   "aufgabe": "ankommen",
+   "b": 3, "h": 3,
+   "start": { "x": 0, "y": 2, "blick": "rechts" },
+   "ziel": { "x": 2, "y": 0 },
+   "hindernisse": [[1, 2]],
+   "maxBefehle": 8
+  },
+  {
+   "id": "e2-b2",
+   "art": "pfad",
+   "aufgabe": "kuerzestes",
+   "b": 3, "h": 4,
+   "start": { "x": 2, "y": 3, "blick": "links" },
+   "ziel": { "x": 0, "y": 1 },
+   "hindernisse": [[1, 3], [1, 1]],
+   "maxBefehle": 8
+  },
+  {
+   "id": "e2-p2",
+   "art": "lesen",
+   "b": 3, "h": 2,
+   "start": { "x": 2, "y": 0, "blick": "unten" },
+   "programm": "vor rechts vor vor"
+  },
+  {
+   "id": "e2-w1",
+   "art": "pfad",
+   "aufgabe": "ankommen",
+   "b": 3, "h": 3,
+   "start": { "x": 1, "y": 2, "blick": "oben" },
+   "ziel": { "x": 2, "y": 1 },
+   "maxBefehle": 8
+  },
+  {
+   "id": "e2-w2",
+   "art": "pfad",
+   "aufgabe": "ankommen",
+   "b": 3, "h": 3,
+   "start": { "x": 2, "y": 2, "blick": "oben" },
+   "ziel": { "x": 0, "y": 1 },
+   "maxBefehle": 8
+  },
+  {
+   "id": "e2-w6",
+   "art": "pfad",
+   "aufgabe": "ankommen",
+   "b": 4, "h": 4,
+   "start": { "x": 0, "y": 3, "blick": "rechts" },
+   "ziel": { "x": 3, "y": 0 },
+   "hindernisse": [[1, 3], [1, 1], [2, 1], [3, 2]],
+   "maxBefehle": 10
+  },
+  {
+   "id": "e2-s1",
+   "art": "pfad",
+   "aufgabe": "kuerzestes",
+   "b": 4, "h": 4,
+   "start": { "x": 0, "y": 3, "blick": "rechts" },
+   "ziel": { "x": 0, "y": 0 },
+   "hindernisse": [[0, 2], [1, 2], [2, 0], [1, 0]],
+   "maxBefehle": 12
+  },
+  {
+   "id": "e2-s2",
+   "art": "pfad",
+   "aufgabe": "kuerzestes",
+   "b": 4, "h": 4,
+   "start": { "x": 0, "y": 3, "blick": "oben" },
+   "ziel": { "x": 3, "y": 0 },
+   "hindernisse": [[1, 2], [2, 1]],
+   "edelsteine": [[2, 3]],
+   "maxBefehle": 12
+  },
+  {
+   "id": "e2-s3",
+   "art": "pfad",
+   "aufgabe": "kuerzestes",
+   "b": 4, "h": 4,
+   "start": { "x": 1, "y": 0, "blick": "unten" },
+   "ziel": { "x": 3, "y": 3 },
+   "hindernisse": [[1, 2], [2, 1]],
+   "maxBefehle": 12
+  },
+  {
+   "id": "e2-s4",
+   "art": "pfad",
+   "aufgabe": "kuerzestes",
+   "mehrereLoesungen": true,
+   "b": 3, "h": 3,
+   "start": { "x": 1, "y": 1, "blick": "oben" },
+   "ziel": { "x": 1, "y": 2 },
+   "maxBefehle": 8
+  },
+  {
+   "id": "e2-s5",
+   "art": "pfad",
+   "aufgabe": "kuerzestes",
+   "b": 4, "h": 4,
+   "start": { "x": 0, "y": 3, "blick": "oben" },
+   "ziel": { "x": 1, "y": 0 },
+   "hindernisse": [[0, 1], [1, 2], [2, 2]],
+   "maxBefehle": 12
+  }
+ ]
+}

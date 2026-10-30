@@ -1,0 +1,393 @@
+<!--
+  Einheit 2: Drachen-Pfade (Block A: Befehle, Programme, Fehler)
+  Programme am Papier lesen und schreiben, mit der Drachen-Figur ausführen,
+  kürzeste Programme finden. Boden-Gitter aus Malerkrepp, Spiel „Schatz-Versteck“.
+  Rätsel: raetsel/e2.json (Web-Paket e2, Schlüsselwort SCHATZ)
+  Blätter: 2-1 Drachen-Pfade, 2-2 Drachen-Pfade mit Steinen, 2-3 Meine Drachen-Figur
+  Eigener Baustein: src/bausteine/e2-drache.js (<m-e2-ausmal>)
+-->
+<style>
+  .e02-ablauf > li { break-inside: avoid; }
+  .e02-ganz > li { break-inside: auto; orphans: 2; widows: 2; }
+  .kasten.e02-schwerer, .kasten.e02-brechen { -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .e02-brechen li { break-inside: avoid; }
+  .e02-sym { display: inline-block; vertical-align: -1.2mm; }
+  .e02-gitterbild { display: flex; gap: 5mm; align-items: flex-start; }
+  .e02-gitterbild > m-gitter { flex: none; zoom: 0.62; }
+  .e02-gitterbild > div { flex: 1; }
+  .e02-befehle { display: grid; grid-template-columns: auto 1fr; gap: 1.5mm 3mm; align-items: center; margin: 1mm 0 2mm 0; }
+  /* Galerie in der Anleitung: verkleinert (Bild für Mama oder Papa), drei Spalten, S1–S5 auf einer Seite */
+  .e02-galerie { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4mm 5mm; margin: 2mm 0 4mm 0; break-inside: avoid; }
+  .e02-zusammen { break-inside: avoid; }
+  .e02-galerie > figure { margin: 0; break-inside: avoid; display: flex; flex-direction: column; align-items: center; gap: 1.5mm; }
+  .e02-galerie m-gitter { zoom: 0.64; }
+  .e02-galerie figcaption { font-size: 9.5pt; text-align: center; line-height: 1.3; }
+  .e02-galerie figcaption.e02-links { text-align: left; }
+  .e02-inline .prog .platz .nr { font-size: 6.5pt; }
+  .e02-inline .prog { gap: 0.8mm; vertical-align: middle; }
+  .e02-inline { display: inline-block; vertical-align: middle; margin: 0.5mm 0; }
+  .e02-text .e02-inline .prog .platz .nr { display: none; }
+  .e02-text .e02-inline { margin: 0; vertical-align: -1.2mm; }
+  /* Lösungen: drei verkleinerte Blätter und ein Text-Kasten im Raster */
+  .e02-loes { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm 4mm; align-items: start; margin: 2mm 0 4mm 0; }
+  .e02-loes m-loesungen, .e02-loes .loesungen-raster { display: contents; }
+  .e02-loes > .kasten.loesung { margin: 1mm 0 0 0; font-size: 9.5pt; }
+  .e02-loes > .kasten.loesung p { margin-bottom: 1.6mm; }
+  .kasten.loesung.e02-text p { margin-bottom: 1.8mm; break-inside: avoid; }
+  /* Blätter */
+  .e02-hinweis { margin: 0; }
+  .e02-paar { display: flex; justify-content: space-around; align-items: flex-start; }
+  .e02-spalte { display: flex; flex-direction: column; align-items: center; gap: 3mm; }
+  .e02-zeile { display: flex; align-items: center; gap: 6mm; flex-wrap: nowrap; }
+  .e02-kuerzer { margin-top: 1mm; }
+  .e02-kuerzer > p { margin: 0; }
+  .e02-unten { display: flex; justify-content: space-between; align-items: flex-end; gap: 6mm; }
+  .e02-unten > .profi { flex: 1; }
+  .e02-bastel { display: flex; justify-content: space-between; align-items: flex-start; gap: 6mm; }
+  .e02-bastel .e02-spalte p { margin: 0; }
+  m-e2-ausmal { display: inline-block; line-height: 0; vertical-align: middle; }
+  m-e2-ausmal svg { display: block; }
+</style>
+
+<section class="anleitung" data-einheit="2" data-titel="Drachen-Pfade">
+
+  <div class="kasten ziel">
+    <p>{{KIND}} schreibt heute ihre ersten <span class="begriff">Programme</span> am Papier: eine nummerierte Reihe aus <span class="begriff">Befehlen</span>, die einen Drachen durch ein Gitter zum Schatz bringt. Es gibt nur die drei Befehle aus Einheit 1: <m-symbol class="e02-sym" name="vor" gr="4.5"></m-symbol> vor, <m-symbol class="e02-sym" name="links" gr="4.5"></m-symbol> links drehen und <m-symbol class="e02-sym" name="rechts" gr="4.5"></m-symbol> rechts drehen.</p>
+    <p>Zuerst ist {{KIND}} selbst der Drache am <span class="begriff">Boden-Gitter</span>, dann schiebt sie eine ausgeschnittene <span class="begriff">Drachen-Figur</span> übers Blatt. Sie übt drei Dinge: ein Programm <b>lesen</b> (Befehl für Befehl mittippen und sagen, wo der Drache landet), ein Programm <b>schreiben</b> und das <span class="begriff">kürzeste Programm</span> finden. Dabei zählt jeder Befehl, auch jede Drehung. Und sie lernt, aus Sicht des Drachen zu denken: Schaut er nach rechts, dann dreht er sich mit „links drehen“ nach oben.</p>
+  </div>
+
+  <div class="kasten material">
+    <p><b>Vorher, ohne {{KIND}} (etwa 25 Min):</b></p>
+    <ul>
+      <li><b>Boden-Gitter kleben (10 Min):</b> 3 · 3 Felder aus Malerkrepp, Anleitung im Kasten „So klebst du das Boden-Gitter“ gleich nach dem Ablauf.</li>
+      <li><b>Ausdrucken (3 Min):</b> <a class="blattref" href="#blatt-2-1"></a> und <a class="blattref" href="#blatt-2-2"></a> auf normales Papier. <a class="blattref" href="#blatt-2-3"></a> (Bastelvorlage) am besten auf dickeres Papier (160&nbsp;g), sonst vor dem Ausschneiden auf dünnen Karton kleben (eine leere Müslischachtel reicht).</li>
+      <li><b>Ausschneiden (10 Min):</b> von <a class="blattref" href="#blatt-2-3"></a> die 4 Drachen-Figuren, die 2 Schatz-, 2 Edelstein- und 8 Stein-Plättchen. Alles in ein Kuvert, das ihr in den nächsten Einheiten wieder braucht. Den großen Drachen und das leere Gitter am Blatt lassen.</li>
+      <li><b>Bereitlegen (2 Min):</b> die 16 Befehlskarten aus Einheit 1 (<a class="blattref" href="#blatt-1-1"></a>: 8 Karten vor, je 4 Karten links drehen und rechts drehen), einen Polster (er zeigt am Boden-Gitter, wo oben ist), 3 Becher (Plastik- oder Joghurtbecher), einen Würfel, ein paar Zuckerl oder Rosinen, einen Muggelstein zum Mittippen, Bleistift, Radiergummi, Buntstifte in <b>Blau, Grün und Orange</b> (die Farben der Befehle).</li>
+    </ul>
+    <p><b>Für „Schwerer machen“</b> (an einem anderen Tag oder wenn es heute flott geht): ein Gitter mit 4 · 4 Feldern (15 Min kleben) und 4 Kuscheltiere oder Schuhe als Steine. Den Polster nehmt ihr dafür nicht, der bleibt „oben“.</p>
+    <p><b>Extra außerhalb der Einheit:</b> den großen Drachen auf <a class="blattref" href="#blatt-2-3"></a> anmalen (10–15 Min). Schneidet {{KIND}} gern, darf sie die Figuren am Tag davor selbst ausschneiden.</p>
+  </div>
+
+  <h2>Ablauf Schritt für Schritt</h2>
+  <ol class="ablauf e02-ablauf">
+    <li data-min="2"><span class="schritt-titel">Aufwärmen: der Roboter von Einheit 1</span>{{KIND}} programmiert dich mit höchstens 5 Befehlen zur Tür. Dann legst du die Befehlskarten aus: „Weißt du noch? Es gibt nur drei Befehle.“ Sie zeigt auf jede Karte und sagt sie laut: vor, links drehen, rechts drehen.</li>
+    <li data-min="5"><span class="schritt-titel">Ich bin der Drache (Boden-Gitter)</span>{{KIND}} ist der Drache (Kasten „Bewegung“). Du legst ein Programm aus Befehlskarten als Reihe neben das Gitter und ein Zuckerl ins Zielfeld. <b>Bevor sie losgeht</b>, zeigt sie, wo sie landen wird. Dann geht sie, und du zeigst Karte für Karte mit. Drei Programme reichen, dann tauscht ihr: Sie legt ein Programm, du bist der Drache und machst genau, was dasteht.</li>
+    <li data-min="7"><span class="schritt-titel">Spiel: Schatz-Versteck</span>Das Hauptspiel am Boden-Gitter (Kasten unten). 4 Runden, jede ist zweimal Versteckerin. Wird es knapp mit der Zeit, reichen 2 Runden.</li>
+    <li data-min="2"><span class="schritt-titel">Vom Boden aufs Papier</span>Leg <a class="blattref" href="#blatt-2-1"></a> auf den Tisch und eine Drachen-Figur ins grüne Startfeld des <b>linken</b> Gitters von Aufgabe 1 (links unten), die Nase nach oben. „Das ist unser Boden-Gitter, von oben fotografiert. Oben am Blatt ist der Polster.“ Zeig einmal „vor“ (die Figur ein Feld weiterschieben) und einmal „rechts drehen“ (die Figur im Feld drehen, nicht schieben).</li>
+    <li data-min="8"><span class="schritt-titel">Blatt „Drachen-Pfade“</span><a class="blattref" href="#blatt-2-1"></a>. Bei Aufgabe 1 schiebt {{KIND}} die Figur mit und tippt mit dem Muggelstein auf den Befehl, den sie gerade ausführt. Bei Aufgabe 2 malt sie in jedes Kästchen ein Befehls-Symbol (Stolpersteine: „Wie malt sie die Befehle?“). Danach prüft sie ihr Programm mit der Figur. Die Profi-Aufgabe ist der Einstieg ins kürzeste Programm.</li>
+    <li data-min="4"><span class="schritt-titel">Blatt „Drachen-Pfade mit Steinen“, Aufgabe 1</span><a class="blattref" href="#blatt-2-2"></a>. Jetzt schaut der Drache am Start nach rechts. Tipp: Die Figur hinlegen, wie sie im Startfeld schaut, und {{KIND}} darf das Blatt drehen. Aufgabe 2 und die Profi-Aufgabe sind für flotte Tage oder für die nächste Runde.</li>
+    <li data-min="2"><span class="schritt-titel">Sammelpass</span>Feld „Einheit&nbsp;2“ stempeln oder bekleben, 1 bis 3 Sterne anmalen. Frag: „Was war schwerer, Drache sein oder Drache schieben?“ Die Antwort passt gut in den Rückmeldebogen. Danach, wenn ihr wollt: Bildschirm-Bonus (höchstens 10 Min, siehe unten).</li>
+  </ol>
+
+  <div class="kasten tipp" data-titel="So klebst du das Boden-Gitter">
+    <div class="e02-gitterbild">
+      <m-gitter deko b="3" h="3" start="0,2,oben" feld="20"></m-gitter>
+      <div>
+        <ul>
+          <li><b>Platz:</b> etwa 1,5&nbsp;m mal 1,5&nbsp;m (Gang, Wohnzimmer, mit Kreide im Hof). Ein Feld ist 45&nbsp;cm groß, ein großer Kinderschritt.</li>
+          <li><b>Kleben:</b> 4 Streifen Malerkrepp (je 1,35&nbsp;m) mit 45&nbsp;cm Abstand, dann 4 gleiche quer darüber: 8 Streifen, knapp 11&nbsp;m, 9 Felder.</li>
+          <li><b>Startfeld:</b> links unten (im Bild hellgrün). Kleb ein kleines Kreuz hinein.</li>
+          <li><b>Oben:</b> Ein Polster an der oberen Kante ist ab jetzt „oben“, wie am Blatt. Am Start schaut der Drache zum Polster, wenn ihr nichts anderes ansagt.</li>
+          <li><b>Schwerer (4 · 4):</b> 5 Streifen zu je 1,8&nbsp;m in jede Richtung (18&nbsp;m). Habt ihr Platz, klebt gleich 4 · 4 und spielt zuerst nur in den 3 · 3 Feldern links unten. Die oberste Reihe und die rechte Spalte sind dann Rand: Wer hinein will, stößt an.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <h3>Beispielsätze</h3>
+  <div class="sag">
+    <p class="du">(am Boden-Gitter, du hast „vor, rechts drehen, vor, vor“ gelegt) „Du bist der Drache. Lies zuerst das Programm, ohne zu gehen. Wo wirst du landen? Zeig hin!“</p>
+    <p class="sie">„Da! In der Mitte, ganz rechts.“</p>
+    <p class="du">„Dann los. Ich zeige auf die Karten, du machst genau, was draufsteht.“</p>
+    <p class="dann">Stimmt die Vorhersage, gibt es das Zuckerl doppelt so feierlich. Macht sie bei „rechts drehen“ einen Schritt zur Seite: „Stopp! Drehen heißt: Die Füße bleiben im Feld, nur deine Nase zeigt woandershin.“ Das Programm endet wirklich in der mittleren Reihe ganz rechts, und der Drache schaut nach rechts.</p>
+  </div>
+  <div class="sag">
+    <p class="du">(<a class="blattref" href="#blatt-2-1"></a>, Aufgabe 1, linkes Gitter) „Stell deinen Drachen ins grüne Feld. Wohin schaut seine Nase?“</p>
+    <p class="sie">„Nach oben.“</p>
+    <p class="du">„Leg den Muggelstein auf Befehl 1 und schieb den Drachen.“</p>
+    <p class="sie">„Vor … vor. Jetzt ist er links oben. Befehl 3 ist rechts drehen, er bleibt da und schaut nach rechts. Vor: in der Mitte oben!“</p>
+    <p class="dann">Genau so lesen Programmiererinnen ein Programm: Befehl für Befehl, und nach jedem Befehl wissen sie, wo der Drache steht und wohin er schaut. Lass {{KIND}} das ruhig laut machen. Der Punkt kommt ins Feld in der Mitte der obersten Reihe.</p>
+  </div>
+  <div class="sag">
+    <p class="du">(<a class="blattref" href="#blatt-2-1"></a>, Profi-Aufgabe) „Dieses Programm kommt auch beim Schatz an. Wie viele Befehle hat es?“</p>
+    <p class="sie">„Sechs. Aber die Drehungen sind doch keine Schritte!“</p>
+    <p class="du">„Für den Drachen ist jede Karte ein Befehl. Auch Drehen dauert. Schaffst du es mit weniger Karten?“</p>
+    <p class="sie">„Zuerst nach oben, dann nur einmal drehen: vor, vor, rechts drehen, vor, vor. Fünf!“</p>
+    <p class="dann">Das ist das kürzeste Programm: 4 vor und 1 Drehung, also 4 + 1 = 5. Kürzer geht es nicht, weil der Schatz 2 Felder hoch und 2 Felder rechts liegt (mindestens 4 vor) und der Drache nach oben schaut und einmal nach rechts drehen muss.</p>
+  </div>
+  <div class="sag">
+    <p class="du">(<a class="blattref" href="#blatt-2-2"></a>, Aufgabe 1) „Diesmal schaut der Drache nach rechts. Der Stein ist im Weg. Wie kommt er nach oben?“</p>
+    <p class="sie">„Rechts drehen!“</p>
+    <p class="du">„Probier es mit der Figur. Wohin schaut er jetzt?“</p>
+    <p class="sie">„Nach unten … Ah, links drehen! Dann schaut er nach oben.“</p>
+    <p class="dann">Das ist der wichtigste Moment der Einheit: {{KIND}} denkt aus Sicht des Drachen. Klappt das nicht, darf sie das Blatt drehen, bis die Nase des Drachen von ihr wegzeigt, oder sich am Boden-Gitter hinter den Drachen stellen.</p>
+  </div>
+
+  <div class="kasten einschaetzung">
+    <p>Kein Test, nur Beobachten. Notiere dir für den Rückmeldebogen, was zutrifft:</p>
+    <ul>
+      <li><b>Liest sie das Programm, bevor sie geht?</b> Oder geht sie los und schaut erst dann? Vorhersagen ist der Kern von „Programm lesen“.</li>
+      <li><b>Dreht sie die Figur auf der Stelle</b> oder schiebt sie bei „rechts drehen“ zur Seite?</li>
+      <li><b>Start nach rechts oder links:</b> Braucht sie das Blatt-Drehen oder die Figur, oder sagt sie es im Kopf?</li>
+      <li><b>Kürzestes Programm:</b> Zählt sie die Drehungen von selbst mit?</li>
+    </ul>
+    <p>Klappt alles schon nach wenigen Minuten, nimm den Kasten „Schwerer machen“ als Hauptteil und kreuze im Rückmeldebogen bei Einheit 2 „zu leicht“ an.</p>
+  </div>
+
+  <h2>Spiele, Bewegung und Basteln</h2>
+
+  <div class="kasten spiel darf-brechen e02-brechen" data-titel="Schatz-Versteck">
+    <p class="spiel-meta">2 Personen · 6–10 Minuten · Boden-Gitter 3 · 3, die 16 Befehlskarten von <a class="blattref" href="#blatt-1-1"></a>, 3 Becher, ein Würfel, ein Zuckerl pro Runde</p>
+    <ol class="regeln">
+      <li><b>Rollen:</b> Eine ist die <b>Versteckerin</b>, die andere der <b>Drache</b>. Nach jeder Runde wird getauscht.</li>
+      <li><b>Verstecken:</b> Der Drache dreht sich um und hält sich die Augen zu. Die Versteckerin stellt die 3 Becher umgedreht auf 3 verschiedene Felder (nicht aufs Startfeld) und legt das Zuckerl unter einen davon. Die 2 leeren Becher sind <b>Täusch-Becher</b>: Der Drache weiß nicht, unter welchem Becher der Schatz liegt.</li>
+      <li><b>Programm legen:</b> Die Versteckerin legt mit den Befehlskarten ein Programm als Reihe neben das Gitter, von links nach rechts. Es soll den Drachen vom Startfeld (Blick zum Polster) genau auf das Feld mit dem Schatz-Becher bringen. Höchstens 8 Karten.</li>
+      <li><b>Vorhersage:</b> Der Drache schaut sich das Programm an, ohne zu gehen. Mit dem Finger darf er auf den Karten mittippen. Dann zeigt er auf das Feld, auf dem das Programm endet.</li>
+      <li><b>Gehen:</b> Der Drache stellt sich ins Startfeld und geht das Programm Befehl für Befehl. Die Versteckerin zeigt auf die Karte, die gerade dran ist. Über Becher steigt der Drache vorsichtig drüber. Stößt er an den Rand, bleibt er stehen: „Hier hat der Kobold zugeschlagen!“ Das Programm ist dann zu Ende.</li>
+      <li><b>Punkte:</b> Erst jetzt hebt der Drache den Becher hoch, auf dem er steht. Der Drache bekommt 1 Punkt, wenn seine Vorhersage stimmt (auch wenn dort kein Schatz ist). Die Versteckerin bekommt 1 Punkt, wenn der Drache am Ende auf dem Schatz-Becher steht. Wer am Schatz-Becher steht, darf das Zuckerl essen.</li>
+      <li><b>Mama-oder-Papa-Regel (der Kobold-Würfel):</b> Deine Programme haben mindestens 5 Karten. Bevor du versteckst, würfelst du heimlich. Bei 1 oder 2 baust du absichtlich einen Kobold ein: Dein Programm endet auf einem Feld <b>ohne</b> Becher oder stößt an den Rand. Dann bekommst du keinen Versteck-Punkt. Ruft {{KIND}} schon bei der Vorhersage „Kobold!“ und zeigt, wo das Programm wirklich endet oder anstößt, bekommt sie 1 Extra-Punkt. So hängt das Spiel nicht davon ab, ob du absichtlich verlierst, und {{KIND}} kann dich mit genauem Lesen schlagen. Das ist schon ein Vorgeschmack auf den Fehler-Kobold in Einheit 4.</li>
+      <li><b>Ende:</b> Nach 4 Runden (jede ist zweimal Versteckerin) gewinnt, wer mehr Punkte hat. Pro Runde gibt es höchstens 2 Punkte. Bei Gleichstand ist jede noch einmal Versteckerin, mit Startrichtung „rechts“. Ist es dann immer noch gleich, haben beide gewonnen.</li>
+    </ol>
+    <p><b>Varianten:</b></p>
+    <ul>
+      <li><b>Würfel-Start (schwerer):</b> Vor jeder Runde würfelt der Drache die Startrichtung: 1 oder 2 zum Polster (oben), 3 oder 4 nach rechts, 5 oder 6 nach links. Profi-Regel: Die 6 heißt „nach unten“.</li>
+      <li><b>Kürzer-Jagd:</b> Nach dem Gehen darf der Drache ein kürzeres Programm zum selben Becher legen. Schafft er es, bekommt er einen Extra-Punkt.</li>
+      <li><b>Höhlen:</b> Becher ohne Schatz sind Drachen-Höhlen, in die man nicht hineingehen darf. Sie zählen wie Steine. Die Versteckerin muss um sie herum programmieren.</li>
+      <li><b>Am Papier:</b> Im leeren 4 · 4-Gitter von <a class="blattref" href="#blatt-2-3"></a> mit Drachen-Figur und 3 umgedrehten Plättchen (1&nbsp;Schatz, 2&nbsp;Steine). Startfeld ist links unten, Blick nach oben, wie am Boden. Umgedrehte Plättchen sind nur Deckel, kein Hindernis. Das Programm wird auf einen Zettel gemalt oder mit den Befehlskarten gelegt.</li>
+    </ul>
+  </div>
+
+  <div class="sag">
+    <p class="du">(Du bist Versteckerin und hast „rechts drehen, vor, vor, links drehen, vor“ gelegt.) „Wo landest du?“</p>
+    <p class="sie">„Rechts drehen, dann schaue ich nach rechts … zwei vor … links drehen, jetzt schaue ich zum Polster … vor. Beim Becher in der Mitte rechts!“</p>
+    <p class="dann">Stimmt: Der Drache landet in der mittleren Reihe ganz rechts. Wenn sie beim Vorhersagen in Gedanken „mitgeht“ (sich leicht dreht, mit dem Kopf nickt), ist das super. Genau so wird ein Programm im Kopf ausgeführt.</p>
+  </div>
+
+  <div class="kasten bewegung" data-titel="Ich bin der Drache">
+    <p><b>Drachen-Kostüm in einer Minute:</b> ein Geschirrtuch hinten in den Hosenbund (der Schwanz) und ein oranges Gummiringerl oder ein oranger Sticker an die rechte Hand (die rechte Pfote, wie bei der Figur). Ab jetzt geht der Drache nur, wenn eine Karte es sagt.</p>
+    <p><b>Drei Programme zum Start</b> (Startfeld links unten, Blick zum Polster):</p>
+    <div class="e02-befehle">
+      <span class="e02-inline"><m-programm befehle="vor vor" gr="6"></m-programm></span><span>Zum Aufwärmen: Der Drache landet links oben.</span>
+      <span class="e02-inline"><m-programm befehle="vor rechts vor vor" gr="6"></m-programm></span><span>Mittlere Reihe, ganz rechts. Der Drache schaut nach rechts.</span>
+      <span class="e02-inline"><m-programm befehle="rechts vor vor links vor vor" gr="6"></m-programm></span><span>Rechts oben, Blick zum Polster. Das ist der Schatz von <a class="blattref" href="#blatt-2-1"></a>, Aufgabe 2, auf einem anderen Weg.</span>
+    </div>
+    <ul>
+      <li><b>Tausch:</b> {{KIND}} legt ein Programm für dich. Du gehst <b>genau</b> so, wie es dasteht, auch wenn du dabei an den Rand stößt („Hier hat der Kobold zugeschlagen!“).</li>
+      <li><b>Drachen-Stampfer:</b> Bei jedem „vor“ ein lauter Stampfer, bei jeder Drehung ein Fauchen. So hört man, wie viele Befehle das Programm hat.</li>
+      <li><b>Kehrtwende (schwerer):</b> <span class="e02-inline"><m-programm befehle="vor vor rechts rechts vor" gr="6"></m-programm></span> Der Drache landet in der linken Spalte in der Mitte und schaut nach unten. Was ist passiert? (Zwei Drehungen sind eine halbe Drehung.)</li>
+    </ul>
+  </div>
+
+  <div class="kasten basteln" data-titel="Meine Drachen-Figur">
+    <ul>
+      <li>Die Figuren auf <a class="blattref" href="#blatt-2-3"></a> sind so groß, dass sie in die Felder der Blätter passen (20 bis 22&nbsp;mm). Jede Figur hat eine <b>orange rechte Pfote</b>, wie das orange Symbol „rechts drehen“.</li>
+      <li>Auf Karton geklebt halten sie viel länger. Wer will, malt hinten ein Gesicht oder den eigenen Namen drauf.</li>
+      <li>Die Plättchen (Schatz, Edelstein, Stein) passen genauso in die Felder. Mit dem leeren Gitter auf Blatt 2-3 baut ihr damit eigene Rätsel und die „Rätsel zum Nachlegen“ unten.</li>
+      <li><b>Extra:</b> Der große Drache auf Blatt 2-3 ist zum Anmalen. Die rechte Pfote ist schon orange. Wer will, schneidet ihn aus und klebt ihn an die Zimmertür: Der Drache schaut nach oben, also zur Decke.</li>
+    </ul>
+  </div>
+
+  <h2>Wenn es hakt oder zu leicht ist</h2>
+
+  <div class="kasten stolper darf-brechen e02-brechen">
+    <ul>
+      <li><b>Bei „rechts drehen“ geht sie einen Schritt nach rechts.</b> Der häufigste Fehler. Drehen heißt: Die Füße bleiben im Feld. Am Papier wird die Figur gedreht, nicht geschoben. Lass sie am Boden einmal übertrieben langsam drehen, wie eine Spieluhr.</li>
+      <li><b>Sie zählt das Startfeld mit</b> oder geht bei „vor“ zwei Felder: Muggelstein auf den Befehl, dann genau ein Feld weiter. Ein „vor“ ist immer ein Feld.</li>
+      <li><b>Wie malt sie die Befehle?</b> In jedes Kästchen kommt ein Symbol wie auf den Befehlskarten. Vereinfacht reicht: blauer gerader Pfeil für vor, grüner Bogen nach links für links drehen, oranger Bogen nach rechts für rechts drehen. Lass die Befehlskarten zum Abschauen liegen.</li>
+      <li><b>Sie malt einen Pfeil nach rechts für „nach rechts gehen“.</b> Unser Drache kennt keinen solchen Befehl. Frag: „Welche Karte ist das?“ Dann merkt sie, dass sie „rechts drehen“ und „vor“ braucht, also zwei Kästchen.</li>
+      <li><b>Links und rechts vertauscht</b>, sobald der Drache nicht nach oben schaut: Blatt drehen, Figur hinlegen, am Boden hinter den Drachen stellen (Hilfen unten). Das ist normal und genau der Lerninhalt.</li>
+      <li><b>Drehungen zählen nicht mit</b> („das sind ja nur 4 Schritte“): jede Karte ist ein Befehl. Legt das Programm mit den Befehlskarten und zählt die Karten.</li>
+      <li><b><a class="blattref" href="#blatt-2-2"></a>, Aufgabe 2:</b> Viele probieren <span class="e02-inline"><m-programm befehle="rechts vor vor links vor vor" gr="5.5"></m-programm></span>. Bei Befehl 5 stößt der Drache an den Stein. Super Fehler! Frag: „Wo genau hat der Kobold zugeschlagen?“ und lass sie ab dort neu planen.</li>
+      <li><b>Der Drache geht am Schatz vorbei</b> und weiter: Geschafft heißt, er steht <b>am Ende</b> des Programms auf dem Schatz. Vorbeigehen zählt nicht.</li>
+      <li><b>Am Boden verliert sie „oben“</b>, sobald sie sich dreht: „Oben“ ist immer beim Polster, egal wohin der Drache gerade schaut.</li>
+      <li><b>Frust:</b> zurück zum Boden-Gitter oder zur Figur. Oder du schreibst die erste Hälfte, sie die zweite.</li>
+    </ul>
+  </div>
+
+  <m-linksrechts></m-linksrechts>
+
+  <div class="zwei">
+    <div class="kasten leichter">
+      <ul>
+        <li>Nur Programme ohne Drehung („vor vor“), dann mit genau einer Drehung.</li>
+        <li>Am Boden bleiben und erst am nächsten Tag aufs Papier.</li>
+        <li>Am Papier immer mit Figur und Muggelstein. Nach jedem Befehl fragst du: „Wo ist er? Wohin schaut er?“</li>
+        <li>Programm mit Befehlskarten legen statt malen, dann abmalen.</li>
+        <li><a class="blattref" href="#blatt-2-2"></a> an einem anderen Tag. <a class="blattref" href="#blatt-2-1"></a> reicht für heute.</li>
+        <li>Erst nur lesen: Du legst die Programme, {{KIND}} führt sie aus. Selbst schreiben kommt, wenn Lesen sicher klappt.</li>
+        <li>Am Boden nur mit 2 · 2 Feldern spielen: Grenzt links unten mit Malerkrepp ein Viereck aus 4 Feldern ab, oder stellt Schuhe auf die 5 anderen Felder. Der Polster bleibt oben.</li>
+      </ul>
+    </div>
+    <div class="kasten bonus" data-titel="Bonus-Knobelei">
+      <p class="klein"><i>Für zwischendurch: im Auto, beim Abendessen. Augen zu, Drache im Kopf.</i></p>
+      <p><b>Dreh-Rätsel:</b> „Der Drache schaut nach oben. Er macht: rechts drehen, rechts drehen, rechts drehen. Wohin schaut er? Geht das auch mit einem Befehl?“</p>
+      <p><b>Kreisel:</b> „Er macht viermal hintereinander links drehen. Was hat sich verändert?“</p>
+      <p><b>Kopf-Gitter:</b> „Du stehst im 3 · 3-Gitter links unten und schaust nach oben: vor, rechts drehen, vor. Wo bist du?“</p>
+      <p><b>Für Profis:</b> „Du stehst wieder links unten und schaust nach oben. Dreimal hintereinander: vor, rechts drehen. Wo bist du, und wohin schaust du?“</p>
+      <p class="klein"><b>Kurz-Lösungen:</b> nach links, ja mit links drehen; nichts, aber 4 Befehle verschwendet; im mittleren Feld, Blick nach rechts; im Feld rechts neben dem Start, Blick nach links. Mehr bei den Lösungen.</p>
+    </div>
+  </div>
+
+  <div class="kasten schwerer darf-brechen e02-schwerer">
+    <p>Wenn <a class="blattref" href="#blatt-2-1"></a> ohne Zögern klappt, wähle hier aus. Das ist kein Zusatz „für später“, sondern ein vollwertiger Hauptteil. Die Rätsel zum Nachlegen stehen gleich nach diesem Kasten.</p>
+    <ol class="e02-ganz">
+      <li><b>Start nach links oder rechts:</b> <a class="blattref" href="#blatt-2-2"></a> ganz, dazu im Spiel „Schatz-Versteck“ der Würfel-Start. Am Boden: {{KIND}} steht im Startfeld und schaut nach rechts statt zum Polster.</li>
+      <li><b>Der Drache schaut nach unten:</b> Profi-Aufgabe von <a class="blattref" href="#blatt-2-2"></a> und Rätsel S3. Jetzt ist sein Links von {{KIND}} aus gesehen rechts. Erst ohne Blatt-Drehen versuchen, dann mit.</li>
+      <li><b>Das kürzeste Programm beweisen:</b> Frag zu <a class="blattref" href="#blatt-2-1"></a>, Aufgabe 2: „Warum geht es nicht mit 4 Befehlen?“ Der Schatz liegt 2 Felder höher und 2 Felder weiter rechts. Das sind mindestens 4 vor. Weil der Drache nach oben schaut und auch nach rechts muss, braucht er mindestens eine Drehung. Also mindestens 4 + 1 = 5. Bei <a class="blattref" href="#blatt-2-2"></a>, Aufgabe 2, sagt dieselbe Überlegung „mindestens 4 + 1 = 5“. Die Steine erzwingen aber einen Umweg mit 3 Drehungen: 4 + 3 = 7. Frag: „Warum reichen hier 5 nicht?“</li>
+      <li><b>Augen-zu-Drache:</b> Ein Programm von <a class="blattref" href="#blatt-2-1"></a> nur anschauen, dann Augen zu und im Kopf ausführen. Erst danach mit der Figur prüfen.</li>
+      <li><b>4 · 4 am Boden mit Kuscheltier-Steinen:</b> Die Rätsel zum Nachlegen gehen am Boden genauso: Kuscheltiere oder Schuhe sind Steine, ein Zuckerl ist der Schatz. Der Polster bleibt an der oberen Kante und zeigt weiter, wo oben ist. Mit 4 · 4 werden Programme bis 12 Befehle lang (Rätsel S5 braucht 11). Achtung: Am Boden habt ihr nur 8 vor-Karten, 4 links und 4 rechts. Alle Rätsel unten passen damit.</li>
+      <li><b>Edelsteine sammeln</b> (Rätsel S2): Der Drache muss zuerst über den Edelstein gehen und am Ende auf dem Schatz stehen. Ohne Edelstein wäre das kürzeste Programm ein anderes, nämlich 7 Befehle lang über die linke obere Ecke.</li>
+      <li><b>Gibt es mehrere kürzeste?</b> Rätsel S4: Der Schatz liegt hinter dem Drachen. „rechts drehen, rechts drehen, vor“ und „links drehen, links drehen, vor“ sind beide gleich kurz. Frag: „Welches ist das kürzeste?“ und lass sie entdecken, dass beide gleich gut sind. Programmiererinnen sagen dann: Es gibt mehrere Lösungen.</li>
+      <li><b>Rückweg ist nicht rückwärts:</b> Stell den Drachen ins rechte obere Feld, Blick nach rechts. So endet das kürzeste Programm von <a class="blattref" href="#blatt-2-1"></a>, Aufgabe 2 (hat {{KIND}} ein anderes geschrieben, schaut ihr Drache vielleicht anders, dann einfach umstellen). „Schreib ein Programm zurück zum Start links unten!“ Viele drehen erst um: <span class="e02-inline"><m-programm befehle="rechts rechts vor vor links vor vor" gr="5.5"></m-programm></span> (7 Befehle). Kürzer geht es mit nur 6: zuerst nach unten. Wer findet es?</li>
+      <li><b>Rückwärts-Detektivin:</b> „Der Drache stand im 3 · 3-Gitter irgendwo in der untersten Reihe und schaute nach oben. Nach ‚vor, vor, rechts drehen, vor‘ steht er in der Mitte der obersten Reihe. Wo war der Start?“ Probieren mit der Figur ist erlaubt.</li>
+      <li><b>Kaputte Karte:</b> Zum Schatz von <a class="blattref" href="#blatt-2-1"></a>, Aufgabe 2: „Alle rechts-drehen-Karten sind weg! Bring den Drachen trotzdem zum Schatz.“ Tipp, falls sie hängt: Wie oft muss man links drehen, damit man nach rechts schaut?</li>
+      <li><b>Eigene Rätsel erfinden:</b> Im leeren Gitter von <a class="blattref" href="#blatt-2-3"></a> baut {{KIND}} ein Rätsel für dich (Profi-Aufgabe dort). Du suchst ein Programm, sie schreibt ihr eigenes in die Reihe auf dem Blatt. Wer hat weniger Befehle? Meisterstufe: ein Rätsel, bei dem es <b>genau ein</b> kürzestes Programm gibt. Tipp: Steine so legen, dass man nicht „erst rauf, dann rüber“ und „erst rüber, dann rauf“ gehen kann.</li>
+      <li><b>Programm-Diktat:</b> Du sagst ein Programm mit 8 bis 10 Befehlen nur einmal langsam an, {{KIND}} malt es als Reihe auf und führt es dann aus. Das trainiert, eine lange Reihe im Kopf zu behalten.</li>
+    </ol>
+  </div>
+
+  <div class="e02-zusammen">
+  <h3>Rätsel zum Nachlegen (für „Schwerer machen“)</h3>
+  <p>Leg die Rätsel mit Drachen-Figur und Plättchen ins leere Gitter von <a class="blattref" href="#blatt-2-3"></a> oder baut sie am 4 · 4-Boden-Gitter nach. Gesucht ist jeweils das kürzeste Programm. Die Zahl der Befehle sagst du erst, wenn {{KIND}} eine Lösung hat: „Geht es noch kürzer?“</p>
+  <div class="e02-galerie">
+    <figure><m-gitter raetsel="e2-s1" feld="20"></m-gitter><figcaption><b>S1 Schlange:</b> Start nach rechts. Kürzestes: 10 Befehle.</figcaption></figure>
+    <figure><m-gitter raetsel="e2-s2" feld="20"></m-gitter><figcaption><b>S2 Edelstein:</b> erst den Edelstein, dann der Schatz. Kürzestes: 8 Befehle.</figcaption></figure>
+    <figure><m-gitter raetsel="e2-s3" feld="20"></m-gitter><figcaption><b>S3 Nach unten:</b> Der Drache schaut nach unten. Kürzestes: 7 Befehle.</figcaption></figure>
+    <figure><m-gitter raetsel="e2-s4" feld="20"></m-gitter><figcaption><b>S4 Hinter dir!</b> Kürzestes: 3 Befehle. Mehrere Lösungen möglich.</figcaption></figure>
+    <figure><m-gitter raetsel="e2-s5" feld="20"></m-gitter><figcaption><b>S5 Der lange Weg:</b> Kürzestes: 11 Befehle.</figcaption></figure>
+    <figure><figcaption class="e02-links"><b>So geht’s am Boden:</b> Kuscheltiere oder Schuhe als Steine, Zuckerl als Schatz, ein Muggelstein als Edelstein. Das Programm legt {{KIND}} mit den Befehlskarten. Zuerst geht sie es im Kopf durch, dann zu Fuß. Stößt sie an, legt sie ab der Kobold-Stelle neu.</figcaption></figure>
+  </div>
+  </div>
+
+  <h2>Hintergrund</h2>
+  <div class="kasten warum">
+    <p>Ein <span class="begriff">Programm</span> ist eine genaue Folge von Befehlen (Fachwort: <i>Anweisungen</i>, die Folge heißt auch <i>Sequenz</i> oder <i>Algorithmus</i>). Der <span class="begriff">Roboter</span> (Fachwort: <i>Computer</i>) führt sie der Reihe nach aus, ohne mitzudenken. Genau das macht {{KIND}}, wenn sie die Figur Befehl für Befehl schiebt. Programmiererinnen nennen das „ein Programm im Kopf durchgehen“ (<i>Trace</i> oder <i>Schreibtischtest</i>). Sie machen es jeden Tag, um Fehler zu finden.</p>
+    <p>Wo der Drache steht und wohin er schaut, ist sein <i>Zustand</i>. Jeder Befehl ändert den Zustand ein bisschen. Weil die Befehle <i>relativ</i> sind („rechts drehen“ statt „nach Osten“), muss man den Zustand immer mitdenken. Diese Idee stammt aus den 1960er-Jahren: Kinder steuerten damals eine Roboter-Schildkröte mit genau solchen Befehlen über den Boden.</p>
+    <p>Das <b>kürzeste Programm</b> zu finden heißt <i>Optimieren</i>. Navis und Staubsauger-Roboter suchen ständig kürzeste Wege. Die Rätsel in diesem Heft hat ein kleines Programm so geprüft: Es probiert von jedem Feld und jeder Blickrichtung aus alle Befehle, Schritt für Schritt (<i>Breitensuche</i>), und zählt, wie viele kürzeste Programme es gibt. Steht bei einem Rätsel „Finde das kürzeste“, gibt es genau eines, sonst steht „mehrere Lösungen möglich“ dabei.</p>
+  </div>
+
+  <h2>Bildschirm-Bonus</h2>
+  <div class="kasten bildschirm">
+    <p><b>Paket 2 „Drachen-Pfade“, Schlüsselwort: SCHATZ.</b> Den QR-Code (nur für dich) findest du auf <a class="blattref" href="#blatt-2-3"></a> unten. Das Schlüsselwort gibst du ein, Groß- und Kleinschreibung ist egal.</p>
+    <ul>
+      <li><b>Level 1–3 ohne Steine:</b> Das kürzeste Programm hat 3, 4 und 5 Befehle. Level 3 ist genau Aufgabe 2 von <a class="blattref" href="#blatt-2-1"></a>.</li>
+      <li><b>Level 4–6 mit Steinen:</b> Level 4 ist Aufgabe 1 von <a class="blattref" href="#blatt-2-2"></a> (Start nach rechts, kürzestes Programm 6 Befehle), Level 5 ist Aufgabe 2 vom selben Blatt (Start nach links, kürzestes Programm 7 Befehle). Level 6 ist neu: 4 · 4 Felder, kürzestes Programm 8 Befehle.</li>
+      <li><b>Wann:</b> erst nach den Blättern, am Schluss, 5 bis 10 Minuten. Das Gerät liegt flach auf dem Tisch, dann ist oben am Bildschirm auch oben wie am Blatt.</li>
+      <li><b>Stern:</b> Die App führt das Programm aus und bewertet das Ergebnis. Bei Level 1–4 und 6 gibt es den Stern, sobald der Drache auf dem Schatz steht. Level 5 ist wie am Blatt ein „Finde das kürzeste Programm“: Den Stern gibt es nur mit 7 Befehlen. Ist das Programm länger, sagt die App freundlich „Fast geschafft! Der Drache ist da! Aber es geht kürzer: mit 7 Befehlen.“</li>
+      <li><b>Tipp:</b> Vor jedem „Los“ sagt {{KIND}}, wo der Drache landen wird. Bei den anderen Levels könnt ihr selbst vergleichen: Zählt die Befehle in der Reihe am Bildschirm (die Reihe ist dort nicht nummeriert) und vergleicht mit dem kürzesten Programm oben.</li>
+      <li><b>Ende:</b> Nach Level 6 erscheint „Super! Jetzt zurück zum Papier.“ Dann legst du das Gerät weg, auch wenn sie noch möchte: „Die Drachen-Pfade warten am Boden.“ Keine Zeit für den Bildschirm? Die Einheit ist ohne ihn komplett.</li>
+    </ul>
+  </div>
+
+  <h2>Lösungen</h2>
+  <div class="e02-loes">
+    <m-loesungen einheit="2" skala="0.37"></m-loesungen>
+    <div class="kasten loesung">
+      <p><b><a class="blattref" href="#blatt-2-1"></a>, Aufgabe 1:</b> Links: Mitte der obersten Reihe, Blick nach rechts. Rechts: linke Spalte, mittlere Reihe, Blick nach oben (der erste Befehl ist eine Drehung, der Drache bleibt dabei im Startfeld).</p>
+      <p><b>Aufgabe 2:</b> Richtig ist jedes Programm, das am Schatz endet, ohne anzustoßen, z. B. auch das Stiegen-Programm „rechts drehen, vor, links drehen, vor“ zweimal hintereinander (8 Befehle). Das kürzeste hat 5 Befehle. <b>Profi:</b> 6 Befehle. Kürzer geht es nur mit vor, vor, rechts drehen, vor, vor (5 Befehle).</p>
+      <p><b><a class="blattref" href="#blatt-2-2"></a>, Aufgabe 1:</b> Jedes Programm, das ankommt. Das kürzeste (6 Befehle) beginnt mit links drehen. <b>Aufgabe 2:</b> Es gibt genau ein kürzestes Programm mit 7 Befehlen. <b>Profi:</b> Der Drache landet links unten und schaut nach links. Sein „rechts drehen“ war von {{KIND}} aus gesehen eine Drehung nach links.</p>
+      <p><b><a class="blattref" href="#blatt-2-3"></a>, Profi:</b> eigene Rätsel. Richtig ist jedes Programm, das am Schatz endet, ohne anzustoßen. Probiert beide Programme mit der Figur aus.</p>
+    </div>
+  </div>
+
+  <div class="kasten loesung darf-brechen e02-brechen e02-text" data-titel="Lösungen: Schwerer machen, Rätsel zum Nachlegen, Bonus">
+    <p><b>S1 Schlange</b> (10 Befehle, genau eines): <span class="e02-inline loesungsmodus"><m-programm raetsel="e2-s1" plaetze="10" gr="5.5" nummern="nein"></m-programm></span> Am Boden: 7 vor, 2 links, 1 rechts, also 7 + 2 + 1 = 10 Karten.</p>
+    <p><b>S2 Edelstein</b> (8 Befehle, genau eines): <span class="e02-inline loesungsmodus"><m-programm raetsel="e2-s2" plaetze="8" gr="5.5" nummern="nein"></m-programm></span></p>
+    <p><b>S3 Nach unten</b> (7 Befehle, genau eines): <span class="e02-inline loesungsmodus"><m-programm raetsel="e2-s3" plaetze="7" gr="5.5" nummern="nein"></m-programm></span> Das erste „links drehen“ dreht den Drachen von {{KIND}} aus gesehen nach rechts.</p>
+    <p><b>S4 Hinter dir!</b> (3 Befehle, zwei kürzeste): <span class="e02-inline loesungsmodus"><m-programm raetsel="e2-s4" plaetze="3" gr="5.5" nummern="nein"></m-programm></span> oder rechts drehen, rechts drehen, vor.</p>
+    <p><b>S5 Der lange Weg</b> (11 Befehle, genau eines): <span class="e02-inline loesungsmodus"><m-programm raetsel="e2-s5" plaetze="11" gr="5.5" nummern="nein"></m-programm></span> Am Boden braucht ihr alle 8 vor-Karten.</p>
+    <p><b>Rückweg</b> (Schwerer, Punkt 8): <span class="e02-inline"><m-programm befehle="rechts vor vor rechts vor vor" gr="5.5" nummern="nein"></m-programm></span> Der Drache schaut nach rechts, ein „rechts drehen“ und er schaut nach unten. 6 Befehle, kürzer geht es nicht. Steht der Drache nach dem Stiegen-Programm rechts oben mit Blick nach oben, geht es auch mit 6: <span class="e02-inline"><m-programm befehle="links vor vor links vor vor" gr="5.5" nummern="nein"></m-programm></span></p>
+    <p><b>Rückwärts-Detektivin:</b> Start links unten. Vom mittleren Feld der untersten Reihe aus landet der Drache rechts oben, vom rechten Feld aus stößt er bei Befehl 4 an den Rand.</p>
+    <p><b>Kaputte Karte:</b> <span class="e02-inline"><m-programm befehle="vor vor links links links vor vor" gr="5.5" nummern="nein"></m-programm></span> 7 Befehle. Dreimal links drehen ist dasselbe wie einmal rechts drehen.</p>
+    <p><b>Bonus:</b> Dreimal rechts drehen ist dasselbe wie einmal links drehen. Viermal links drehen: wieder Blick nach oben, nichts verändert. Für Profis: Der Drache geht hinauf, nach rechts und hinunter, landet im Feld rechts neben dem Start und schaut nach links. Zum Nachprüfen: Figur aufs leere Gitter von <a class="blattref" href="#blatt-2-3"></a>.</p>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 2-1: Drachen-Pfade (Start nach oben)                       -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="2" data-titel="Drachen-Pfade" data-art="Arbeitsblatt" data-verteilt>
+  <div class="aufg">
+    <p class="anw">{{KIND}}, lies das Programm. Schieb deinen Drachen mit. Wo landet er? Male dort einen Punkt.</p>
+    <div class="e02-paar">
+      <div class="e02-spalte"><m-gitter raetsel="e2-l1" feld="20" loesung="ende"></m-gitter><m-programm raetsel="e2-l1" gr="12"></m-programm></div>
+      <div class="e02-spalte"><m-gitter raetsel="e2-l2" feld="20" loesung="ende"></m-gitter><m-programm raetsel="e2-l2" gr="12"></m-programm></div>
+    </div>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">Schreib ein Programm. Bring den Drachen zum Schatz!</p>
+    <div class="e02-zeile"><m-gitter raetsel="e2-a2" feld="20"></m-gitter><m-programm raetsel="e2-a2" plaetze="8" gr="12"></m-programm></div>
+  </div>
+
+  <div class="profi" data-titel="Profi-Aufgabe: Geht es kürzer?">
+    <p>Auch so kommt der Drache zum Schatz von Aufgabe 2.</p>
+    <div class="e02-zeile"><m-programm raetsel="e2-p1" gr="11"></m-programm><span>Befehle: <m-feld l="6"></m-feld></span></div>
+    <div class="e02-zeile e02-kuerzer"><p>Geht es kürzer?<br>Drehen zählt mit!</p><m-programm raetsel="e2-a2" plaetze="5" gr="11"></m-programm></div>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 2-2: Drachen-Pfade mit Steinen (Start rechts/links, unten) -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="2" data-titel="Drachen-Pfade mit Steinen" data-art="Arbeitsblatt" data-verteilt>
+  <div class="aufg">
+    <p class="anw">Der Drache schaut nach rechts. {{KIND}}, bring ihn zum Schatz!</p>
+    <div class="e02-zeile"><m-gitter raetsel="e2-b1" feld="20"></m-gitter><m-programm raetsel="e2-b1" plaetze="8" gr="12"></m-programm></div>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">Jetzt schaut er nach links. Finde das kürzeste Programm!</p>
+    <div class="e02-zeile"><m-gitter raetsel="e2-b2" feld="20"></m-gitter><m-programm raetsel="e2-b2" plaetze="8" gr="12"></m-programm></div>
+  </div>
+
+  <div class="profi" data-titel="Profi-Aufgabe: Der Drache schaut nach unten">
+    <p>Wo landet der Drache? Male dort einen Punkt.</p>
+    <div class="e02-zeile"><m-gitter raetsel="e2-p2" feld="20" loesung="ende"></m-gitter><m-programm raetsel="e2-p2" gr="12"></m-programm></div>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 2-3: Meine Drachen-Figur (Bastelvorlage)                   -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="2" data-titel="Meine Drachen-Figur" data-art="Bastelvorlage" data-verteilt>
+  <p class="e02-hinweis">{{KIND}}, das sind deine Drachen und Plättchen. Die orange Pfote ist die rechte Pfote.</p>
+  <m-karten spalten="8" zeilen="2" hoehe="19" breite="152">
+    <div><m-symbol name="drache" gr="16"></m-symbol></div>
+    <div><m-symbol name="drache" gr="16"></m-symbol></div>
+    <div><m-symbol name="drache" gr="16"></m-symbol></div>
+    <div><m-symbol name="drache" gr="16"></m-symbol></div>
+    <div><m-symbol name="schatz" gr="15"></m-symbol></div>
+    <div><m-symbol name="schatz" gr="15"></m-symbol></div>
+    <div><m-symbol name="edelstein" gr="14"></m-symbol></div>
+    <div><m-symbol name="edelstein" gr="14"></m-symbol></div>
+    <div><m-symbol name="hindernis" gr="16"></m-symbol></div>
+    <div><m-symbol name="hindernis" gr="16"></m-symbol></div>
+    <div><m-symbol name="hindernis" gr="16"></m-symbol></div>
+    <div><m-symbol name="hindernis" gr="16"></m-symbol></div>
+    <div><m-symbol name="hindernis" gr="16"></m-symbol></div>
+    <div><m-symbol name="hindernis" gr="16"></m-symbol></div>
+    <div><m-symbol name="hindernis" gr="16"></m-symbol></div>
+    <div><m-symbol name="hindernis" gr="16"></m-symbol></div>
+  </m-karten>
+
+  <div class="e02-bastel">
+    <div class="e02-spalte">
+      <p>Mein Rätsel-Gitter</p>
+      <m-gitter deko b="4" h="4" feld="21"></m-gitter>
+    </div>
+    <div class="e02-spalte">
+      <p>Male deinen Drachen an!</p>
+      <m-e2-ausmal gr="66"></m-e2-ausmal>
+    </div>
+  </div>
+
+  <div class="e02-unten">
+    <div class="profi" data-titel="Profi-Aufgabe: Rätsel-Erfinderin">
+      <p>Leg Drache, Schatz und Steine ins Gitter. Findet Mama oder Papa ein Programm? Schreib hier dein Programm auf. Wer hat weniger Befehle?</p>
+      <m-programm leer="10" gr="10.5"></m-programm>
+      <p class="lsg-nur">Eigene Rätsel: Richtig ist jedes Programm, das am Schatz endet, ohne anzustoßen.</p>
+    </div>
+    <m-qr paket="e2"></m-qr>
+  </div>
+</section>
