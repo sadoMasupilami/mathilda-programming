@@ -396,7 +396,17 @@ test('Kobold: Neu stellt das Kobold-Programm wie am Anfang her', async ({ page }
   await expect(page.locator('.tasten-frage')).toContainText('austauschen gegen');
   await tippe(page, '.tasten [data-befehl="' + anders + '"]');
   await expect(page.locator('.kobold-karte[data-i="0"]')).toHaveClass(new RegExp('befehl-' + anders));
+  // nur ein Tausch: die anderen Befehle sind zu, der getauschte bleibt änderbar
+  await expect(page.locator('.kobold-karte.zu')).toHaveCount(vorher.length - 1);
+  await tippeGrau(page, '.kobold-karte[data-i="1"]');
+  await expect(page.locator('.kobold-karte.gewaehlt')).toHaveCount(0);
+  await expect(page.locator('.meldung')).toContainText('schon einen Befehl getauscht');
+  await ansicht(page, 'kobold-ein-tausch', info);
+  await tippe(page, '.kobold-karte[data-i="0"]');
+  await expect(page.locator('.kobold-karte.gewaehlt')).toHaveCount(1);
+  await tippe(page, '.tasten [data-aktion="abbrechen"]');
   await tippe(page, '.tasten [data-aktion="neu"]');
+  await expect(page.locator('.kobold-karte.zu')).toHaveCount(0);
   await expect(page.locator('.kobold-karte[data-i="0"]')).toHaveClass(new RegExp('befehl-' + b0));
   expect(await page.locator('.kobold-karte').evaluateAll((k) => k.map((x) => x.className))).toEqual(vorher);
   await ansicht(page, 'kobold-neu', info);
@@ -437,8 +447,8 @@ test('Doppeltipp löst nie die Taste aus, die danach an derselben Stelle liegt',
     // repariert, und der zweite Tipp hat nicht „Neu“ (Kobold-Programm wie am Anfang) erwischt
     await expect(page.locator('.kobold-karte[data-i="2"]')).toHaveClass(new RegExp('befehl-' + anders));
     await expect(page.locator('.kobold-karte.gewaehlt')).toHaveCount(0);
-    // Doppeltipp auf eine Karte: sie bleibt ausgewählt
-    await doppeltipp(page, '.kobold-karte[data-i="0"]');
+    // Doppeltipp auf eine Karte: sie bleibt ausgewählt (die getauschte, nur sie ist noch änderbar)
+    await doppeltipp(page, '.kobold-karte[data-i="2"]');
     await expect(page.locator('.kobold-karte.gewaehlt')).toHaveCount(1);
     await ansicht(page, 'doppeltipp-kobold', info);
   }

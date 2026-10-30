@@ -456,7 +456,8 @@
     const a = L.auswahl;
     let html = '';
     L.prog.forEach((b, i) => {
-      html += '<button class="karte kobold-karte befehl-' + b + (a && a.i === i ? ' gewaehlt' : '') + '" data-aktion="karte" data-i="' + i + '" data-teil="' + i + '" aria-label="Befehl ' + (i + 1) + ': ' + NAMEN[b] + '"' + (L.laeuft ? ' disabled' : '') + '>' +
+      const zu = koboldZu(i);
+      html += '<button class="karte kobold-karte befehl-' + b + (a && a.i === i ? ' gewaehlt' : '') + (zu ? ' zu' : '') + '" data-aktion="karte" data-i="' + i + '" data-teil="' + i + '" aria-label="Befehl ' + (i + 1) + ': ' + NAMEN[b] + '"' + (L.laeuft ? ' disabled' : zu ? ' aria-disabled="true"' : '') + '>' +
         '<span class="nr">' + (i + 1) + '</span>' + sym(b) + '</button>';
     });
     box.innerHTML = '<div class="prog-zeile kobold-zeile" aria-label="Programm">' + html + '</div>';
@@ -624,8 +625,14 @@
   }
 
   // ----- Ändern (Kobold): antippen, kein Ziehen -----
+  // Der Kobold versteckt genau einen Fehler: nur so viele Befehle tauschen, wie es braucht.
+  // Ist schon getauscht, bleibt nur dieser Befehl änderbar; „Neu“ gibt alle wieder frei.
+  const MAX_TAUSCH = 1;
+  function getauscht() { return L.prog.filter((b, i) => b !== L.orig[i]).length; }
+  function koboldZu(i) { return getauscht() >= MAX_TAUSCH && L.prog[i] === L.orig[i]; }
   function koboldWaehle(i) {
     if (!vorAenderung()) return;
+    if (koboldZu(i)) return meldung('Du hast schon einen Befehl getauscht. Der Kobold versteckt nur einen Fehler. Für einen anderen tippe auf „Neu“.', 'hinweis', sym('kobold'));
     const a = L.auswahl;
     L.auswahl = a && a.i === i ? null : { i };
     zeichneProgramm(); zeichneTasten();

@@ -365,6 +365,7 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
 .kobold-karte .nr { position: absolute; top: -2px; left: 2px; font-size: 11px; font-weight: 700; color: var(--grau); line-height: 1; }
 .kobold-karte.gewaehlt { box-shadow: 0 0 0 4px var(--akzent); background: var(--akzent-hell); }
 .kobold-karte:disabled { opacity: 1; }
+.kobold-karte.zu { opacity: 0.35; }
 
 .tasten { flex: none; display: flex; flex-direction: column; align-items: center; gap: var(--abst); }
 .tasten .reihe { display: flex; gap: var(--abst); justify-content: center; flex-wrap: wrap; }
