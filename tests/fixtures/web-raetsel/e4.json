@@ -44,17 +44,18 @@
    "h": 3,
    "start": {
     "x": 1,
-    "y": 2,
-    "blick": "oben"
+    "y": 0,
+    "blick": "links"
    },
    "ziel": {
-    "x": 1,
+    "x": 2,
     "y": 0
    },
-   "programm": "vor vor vor",
+   "programm": "vor links vor",
    "reparatur": {
-    "art": "loeschen",
-    "stelle": 3
+    "art": "tauschen",
+    "stelle": 1,
+    "befehl": "links"
    }
   },
   {
@@ -64,17 +65,17 @@
    "h": 3,
    "start": {
     "x": 0,
-    "y": 2,
-    "blick": "rechts"
+    "y": 0,
+    "blick": "oben"
    },
    "ziel": {
     "x": 3,
-    "y": 0
+    "y": 1
    },
-   "programm": "vor vor vor links vor",
+   "programm": "rechts links vor vor rechts vor",
    "reparatur": {
-    "art": "einfuegen",
-    "stelle": 5,
+    "art": "tauschen",
+    "stelle": 2,
     "befehl": "vor"
    }
   },
@@ -84,28 +85,29 @@
    "b": 4,
    "h": 4,
    "start": {
-    "x": 0,
-    "y": 3,
+    "x": 3,
+    "y": 1,
     "blick": "oben"
    },
    "ziel": {
-    "x": 3,
-    "y": 0
+    "x": 0,
+    "y": 3
    },
    "hindernisse": [
     [
-     1,
-     1
+     0,
+     2
     ],
     [
-     2,
-     2
+     3,
+     3
     ]
    ],
-   "programm": "vor vor vor vor rechts vor vor vor",
+   "programm": "vor vor links vor vor rechts vor vor",
    "reparatur": {
-    "art": "loeschen",
-    "stelle": 4
+    "art": "tauschen",
+    "stelle": 1,
+    "befehl": "links"
    }
   },
   {
@@ -115,27 +117,27 @@
    "h": 4,
    "start": {
     "x": 0,
-    "y": 3,
+    "y": 0,
     "blick": "rechts"
    },
    "ziel": {
     "x": 4,
-    "y": 0
+    "y": 3
    },
    "hindernisse": [
     [
      2,
-     3
+     1
     ],
     [
-     3,
-     1
+     1,
+     2
     ]
    ],
-   "programm": "vor links vor vor rechts vor vor vor",
+   "programm": "vor vor links vor rechts vor vor vor",
    "reparatur": {
-    "art": "einfuegen",
-    "stelle": 5,
+    "art": "tauschen",
+    "stelle": 3,
     "befehl": "vor"
    }
   },

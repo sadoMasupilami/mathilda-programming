@@ -182,11 +182,12 @@ async function gibProgrammEin(page, prog) {
     }
   }
 }
+// In der App kann man einen Befehl nur austauschen
 function koboldReparatur(lv) {
   const w = weltVon(lv);
   const p = K.lies(lv.programm);
   for (const r of alleReparaturen(p)) {
-    if (K.ausfuehren(w, wendeReparaturAn(p, r)).geschafft) return r;
+    if (r.art === 'tauschen' && K.ausfuehren(w, wendeReparaturAn(p, r)).geschafft) return r;
   }
   throw new Error('Keine Reparatur für ' + lv.id);
 }
@@ -200,16 +201,11 @@ async function spieleLevel(page, p, i, info, fotos) {
     for (const id of reihe) await tippe(page, '.ablauf-karte[data-id="' + id + '"]');
   } else if (lv.art === 'kobold') {
     const r = koboldReparatur(lv);
-    if (r.art === 'einfuegen') {
-      await tippe(page, '.stelle[data-i="' + (r.stelle - 1) + '"]');
-      if (fotos) await ansicht(page, 'kobold-einfuegen', info);
-      await tippe(page, '.tasten [data-befehl="' + r.befehl + '"]');
-    } else {
-      await tippe(page, '.kobold-karte[data-i="' + (r.stelle - 1) + '"]');
-      if (fotos) await ansicht(page, 'kobold-auswahl', info);
-      if (r.art === 'tauschen') await tippe(page, '.tasten [data-befehl="' + r.befehl + '"]');
-      else await tippe(page, '.tasten [data-aktion="weg"]');
-    }
+    await expect(page.locator('.programm .stelle')).toHaveCount(0);
+    await tippe(page, '.kobold-karte[data-i="' + (r.stelle - 1) + '"]');
+    if (fotos) await ansicht(page, 'kobold-auswahl', info);
+    await expect(page.locator('.tasten [data-aktion="weg"]')).toHaveCount(0);
+    await tippe(page, '.tasten [data-befehl="' + r.befehl + '"]');
   } else {
     await gibProgrammEin(page, loesePfad(lv));
     if (fotos) await ansicht(page, p.paket + '-programm', info);
@@ -234,6 +230,8 @@ test('Startseite, Schlüsselwort und Paket-Auswahl', async ({ page }, info) => {
   const p = DATEN.pakete[0];
   await tippe(page, '.kachel[data-paket="' + p.paket + '"]');
   await expect(page).toHaveURL(new RegExp('#' + p.paket + '$'));
+  // gleich losschreiben, ohne erst ins Feld zu tippen
+  await expect(page.locator('#wort')).toBeFocused();
   await page.goto('./');
   await oeffnePaket(page, p, info, true);
   await ansicht(page, 'paket', info);
@@ -395,7 +393,7 @@ test('Kobold: Neu stellt das Kobold-Programm wie am Anfang her', async ({ page }
   const anders = K.BEFEHLE.find((b) => b !== b0);
   await tippe(page, '.kobold-karte[data-i="0"]');
   await expect(page.locator('.tasten [data-aktion="abbrechen"]')).toContainText('zurück');
-  await expect(page.locator('.tasten-frage')).toContainText('tauschen oder streichen');
+  await expect(page.locator('.tasten-frage')).toContainText('austauschen gegen');
   await tippe(page, '.tasten [data-befehl="' + anders + '"]');
   await expect(page.locator('.kobold-karte[data-i="0"]')).toHaveClass(new RegExp('befehl-' + anders));
   await tippe(page, '.tasten [data-aktion="neu"]');

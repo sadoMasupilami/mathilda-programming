@@ -160,6 +160,8 @@ export function pruefeAlle(ordner = ORDNER) {
     if (daten.web) {
       for (const id of daten.web.levels || []) {
         if (!raetsel[id]) fehler.push(d + ': Web-Level „' + id + '“ gibt es nicht');
+        // In der App kann man einen Befehl nur austauschen (kein Einfügen, kein Streichen)
+        else if (raetsel[id].art === 'kobold' && raetsel[id].reparatur && raetsel[id].reparatur.art !== 'tauschen') fehler.push(d + ': Web-Level „' + id + '“: in der App geht nur „tauschen“');
       }
       if (!daten.schluesselwort || !/^[A-Za-z]+$/.test(daten.schluesselwort)) fehler.push(d + ': Schlüsselwort fehlt oder hat andere Zeichen als A–Z');
     }

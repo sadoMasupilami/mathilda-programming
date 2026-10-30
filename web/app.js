@@ -75,7 +75,6 @@
     heim: '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M7 23 L24 8 L41 23 L41 41 L29 41 L29 30 L19 30 L19 41 L7 41 Z" fill="#fff4cc" stroke="' + T + '" stroke-width="3.5" stroke-linejoin="round"/></svg>',
     schloss: '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M15 22 V15 C15 5 33 5 33 15 V22" fill="none" stroke="' + T + '" stroke-width="4.5"/><rect x="9" y="21" width="30" height="22" rx="5" fill="#f2b705" stroke="' + T + '" stroke-width="3.5"/><circle cx="24" cy="30" r="3.2" fill="' + T + '"/><path d="M24 31 V37" stroke="' + T + '" stroke-width="3.5" stroke-linecap="round"/></svg>',
     weg: '<svg viewBox="0 0 48 48" aria-hidden="true"><rect x="10" y="6" width="28" height="36" rx="5" fill="#fff" stroke="' + T + '" stroke-width="3.5"/><path d="M17 17 L31 31 M31 17 L17 31" stroke="#d1335b" stroke-width="5" stroke-linecap="round"/></svg>',
-    plus: '<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="15" fill="#fff" stroke="currentColor" stroke-width="3.5"/><path d="M24 16 V32 M16 24 H32" stroke="currentColor" stroke-width="4.5" stroke-linecap="round"/></svg>',
     kreuz: '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14 14 L34 34 M34 14 L14 34" stroke="' + T + '" stroke-width="5" stroke-linecap="round"/></svg>',
     los: '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M15 9 L39 24 L15 39 Z" fill="currentColor" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/></svg>',
     karten: '<svg viewBox="0 0 100 100" aria-hidden="true"><rect x="8" y="20" width="36" height="46" rx="6" fill="#fff4cc" stroke="' + T + '" stroke-width="4" transform="rotate(-8 26 43)"/><rect x="56" y="34" width="36" height="46" rx="6" fill="#e9eefc" stroke="' + T + '" stroke-width="4" transform="rotate(8 74 57)"/><path d="M22 36 L28 33 L28 54 M66 50 C66 44 78 44 78 50 C78 56 66 60 66 66 L80 66" fill="none" stroke="' + T + '" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M42 70 C48 78 56 78 60 72" fill="none" stroke="#7a4fd1" stroke-width="4" stroke-linecap="round"/><path d="M60 64 L62 73 L53 74" fill="none" stroke="#7a4fd1" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
@@ -113,7 +112,9 @@
   // ---------------------------------------------------------------------
   // Routen: #e2 öffnet das Paket (QR-Code am Blatt), #e2/3 Level 3, #e2/ende, #eltern
   // ---------------------------------------------------------------------
+  let gezeigt = null;   // Hash der gerade gezeigten Ansicht
   function route() {
+    gezeigt = location.hash;
     const h = decodeURIComponent(location.hash.replace(/^#\/?/, ''));
     if (h !== 'eltern' && h !== 'eltern/bereich') elternOffen = false;
     if (h === 'eltern') return zeigeElternFrage();
@@ -132,9 +133,15 @@
     }
     zeigeStart();
   }
+  // Gleich im Tipp zeichnen, nicht erst beim hashchange: nur so darf ein Eingabefeld am iPad
+  // sofort den Fokus (und die Tastatur) bekommen. Der hashchange danach zeichnet nicht noch einmal.
   function geh(h) {
-    if (location.hash === h || (h === '#' && !location.hash)) route();
-    else location.hash = h;
+    if (!(location.hash === h || (h === '#' && !location.hash))) location.hash = h;
+    route();
+  }
+  function fokus(sel) {
+    const f = app.querySelector(sel);
+    if (f) f.focus({ preventScroll: true });
   }
 
   // ---------------------------------------------------------------------
@@ -187,6 +194,7 @@
       '<button class="taste haupt" type="submit">Öffnen</button></div>' +
       '<p class="hinweis" role="status">' + (hinweis ? esc(hinweis) : 'Das Wort steht in der Anleitung.') + '</p>' +
       '</form></div></section>');
+    fokus('#wort');
   }
   function pruefeSchluessel(form) {
     const p = paketVon(form.dataset.paket);
@@ -259,6 +267,7 @@
       '<button class="taste haupt" type="submit">Weiter</button></div>' +
       '<p class="hinweis' + (hinweis ? ' falsch' : '') + '" role="status">' + esc(hinweis || 'Hier kann man den Fortschritt löschen und einen Namen eingeben.') + '</p>' +
       '</form></div></section>');
+    fokus('#antwort');
   }
   function pruefeEltern(form) {
     const v = parseInt((form.elements.antwort.value || '').trim(), 10);
@@ -352,7 +361,7 @@
   function grundMeldung() {
     const lv = L.lv;
     if (L.art === 'ablauf') return meldung((lv.titel ? lv.titel + ': ' : '') + 'Tippe die Karten der Reihe nach an.', '', ICON.karten);
-    if (L.art === 'kobold') return meldung('Finde den Fehler! Tippe einen Befehl oder ein Plus an.', '', sym('kobold'));
+    if (L.art === 'kobold') return meldung('Ein Befehl ist falsch! Tippe ihn an und tausche ihn aus.', '', sym('kobold'));
     const zs = lv.zielSymbol || 'schatz';
     const karten = lv.zauber && lv.maxKarten ? ' Höchstens ' + lv.maxKarten + ' Karten.' : '';
     if (lv.edelsteine && lv.edelsteine.length) return meldung('Sammle alle Edelsteine, dann zum ' + zielWort() + '!' + karten, '', sym('edelstein'));
@@ -446,18 +455,10 @@
     const box = app.querySelector('.programm');
     const a = L.auswahl;
     let html = '';
-    const n = L.prog.length;
-    const einfuegen = n < MAX_KARTEN;
-    for (let i = 0; i <= n; i++) {
-      if (einfuegen) {
-        html += '<button class="stelle' + (a && a.typ === 'stelle' && a.i === i ? ' gewaehlt' : '') + '" data-aktion="stelle" data-i="' + i + '" aria-label="Hier einfügen"' + (L.laeuft ? ' disabled' : '') + '>' + ICON.plus + '</button>';
-      }
-      if (i < n) {
-        const b = L.prog[i];
-        html += '<button class="karte kobold-karte befehl-' + b + (a && a.typ === 'karte' && a.i === i ? ' gewaehlt' : '') + '" data-aktion="karte" data-i="' + i + '" data-teil="' + i + '" aria-label="Befehl ' + (i + 1) + ': ' + NAMEN[b] + '"' + (L.laeuft ? ' disabled' : '') + '>' +
-          '<span class="nr">' + (i + 1) + '</span>' + sym(b) + '</button>';
-      }
-    }
+    L.prog.forEach((b, i) => {
+      html += '<button class="karte kobold-karte befehl-' + b + (a && a.i === i ? ' gewaehlt' : '') + '" data-aktion="karte" data-i="' + i + '" data-teil="' + i + '" aria-label="Befehl ' + (i + 1) + ': ' + NAMEN[b] + '"' + (L.laeuft ? ' disabled' : '') + '>' +
+        '<span class="nr">' + (i + 1) + '</span>' + sym(b) + '</button>';
+    });
     box.innerHTML = '<div class="prog-zeile kobold-zeile" aria-label="Programm">' + html + '</div>';
   }
 
@@ -511,14 +512,9 @@
       const a = L.auswahl;
       if (a && !lauf) {
         let r = '';
-        for (const b of K.BEFEHLE) {
-          const gleich = a.typ === 'karte' && L.prog[a.i] === b;
-          r += befehlsTaste(b, gleich);
-        }
-        if (a.typ === 'karte') r += taste('weg', ICON.weg, { cls: 'befehl', label: 'Befehl streichen' });
-        // „zurück“ als Wort: nicht mit der Streichen-Taste (Karte mit rotem X) zu verwechseln
+        for (const b of K.BEFEHLE) r += befehlsTaste(b, L.prog[a.i] === b);
         r += taste('abbrechen', '<span>zurück</span>', { cls: 'zurueck', label: 'zurück, nichts ändern' });
-        box.innerHTML = '<p class="tasten-frage">' + (a.typ === 'karte' ? 'Befehl ' + (a.i + 1) + ' tauschen oder streichen:' : 'Welcher Befehl kommt hierher?') + '</p><div class="reihe">' + r + '</div>';
+        box.innerHTML = '<p class="tasten-frage">Befehl ' + (a.i + 1) + ' austauschen gegen:</p><div class="reihe">' + r + '</div>';
       } else {
         box.innerHTML = '<div class="reihe">' +
           taste('neu', sym('kobold') + '<span>Neu</span>', { cls: 'breit', label: 'Kobold-Programm wie am Anfang', aus: lauf }) +
@@ -628,26 +624,18 @@
   }
 
   // ----- Ändern (Kobold): antippen, kein Ziehen -----
-  function koboldWaehle(typ, i) {
+  function koboldWaehle(i) {
     if (!vorAenderung()) return;
     const a = L.auswahl;
-    L.auswahl = a && a.typ === typ && a.i === i ? null : { typ, i };
+    L.auswahl = a && a.i === i ? null : { i };
     zeichneProgramm(); zeichneTasten();
     if (!L.auswahl) grundMeldung();
-    else meldung(typ === 'karte' ? 'Tippe unten einen anderen Befehl an oder streiche ihn.' : 'Tippe unten den Befehl an, der hier fehlt.', 'hinweis');
+    else meldung('Tippe unten den richtigen Befehl an.', 'hinweis');
   }
   function koboldSetzen(b) {
     const a = L.auswahl;
     if (!a) return;
-    if (a.typ === 'karte') L.prog[a.i] = b;
-    else L.prog.splice(a.i, 0, b);
-    L.auswahl = null;
-    zeichneProgramm(); zeichneTasten(); grundMeldung();
-  }
-  function koboldWeg() {
-    const a = L.auswahl;
-    if (!a || a.typ !== 'karte') return;
-    L.prog.splice(a.i, 1);
+    L.prog[a.i] = b;
     L.auswahl = null;
     zeichneProgramm(); zeichneTasten(); grundMeldung();
   }
@@ -935,9 +923,7 @@
         L.wahl = null; L.auswahl = null;
         zeichneProgramm(); zeichneTasten(); grundMeldung();
         return;
-      case 'karte': return koboldWaehle('karte', parseInt(b.dataset.i, 10));
-      case 'stelle': return koboldWaehle('stelle', parseInt(b.dataset.i, 10));
-      case 'weg': return koboldWeg();
+      case 'karte': return koboldWaehle(parseInt(b.dataset.i, 10));
       case 'neu':
         if (L.laeuft) return;
         L.prog = L.orig.slice(); L.auswahl = null;
@@ -977,7 +963,7 @@
     }
   });
 
-  window.addEventListener('hashchange', route);
+  window.addEventListener('hashchange', () => { if (location.hash !== gezeigt) route(); });
   route();
 
   // Offline: Service Worker (relativer Pfad, Seite liegt unter /<repo>/).

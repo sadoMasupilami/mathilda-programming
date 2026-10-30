@@ -116,7 +116,7 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
 }
 .taste:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(31, 35, 64, 0.22); }
 .taste:disabled, .taste[aria-disabled="true"] { opacity: 0.35; box-shadow: none; transform: none; }
-.taste:focus-visible, .kachel:focus-visible, .level-knopf:focus-visible, .ablauf-karte:focus-visible, .stelle:focus-visible, .kobold-karte:focus-visible { outline: 4px solid var(--gold); outline-offset: 2px; }
+.taste:focus-visible, .kachel:focus-visible, .level-knopf:focus-visible, .ablauf-karte:focus-visible, .kobold-karte:focus-visible { outline: 4px solid var(--gold); outline-offset: 2px; }
 .taste svg { width: calc(var(--t) * 0.5); height: calc(var(--t) * 0.5); flex: none; }
 .taste.rund { width: var(--t); height: var(--t); padding: 0; border-radius: 50%; }
 .taste.rund svg { width: 70%; height: 70%; }
@@ -354,9 +354,9 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
 .zaehler-karten i { width: 10px; height: 14px; border: 2px solid var(--zauber); border-radius: 2px; }
 .zaehler-karten i.voll { background: var(--zauber); }
 
-/* Kobold: Befehle und Einfüge-Stellen zum Antippen */
+/* Kobold: Befehle zum Antippen und Austauschen */
 .kobold-zeile { gap: 8px; align-items: center; }
-.kobold-karte, .stelle { width: var(--kk); height: var(--kk); padding: 0; cursor: pointer; }
+.kobold-karte { width: var(--kk); height: var(--kk); padding: 0; cursor: pointer; }
 .kobold-karte { border-width: 3px; }
 .kobold-karte.befehl-vor { border-color: var(--vor); }
 .kobold-karte.befehl-links { border-color: var(--links); }
@@ -365,13 +365,6 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
 .kobold-karte .nr { position: absolute; top: -2px; left: 2px; font-size: 11px; font-weight: 700; color: var(--grau); line-height: 1; }
 .kobold-karte.gewaehlt { box-shadow: 0 0 0 4px var(--akzent); background: var(--akzent-hell); }
 .kobold-karte:disabled { opacity: 1; }
-.stelle {
-  border: 2px dashed #b7b1a6; border-radius: 10px; background: transparent; color: #8b867c;
-  display: flex; align-items: center; justify-content: center;
-}
-.stelle svg { width: 58%; height: 58%; }
-.stelle.gewaehlt { border: 3px solid var(--akzent); color: var(--akzent); background: var(--akzent-hell); }
-.stelle:disabled { opacity: 0.4; }
 
 .tasten { flex: none; display: flex; flex-direction: column; align-items: center; gap: var(--abst); }
 .tasten .reihe { display: flex; gap: var(--abst); justify-content: center; flex-wrap: wrap; }
