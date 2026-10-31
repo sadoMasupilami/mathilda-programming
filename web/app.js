@@ -34,13 +34,12 @@
   const SCHLUESSEL = 'denk-werkstatt-v1';
   let speicher = lade();
   function lade() {
-    const leer = { offen: {}, sterne: {}, name: '' };
+    const leer = { sterne: {}, name: '' };
     try {
       const t = window.localStorage.getItem(SCHLUESSEL);
       const d = t ? JSON.parse(t) : null;
       if (d && typeof d === 'object') {
         return {
-          offen: d.offen && typeof d.offen === 'object' ? d.offen : {},
           sterne: d.sterne && typeof d.sterne === 'object' ? d.sterne : {},
           name: typeof d.name === 'string' ? d.name.slice(0, 30) : '',
         };
@@ -73,7 +72,6 @@
   const T = '#1f2340';
   const ICON = {
     heim: '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M7 23 L24 8 L41 23 L41 41 L29 41 L29 30 L19 30 L19 41 L7 41 Z" fill="#fff4cc" stroke="' + T + '" stroke-width="3.5" stroke-linejoin="round"/></svg>',
-    schloss: '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M15 22 V15 C15 5 33 5 33 15 V22" fill="none" stroke="' + T + '" stroke-width="4.5"/><rect x="9" y="21" width="30" height="22" rx="5" fill="#f2b705" stroke="' + T + '" stroke-width="3.5"/><circle cx="24" cy="30" r="3.2" fill="' + T + '"/><path d="M24 31 V37" stroke="' + T + '" stroke-width="3.5" stroke-linecap="round"/></svg>',
     weg: '<svg viewBox="0 0 48 48" aria-hidden="true"><rect x="10" y="6" width="28" height="36" rx="5" fill="#fff" stroke="' + T + '" stroke-width="3.5"/><path d="M17 17 L31 31 M31 17 L17 31" stroke="#d1335b" stroke-width="5" stroke-linecap="round"/></svg>',
     kreuz: '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14 14 L34 34 M34 14 L14 34" stroke="' + T + '" stroke-width="5" stroke-linecap="round"/></svg>',
     los: '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M15 9 L39 24 L15 39 Z" fill="currentColor" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/></svg>',
@@ -123,7 +121,6 @@
     if (m) {
       const p = paketVon(m[1].toLowerCase());
       if (p) {
-        if (!speicher.offen[p.paket]) return zeigeSchluessel(p);
         if (!m[2]) return zeigePaket(p);
         if (m[2] === 'ende') return zeigeEnde(p);
         const i = parseInt(m[2], 10) - 1;
@@ -145,7 +142,7 @@
   }
 
   // ---------------------------------------------------------------------
-  // Startseite: Pakete der Einheiten, gesperrt oder offen
+  // Startseite: Pakete der Einheiten, alle offen
   // ---------------------------------------------------------------------
   function paketIcon(p) {
     if (p.art === 'kobold') return sym('kobold');
@@ -157,15 +154,12 @@
     const name = speicher.name ? ', ' + esc(speicher.name) : '';
     let kacheln = '';
     for (const p of DATEN.pakete) {
-      const offen = !!speicher.offen[p.paket];
       const n = sterneVon(p);
-      kacheln += '<button class="kachel' + (offen ? ' offen' : ' zu') + '" data-aktion="paket" data-paket="' + p.paket + '">' +
+      kacheln += '<button class="kachel" data-aktion="paket" data-paket="' + p.paket + '">' +
         '<span class="kachel-nr">' + p.einheit + '</span>' +
         '<span class="kachel-bild">' + paketIcon(p) + '</span>' +
         '<span class="kachel-titel">' + esc(p.titel) + '</span>' +
-        '<span class="kachel-stand">' + (offen
-          ? '<span class="mini-stern">' + sym(n === p.levels.length ? 'stern' : 'sternLeer') + '</span>' + n + ' von ' + p.levels.length
-          : '<span class="mini-stern">' + ICON.schloss + '</span>Schlüsselwort') + '</span>' +
+        '<span class="kachel-stand"><span class="mini-stern">' + sym(n === p.levels.length ? 'stern' : 'sternLeer') + '</span>' + n + ' von ' + p.levels.length + '</span>' +
         '</button>';
     }
     if (!kacheln) kacheln = '<p class="leer-hinweis">Hier gibt es noch keine Pakete.</p>';
@@ -176,39 +170,6 @@
       '<div class="kacheln" data-n="' + DATEN.pakete.length + '">' + kacheln + '</div>' +
       '<footer class="start-fuss"><button class="taste klein-taste" data-aktion="eltern">Für Erwachsene</button></footer>' +
       '</section>');
-  }
-
-  // ---------------------------------------------------------------------
-  // Schlüsselwort (Papier → Bildschirm). Nur eine Spielregel, kein Schutz.
-  // ---------------------------------------------------------------------
-  function zeigeSchluessel(p, hinweis) {
-    ansicht('schluessel',
-      '<section class="ansicht formular">' +
-      '<header class="kopf">' + heimKnopf() + '<span class="kopf-titel">Paket ' + p.einheit + '</span></header>' +
-      '<div class="formular-inhalt">' +
-      '<div class="formular-bild">' + paketIcon(p) + '</div>' +
-      '<form class="formular-feld" data-form="schluessel" data-paket="' + p.paket + '" autocomplete="off">' +
-      '<h1>' + esc(p.titel) + '</h1>' +
-      '<label for="wort">Wie heißt das Schlüsselwort?</label>' +
-      '<div class="eingabe-reihe"><input id="wort" name="wort" type="text" inputmode="text" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" enterkeyhint="go" maxlength="30">' +
-      '<button class="taste haupt" type="submit">Öffnen</button></div>' +
-      '<p class="hinweis" role="status">' + (hinweis ? esc(hinweis) : 'Das Wort steht in der Anleitung.') + '</p>' +
-      '</form></div></section>');
-    fokus('#wort');
-  }
-  function pruefeSchluessel(form) {
-    const p = paketVon(form.dataset.paket);
-    const wort = (form.elements.wort.value || '').trim().toLowerCase();
-    if (p && wort && wort === String(p.schluesselwort || '').toLowerCase()) {
-      speicher.offen[p.paket] = true;
-      sichere();
-      if (document.activeElement) document.activeElement.blur();
-      route();
-    } else {
-      const h = form.querySelector('.hinweis');
-      h.textContent = wort ? 'Das ist nicht das Wort. Schau in der Anleitung nach.' : 'Tippe das Wort ein.';
-      h.classList.add('falsch');
-    }
   }
 
   // ---------------------------------------------------------------------
@@ -290,13 +251,13 @@
       '</form>' +
       '<div class="formular-feld loeschen-feld">' +
       '<button class="taste warnung" data-aktion="loeschen-frage">' + ICON.weg + '<span>Fortschritt löschen</span></button>' +
-      '<p class="hinweis" role="status">' + esc(hinweis || 'Sterne und Schlüsselwörter. Der Sammelpass am Papier zählt.') + '</p>' +
+      '<p class="hinweis" role="status">' + esc(hinweis || 'Alle Sterne. Der Sammelpass am Papier zählt.') + '</p>' +
       '<p class="klein">Version ' + esc(VERSION) + '</p>' +
       '</div></div></section>');
   }
   function loeschenFrage() {
     const f = app.querySelector('.loeschen-feld');
-    f.innerHTML = '<p class="frage">Wirklich alle Sterne und Schlüsselwörter löschen?</p>' +
+    f.innerHTML = '<p class="frage">Wirklich alle Sterne löschen?</p>' +
       '<div class="eingabe-reihe"><button class="taste warnung" data-aktion="loeschen-ja">Ja, löschen</button>' +
       '<button class="taste" data-aktion="loeschen-nein">Nein</button></div>';
   }
@@ -914,9 +875,9 @@
       case 'level': return geh('#' + b.dataset.paket + '/' + (parseInt(b.dataset.i, 10) + 1));
       case 'loeschen-frage': return loeschenFrage();
       case 'loeschen-ja':
-        speicher = { offen: {}, sterne: {}, name: speicher.name };
+        speicher = { sterne: {}, name: speicher.name };
         sichere();
-        return zeigeEltern('Gelöscht. Alle Pakete sind wieder gesperrt.');
+        return zeigeEltern('Gelöscht. Alle Sterne sind weg.');
       case 'loeschen-nein': return zeigeEltern();
     }
     if (!L) return;
@@ -960,8 +921,7 @@
   app.addEventListener('submit', (ev) => {
     ev.preventDefault();
     const f = ev.target;
-    if (f.dataset.form === 'schluessel') pruefeSchluessel(f);
-    else if (f.dataset.form === 'eltern') pruefeEltern(f);
+    if (f.dataset.form === 'eltern') pruefeEltern(f);
     else if (f.dataset.form === 'name') {
       speicher.name = (f.elements.name.value || '').trim().slice(0, 30);
       sichere();

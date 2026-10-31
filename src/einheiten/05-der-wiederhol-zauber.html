@@ -2,7 +2,7 @@
   Einheit 5: Der Wiederhol-Zauber (Block A)
   Schleifen: Zauber-Kasten „3-mal: vor“ statt „vor, vor, vor“, Karten zählen,
   Muster tanzen und malen, im Schwerer-Teil Gruppen von 2 bis 3 Befehlen.
-  Rätsel: raetsel/e5.json (Web-Paket e5, Schlüsselwort TANZ)
+  Rätsel: raetsel/e5.json (Web-Paket e5)
   Eigener Baustein: src/bausteine/e5-muster.js (Muster-Bild, Kartenzahl)
   Blätter: 5-1 Der Zauber-Kasten, 5-2 Drachen-Pfade mit Zauber-Kasten, 5-3 Mein Zauber-Kasten (Bastelvorlage)
 -->
@@ -278,10 +278,10 @@
 
   <h2>Bildschirm-Bonus</h2>
   <div class="kasten bildschirm darf-brechen e05-bricht">
-    <p><b>Paket 5 „Wiederhol-Zauber“</b>, Schlüsselwort <b>TANZ</b>. Den QR-Code findest du auf <a class="blattref" href="#blatt-5-1"></a> unten rechts. Nur am Schluss, nach den Blättern, höchstens 10 Minuten. Die Einheit funktioniert auch ganz ohne Bildschirm.</p>
-    <p><b>6 Levels:</b> Drachen-Pfade mit Zauber-Kasten und <b>Kartengrenze</b>. Die App zeigt, wie viele Karten erlaubt sind, und zählt genauso wie am Papier. Level 1 bis 4 gehen mit einem Befehl im Kasten, Level 5 und 6 brauchen eine Gruppe. <b>Level 2 ist Aufgabe 2 von <a class="blattref" href="#blatt-5-2"></a>, Level 6 ist die Profi-Aufgabe von diesem Blatt.</b> Am besten spielt {{KIND}} sie nach dem Blatt: Dann sieht sie ihr eigenes Programm laufen.</p>
+    <p><b>Paket 5 „Wiederhol-Zauber“.</b> Den QR-Code findest du auf <a class="blattref" href="#blatt-5-1"></a> unten rechts. Nur am Schluss, nach den Blättern, höchstens 15 Minuten. Die Einheit funktioniert auch ganz ohne Bildschirm.</p>
+    <p><b>9 Levels:</b> Drachen-Pfade mit Zauber-Kasten und <b>Kartengrenze</b>. Die App zeigt, wie viele Karten erlaubt sind, und zählt genauso wie am Papier. Level 1 bis 6 gehen mit einem Befehl im Kasten, Level 7 bis 9 brauchen eine Gruppe. Bei Level 5, 6 und 9 liegen die Steine mitten im Weg, der Drache muss einen Bogen machen. <b>Level 2 ist Aufgabe 2 von <a class="blattref" href="#blatt-5-2"></a>, Level 8 ist die Profi-Aufgabe von diesem Blatt.</b> Am besten spielt {{KIND}} sie nach dem Blatt: Dann sieht sie ihr eigenes Programm laufen.</p>
     <p><b>So geht der Zauber-Kasten in der App:</b> Zauber-Kasten antippen, Zahl wählen (2 bis 5), die Befehle für den Kasten antippen (höchstens 3, wie am Papier), „fertig“ tippen. Dann „Los“. Der Drache läuft langsam, der laufende Befehl leuchtet auf. Die Taste mit der Karte und dem roten X löscht den letzten Befehl, „Nochmal“ stellt den Drachen zurück an den Start (das Programm bleibt). Einen Stern gibt es, sobald der Drache mit erlaubter Kartenzahl beim Schatz ankommt.</p>
-    <p><b>Wann weglegen:</b> Nach Level 6 kommt „Super! Jetzt zurück zum Papier.“ Dann ist Schluss, auch wenn noch Zeit wäre. Wer beim Tanz noch Energie hat: lieber ein Rekord-Tanz als ein weiteres Level.</p>
+    <p><b>Wann weglegen:</b> Nach Level 9 kommt „Super! Jetzt zurück zum Papier.“ Dann ist Schluss, auch wenn noch Zeit wäre. Wer beim Tanz noch Energie hat: lieber ein Rekord-Tanz als ein weiteres Level.</p>
   </div>
 
   <h2>Lösungen</h2>
@@ -299,15 +299,18 @@
     <p class="e05-inline"><b>Aufgabe 2:</b> <m-programm befehle="vor rechts 4[vor]" gr="6" nummern="nein"></m-programm> Das ist das einzige Programm mit 4 Karten (vom Löser geprüft). Ohne Zauber-Kasten wäre das kürzeste vor, rechts drehen, vor, vor, vor, vor: 6 Karten, zu viele.</p>
     <p class="e05-inline"><b>Profi:</b> <m-programm befehle="3[vor vor rechts]" gr="6" nummern="nein"></m-programm> Das ist das einzige Programm mit 4 Karten. Ohne Kasten braucht der Weg um die Steine herum 8 Karten (vor, vor, rechts drehen, vor, vor, rechts drehen, vor, vor). Am Ende schaut der Drache nach links, er steht aber auf dem Schatz: geschafft.</p>
     <p><b>Bonus-Knobelei:</b> Klatsch-Kasten: 3 Runden mit je 2-mal klatschen, also 6-mal klatschen und 3-mal stampfen. Dreh-Kasten: 4 Vierteldrehungen sind einmal ganz herum, er schaut wieder zum Fenster. Karten-Rätsel: 5 Runden mit je 2 Schritten sind 10 Schritte, mit 3 Karten (Zahlenkarte und zwei vor-Karten). Für Profis: „4-mal: klatschen, klatschen, klatschen“, das sind 4 Karten (4 Runden mit je 3 Klatschern sind 12). Mit „5-mal“ geht es nicht genau: 2 Klatscher pro Runde sind 10, 3 sind 15. „3-mal“ mit 4 Klatschern geht nicht, denn mehr als 3 Karten passen nicht in den Kasten. „6-mal“ gibt es nicht, und zwei Kästen mit je einer Klatsch-Karte (4 Karten) schaffen höchstens 5 und 5, also 10.</p>
-    <p><b>Bildschirm-Levels (zum Nachschauen):</b> Jedes Level geht mit genau einem Programm mit der erlaubten Kartenzahl (vom Löser geprüft, mit höchstens 3 Befehlen im Kasten wie in der App). Bei Level 3 wäre „2-mal: vor, vor, vor, rechts drehen“ auch 5 Karten lang, aber 4 Befehle passen nicht in den Kasten. Die App prüft aber nur, ob der Drache mit der erlaubten Kartenzahl ankommt.</p>
+    <p><b>Bildschirm-Levels (zum Nachschauen):</b> Level 1 bis 4, 7 und 8 gehen mit genau einem Programm mit der erlaubten Kartenzahl, Level 5, 6 und 9 mit zwei (vom Löser geprüft, mit höchstens 3 Befehlen im Kasten wie in der App). Bei Level 5 geht es oben oder unten am Stein vorbei. Bei Level 3 wäre „2-mal: vor, vor, vor, rechts drehen“ auch 5 Karten lang, aber 4 Befehle passen nicht in den Kasten. Die App prüft aber nur, ob der Drache mit der erlaubten Kartenzahl ankommt.</p>
     <table class="tab e05-tab">
       <tr><th>Level</th><th>Was ist neu?</th><th>Karten</th><th>Lösung</th></tr>
       <tr><td>1</td><td>nur nach vorne zum Schatz</td><td>2</td><td><m-programm befehle="3[vor]" gr="6" nummern="nein"></m-programm></td></tr>
       <tr><td>2</td><td><a class="blattref" href="#blatt-5-2"></a>, Aufgabe 2</td><td>4</td><td><m-programm befehle="vor rechts 4[vor]" gr="6" nummern="nein"></m-programm></td></tr>
       <tr><td>3</td><td>zwei Kästen</td><td>5</td><td><m-programm befehle="3[vor] rechts 3[vor]" gr="6" nummern="nein"></m-programm></td></tr>
       <tr><td>4</td><td>Drache schaut nach links</td><td>5</td><td><m-programm befehle="4[vor] rechts 3[vor]" gr="6" nummern="nein"></m-programm></td></tr>
-      <tr><td>5</td><td>Gruppe, zwei Edelsteine</td><td>3</td><td><m-programm befehle="3[vor rechts]" gr="6" nummern="nein"></m-programm></td></tr>
-      <tr><td>6</td><td><a class="blattref" href="#blatt-5-2"></a>, Profi</td><td>4</td><td><m-programm befehle="3[vor vor rechts]" gr="6" nummern="nein"></m-programm></td></tr>
+      <tr><td>5</td><td>Stein mitten im Weg</td><td>7</td><td><m-programm befehle="links vor rechts 4[vor] rechts vor" gr="6" nummern="nein"></m-programm></td></tr>
+      <tr><td>6</td><td>über die Mauer</td><td>9</td><td><m-programm befehle="links 3[vor] rechts 4[vor] rechts 3[vor]" gr="6" nummern="nein"></m-programm></td></tr>
+      <tr><td>7</td><td>Gruppe, zwei Edelsteine</td><td>3</td><td><m-programm befehle="3[vor rechts]" gr="6" nummern="nein"></m-programm></td></tr>
+      <tr><td>8</td><td><a class="blattref" href="#blatt-5-2"></a>, Profi</td><td>4</td><td><m-programm befehle="3[vor vor rechts]" gr="6" nummern="nein"></m-programm></td></tr>
+      <tr><td>9</td><td>Gruppe, Slalom</td><td>7</td><td><m-programm befehle="vor vor links 3[vor vor rechts]" gr="6" nummern="nein"></m-programm></td></tr>
     </table>
   </div>
 </section>

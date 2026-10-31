@@ -53,7 +53,7 @@ Fehlt einer davon, bricht der Build ab. Überschriften der Kästen entstehen aut
 | `<div class="kasten schwerer">` | Schwerer machen (**ausführlich!** Das Kind ist schnell, das ist ein vollwertiger Hauptteil) |
 | `<div class="kasten bonus">` | Bonus-Knobelei für zwischendurch (ohne Papier: Auto, Abendessen) mit Kurz-Lösung |
 | `<div class="kasten warum">` | Was hat das mit echtem Programmieren zu tun? (Fachwörter hier erklären) |
-| `<div class="kasten bildschirm">` | Bildschirm-Bonus: welche Levels passen, das **Schlüsselwort**, wann das Gerät wieder weggelegt wird (Einheit 1: „heute kein Bildschirm“) |
+| `<div class="kasten bildschirm">` | Bildschirm-Bonus: welche Levels passen, wann das Gerät wieder weggelegt wird (Einheit 1: „heute kein Bildschirm“) |
 | `<m-loesungen einheit="N">` | alle Blätter verkleinert mit roten Lösungen |
 
 Lange Tabellen, die umbrechen dürfen: `<table class="tab darf-brechen">`. Kästen auch auf fließenden Rahmenseiten (`<section class="fliess">`) bekommen ihre Überschrift automatisch. Weitere Kästen: `kasten spiel` (mit `data-titel="Roboter-Koch"` → „Spiel: Roboter-Koch“), `kasten bewegung`, `kasten basteln`, `kasten tipp`, `kasten einschaetzung`, `kasten loesung` (Text-Lösungen), `kasten material`. Zwei Kästen nebeneinander: `<div class="zwei">…</div>`. Tabellen: `<table class="tab">`. Ein Begriff aus der Begriffsliste beim ersten Auftreten: `<span class="begriff">Wiederhol-Zauber</span>`.
@@ -82,7 +82,6 @@ Spielregeln immer so, dass sie **zu zweit** mit Haushaltsmaterial funktionieren:
   "paket": "e2",
   "einheit": 2,
   "titel": "Drachen-Pfade",
-  "schluesselwort": "SCHATZ",
   "web": { "titel": "Drachen-Pfade", "art": "pfad", "levels": ["e2-w1", "e2-w2", "e2-a1"] },
   "raetsel": [
     { "id": "e2-a1", "art": "pfad", "aufgabe": "kuerzestes",
@@ -196,16 +195,16 @@ Ablauf-Karten (`art: "ablauf"`) dürfen ohne `bild` sein (leere Karte zum Selber
 - **Geschafft** heißt: Am Ende des Programms steht der Drache auf dem Schatz (und hat alle Edelsteine eingesammelt). Nur vorbeigehen zählt nicht.
 - Österreichisch: Volksschule, Hausübung, Jänner, Sackerl, Zuckerl, Gummiringerl, Kasten, Stiege, Gang, Jause, Semmel, Tixo, Malerkrepp. Rechenzeichen: plus, minus, mal (·), durch (:). Kein × oder ÷.
 
-### Schlüsselwörter der Web-App (Papier → Bildschirm)
+### Pakete der Web-App
 
-| Paket | Einheit | Schlüsselwort | Adresse | Inhalt |
-|---|---|---|---|---|
-| e2 | 2 Drachen-Pfade | `SCHATZ` | `…/#e2` | Drachen-Pfade programmieren (erst 3–5 Befehle, dann mit Steinen) |
-| e3 | 3 Erst das, dann das | `JAUSE` | `…/#e3` | Bilder-Abläufe sortieren (antippen, kein Ziehen) |
-| e4 | 4 Der Fehler-Kobold | `KOBOLD` | `…/#e4` | Kaputte Programme reparieren |
-| e5 | 5 Der Wiederhol-Zauber | `TANZ` | `…/#e5` | Drachen-Pfade mit Zauber-Kasten und Kartengrenze |
+| Paket | Einheit | Adresse | Inhalt |
+|---|---|---|---|
+| e2 | 2 Drachen-Pfade | `…/#e2` | Drachen-Pfade programmieren (erst 3–5 Befehle, dann mit Steinen) |
+| e3 | 3 Erst das, dann das | `…/#e3` | Bilder-Abläufe sortieren (antippen, kein Ziehen) |
+| e4 | 4 Der Fehler-Kobold | `…/#e4` | Kaputte Programme reparieren |
+| e5 | 5 Der Wiederhol-Zauber | `…/#e5` | Drachen-Pfade mit Zauber-Kasten und Kartengrenze |
 
-Groß- und Kleinschreibung und Leerzeichen am Rand sind egal. Jedes Paket hat 5–7 Levels (5–10 Minuten).
+Kein Schlüsselwort: Alle Pakete sind offen, der QR-Code führt direkt zum Paket. Jedes Paket hat 5–9 Levels (10–15 Minuten). Steine sollen nicht nur am Rand liegen, sondern auch mitten im Weg (direkt vor der Nase, Mauer mit Lücke, Slalom).
 
 **Sterne in der App:** 1 Stern pro geschafftem Level. Bei `pfad`-Levels mit `"aufgabe": "kuerzestes"` (ohne Zauber) gibt es den Stern nur mit einem kürzesten Programm, sonst zeigt die App „Fast geschafft! Es geht kürzer“. Bei `maxKarten` zählt die Grenze. Texte im Kasten „bildschirm“ müssen diese Regel richtig wiedergeben. Danach kommt ein klares Ende: „Super! Jetzt zurück zum Papier.“
 

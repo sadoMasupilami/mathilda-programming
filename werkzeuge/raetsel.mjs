@@ -163,12 +163,9 @@ export function pruefeAlle(ordner = ORDNER) {
         // In der App kann man einen Befehl nur austauschen (kein Einfügen, kein Streichen)
         else if (raetsel[id].art === 'kobold' && raetsel[id].reparatur && raetsel[id].reparatur.art !== 'tauschen') fehler.push(d + ': Web-Level „' + id + '“: in der App geht nur „tauschen“');
       }
-      if (!daten.schluesselwort || !/^[A-Za-z]+$/.test(daten.schluesselwort)) fehler.push(d + ': Schlüsselwort fehlt oder hat andere Zeichen als A–Z');
     }
-    pakete[paket] = { paket, einheit: daten.einheit, titel: daten.titel, schluesselwort: daten.schluesselwort, web: daten.web || null };
+    pakete[paket] = { paket, einheit: daten.einheit, titel: daten.titel, web: daten.web || null };
   }
-  const worte = Object.values(pakete).map((p) => (p.schluesselwort || '').toLowerCase()).filter(Boolean);
-  if (new Set(worte).size !== worte.length) fehler.push('Zwei Pakete haben dasselbe Schlüsselwort');
   return { fehler, raetsel, pakete };
 }
 
@@ -179,7 +176,6 @@ export function webDaten(erg) {
     if (!p.web || !p.einheit) continue; // Einheit 0 = Muster, nicht in der App
     aus.pakete.push({
       paket: p.paket, einheit: p.einheit, titel: p.web.titel || p.titel, art: p.web.art,
-      schluesselwort: p.schluesselwort,
       levels: p.web.levels.map((id) => {
         const r = erg.raetsel[id];
         // keine Lösungen in die App: sie bewertet nur nach dem Ergebnis

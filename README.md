@@ -89,7 +89,7 @@ werkzeuge/mit-nix.sh npx playwright test              # Tests in Chromium und We
 
 `web-bauen.mjs` löst und prüft dabei alle Rätsel, schreibt die Level-Daten nach `_site/`, setzt die Build-Version in den Cache-Namen des Service Workers und prüft, dass jedes Level spielbar ist und keine fremden Adressen geladen werden. Zum Ausprobieren im Browser `_site/` mit einem beliebigen lokalen Webserver ausliefern (Service Worker brauchen `http://localhost`, nicht `file://`). Die Playwright-Tests spielen jedes Level einmal durch, machen Bildschirmfotos und lassen jeden Zugriff auf fremde Hosts scheitern. Die Chromium-Tests nutzen das installierte Google Chrome (`channel: 'chrome'`, das braucht auch der PDF-Build); WebKit für Playwright einmalig mit `werkzeuge/mit-nix.sh npx playwright install webkit` holen.
 
-Schlüsselwörter der Pakete (Papier → Bildschirm, stehen in der Anleitung der jeweiligen Einheit): siehe `plan/lehrplan.md`, Abschnitt 7.7.
+Die Pakete sind ohne Schlüsselwort offen, der QR-Code auf dem Blatt führt direkt hin. Übersicht: `plan/lehrplan.md`, Abschnitt 7.7.
 
 ## Veröffentlichen (GitHub Pages)
 
@@ -111,7 +111,7 @@ Vor Einheit 1: die **Gerätetest-Checkliste** (letzte Seite im PDF) auf iPhone, 
 
 ```
 AUFTRAG.md                       Auftrag mit allen Wünschen
-plan/lehrplan.md                 Plan für 20 Einheiten + verbindliche Begriffsliste, Symbole, Gitter-Regeln, Schlüsselwörter
+plan/lehrplan.md                 Plan für 20 Einheiten + verbindliche Begriffsliste, Symbole, Gitter-Regeln, Web-Pakete
 vorlagen/AUTOREN-LEITFADEN.md    wie man eine Einheit schreibt, alle Bausteine, Rätsel-Datenformat
 src/buch.json                    Reihenfolge der Teile im Buch
 src/rahmen/                      Titel, Inhalt, Einleitung, Hallo-Seite, Sammelpass, Urkunden, Rückmeldebogen, Gerätetest

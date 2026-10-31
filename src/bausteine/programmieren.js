@@ -245,7 +245,7 @@
     const svg = q.svg.replace(/width="[^"]*"/, 'width="' + gr + 'mm"').replace(/height="[^"]*"/, 'height="' + gr + 'mm"');
     const pak = H().DATEN.pakete[p];
     el.dataset.url = q.url;
-    el.innerHTML = '<span class="qr-box"><span class="qr">' + svg + '</span><span class="klein" style="font-size:8.5pt;font-family:var(--text);color:var(--grau)">Bildschirm-Bonus<br>für Mama oder Papa:<br>Paket ' + pak.einheit + ' · Schlüsselwort<br>steht in der Anleitung</span></span>';
+    el.innerHTML = '<span class="qr-box"><span class="qr">' + svg + '</span><span class="klein" style="font-size:8.5pt;font-family:var(--text);color:var(--grau)">Bildschirm-Bonus<br>für Mama oder Papa:<br>Paket ' + pak.einheit + '</span></span>';
     el.classList.add('komp');
   };
 

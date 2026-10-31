@@ -1,6 +1,6 @@
 # {{KIND}}s Denk- und Programmier-Werkstatt: Lehrplan
 
-Langfristiger Plan für 20 Einheiten plus Extras. Er ist ein **Vorschlag** und wird nach der Rückmeldung zu den Einheiten 1–5 angepasst (Tempo, Schwierigkeit, Länge, Stil, Bildschirm-Anteil). Abschnitt 7 (Begriffsliste, Symbole, Gitter-Regeln, Schlüsselwörter) ist **verbindlich** für alle Einheiten, die Rahmenseiten und die Web-App.
+Langfristiger Plan für 20 Einheiten plus Extras. Er ist ein **Vorschlag** und wird nach der Rückmeldung zu den Einheiten 1–5 angepasst (Tempo, Schwierigkeit, Länge, Stil, Bildschirm-Anteil). Abschnitt 7 (Begriffsliste, Symbole, Gitter-Regeln, Pakete der Web-App) ist **verbindlich** für alle Einheiten, die Rahmenseiten und die Web-App.
 
 - **Für wen:** {{KIND}}, 6 Jahre, 1. Klasse Volksschule (Österreich). Sie liest kurze Sätze selbst, zählt bis 100, rechnet mit kleinen Zahlen und ist schnell. Ziel ist **Fordern**, nicht Aufholen. Links und rechts sind noch unklar und werden in Einheit 1 eingeschätzt.
 - **Wie:** zu zweit ({{KIND}} und Mama oder Papa), 20–30 Minuten gemeinsame Zeit, 2- bis 3-mal pro Woche. Vorbereitung ohne {{KIND}} steht getrennt mit Minuten. Fast alles am Papier, mit Bewegung und Basteln.
@@ -42,7 +42,7 @@ Der Ablauf ist **flexibel** und richtet sich nach dem Thema. Jede Einheit hat ab
 | Leichter machen / Schwerer machen | „Schwerer“ ist wichtiger und ausführlicher, ein vollwertiger Hauptteil |
 | Bonus-Knobelei | ohne Papier (Auto, Abendessen), mit Kurz-Lösung |
 | Was hat das mit echtem Programmieren zu tun? | kurzer Hintergrund, hier werden die Fachwörter erklärt |
-| Bildschirm-Bonus | Paket, **Schlüsselwort**, welche Levels, wann das Gerät wieder weggelegt wird (Einheit 1: „heute kein Bildschirm“) |
+| Bildschirm-Bonus | Paket, welche Levels, wann das Gerät wieder weggelegt wird (Einheit 1: „heute kein Bildschirm“) |
 | Lösungen | alle Blätter verkleinert mit roten Lösungen, dazu Lösungen der Knobeleien |
 
 **{{KIND}}s Blätter:** 1–3 pro Einheit (Arbeitsblatt, Spielplan, Karten, Bastelvorlage). Jedes Blatt passt auf genau eine A4-Seite, ist luftig, hat oben den Stern „Geschafft?“ (automatisch), große Schrift (mindestens 14 pt, meist 16–22 pt), Gitterfelder mindestens 20 mm und unten eine Profi-Aufgabe (Krone) oder Knobel-Ecke (Eule). {{KIND}} wird mit „du“ und mit Namen angesprochen. Auf einem Blatt jeder Einheit mit Bildschirm-Bonus steht der QR-Code zum Paket (`<m-qr paket="eN">`, nur für Mama oder Papa).
@@ -71,7 +71,7 @@ Die Blockgrenzen sind im Code fest (`src/components.js`, `blockVon`: 1–5 A, 6�
 
 ### 3.2 Bildschirm-Bonus (Web-App)
 
-Ein Level-Paket pro Einheit ab E2 (E1, E18 ohne), 5–7 Levels, 5–10 Minuten, freigeschaltet mit dem Schlüsselwort aus der Anleitung. Mindestens 2 Levels sind genau Rätsel von den Blättern. Die Levels stehen in derselben Datei `raetsel/eN.json` wie die Rätsel der Blätter (`"web": { "titel", "art", "levels": […] }`). Bewertet wird nach dem Ergebnis mit demselben Ausführer (`web/kern/ausfuehrer.js`), nie durch Vergleich mit einer gespeicherten Lösung. Am Paket-Ende: „Super! Jetzt zurück zum Papier.“
+Ein Level-Paket pro Einheit ab E2 (E1, E18 ohne), 5–9 Levels, 10–15 Minuten, ohne Schlüsselwort (alle Pakete sind offen). Mindestens 2 Levels sind genau Rätsel von den Blättern. Die Levels stehen in derselben Datei `raetsel/eN.json` wie die Rätsel der Blätter (`"web": { "titel", "art", "levels": […] }`). Bewertet wird nach dem Ergebnis mit demselben Ausführer (`web/kern/ausfuehrer.js`), nie durch Vergleich mit einer gespeicherten Lösung. Am Paket-Ende: „Super! Jetzt zurück zum Papier.“
 
 ### 3.3 Querverweise zur Rechen-Werkstatt
 
@@ -114,7 +114,7 @@ Die Rechen-Werkstatt (anderes Heft, gleiches Format) läuft parallel. Was dort s
 - **Bewegung:** Boden-Gitter aus Malerkrepp **3 · 3** (Schwerer 4 · 4; Felder 40–50 cm; vorher ohne {{KIND}} kleben), {{KIND}} ist der Drache, ein Schatz-Zuckerl liegt im Zielfeld. Die Befehlskarten aus Blatt 1-1 werden als Programm hingelegt.
 - **Blätter:** 2-1 Drachen-Pfade (ein Programm lesen und mit der Figur mitschieben, ein Programm zum Schatz schreiben), 2-2 Drachen-Pfade mit Steinen (Start nach rechts, dann nach links mit „Finde das kürzeste Programm“), 2-3 Meine Drachen-Figur (Bastelvorlage: 4 Drachen-Figuren, 2 Schatz-, 2 Edelstein- und 8 Stein-Plättchen, großer Drache zum Anmalen, leeres Rätsel-Gitter für eigene Rätsel). QR-Code e2.
 - **Schwerer:** 4 · 4-Gitter, Steine, Start mit Blick nach rechts oder links, erst ganz am Ende Blick nach unten; eigene Drachen-Pfade für Mama oder Papa erfinden.
-- **Bildschirm-Bonus:** Paket **e2**, Schlüsselwort **SCHATZ**: erste Drachen-Pfade (3–5 Befehle), dann mit Steinen.
+- **Bildschirm-Bonus:** Paket **e2**: erste Drachen-Pfade (3–5 Befehle), dann mit Steinen.
 - **Rechen-Werkstatt:** Befehle zählen und vergleichen, keine neue Rechnung.
 
 ### Einheit 3: Erst das, dann das ✅ ausformuliert (`src/einheiten/03-erst-das-dann-das.html`, `raetsel/e3.json`)
@@ -124,7 +124,7 @@ Die Rechen-Werkstatt (anderes Heft, gleiches Format) läuft parallel. Was dort s
 - **Spiel / Basteln:** Ablauf-Karten ausschneiden. **Roboter-Koch:** Mama oder Papa macht ein Butterbrot (Semmel, Butter, Messer) nach {{KIND}}s Programm und nimmt jeden Befehl wörtlich.
 - **Blätter:** 3-1 Ablauf-Karten (16 Karten zum Ausschneiden in drei Farben: Zähne putzen, Jause, Anziehen; eine leere Karte zum Selbermalen), 3-2 Was kommt zuerst? (Drachen-Ei nummerieren, zwei vertauschte Karten finden, „Reihenfolge egal“ beim Belag), 3-3 Der Roboter-Koch (Anziehen: zuerst oder egal?, eigenes Butterbrot-Programm schreiben). QR-Code e3.
 - **Schwerer:** Abläufe mit 6–8 Karten, mehrere richtige Reihenfolgen finden und zählen, eigenen Ablauf erfinden, der Roboter-Koch bekommt einen Fehler.
-- **Bildschirm-Bonus:** Paket **e3**, Schlüsselwort **JAUSE**: Bilder-Abläufe sortieren (antippen, kein Ziehen).
+- **Bildschirm-Bonus:** Paket **e3**: Bilder-Abläufe sortieren (antippen, kein Ziehen).
 - **Rechen-Werkstatt:** kein Bezug nötig.
 
 ### Einheit 4: Der Fehler-Kobold ✅ ausformuliert (`src/einheiten/04-der-fehler-kobold.html`, `raetsel/e4.json`)
@@ -134,7 +134,7 @@ Die Rechen-Werkstatt (anderes Heft, gleiches Format) läuft parallel. Was dort s
 - **Spiel / Bewegung:** **Kobold-Jagd:** Mama oder Papa baut absichtlich einen Fehler ins Roboter-Programm (Befehlskarten am Boden-Gitter), {{KIND}} findet ihn. Rollentausch: {{KIND}} versteckt einen Kobold.
 - **Blätter:** 4-1 Kobold-Jagd („Wo ist der Drache nach Befehl 3?“, zweimal einen falschen Befehl finden und reparieren), 4-2 Wo ist der Drache? („nach Befehl 5“, ein fehlender und ein überzähliger Befehl), 4-3 Kobold-Profi (für „Schwerer machen“: Art des Fehlers bestimmen, Drache mit Blick nach unten). QR-Code e4.
 - **Schwerer:** längere Programme, Fehler ohne Gitter nur im Kopf finden, mehrere mögliche Reparaturen finden („Auch richtig: …“), selbst Kobold-Programme für Mama oder Papa bauen.
-- **Bildschirm-Bonus:** Paket **e4**, Schlüsselwort **KOBOLD**: kaputte Programme reparieren.
+- **Bildschirm-Bonus:** Paket **e4**: kaputte Programme reparieren.
 - **Rechen-Werkstatt:** kein Bezug nötig (hier geht es um Fehler in Befehlen, nicht in Rechnungen).
 
 ### Einheit 5: Der Wiederhol-Zauber ✅ ausformuliert (`src/einheiten/05-der-wiederhol-zauber.html`, `raetsel/e5.json`)
@@ -146,7 +146,7 @@ Die Rechen-Werkstatt (anderes Heft, gleiches Format) läuft parallel. Was dort s
 - **Basteln / Papier:** Muster-Bild auf Kästchenpapier mit Wiederholungen.
 - **Blätter:** 5-1 Der Zauber-Kasten (Programm kürzer schreiben und Karten zählen, Muster-Bild nach Zauber-Kästen malen), 5-2 Drache und Zauber-Kasten (Programm mit Zauber-Kasten lesen, Drachen-Pfad mit Kartengrenze „nur 4 Karten“), 5-3 Mein Zauber-Kasten (Bastelvorlage: lila Streifen, Zahlenkarten „2-mal“ bis „5-mal“, Tanz-Karten). QR-Code e5.
 - **Schwerer:** Gruppe aus 2–3 Befehlen im Kasten, kleinste Kartenzahl finden, Quadrat-Tanz („4-mal: vor, vor, rechts drehen“), eigene Kartengrenzen.
-- **Bildschirm-Bonus:** Paket **e5**, Schlüsselwort **TANZ**: Drachen-Pfade mit Zauber-Kasten und Kartengrenze.
+- **Bildschirm-Bonus:** Paket **e5**: Drachen-Pfade mit Zauber-Kasten und Kartengrenze.
 - **Rechen-Werkstatt:** „3-mal: 2 Felder“ ist 3 · 2 (Mal als wiederholtes Plus), nur als Ausblick.
 - **Schluss von Block A:** Rückmeldebogen ausfüllen, Sammelpass stempeln. Danach wird der Plan angepasst (Abschnitt 10).
 
@@ -247,7 +247,6 @@ Die Spalte **Kinderwort** wird auf den Blättern, in den Beispielsätzen und in 
 | **Labyrinth**, **Sackgasse** | Graph, Suche | – | Irrgarten (geht auch, nicht als Hauptwort) | 16 |
 | **Zauberspruch** | Funktion, Unterprogramm | eine Befehlsgruppe mit Namen, die man wiederverwenden kann | Funktion | 17 |
 | **Spielregel**, **testen** | Spezifikation, Test | – | – | 18 |
-| **Schlüsselwort** | Freischalt-Code | Wort aus der Anleitung, das ein Web-App-Paket öffnet | Passwort, Zauberwort | 2 |
 
 ### 7.2 Die drei Befehle (Einheiten 1–5, bleiben für immer)
 
@@ -263,7 +262,7 @@ Die Spalte **Kinderwort** wird auf den Blättern, in den Beispielsätzen und in 
 
 ### 7.3 Das Wort „Zauber“
 
-„Zauber“ nur in **Wiederhol-Zauber**, **Zauber-Kasten** und **Zauberspruch** (der Build prüft das in allen Texten der PDFs). Alles andere bekommt andere Namen: Schlüsselwort (nicht Zauberwort), Formen-Quadrat, Code-Meisterin, Drachen-Programmiererin. Kein „verzaubern“, „Zauberei“, „Zauberstab“, „Zauberin“ im Text. Bilder (`<m-bild name="zauberstab">`, `zauberhut`) sind erlaubt, sie sind nur Deko ohne Wort.
+„Zauber“ nur in **Wiederhol-Zauber**, **Zauber-Kasten** und **Zauberspruch** (der Build prüft das in allen Texten der PDFs). Alles andere bekommt andere Namen: Formen-Quadrat, Code-Meisterin, Drachen-Programmiererin. Kein „verzaubern“, „Zauberei“, „Zauberstab“, „Zauberin“ im Text. Bilder (`<m-bild name="zauberstab">`, `zauberhut`) sind erlaubt, sie sind nur Deko ohne Wort.
 
 ### 7.4 Symbole (SVG, `web/kern/symbole.js`)
 
@@ -317,57 +316,20 @@ Rätsel stehen immer in `raetsel/eN.json` und werden beim Bauen gelöst und gepr
 | `kuerzer` | Programm mit Zauber-Kasten kürzer schreiben | macht genau dasselbe und braucht weniger Karten |
 | später | Logikgitter, Formen-Quadrate, Geheimtexte (genau eine Lösung); Strategiespiele (Gewinn-Strategie per Spielbaum) | – |
 
-### 7.7 Schlüsselwörter der Web-App (Papier → Bildschirm)
+### 7.7 Pakete der Web-App
 
-| Paket | Einheit | Schlüsselwort | Adresse | Inhalt |
-|---|---|---|---|---|
-| e2 | 2 Drachen-Pfade | `SCHATZ` | `…/#e2` | Drachen-Pfade programmieren (erst 3–5 Befehle, dann mit Steinen) |
-| e3 | 3 Erst das, dann das | `JAUSE` | `…/#e3` | Bilder-Abläufe sortieren (antippen, kein Ziehen) |
-| e4 | 4 Der Fehler-Kobold | `KOBOLD` | `…/#e4` | Kaputte Programme reparieren |
-| e5 | 5 Der Wiederhol-Zauber | `TANZ` | `…/#e5` | Drachen-Pfade mit Zauber-Kasten und Kartengrenze |
+| Paket | Einheit | Adresse | Inhalt |
+|---|---|---|---|
+| e2 | 2 Drachen-Pfade | `…/#e2` | Drachen-Pfade programmieren (erst 3–5 Befehle, dann mit Steinen, auch mitten im Weg) |
+| e3 | 3 Erst das, dann das | `…/#e3` | Bilder-Abläufe sortieren (antippen, kein Ziehen) |
+| e4 | 4 Der Fehler-Kobold | `…/#e4` | Kaputte Programme reparieren (einen Befehl tauschen) |
+| e5 | 5 Der Wiederhol-Zauber | `…/#e5` | Drachen-Pfade mit Zauber-Kasten und Kartengrenze |
 
-Vorschläge für später (noch nicht verbindlich): e6 `PERLE`, e7 `FEENPOST`, e8 `MOSAIK`, e9 `LAMPE`, e10 `LUPE`, e11 `REGEL`, e12 `EULE`, e13 `BAUM`, e14 `FORMEN`, e15 `STEIN`, e16 `SACKGASSE`, e17 `SPRUCH`, e19 `PARCOURS`, e20 `FEST`.
-
-Regeln für Schlüsselwörter:
-- Nur Großbuchstaben A–Z, keine Umlaute und kein ß, 4–9 Buchstaben, ein Wort, das in der Einheit vorkommt (Papier → Bildschirm).
-- Kein Wort mit „Zauber“, keine Fachwörter, kein Name.
-- Es steht in der Anleitung im Kasten „Bildschirm-Bonus“ (der Build prüft das). Auf dem Blatt steht nur der QR-Code mit dem Hinweis „Schlüsselwort steht in der Anleitung“.
-- Groß- und Kleinschreibung und Leerzeichen am Rand sind egal. Das ist eine Spielregel, kein Schutz; es darf im Code stehen.
-- Jedes Paket hat 5–7 Levels (5–10 Minuten), danach ein klares Ende: „Super! Jetzt zurück zum Papier.“
+- Kein Schlüsselwort: Alle Pakete sind offen. Der QR-Code auf dem Blatt führt direkt zum Paket.
+- Jedes Paket hat 5–9 Levels (10–15 Minuten), danach ein klares Ende: „Super! Jetzt zurück zum Papier.“
+- Steine liegen nicht nur am Rand, sondern auch mitten im Weg (direkt vor der Nase, Mauer mit Lücke, Slalom).
 - Die Adresse ist `<pagesBasis>#eN` (`werkstatt.json`, lokal überschreibbar in `kind.json`). Die volle Adresse steht nie im Text der Blätter oder der Anleitung, nur im QR-Code.
 
-### 7.8 Rund um die Werkstatt
-
-| So sagen wir | Bedeutung |
-|---|---|
-| **Einheit** | eine Werkstatt-Runde (20–30 Min) |
-| **Blatt** | ein Kopiervorlagen-Blatt für {{KIND}}; „Blatt 4-2“ = Einheit 4, zweites Blatt |
-| **Profi-Aufgabe** (Krone) | schwerere Aufgabe unten am Blatt |
-| **Knobel-Ecke** (Eule) | Rätsel zum Nachdenken unten am Blatt |
-| **Bonus-Knobelei** | Rätsel ohne Papier für Auto oder Abendessen (in der Anleitung) |
-| **Geschafft?-Stern** | Stern oben rechts auf jedem Blatt zum Anmalen |
-| **Sammelpass** | ein Feld pro Einheit zum Stempeln oder Bekleben, dazu 1–3 Sterne |
-| **Urkunde** (Medaille im Sammelpass) | nach Einheit 10 („Drachen-Programmiererin“) und 20 („Code-Meisterin“) |
-| **Bildschirm-Bonus** | das Level-Paket der Web-App zur Einheit (Tablet-Symbol) |
-| **Mama oder Papa** | so heißt der Elternteil auf allen Seiten |
-
-### 7.9 Österreichisches Deutsch und Schreibweisen
-
-- Wortwahl: Volksschule, Klasse, Lehrerin, Hausübung, Schultasche, Jänner, heuer, Sackerl, Zuckerl, Gummiringerl, Tixo, Malerkrepp, Kasten, Stiege, Gang, Vorzimmer, Jause, Semmel, Kipferl, Topfen, Paradeiser, Erdäpfel, Marillen, Mistkübel, Bub, Kreide, Muggelsteine. Der Build warnt bei bundesdeutschen Wörtern (Treppe, Schrank, Tüte, Flur, Klebeband …).
-- Rechenzeichen, falls Rechnungen vorkommen: plus, minus, **mal (·)**, **durch (:)**. Kein × und kein ÷. Gittergrößen: „3 · 3“. Rechnungen im Text (`3 + 4 = 7`) werden vom Build geprüft.
-- Anführungszeichen „so“. Zahlen ab 1000 mit Leerzeichen.
-- Blätter: kurze Hauptsätze, „du“, {{KIND}} namentlich („{{KIND}}, kannst du den Drachen zum Schatz programmieren?“). Die Anleitung spricht Mama oder Papa mit „du“ an.
-- Symbole nie als Schriftzeichen (kein ← → ↑ ↻ ★ ✓, auch nicht in der Anleitung).
-
-### 7.10 Datenschutz (Variante B: „Name nur lokal“)
-
-- Der Vorname des Kindes steht **in keiner Datei im Repo**, auch nicht in Kommentaren, Dateinamen oder Commit-Nachrichten. In allen Quellen steht `{{KIND}}` (Genitiv `{{KIND}}s`).
-- Der Name steht nur in `kind.json` (in `.gitignore`), angelegt aus `kind.beispiel.json`. Beim Bauen setzt `build.mjs` ihn ein. Der Build bricht ab, wenn der Name in einer Datei steht, die ins Repo käme (`werkzeuge/pruefe-name.mjs`).
-- Repo-Name ohne den Namen (z. B. `denk-werkstatt`). Er steht in der öffentlichen Pages-Adresse und in jedem QR-Code. Der Build prüft ihn **nicht**, ebenso wenig `pagesBasis` in `kind.json`: beides vor dem ersten Deploy von Hand kontrollieren (README, Abschnitt „Veröffentlichen“).
-- **Name am Gerät (freiwillig):** Wer will, gibt in der Web-App unter „Für Erwachsene“ (Eltern-Frage: eine Malrechnung) einen Namen ein. Er bleibt nur im Browser dieses Geräts, die Startseite zeigt dann „Hallo, …!“ mit diesem Namen.
-- PDFs werden **nur lokal** gebaut (`out/`, nicht eingecheckt, nicht auf Pages).
-- Die Web-App enthält keinen Namen, keine Fotos, keine Anmeldung, keine Tracker; Fortschritt nur lokal im Browser; `noindex`.
-- Keine Fotos, kein Nachname, keine Schule, kein Wohnort in den Quellen.
 
 ---
 
@@ -400,12 +362,12 @@ Regeln für Schlüsselwörter:
 
 ## 9. Bildschirm-Regeln (für alle Einheiten)
 
-- Höchstens 5–10 Minuten, **am Schluss**, optional. Die Einheit ist ohne Bildschirm vollständig.
-- Mama oder Papa scannt den QR-Code (oder öffnet die Adresse), gibt das Schlüsselwort ein oder lässt {{KIND}} es eintippen (gutes Lese-Training).
+- Höchstens 10–15 Minuten, **am Schluss**, optional. Die Einheit ist ohne Bildschirm vollständig.
+- Mama oder Papa scannt den QR-Code (oder öffnet die Adresse), das Paket geht direkt auf.
 - In der Anleitung steht, welche Levels passen und wann das Gerät wieder weggelegt wird: spätestens beim Ende-Bildschirm „Super! Jetzt zurück zum Papier.“
 - Die App ist ruhig: keine Werbung, keine Zeitlimits, kein Fehlerton, kein Leben-Verlieren, keine blinkenden Belohnungen, kein endloses „noch ein Level“.
 - Ein Stern pro Level. Bewertet wird nach dem Ergebnis; nur bei Levels „Finde das kürzeste Programm“ gibt es den Stern erst mit dem kürzesten Programm (sonst „Fast geschafft!“ mit der kürzesten Befehlszahl).
-- Sterne in der App zählen nur als Extra. Gehen sie verloren (Safari löscht Daten von Seiten, die etwa eine Woche nicht benutzt wurden, außer die App liegt am Home-Bildschirm), ist das egal: Der Sammelpass am Papier zählt, Schlüsselwörter kann man jederzeit neu eingeben.
+- Sterne in der App zählen nur als Extra. Gehen sie verloren (Safari löscht Daten von Seiten, die etwa eine Woche nicht benutzt wurden, außer die App liegt am Home-Bildschirm), ist das egal: Der Sammelpass am Papier zählt.
 
 ---
 
@@ -423,7 +385,7 @@ Der Rückmeldebogen (`src/rahmen/90-rueckmeldebogen.html`, hinten im PDF) fragt 
 | Anleitung „zu lang“ / „mehr Details“ | Beispielsätze und Stolpersteine kürzen bzw. ausbauen; Lösungen immer vollständig lassen |
 | Blätter „zu viele Aufgaben“ / „mehr“ | 2 statt 3 Aufgaben pro Blatt bzw. ein drittes Blatt |
 | Bildschirm „zu viel“ oder „Konnte sie gut aufhören?“ = nein | Pakete auf 5 Levels kürzen, Bildschirm nur jede zweite Einheit, Gerät von Anfang an mit „Wir spielen bis zum Ende-Bildschirm“ ankündigen |
-| Bildschirm „zu wenig“ | 7 Levels, ein zusätzliches Übungs-Paket für das Wochenende (bleibt optional) |
+| Bildschirm „zu wenig“ | ein zusätzliches Übungs-Paket für das Wochenende (bleibt optional) |
 | Gerätetest: etwas hakt (iPhone, iPad, Android) | Fehler in der Web-App beheben, bevor Paket e6 kommt; Hinweise in der Einleitung (Abschnitt Web-App) ergänzen |
 | Links und rechts „noch schwer“ | in jeder Einheit 2 Minuten Roboter-Aufwärmen, Blick nach unten weiter nur im Schwerer-Teil, Extra X9 (absolute Pfeile) **nicht** einschieben |
 | Links und rechts „sicher“ | Blick nach unten ab Einheit 6 im Normalteil, Extra X9 als Vergleich anbieten |

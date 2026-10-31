@@ -63,7 +63,7 @@ Ein druckbarer Guide plus eine kleine Web-App, mit dem ich mit meiner Tochter {{
 - Eine **Bonus-Knobelei** für zwischendurch (Auto, Abendessen), ohne Papier
 - Ein kurzer Hintergrund „Was hat das mit echtem Programmieren zu tun?“
 - **Alle Lösungen** zu {{KIND}}s Blättern
-- **Bildschirm-Bonus:** welche Levels passen, das **Schlüsselwort** zum Freischalten, wann ich das Gerät wieder weglege
+- **Bildschirm-Bonus:** welche Levels passen, wann ich das Gerät wieder weglege
 
 ## 5. {{KIND}}s Blätter (zum Ausdrucken)
 
@@ -72,7 +72,7 @@ Ein druckbarer Guide plus eine kleine Web-App, mit dem ich mit meiner Tochter {{
 - Kurze Sätze, die sie selbst lesen kann. Sie wird mit „du“ angesprochen.
 - Oben ein **Stern zum Anmalen** („Geschafft?“), unten gern eine Profi- oder Knobelaufgabe
 - **Pixelbilder auf 1-cm-Kästchen** wie im Volksschul-Rechenheft. **Pfeil-Pfade und Labyrinthe auf großen Feldern** (mindestens 2 cm), damit Drache, Schatz und Hindernis gut hineinpassen
-- Auf Blättern mit passendem Bildschirm-Bonus ein **QR-Code** zum passenden Level-Paket (nur für mich zum Scannen): mindestens 2,5 cm breit, schwarz auf weiß, Ruhezone 4 Module, Fehlerkorrektur M, kurze Adresse (z. B. `…/#e3`). Der QR-Code führt nur zum Paket, das Schlüsselwort braucht es trotzdem.
+- Auf Blättern mit passendem Bildschirm-Bonus ein **QR-Code** zum passenden Level-Paket (nur für mich zum Scannen): mindestens 2,5 cm breit, schwarz auf weiß, Ruhezone 4 Module, Fehlerkorrektur M, kurze Adresse (z. B. `…/#e3`). Der QR-Code führt direkt zum Paket.
 
 ## 6. Sprache und Symbole
 
@@ -92,7 +92,7 @@ Ein druckbarer Guide plus eine kleine Web-App, mit dem ich mit meiner Tochter {{
 | Zauberspruch | Funktion, Unterprogramm |
 | Roboter | Computer, Ausführender |
 
-- **„Zauber“ nur für zwei Dinge:** Wiederhol-Zauber und Zauberspruch. Alles andere bekommt andere Namen (Schlüsselwort, Formen-Quadrate, Code-Meisterin), damit sich nichts vermischt.
+- **„Zauber“ nur für zwei Dinge:** Wiederhol-Zauber und Zauberspruch. Alles andere bekommt andere Namen (Formen-Quadrate, Code-Meisterin), damit sich nichts vermischt.
 
 ### Gitter-Regeln (verbindlich für Blätter, Boden-Gitter und Web-App)
 
@@ -131,12 +131,12 @@ Ein druckbarer Guide plus eine kleine Web-App, mit dem ich mit meiner Tochter {{
 - Tasten mindestens 48 · 48 px mit mindestens 8 px Abstand.
 - Bekannte Handy-Fallen vermeiden: `touch-action: manipulation` (kein Doppeltipp-Zoom), `-webkit-touch-callout: none` und `user-select: none` auf Spielelementen, Eingabefelder mit mindestens 16 px Schrift und `autocapitalize="off" autocorrect="off"`, Höhen mit `dvh` statt `vh`, `env(safe-area-inset-*)` für die Notch.
 
-### Freischalten, Fortschritt, offline
+### Fortschritt, offline
 
-- **Schlüsselwort:** Jedes Level-Paket wird mit einem Wort aus der Anleitung freigeschaltet (Papier → Bildschirm). Groß- und Kleinschreibung und Leerzeichen am Rand sind egal. Das ist **nur eine Spielregel, kein Schutz**, es darf einfach im Code stehen.
+- **Kein Schlüsselwort:** Alle Level-Pakete sind offen, ohne Freischalten.
 - **Fortschritt:** Sterne pro Level nur lokal im Browser. Ein Knopf „Fortschritt löschen“ steht hinter einer einfachen Eltern-Frage.
 - **Offline:** Service Worker mit **relativen Pfaden** (die Seite liegt unter `/<repo>/`), der Cache-Name enthält die Build-Version, und alte Caches werden beim Aktivieren gelöscht. So kommen nach einem Update sicher die neuen Levels. Dazu ein Web-Manifest mit Symbol zum **Hinzufügen zum Home-Bildschirm**.
-- In der Anleitung steht kurz, wie das am iPhone/iPad und unter Android geht. Dazu der Hinweis, dass Safari gespeicherte Daten von Seiten löschen kann, die etwa eine Woche nicht benutzt wurden (nicht, wenn die App am Home-Bildschirm liegt). Verlorene Sterne sind kein Problem, weil der Sammelpass am Papier zählt und Schlüsselwörter jederzeit neu eingegeben werden können.
+- In der Anleitung steht kurz, wie das am iPhone/iPad und unter Android geht. Dazu der Hinweis, dass Safari gespeicherte Daten von Seiten löschen kann, die etwa eine Woche nicht benutzt wurden (nicht, wenn die App am Home-Bildschirm liegt). Verlorene Sterne sind kein Problem, weil der Sammelpass am Papier zählt.
 - **Schriften** lokal: nur Andika Regular und Bold, auf die benötigten Zeichen gekürzt, als WOFF2 (z. B. mit `pyftsubset`), Lizenztexte (SIL OFL) in `web/fonts/` mitliefern.
 - **Keine externen Anfragen** (keine Tracker, keine Fremd-Schriften, keine CDNs zur Laufzeit).
 

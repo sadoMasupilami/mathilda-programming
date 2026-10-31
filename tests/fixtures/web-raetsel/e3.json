@@ -2,7 +2,6 @@
   "paket": "e3",
   "einheit": 3,
   "titel": "Erst das, dann das (Test)",
-  "schluesselwort": "JAUSE",
   "web": { "titel": "Erst das, dann das", "art": "ablauf", "levels": ["t3-1", "t3-2", "t3-3", "t3-4", "t3-5"] },
   "raetsel": [
     { "id": "t3-1", "art": "ablauf", "karten": [

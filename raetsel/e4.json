@@ -2,11 +2,10 @@
  "paket": "e4",
  "einheit": 4,
  "titel": "Der Fehler-Kobold",
- "schluesselwort": "KOBOLD",
  "web": {
   "titel": "Kobold-Jagd",
   "art": "kobold",
-  "levels": ["e4-k1", "e4-w1", "e4-w2", "e4-k2", "e4-w3", "e4-w4"]
+  "levels": ["e4-k1", "e4-w1", "e4-w5", "e4-w2", "e4-k2", "e4-w6", "e4-w3", "e4-w4", "e4-w7"]
  },
  "raetsel": [
   { "id": "e4-l1", "art": "lesen", "b": 3, "h": 3,
@@ -74,6 +73,21 @@
     "start": { "x": 1, "y": 3, "blick": "rechts" }, "ziel": { "x": 3, "y": 1 },
     "hindernisse": [[0, 0], [3, 2], [2, 1]],
     "programm": "rechts vor vor vor rechts vor vor rechts vor",
-    "reparatur": { "art": "tauschen", "stelle": 1, "befehl": "links" } }
+    "reparatur": { "art": "tauschen", "stelle": 1, "befehl": "links" } },
+  { "id": "e4-w5", "art": "kobold", "b": 3, "h": 3,
+    "start": { "x": 0, "y": 2, "blick": "rechts" }, "ziel": { "x": 2, "y": 0 },
+    "hindernisse": [[0, 1], [2, 1]],
+    "programm": "vor rechts vor vor rechts vor",
+    "reparatur": { "art": "tauschen", "stelle": 2, "befehl": "links" } },
+  { "id": "e4-w6", "art": "kobold", "b": 3, "h": 3,
+    "start": { "x": 1, "y": 2, "blick": "oben" }, "ziel": { "x": 1, "y": 0 },
+    "hindernisse": [[1, 1]],
+    "programm": "vor vor rechts vor vor rechts vor",
+    "reparatur": { "art": "tauschen", "stelle": 1, "befehl": "links" } },
+  { "id": "e4-w7", "art": "kobold", "b": 4, "h": 4,
+    "start": { "x": 0, "y": 3, "blick": "rechts" }, "ziel": { "x": 3, "y": 0 },
+    "hindernisse": [[1, 1], [2, 0], [2, 3], [3, 2]],
+    "programm": "vor links vor vor vor links vor rechts vor links vor",
+    "reparatur": { "art": "tauschen", "stelle": 4, "befehl": "rechts" } }
  ]
 }

@@ -44,7 +44,7 @@ const SPIELBAR = ['pfad', 'kobold', 'ablauf'];
 for (const p of daten.pakete) {
   if (!SPIELBAR.includes(p.art)) fehler.push('Paket ' + p.paket + ': web.art „' + p.art + '“ kann die App nicht (' + SPIELBAR.join(', ') + ')');
   if (p.levels.length < 1) fehler.push('Paket ' + p.paket + ': keine Levels');
-  if (p.levels.length < 5 || p.levels.length > 7) warnungen.push('Paket ' + p.paket + ' hat ' + p.levels.length + ' Levels (geplant 5–7)');
+  if (p.levels.length < 5 || p.levels.length > 9) warnungen.push('Paket ' + p.paket + ' hat ' + p.levels.length + ' Levels (geplant 5–9)');
   for (const l of p.levels) {
     if (!SPIELBAR.includes(l.art)) fehler.push('Level ' + l.id + ': art „' + l.art + '“ ist in der App nicht spielbar (' + SPIELBAR.join(', ') + ')');
     if ((l.art === 'pfad' || l.art === 'kobold') && !l.ziel) fehler.push('Level ' + l.id + ': ohne Ziel nicht spielbar');
@@ -187,5 +187,5 @@ if (fehler.length) {
 const groesse = dateien.reduce((s, d) => s + fs.statSync(path.join(ZIEL, d)).size, 0);
 console.log('🌐 Web-App gebaut: ' + path.relative(WURZEL, ZIEL) + '/ (' + dateien.length + ' Dateien, ' + Math.round(groesse / 1024) + ' KB), Version ' + VERSION +
   (mitBildern ? ', mit Bildern' : ', ohne Bilder-Katalog'));
-console.log('   Rätsel aus ' + path.relative(WURZEL, RAETSEL) + '/: ' + (daten.pakete.map((p) => p.paket + ' ' + p.art + ' (' + p.levels.length + ' Levels, „' + p.schluesselwort + '“)').join(', ') || 'keine Pakete'));
+console.log('   Rätsel aus ' + path.relative(WURZEL, RAETSEL) + '/: ' + (daten.pakete.map((p) => p.paket + ' ' + p.art + ' (' + p.levels.length + ' Levels)').join(', ') || 'keine Pakete'));
 console.log('✅ Keine Fehler.');

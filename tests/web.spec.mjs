@@ -139,21 +139,8 @@ async function tippe(page, sel, opt) {
 }
 // Eine nur grau dargestellte Taste (aria-disabled): Playwright hält sie für gesperrt, ein Kind tippt trotzdem darauf
 const tippeGrau = (page, sel) => tippe(page, sel, { force: true });
-async function oeffnePaket(page, p, info, mitFotos) {
+async function oeffnePaket(page, p) {
   await page.goto('./#' + p.paket);
-  await expect(page.locator('body')).toHaveAttribute('data-ansicht', 'schluessel');
-  if (mitFotos) await ansicht(page, 'schluessel', info);
-  await page.locator('#wort').tap();
-  await page.keyboard.type('falsch');
-  await tippe(page, 'form button[type=submit]');
-  await expect(page.locator('.hinweis.falsch')).toBeVisible();
-  if (mitFotos) await ansicht(page, 'schluessel-falsch', info);
-  await page.locator('#wort').fill('');
-  await page.locator('#wort').tap();
-  // Groß/klein und Leerzeichen am Rand sind egal
-  const w = p.schluesselwort;
-  await page.keyboard.type('  ' + w.charAt(0) + w.slice(1).toLowerCase() + ' ');
-  await tippe(page, 'form button[type=submit]');
   await expect(page.locator('body')).toHaveAttribute('data-ansicht', 'paket');
 }
 
@@ -220,30 +207,26 @@ async function spieleLevel(page, p, i, info, fotos) {
 // ---------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------
-test('Startseite, Schlüsselwort und Paket-Auswahl', async ({ page }, info) => {
+test('Startseite und Paket-Auswahl', async ({ page }, info) => {
   await page.goto('./');
   await expect(page.locator('body')).toHaveAttribute('data-ansicht', 'start');
   await expect(page.locator('meta[name=robots]')).toHaveAttribute('content', /noindex/);
   await expect(page.locator('.kachel')).toHaveCount(DATEN.pakete.length);
-  await expect(page.locator('.kachel.zu')).toHaveCount(DATEN.pakete.length);
   await ansicht(page, 'start', info);
+  // Alle Pakete sind gleich offen: Antippen öffnet die Level-Auswahl, ohne Schlüsselwort
   const p = DATEN.pakete[0];
   await tippe(page, '.kachel[data-paket="' + p.paket + '"]');
   await expect(page).toHaveURL(new RegExp('#' + p.paket + '$'));
-  // gleich losschreiben, ohne erst ins Feld zu tippen
-  await expect(page.locator('#wort')).toBeFocused();
-  await page.goto('./');
-  await oeffnePaket(page, p, info, true);
+  await expect(page.locator('body')).toHaveAttribute('data-ansicht', 'paket');
   await ansicht(page, 'paket', info);
   await tippe(page, '[data-aktion="heim"]');
-  await expect(page.locator('.kachel.offen')).toHaveCount(1);
-  await ansicht(page, 'start-offen', info);
+  await expect(page.locator('.kachel[data-paket="' + p.paket + '"] .kachel-stand')).toContainText('0 von ' + p.levels.length);
 });
 
 for (const p of DATEN.pakete) {
   test('Paket ' + p.paket + ' (' + p.titel + '): jedes Level durchspielen', async ({ page }, info) => {
     await schnell(page);
-    await oeffnePaket(page, p, info, false);
+    await oeffnePaket(page, p);
     await tippe(page, '.paket [data-aktion="level"].haupt');
     for (let i = 0; i < p.levels.length; i++) await spieleLevel(page, p, i, info, i === 0);
     await expect(page.locator('body')).toHaveAttribute('data-ansicht', 'ende');
@@ -261,7 +244,7 @@ test('Drache läuft Schritt für Schritt, Kobold-Stoß', async ({ page }, info) 
   test.skip(!pfadPaket, 'kein Pfad-Paket');
   const i = pfadPaket.levels.findIndex((l) => l.art === 'pfad');
   const lv = pfadPaket.levels[i];
-  await oeffnePaket(page, pfadPaket, info, false);
+  await oeffnePaket(page, pfadPaket);
   await page.goto('./#' + pfadPaket.paket + '/' + (i + 1));
   // ein Programm, das irgendwo anstößt: so oft vor, bis der Drache an den Rand oder einen Stein kommt
   const w = weltVon(lv);
@@ -311,7 +294,7 @@ function suche(art, bedingung) {
   return null;
 }
 async function oeffneLevel(page, f, info) {
-  await oeffnePaket(page, f.p, info, false);
+  await oeffnePaket(page, f.p);
   await page.goto('./#' + f.p.paket + '/' + (f.i + 1));
   await expect(page.locator('.spiel')).toHaveAttribute('data-level', f.lv.id);
 }
@@ -496,7 +479,7 @@ test('Ohne Speicher (localStorage gesperrt) geht alles, nur ohne Merken', async 
   const p = DATEN.pakete[0];
   await page.goto('./');
   await expect(page.locator('body')).toHaveAttribute('data-ansicht', 'start');
-  await oeffnePaket(page, p, info, false);
+  await oeffnePaket(page, p);
   await tippe(page, '.paket [data-aktion="level"].haupt');
   await spieleLevel(page, p, 0, info, false);
   await expect(page.locator('.spiel')).toHaveAttribute('data-level', p.levels[1].id);
@@ -510,7 +493,7 @@ test('Zauber-Kasten: Zahl wählen, Befehle hinein, fertig, höchstens 3 Befehle'
   let i = zauberPaket.levels.findIndex((l) => l.zauber && (l.maxKarten || 12) >= 5);
   if (i < 0) i = zauberPaket.levels.findIndex((l) => l.zauber);
   const lv = zauberPaket.levels[i];
-  await oeffnePaket(page, zauberPaket, info, false);
+  await oeffnePaket(page, zauberPaket);
   await page.goto('./#' + zauberPaket.paket + '/' + (i + 1));
   await tippe(page, '.tasten [data-aktion="zauber"]');
   await expect(page.locator('.tasten [data-aktion="zahl"]')).toHaveCount(4);
@@ -545,7 +528,7 @@ test('Ablauf-Karten: vertauschte Karten werden freundlich gezeigt und lassen sic
   const i = ablaufPaket.levels.findIndex(ablaufEindeutig);
   test.skip(i < 0, 'kein eindeutiges Ablauf-Level');
   const lv = ablaufPaket.levels[i];
-  await oeffnePaket(page, ablaufPaket, info, false);
+  await oeffnePaket(page, ablaufPaket);
   await page.goto('./#' + ablaufPaket.paket + '/' + (i + 1));
   const richtig = ablaufZaehlen(lv.karten.map((k) => k.id), lv.regeln || []).loesungen[0];
   const falsch = richtig.slice();
@@ -589,7 +572,11 @@ test('Ablauf-Karten: vertauschte Karten werden freundlich gezeigt und lassen sic
 test('Für Erwachsene: Eltern-Frage, Name, Fortschritt löschen', async ({ page }, info) => {
   const p = DATEN.pakete[0];
   test.skip(!p, 'keine Pakete');
-  await oeffnePaket(page, p, info, false);
+  // ein Stern aus einem früheren Spiel
+  await page.goto('./');
+  await page.evaluate((id) => localStorage.setItem('denk-werkstatt-v1', JSON.stringify({ sterne: { [id]: true }, name: '' })), p.levels[0].id);
+  await page.reload();
+  await expect(page.locator('.kachel[data-paket="' + p.paket + '"] .kachel-stand')).toContainText('1 von ' + p.levels.length);
   await page.goto('./#eltern');
   await expect(page.locator('body')).toHaveAttribute('data-ansicht', 'eltern-frage');
   await ansicht(page, 'eltern-frage', info);
@@ -611,7 +598,7 @@ test('Für Erwachsene: Eltern-Frage, Name, Fortschritt löschen', async ({ page 
   await tippe(page, '[data-aktion="loeschen-ja"]');
   await expect(page.locator('.hinweis')).toContainText('Gelöscht');
   await tippe(page, '[data-aktion="heim"]');
-  await expect(page.locator('.kachel.offen')).toHaveCount(0);
+  await expect(page.locator('.kachel[data-paket="' + p.paket + '"] .kachel-stand')).toContainText('0 von ' + p.levels.length);
   await expect(page.locator('.gruss')).toContainText('Testkind');
 });
 

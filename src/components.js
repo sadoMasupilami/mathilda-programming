@@ -1213,12 +1213,11 @@
       if (!proEinheit[a.dataset.einheit]) fehlerL.push('Einheit ' + a.dataset.einheit + ': keine Blätter');
       if (!a.querySelector('m-loesungen[einheit="' + a.dataset.einheit + '"]')) fehlerL.push('Einheit ' + a.dataset.einheit + ': <m-loesungen einheit="' + a.dataset.einheit + '"> fehlt');
     });
-    // 5. Bildschirm-Bonus: Schlüsselwort in der Anleitung, QR-Code auf einem Blatt der Einheit
+    // 5. Bildschirm-Bonus: QR-Code auf einem Blatt der Einheit
     for (const p of Object.values(DATEN.pakete || {})) {
       if (!p.web) continue;
       const a = document.querySelector('section.anleitung[data-einheit="' + p.einheit + '"]');
       if (!a) continue;
-      if (!new RegExp('\\b' + p.schluesselwort + '\\b', 'i').test(a.textContent)) fehlerL.push('Einheit ' + p.einheit + ': Schlüsselwort „' + p.schluesselwort + '“ steht nicht in der Anleitung');
       const qrDa = Array.from(document.querySelectorAll('section.blatt[data-einheit="' + p.einheit + '"] m-qr')).some((q) => !q.closest('.loesungsmodus') && q.getAttribute('paket') === p.paket);
       if (!qrDa) fehlerL.push('Einheit ' + p.einheit + ': kein QR-Code <m-qr paket="' + p.paket + '"> auf den Blättern');
     }
