@@ -35,10 +35,7 @@ Der Build prüft bei jedem Lauf alle Dateien, die ins Repo kommen würden (einge
 werkzeuge/mit-nix.sh node werkzeuge/pruefe-name.mjs
 ```
 
-Die Prüfung sieht nur Dateiinhalte und Dateinamen. Zwei Stellen prüft sie **nicht**, die gehören trotzdem dazu:
-
-- **Der Repo-Name auf GitHub.** Er steht in der öffentlichen Pages-Adresse (`https://<benutzername>.github.io/<repo-name>/`) und damit in jedem QR-Code. Er darf den Namen des Kindes nicht enthalten (z. B. `denk-werkstatt`). Kontrolle: `git remote -v`.
-- **`pagesBasis` in `kind.json`.** Diese lokale Adresse überschreibt die aus `werkstatt.json` und landet in den QR-Codes der PDFs. Sie muss auf dieselbe Adresse ohne Namen zeigen.
+Die Prüfung sieht nur Dateiinhalte und Dateinamen. Der Repo-Name auf GitHub und damit die Pages-Adresse in den QR-Codes darf den Namen enthalten, das ist so gewollt und wird nicht geprüft.
 
 Außerdem: keine Fotos, kein Nachname, keine Schule, kein Wohnort in den Quellen. Die Web-App enthält keinen Namen, keine Anmeldung, keine Tracker und hat `noindex`. Wer will, gibt in der App unter „Für Erwachsene“ einen Namen ein. Er bleibt nur im Browser dieses Geräts.
 
@@ -97,13 +94,12 @@ Veröffentlicht wird **nur die Web-App** (`_site/`, gebaut aus `web/` und `raets
 
 Einmalig vor dem ersten Deploy:
 
-1. **Repo-Name prüfen (Pflicht).** Der Repo-Name darf den Vornamen des Kindes nicht enthalten, sonst steht er in der öffentlichen Adresse und in jedem QR-Code. Enthält er ihn, das Repo auf GitHub umbenennen (**Settings → General → Repository name**, z. B. `denk-werkstatt`) und danach lokal die Remote-Adresse anpassen: `git remote set-url origin https://github.com/<benutzername>/<neuer-name>.git`.
-2. Im Repo auf GitHub: **Settings → Pages → Source: „GitHub Actions“** einstellen.
-3. Die Adresse ist dann `https://<benutzername>.github.io/<repo-name>/`.
-4. Diese Adresse muss als `pagesBasis` in `werkstatt.json` stehen, weil die QR-Codes auf den Blättern daraus gebaut werden (`<pagesBasis>#e2` usw.). Steht in `kind.json` ebenfalls ein `pagesBasis`, gilt dieser Wert: Er muss dieselbe Adresse sein (oder ganz weg). Danach die PDFs neu bauen.
-5. Die Adresse in der Gerätetest-Checkliste (letzte Seite im PDF) bei „Adresse der Web-App“ eintragen. Das Heft nennt sie absichtlich nirgends im Text, nur im QR-Code.
+1. Im Repo auf GitHub: **Settings → Pages → Source: „GitHub Actions“** einstellen.
+2. Die Adresse ist dann `https://<benutzername>.github.io/<repo-name>/`.
+3. Diese Adresse muss als `pagesBasis` in `werkstatt.json` stehen, weil die QR-Codes auf den Blättern daraus gebaut werden (`<pagesBasis>#e2` usw.). Steht in `kind.json` ebenfalls ein `pagesBasis`, gilt dieser Wert: Er muss dieselbe Adresse sein (oder ganz weg). Danach die PDFs neu bauen.
+4. Die Adresse in der Gerätetest-Checkliste (letzte Seite im PDF) bei „Adresse der Web-App“ eintragen. Das Heft nennt sie absichtlich nirgends im Text, nur im QR-Code.
 
-Ein Paket öffnet man über den QR-Code auf dem Blatt der Einheit oder über die Adresse plus `#e2`, `#e3` … Gratis-Konten brauchen für Pages ein öffentliches Repo. Deshalb darf der Name des Kindes in keiner Datei und auch nicht im Repo-Namen stehen.
+Ein Paket öffnet man über den QR-Code auf dem Blatt der Einheit oder über die Adresse plus `#e2`, `#e3` … Gratis-Konten brauchen für Pages ein öffentliches Repo. Deshalb steht der Name des Kindes in keiner Datei (im Repo-Namen ist er erlaubt).
 
 Vor Einheit 1: die **Gerätetest-Checkliste** (letzte Seite im PDF) auf iPhone, iPad und Android abarbeiten.
 

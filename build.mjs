@@ -55,14 +55,7 @@ const setzeName = (s) => s.replace(/\{\{KIND\}\}/g, KIND);
 const alleFehler = [];
 const namensFehler = pruefeNamen(KIND);
 alleFehler.push(...namensFehler);
-// Der Name in der Web-Adresse (QR-Codes) oder im Repo-Namen ist eine Entscheidung der Eltern: nur warnen
-const nameRe = new RegExp(KIND.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-const datenschutzHinweise = [];
-if (nameRe.test(pagesBasis)) datenschutzHinweise.push('Die Adresse in den QR-Codes enthält den Namen (' + pagesBasis + '). Für Variante B das Repo umbenennen (z. B. denk-werkstatt) und pagesBasis in kind.json löschen.');
-try {
-  const remote = execFileSync('git', ['remote', 'get-url', 'origin'], { cwd: WURZEL, encoding: 'utf8' }).trim();
-  if (nameRe.test(remote)) datenschutzHinweise.push('Der Repo-Name enthält den Namen (' + remote.replace(/^.*[/:]([^/]+\/[^/]+?)(\.git)?$/, '$1') + '). Variante B sieht einen Repo-Namen ohne Namen vor (AUFTRAG.md Abschnitt 8).');
-} catch (e) { /* kein Remote */ }
+// Der Name in der Web-Adresse (QR-Codes) und im Repo-Namen ist so gewollt: keine Prüfung, keine Warnung
 
 // ---------------------------------------------------------------------
 // Rätsel prüfen und lösen (dieselben Daten wie die Web-App)
@@ -268,7 +261,6 @@ try {
   const s = erg.statistik;
   console.log('🔢 Geprüft: ' + s.bausteine + ' Bausteine mit Lösung, ' + s.gleichungenText + ' Rechnungen im Text, ' + s.blaetter + ' feste Seiten/Blätter, ' +
     qrGelesen + '/' + qrSoll.length + ' QR-Codes zurückgelesen, ' + Object.values(erg.zeichen).reduce((a, z) => a + z.length, 0) + ' verschiedene Zeichen');
-  for (const h of datenschutzHinweise) erg.warnungen.push('Datenschutz: ' + h);
   if (erg.warnungen.length) {
     console.log('\n⚠️  ' + erg.warnungen.length + ' Warnung(en):');
     for (const w of erg.warnungen) console.log('  • ' + w);

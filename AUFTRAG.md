@@ -145,7 +145,7 @@ Ein druckbarer Guide plus eine kleine Web-App, mit dem ich mit meiner Tochter {{
 GitHub Pages braucht im Gratis-Konto ein **öffentliches Repo**. Dann ist der ganze Quelltext öffentlich (auch diese Datei), und die veröffentlichte Seite ist es sowieso. **Bitte oben ankreuzen:**
 
 - **Variante A: „Vorname im öffentlichen Repo ist in Ordnung.“** Blätter und Anleitung dürfen „{{KIND}}“ enthalten. Trotzdem: keine Fotos, kein Nachname, keine Schule oder Wohnort in den Quellen, die Web-App zeigt keinen Namen.
-- **Variante B: „Name nur lokal“ (Standard).** Repo-Name ohne {{KIND}}s Namen (z. B. `denk-werkstatt`). In den Quellen steht statt des Namens ein Platzhalter (`{{KIND}}`), der erst beim Bauen aus einer lokalen, nicht eingecheckten Datei (`kind.json`, in `.gitignore`) eingesetzt wird. Diese Datei hier bekommt vor dem ersten Commit statt „{{KIND}}“ ebenfalls `{{KIND}}`, die echte Fassung bleibt lokal.
+- **Variante B: „Name nur lokal“ (Standard).** Der Repo-Name (und damit die Pages-Adresse) darf {{KIND}}s Namen enthalten, das ist so entschieden. In den Quellen steht statt des Namens ein Platzhalter (`{{KIND}}`), der erst beim Bauen aus einer lokalen, nicht eingecheckten Datei (`kind.json`, in `.gitignore`) eingesetzt wird. Diese Datei hier bekommt vor dem ersten Commit statt „{{KIND}}“ ebenfalls `{{KIND}}`, die echte Fassung bleibt lokal.
 
 **Für beide Varianten:**
 - PDFs werden **nur lokal gebaut**, nicht eingecheckt und nicht auf Pages veröffentlicht.
