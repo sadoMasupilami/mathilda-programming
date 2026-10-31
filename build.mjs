@@ -1,6 +1,6 @@
 // Denk- und Programmier-Werkstatt – baut die PDFs aus src/ und raetsel/
 //
-//   node build.mjs                 ganzes Buch + Kopiervorlagen  → out/
+//   node build.mjs                 ganzes Buch + Kopiervorlagen + Spickzettel  → out/
 //   node build.mjs --nur 03        nur Einheit 03 (Anleitung + Blätter) → out/teil-03.pdf
 //   node build.mjs --nur rahmen    nur die Rahmenseiten (Titel, Sammelpass …)
 //   node build.mjs --png           zusätzlich jede Seite als Bild → out/seiten/
@@ -199,6 +199,14 @@ try {
   if (!nur) for (const f of fehlend) alleFehler.push('Seitenzahl für Ziel „' + f + '“ nicht gefunden');
 
   const zielMap = ziele(pdf);
+  // Spickzettel: höchstens zwei Seiten (vom Spickzettel bis zur Anleitung derselben Einheit)
+  let spickSeiten = 0;
+  for (const n of await page.evaluate(() => Array.from(document.querySelectorAll('section.spick')).map((s) => s.dataset.einheit))) {
+    const von = zielMap['spick-' + n], bis = zielMap['einheit-' + n];
+    if (!von || !bis) { alleFehler.push('Spickzettel Einheit ' + n + ': Seitenzahl nicht gefunden'); continue; }
+    spickSeiten += bis - von;
+    if (bis - von > 2) alleFehler.push('Spickzettel Einheit ' + n + ': ' + (bis - von) + ' Seiten, höchstens 2 – bitte kürzen');
+  }
   const festeIds = await page.evaluate(() => Array.from(document.querySelectorAll('.seite[id]'))
     .filter((s) => !s.closest('.loesungsmodus') && getComputedStyle(s).display !== 'none').map((s) => s.id));
   const gesamt = seitenAnzahl(pdf);
@@ -242,6 +250,15 @@ try {
     console.log('📄 ' + path.relative(WURZEL, vorlagenPdf) + ' – ' + n + ' Seiten');
     if (n !== sichtbar) alleFehler.push('Kopiervorlagen: ' + n + ' PDF-Seiten, aber ' + sichtbar + ' feste Seiten – irgendwo läuft eine Seite über oder es entsteht eine Leerseite');
     await page.evaluate(() => document.body.classList.remove('vorlagen'));
+
+    // Spickzettel (höchstens zwei Seiten pro Einheit, für Mama oder Papa zum Mitnehmen)
+    await page.evaluate(() => document.body.classList.add('spickzettel'));
+    const spickPdf = path.join(OUT, 'spickzettel.pdf');
+    await page.pdf({ ...pdfOpt, path: spickPdf });
+    const ns = seitenAnzahl(spickPdf);
+    console.log('📄 ' + path.relative(WURZEL, spickPdf) + ' – ' + ns + ' Seiten');
+    if (ns !== spickSeiten) alleFehler.push('spickzettel.pdf: ' + ns + ' Seiten, im Buch sind es ' + spickSeiten + ' – irgendwo entsteht eine Leerseite');
+    await page.evaluate(() => document.body.classList.remove('spickzettel'));
   } else {
     // Bei Teil-Builds: feste Seiten zählen gegen Abstand der Sprungziele
     for (let i = 0; i < festeIds.length - 1; i++) {

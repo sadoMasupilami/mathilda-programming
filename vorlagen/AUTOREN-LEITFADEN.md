@@ -22,6 +22,8 @@ Der Name des Kindes steht **nirgends** im Repo. In allen Quellen steht `{{KIND}}
 ## 1. Grundgerüst
 
 ```html
+<section class="spick nur-buch" data-einheit="2" data-titel="Drachen-Pfade">  … Spickzettel … </section>
+
 <section class="anleitung" data-einheit="2" data-titel="Drachen-Pfade">
   … Anleitung …
   <h2>Lösungen</h2>
@@ -61,6 +63,41 @@ Lange Tabellen, die umbrechen dürfen: `<table class="tab darf-brechen">`. Käst
 Spielregeln immer so, dass sie **zu zweit** mit Haushaltsmaterial funktionieren: Material, Vorbereitung, Ziel, Ablauf eines Zuges, Ende/Gewinner, Varianten. Einmal im Kopf durchspielen.
 
 Überschriften `<h2>` in der Anleitung (in dieser Reihenfolge, wenn passend): „Ablauf Schritt für Schritt“, „Spiele, Bewegung und Basteln“, „Wenn es hakt oder zu leicht ist“, „Hintergrund“, „Bildschirm-Bonus“, „Lösungen“.
+
+## 2a. Spickzettel: Kurzfassung auf höchstens zwei Seiten
+
+Zum Mitnehmen beim Durchführen, beidseitig gedruckt ein Blatt. Steht im Buch direkt vor der Anleitung und gesammelt in `out/spickzettel.pdf`. Fließt über höchstens zwei Seiten (wird geprüft), lange Schritte dürfen umbrechen, Regelkästen, Tabellen und Sätze bleiben ganz. Der Kopf entsteht automatisch, die Anleitung verweist mit „Kurzfassung: Spickzettel (S. n)“ zurück.
+
+Aufbau: oben die Vorbereitung, dann der Ablauf als **Drehbuch** (pro Schritt: was zu tun ist, die Spielregeln in Kürze, die Sätze zum Sagen), am Ende Hilfen und Schluss. So muss man beim Durchführen nicht blättern.
+
+```html
+<section class="spick nur-buch" data-einheit="2" data-titel="Drachen-Pfade">
+  <p class="spick-kern"><b>Darum geht’s:</b> …</p>
+  <div class="spick-zwei breit-links">
+    <div class="spick-block vorher"><h2>Vorher, ohne {{KIND}} <small>· etwa 25 Min</small></h2><ul class="check"><li>… <span class="min">10 Min</span></li></ul></div>
+    <div class="spick-block vorher"><h2>Bereitlegen</h2><ul class="check">…</ul></div>
+  </div>
+  <h2>Gemeinsam</h2>
+  <ol class="spick-ablauf">
+    <li data-min="7"><div><b>Spiel „Schatz-Versteck“.</b> Das Hauptspiel, 4 Runden.
+      <div class="spick-spiel"><h3>Schatz-Versteck</h3><p class="meta">Material</p>
+        <ul><li><b>Rollen:</b> …</li><li><b>Ein Zug:</b> …</li><li><b>Punkte:</b> …</li><li><b>Ende:</b> …</li></ul></div>
+      <div class="sag"><p class="du">„…“</p><p class="sie">„…“</p><p class="dann">Hinweis</p></div>
+    </div></li>
+  </ol>
+  <div class="spick-zwei">
+    <div class="spick-block stolper"><h2>Wenn es hakt</h2><ul>…</ul></div>
+    <div class="spick-block schwerer"><h2>Zu leicht?</h2><ul>…</ul></div>
+  </div>
+  <div class="spick-block schluss"><h2>Zum Schluss nicht vergessen</h2><ul class="check">…</ul></div>
+</section>
+```
+
+- `ol.spick-ablauf` braucht **dieselben Schritte mit denselben Minuten** wie `ol.ablauf` der Anleitung (wird geprüft). Ändert sich der Ablauf, den Spickzettel mitziehen.
+- Der Schritt-Text sagt nur, was nicht schon im Regelkasten steht. Mehrere Satz-Gruppen in einem Schritt bekommen je eine `<p class="unterzeile">` davor. Tabellen: `<table class="spick-tab">` (z. B. „Kind sagt / Roboter macht“).
+- `ul.check` zeichnet Abhak-Kästchen. Keine Verweise auf Rahmenseiten (`#rueckmeldebogen` …), sonst scheitert der Teil-Build; Blätter (`#blatt-N-M`) und die eigene Anleitung gehen.
+- Die Einleitung verweist auf jeden Spickzettel (`#spick-N`). Bei einer neuen Einheit dort ergänzen.
+- Zu lang? Zuerst doppelte Stellen streichen (Schritt-Text gegen Regelkasten), dann Sätze kürzen.
 
 ## 3. Blätter für das Kind
 

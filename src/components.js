@@ -915,7 +915,8 @@
       k.className = 'einheit-kopf';
       const blk = a.dataset.block;
       k.innerHTML = '<div class="badge"><small>Einheit</small><b>' + n + '</b></div><div><h1>' + esc(a.dataset.titel || '') + '</h1>' +
-        '<div class="unter">Block ' + blk + ': ' + BLOCK_TITEL[blk] + ' · Anleitung für dich' + (summe ? ' · etwa ' + summe + ' Minuten' : '') + '</div></div>';
+        '<div class="unter">Block ' + blk + ': ' + BLOCK_TITEL[blk] + ' · Anleitung für dich' + (summe ? ' · etwa ' + summe + ' Minuten' : '') +
+        (document.querySelector('section.spick[data-einheit="' + n + '"]') ? ' · Kurzfassung: <a class="blattref" href="#spick-' + n + '">Spickzettel</a>' : '') + '</div></div>';
       a.insertBefore(k, a.firstChild);
     }
     kastenTitel(a);
@@ -924,6 +925,41 @@
       leichter: '.kasten.leichter', schwerer: '.kasten.schwerer', bonus: '.kasten.bonus', warum: '.kasten.warum', bildschirm: '.kasten.bildschirm',
       loesungen: 'm-loesungen, .loesungen-raster' };
     for (const [name, sel] of Object.entries(pflicht)) if (!a.querySelector(sel)) fehler(a, 'Pflichtteil fehlt: ' + name + ' (' + sel + ')');
+  }
+
+  // Spickzettel: Kurzfassung der Anleitung, fließt über höchstens zwei Seiten (build.mjs prüft das).
+  // Die Schritte im Ablauf müssen dieselben Minuten haben wie die Anleitung.
+  function baueSpickzettel(s) {
+    const n = s.dataset.einheit;
+    if (!n) return fehler(s, 'Spickzettel ohne data-einheit');
+    if (!s.dataset.block) s.dataset.block = blockVon(+n);
+    s.id = s.id || 'spick-' + n;
+    const minuten = [];
+    s.querySelectorAll('ol.spick-ablauf > li').forEach((li) => {
+      const m = zahl(li.dataset.min);
+      if (isNaN(m)) { fehler(li, 'Spickzettel-Schritt ohne data-min'); return; }
+      minuten.push(m);
+      if (!li.querySelector(':scope > .zeit')) {
+        const z = document.createElement('span');
+        z.className = 'zeit';
+        z.textContent = m + ' Min';
+        li.insertBefore(z, li.firstChild);
+      }
+    });
+    const a = document.querySelector('section.anleitung[data-einheit="' + n + '"]');
+    if (!a) fehler(s, 'Spickzettel ohne Anleitung für Einheit ' + n);
+    else {
+      const soll = Array.from(a.querySelectorAll('ol.ablauf > li')).map((li) => zahl(li.dataset.min));
+      if (soll.join() !== minuten.join()) fehler(s, 'Ablauf passt nicht zur Anleitung: ' + minuten.join(', ') + ' Min statt ' + soll.join(', ') + ' Min');
+    }
+    const summe = minuten.reduce((x, y) => x + y, 0);
+    if (!s.querySelector(':scope > .einheit-kopf')) {
+      const k = document.createElement('header');
+      k.className = 'einheit-kopf';
+      k.innerHTML = '<div class="badge"><small>Einheit</small><b>' + n + '</b></div><div><h1>' + esc(s.dataset.titel || '') + '</h1>' +
+        '<div class="unter">Spickzettel für dich · etwa ' + summe + ' Minuten · alles ausführlich in der <a class="blattref" href="#einheit-' + n + '">Anleitung</a></div></div>';
+      s.insertBefore(k, s.firstChild);
+    }
   }
 
   // Lösungsansicht: Kopien der Blätter mit eingetragenen Lösungen
@@ -972,6 +1008,8 @@
           if (!a.textContent.trim()) a.textContent = (/Blatt[\s\u00a0]*$/.test(davor) ? '' : 'Blatt ') + m[1];
           return;
         }
+        // \u2026 und die Spickzettel (Verweise aus der Einleitung)
+        if (DATEN.teilBuild && /^spick-\d+$/.test(ziel)) return;
         fehler(a, 'Verweis auf unbekanntes Ziel ' + ziel);
         return;
       }
@@ -1035,6 +1073,7 @@
         }
       });
       document.querySelectorAll('section.anleitung').forEach(baueAnleitung);
+      document.querySelectorAll('section.spick').forEach(baueSpickzettel);
       document.querySelectorAll('.fliess').forEach(kastenTitel);
       // Karten zuerst (sie verschieben Kinder), dann der Rest
       document.querySelectorAll('m-karten').forEach((el) => { try { mKarten(el); } catch (e) { fehler(el, 'Absturz: ' + e.message); } });
@@ -1187,7 +1226,7 @@
     });
 
     // 3. Anleitung: nichts breiter als der Satzspiegel
-    document.querySelectorAll('.anleitung, .fliess').forEach((a) => {
+    document.querySelectorAll('.anleitung, .fliess, .spick').forEach((a) => {
       const r = a.getBoundingClientRect();
       const gemeldetA = [];
       a.querySelectorAll('*').forEach((x) => {

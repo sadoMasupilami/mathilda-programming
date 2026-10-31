@@ -8,8 +8,9 @@ Die Werkstatt entsteht in Blöcken. Jetzt fertig: **Block A, Einheiten 1–5** (
 
 | Was | Inhalt |
 |---|---|
-| `out/denk-werkstatt.pdf` | alles: Titel, Inhalt, Einleitung, Hallo-Seite, Sammelpass, Einheiten (Anleitung + Blätter + Lösungen), Urkunden, Rückmeldebogen, Gerätetest-Checkliste |
+| `out/denk-werkstatt.pdf` | alles: Titel, Inhalt, Einleitung, Hallo-Seite, Sammelpass, Einheiten (Spickzettel + Anleitung + Blätter + Lösungen), Urkunden, Rückmeldebogen, Gerätetest-Checkliste |
 | `out/kopiervorlagen.pdf` | nur die Seiten des Kindes: Deckblatt, Hallo-Seite, Sammelpass, alle Blätter, Urkunden |
+| `out/spickzettel.pdf` | höchstens zwei Seiten pro Einheit zum Mitnehmen beim Durchführen (beidseitig drucken): Vorbereitung zum Abhaken, Ablauf als Drehbuch mit Minuten, Spielregeln in Kürze und Sätzen zum Sagen, Hilfen, „Zum Schluss nicht vergessen“ |
 | Web-App (`web/`, gebaut nach `_site/`) | Level-Pakete e2–e5 für Handy und Tablet, offline-fähig, über GitHub Pages veröffentlicht |
 
 Drucken in **Originalgröße (100 %)**, damit die Gitterfelder mindestens 2 cm groß sind.
@@ -57,6 +58,7 @@ Der Build prüft automatisch und bricht mit ❌ ab, wenn
 - ein Rätsel nicht lösbar oder nicht eindeutig (und nicht gekennzeichnet) ist,
 - eine Rechnung im Text falsch ist,
 - ein Blatt über die A4-Seite läuft, etwas in den Druckrand ragt oder eine Leerseite entsteht,
+- ein Spickzettel länger als zwei Seiten wird oder sein Ablauf (Schritte und Minuten) nicht mehr zur Anleitung passt,
 - die Schrift auf einem Blatt des Kindes kleiner als 14 pt ist,
 - ein Pflichtteil einer Anleitung fehlt (Ziel, Material, Ablauf, Beispielsätze, Stolpersteine, Leichter/Schwerer, Bonus-Knobelei, Hintergrund, Bildschirm-Bonus, Lösungen),
 - ein Symbol als Schriftzeichen statt als SVG geschrieben ist, ein Fachwort auf einem Blatt steht oder „Zauber“ außerhalb von Wiederhol-Zauber, Zauber-Kasten und Zauberspruch vorkommt,
