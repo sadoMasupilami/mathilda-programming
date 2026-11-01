@@ -354,7 +354,7 @@
       s += '<rect x="' + r2(x + 0.6) + '" y="' + r2(y + 0.6) + '" width="' + r2(F - 1.2) + '" height="' + r2(F - 1.2) + '" rx="' + r2(F * 0.16) + '" fill="' + fill + '" stroke="' + FARBE.wegRand + '" stroke-width="0.7"/>';
       const zahlGr = F * 0.4;
       if (istStart) {
-        s += '<text x="' + r2(x + F / 2) + '" y="' + r2(y + (drachePos === 0 ? F * 0.9 : F / 2 + F * 0.08)) + '" font-family="Andika, sans-serif" font-size="' + r2(F * 0.2) + '" font-weight="700" text-anchor="middle" fill="' + FARBE.tinte + '">Start</text>';
+        s += '<text x="' + r2(x + F / 2) + '" y="' + r2(y + (drachePos === 0 ? F * 0.9 : F / 2 + F * 0.08)) + '" font-family="Andika, sans-serif" font-size="' + r2(F * 0.23) + '" font-weight="700" text-anchor="middle" fill="' + FARBE.tinte + '">Start</text>';
       } else if (istZiel && o.schatz !== false && S) {
         s += '<g transform="translate(' + r2(x + F * 0.2) + ' ' + r2(y + F * 0.04) + ') scale(' + r2(F * 0.6 / 100) + ')">' + S.inhalt('schatz') + '</g>';
         s += '<text x="' + r2(x + F / 2) + '" y="' + r2(y + F * 0.9) + '" font-family="Andika, sans-serif" font-size="' + r2(F * 0.3) + '" font-weight="700" text-anchor="middle" fill="' + FARBE.tinte + '">' + f.zahl + '</text>';

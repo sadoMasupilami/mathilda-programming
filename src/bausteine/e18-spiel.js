@@ -247,10 +247,10 @@
     wolke: () => '<path d="M22 78 C8 78 4 60 18 54 C14 38 34 30 44 40 C50 22 78 24 80 44 C96 44 98 70 82 78 Z" fill="white"' + st(3.5) + '/>',
     // zwei Regel-Zettel übereinander (zwei Regeln, die sich streiten)
     zettel: () => '<g transform="rotate(-10 34 52)"><rect x="8" y="16" width="44" height="60" rx="4" fill="white"' + st(4) + '/>' +
-      '<text x="30" y="40" font-family="Andika, sans-serif" font-weight="700" font-size="20" text-anchor="middle" fill="' + T + '">1</text>' +
+      '<text data-nebenschrift="" x="30" y="40" font-family="Andika, sans-serif" font-weight="700" font-size="20" text-anchor="middle" fill="' + T + '">1</text>' +
       '<path d="M16 54 H44 M16 64 H38" fill="none"' + st(3) + '/></g>' +
       '<g transform="rotate(10 66 52)"><rect x="48" y="22" width="44" height="60" rx="4" fill="white"' + st(4) + '/>' +
-      '<text x="70" y="46" font-family="Andika, sans-serif" font-weight="700" font-size="20" text-anchor="middle" fill="' + T + '">2</text>' +
+      '<text data-nebenschrift="" x="70" y="46" font-family="Andika, sans-serif" font-weight="700" font-size="20" text-anchor="middle" fill="' + T + '">2</text>' +
       '<path d="M56 60 H84 M56 70 H78" fill="none"' + st(3) + '/></g>',
   };
   function bildSVG(name, gr, extra) {

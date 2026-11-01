@@ -264,6 +264,8 @@ table.e07-post td:nth-child(2n) { font-family: var(--kind); font-weight: 700; le
     const gr = parseFloat(el.getAttribute('gr') || String(echt));
     el.innerHTML = G().radSVG({ teil, schluessel: k, groesse: gr + 'mm', anmalen: el.hasAttribute('anmalen') });
     el.classList.add('komp');
+    // Verkleinertes Rad = Bild zum Wiedererkennen (gelesen wird am ausgeschnittenen Rad): Prüfung der Schriftgröße entfällt
+    if (gr < echt - 1) el.setAttribute('data-nebenschrift', '');
   };
 
   // ---------------------------------------------------------------------

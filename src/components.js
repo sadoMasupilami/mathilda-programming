@@ -1220,6 +1220,18 @@
           if (fs < 13.9) zuKlein.add(p);
         }
         zuKlein.forEach((p) => F(p, 'Schrift auf dem Blatt zu klein (' + (parseFloat(getComputedStyle(p).fontSize) * 0.75).toFixed(1) + ' pt, mindestens 14 pt; sonst class="klein")'));
+        // Auch gezeichnete Beschriftungen (<text> in SVG): Schriftgröße mal Maßstab der Zeichnung
+        s.querySelectorAll('svg text').forEach((t) => {
+          // Ausnahmen wie bei HTML; Nebenbeschriftungen einer Zeichnung (Kartenzahl, Bild im Bild) tragen data-nebenschrift
+          // (nicht class="klein": die CSS-Regel .klein würde die Schriftgröße der Zeichnung überschreiben)
+          if (!t.textContent.trim() || t.closest('.fuss, .klein, .blatt-kopf, .marke, .lsg, .lsg-nur, .karte, .prog .nr, [data-nebenschrift]')) return;
+          const st = getComputedStyle(t);
+          if (st.display === 'none' || st.visibility === 'hidden') return;
+          const m = t.getScreenCTM && t.getScreenCTM();
+          if (!m) return;
+          const pt = parseFloat(st.fontSize) * Math.sqrt(Math.abs(m.a * m.d - m.b * m.c)) * 0.75;
+          if (pt < 13.8) F(t, 'Gezeichnete Schrift auf dem Blatt zu klein (' + pt.toFixed(1) + ' pt, mindestens 14 pt; Nebenbeschriftung: data-nebenschrift am <text>)');
+        });
         if (!s.querySelector('.profi, .knobel')) W(s, 'Blatt ohne Profi- oder Knobel-Ecke');
         if (!s.textContent.includes(KIND)) W(s, KIND + ' kommt auf dem Blatt nicht namentlich vor');
       }

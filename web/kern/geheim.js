@@ -284,9 +284,9 @@
     }
     return '<path d="' + p + '" stroke="' + farbe + '" stroke-width="' + breite + '" fill="none"/>';
   }
-  function textAuf(r, grad, t, gr, farbe, gewicht) {
+  function textAuf(r, grad, t, gr, farbe, gewicht, extra) {
     const [x, y] = polar(r, grad);
-    return '<text x="' + x + '" y="' + y + '" transform="rotate(' + r2(grad) + ' ' + x + ' ' + y + ')" font-family="Andika, sans-serif" font-size="' + gr +
+    return '<text' + (extra ? ' ' + extra : '') + ' x="' + x + '" y="' + y + '" transform="rotate(' + r2(grad) + ' ' + x + ' ' + y + ')" font-family="Andika, sans-serif" font-size="' + gr +
       '" font-weight="' + (gewicht || 700) + '" fill="' + farbe + '" text-anchor="middle" dominant-baseline="central">' + t + '</text>';
   }
   // anmalen: Stern nur als Umriss (zum Anmalen auf der Bastelvorlage)
@@ -314,7 +314,7 @@
     s += kreisTeilLinien(R.zahlText - 4, R.innenR, '#7fcdbf', 0.3);
     for (let i = 0; i < N; i++) {
       s += textAuf(R.innenText, i * WINKEL, ABC[i], R.innenGr, '#0b6b65');
-      s += textAuf(R.zahlText, i * WINKEL, String(i), R.zahlGr, '#6b6f86', 700);
+      s += textAuf(R.zahlText, i * WINKEL, String(i), R.zahlGr, '#6b6f86', 700, 'data-nebenschrift=""');   // Zahlenring: Nebenbeschriftung
       // 6 und 9 unterstrichen, damit man sie auch kopfüber unterscheidet
       if (i === 6 || i === 9) {
         const [x, y] = polar(R.zahlText, i * WINKEL);

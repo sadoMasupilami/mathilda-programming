@@ -232,7 +232,7 @@
           : '<circle cx="' + r1(x) + '" cy="' + r1(y) + '" r="' + r1(p.r) + '" fill="' + f.punkt + '"/>';
       }
       if (opt.nummer !== false) {
-        s += '<text x="50" y="123" font-family="Andika, sans-serif" font-size="25" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="' + (leer ? GRAU : T) + '">' + v + '</text>';
+        s += '<text data-nebenschrift="" x="50" y="123" font-family="Andika, sans-serif" font-size="25" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="' + (leer ? GRAU : T) + '">' + v + '</text>';
       }
     } else {
       s += '<rect x="3" y="3" width="94" height="134" rx="10" fill="' + RUECKEN + '" stroke="' + RUECKEN_RAND + '" stroke-width="3"/>' +
@@ -264,7 +264,7 @@
     s += '<rect x="38" y="86" width="24" height="6" rx="2" fill="#a3a8b8" stroke="' + T + '" stroke-width="2"/>' +
       '<rect x="38" y="93" width="24" height="6" rx="2" fill="#a3a8b8" stroke="' + T + '" stroke-width="2"/>' +
       '<path d="M42 100 L58 100 L54 106 L46 106 Z" fill="' + T + '"/>';
-    if (opt.nummer !== false) s += '<text x="50" y="125" font-family="Andika, sans-serif" font-size="25" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="' + (opt.hell ? '#fffdf8' : T) + '">' + v + '</text>';
+    if (opt.nummer !== false) s += '<text data-nebenschrift="" x="50" y="125" font-family="Andika, sans-serif" font-size="25" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="' + (opt.hell ? '#fffdf8' : T) + '">' + v + '</text>';
     if (opt.markiert) s += '<rect x="2" y="2" width="96" height="136" rx="12" fill="none" stroke="' + ROT + '" stroke-width="5" stroke-dasharray="11 7"/>';
     return s + '</svg>';
   }
@@ -307,7 +307,7 @@
       const w = werte(5);
       const pos = HAND_FINGER.map((f, i) => [i === 0 ? f.x - 4 : f.x, oben + (ja[i] ? f.spitze : 54) - 11]).concat([[130, oben + (ja[4] ? 50 : 84)]]);
       pos.forEach((p, i) => {
-        s += '<text x="' + p[0] + '" y="' + p[1] + '" font-family="Andika, sans-serif" font-size="18" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="' + T + '">' + w[i] + '</text>';
+        s += '<text x="' + p[0] + '" y="' + p[1] + '" font-family="Andika, sans-serif" font-size="20" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="' + T + '">' + w[i] + '</text>';
       });
     }
     if (Number.isInteger(opt.markiert) && opt.markiert >= 0 && opt.markiert <= 4) {
