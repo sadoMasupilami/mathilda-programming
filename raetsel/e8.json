@@ -89,7 +89,8 @@
    "code": ["1w 2s 2w 2s 1w", "8s", "8s", "1w 6s 1w", "1w 4s 3w", "3w 2s 3w"],
    "zeile": 5,
    "fehler": "bild",
-   "spiegel": true
+   "spiegel": true,
+   "verschoben": true
   },
   {
    "id": "e8-z1",

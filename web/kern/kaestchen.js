@@ -402,6 +402,17 @@
     }
     for (let i = 0; i <= b; i++) s += '<line x1="' + (links + i * z) + '" y1="' + y0 + '" x2="' + (links + i * z) + '" y2="' + (y0 + h * z) + '" stroke="' + TINTE + '" stroke-width="' + (i === 0 || i === b ? 0.5 : 0.25) + '"/>';
     for (let j = 0; j <= h; j++) s += '<line x1="' + links + '" y1="' + (y0 + j * z) + '" x2="' + (links + b * z) + '" y2="' + (y0 + j * z) + '" stroke="' + TINTE + '" stroke-width="' + (j === 0 || j === h ? 0.5 : 0.25) + '"/>';
+    // Zwischen zwei schwarzen Kästchen ist die dunkle Linie unsichtbar: hell nachziehen, damit man
+    // auch in einer schwarzen Fläche die Kästchen zählen kann (wie in der App)
+    if (B && o.zeigen) {
+      const dunkel = (j, i) => i < b && !!B[j] && B[j][i] === 's';
+      let d = '';
+      for (let j = 0; j < h; j++) {
+        for (let i = 1; i < b; i++) if (dunkel(j, i) && dunkel(j, i - 1)) d += 'M' + (links + i * z) + ' ' + (y0 + j * z) + 'v' + z;
+        if (j > 0) for (let i = 0; i < b; i++) if (dunkel(j, i) && dunkel(j - 1, i)) d += 'M' + (links + i * z) + ' ' + (y0 + j * z) + 'h' + z;
+      }
+      if (d) s += '<path d="' + d + '" fill="none" stroke="#ffffff" stroke-opacity="0.6" stroke-width="0.3"/>';
+    }
     if (extra) {
       B.forEach((r, j) => {
         for (let i = b; i < r.length; i++) s += '<rect x="' + (links + i * z) + '" y="' + (y0 + j * z) + '" width="' + z + '" height="' + z + '" fill="none" stroke="' + ROT + '" stroke-width="0.4" stroke-dasharray="1.2 0.8"/>';

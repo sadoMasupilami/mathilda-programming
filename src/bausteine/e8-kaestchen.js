@@ -19,6 +19,7 @@
      <m-e8-zahlen raetsel="…" teil="lang|kurz|zeilen|spalten|kuerzester|zeile">  Antwortfeld mit einer Zahl
      <m-e8-text raetsel="…" [zeile="3"] [teil="kaputt|richtig|reparatur"] [code="…"]>
          Code in Worten für die Anleitung: „1 weiß, 4 schwarz, 1 weiß“
+     <m-e8-text raetsel="…" teil="auch" alle [anzahl="2"]>  alle Zeilen einer Liste: „…“ oder „…“
      <m-e8-mini raetsel="…" [zelle="3.5"] [spalten]>  kleines Bild und Code in Worten (Anleitung)
      <m-e8-brett b="6" h="6" feld="20">   Muggelstein-Brett mit großen Feldern
      <m-e8-gitter b="6" h="6">           leere 1-cm-Kästchen mit Zeilennummern
@@ -265,6 +266,16 @@ m-e8-bild svg, m-e8-brett svg, m-e8-gitter svg, m-e8-mini svg { display: block; 
         if (!r) return;
         const L = r.loesung;
         const teil = el.getAttribute('teil');
+        // alle: jede Zeile der Liste in Worten, „…“ oder „…“ (z. B. teil="auch": weitere Reparaturen);
+        // anzahl="2" prüft, dass der Text zur Zahl des Lösers passt
+        if (teil && el.hasAttribute('alle')) {
+          const liste = L[teil];
+          if (!Array.isArray(liste) || !liste.length || liste.some((x) => /[{}]/.test(x))) return H().fehler(el, 'teil="' + teil + '" alle: keine Liste von Zeilen (oder leer)');
+          if (el.hasAttribute('anzahl') && +el.getAttribute('anzahl') !== liste.length) return H().fehler(el, 'anzahl="' + el.getAttribute('anzahl') + '", der Löser findet ' + liste.length);
+          el.textContent = liste.map((x) => '„' + KK().zeileWorte(x) + '“').join(liste.length > 2 ? ', ' : ' oder ');
+          el.classList.add('komp', 'geprueft');
+          return;
+        }
         if (teil) {
           if (Array.isArray(L[teil]) && L[teil].length === 1 && !/[{}]/.test(L[teil][0])) z = L[teil][0];
           else if (typeof L[teil] === 'string') z = L[teil];
