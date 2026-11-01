@@ -55,6 +55,9 @@
   .e20-rueck { display: flex; align-items: center; justify-content: space-between; gap: 6mm; flex-wrap: wrap; }
   .e20-rueck > span { display: inline-flex; align-items: center; gap: 2.5mm; }
   .e20-sterne { display: inline-flex; gap: 2mm; }
+  .e20-versteck-zeile { margin: 0; display: flex; align-items: flex-end; gap: 2mm; }
+  .e20-wortlinie { flex: 1; min-width: 0; height: 9mm; }
+  .loesungsmodus .e20-lsg-inline { display: inline; margin-left: 2mm; }
   .e20-linien { display: flex; flex-direction: column; gap: 1mm; margin-top: 1mm; }
   .e20-linien .linie { width: 100%; height: 9mm; }
 
@@ -506,6 +509,8 @@
       <span class="e20-zeile"><span class="e20-box"></span><span class="e20-krone"><m-bild name="krone" gr="10"></m-bild></span></span></span><span class="e20-stempel"></span></div>
   </div>
   <p class="lsg-nur">Stationen, Stempel und Code-Buchstaben hängen von eurem Fest ab, z. B. für das Versteck Kasten: P F X Y J S.</p>
+
+  <p class="e20-versteck-zeile">Mein Code-Wort, das Versteck: <span class="linie e20-wortlinie"></span><span class="lsg-nur e20-lsg-inline">z. B. KASTEN</span></p>
 
   <div class="e20-rueck">
     <span>Lieblings-Station: <span class="e20-box e20-box-leer"></span></span>
