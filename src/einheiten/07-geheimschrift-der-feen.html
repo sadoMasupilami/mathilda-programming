@@ -1,1 +1,508 @@
-<!-- Einheit 7: noch nicht geschrieben (Platzhalter, damit Buch und --nur 07 schon funktionieren) -->
+<!--
+  Einheit 7: Geheimschrift der Feen (Block B)
+  Geheimschrift mit dem Geheimschrift-Rad (Buchstaben um die Schlüssel-Zahl verschieben,
+  nur A bis Z), Feen-Zeichen als zweite Geheimschrift, Kobold-Brief, Feen-Post im Haus,
+  im Schwerer-Teil: andere Schlüssel-Zahlen, zwei Schlüssel hintereinander, 26 und 13,
+  Knacken durch Ausprobieren und mit dem häufigsten Buchstaben (E).
+  Rätsel: raetsel/e7.json (Web-Paket e7, Rätselart geheim: werkzeuge/arten/geheim.mjs)
+  Gemeinsame Logik und Zeichnungen (Rad, Feen-Zeichen, Bilder): web/kern/geheim.js
+  Eigene Bausteine: src/bausteine/e7-geheim.js
+  Blätter: 7-1 Feen-Post lesen, 7-2 Kobold und Feen-Zeichen, 7-3 Mein Geheimschrift-Rad (Bastelvorlage)
+-->
+<style>
+  .e07-ablauf > li { break-inside: avoid; }
+  .e07-ganz > li { break-inside: auto; orphans: 2; widows: 2; }
+  .kasten.e07-bricht { -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .kasten.e07-bricht > .kasten-titel { break-after: avoid; }
+  .kasten.e07-bricht > .kasten-titel + p, .kasten.e07-bricht > .kasten-titel + ul > li:first-child { break-before: avoid; break-inside: avoid; }
+  .kasten.e07-bricht > .spiel-meta { break-after: avoid; }
+  .kasten.e07-bricht > .spiel-meta + ol.regeln > li:first-child { break-before: avoid; break-inside: avoid; }
+  .e07-radtipp { display: flex; gap: 5mm; align-items: center; }
+  .e07-radtipp > div { flex: 1; }
+  .e07-loes { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm 4mm; align-items: start; margin: 2mm 0 4mm 0; }
+  .e07-loes m-loesungen, .e07-loes .loesungen-raster { display: contents; }
+  .e07-loes > .kasten.loesung { margin: 5mm 0 0 0; font-size: 9.5pt; }
+  .e07-loes > .kasten.loesung p, .kasten.loesung.e07-weiter p { margin-bottom: 1.6mm; }
+  table.tab.e07-tab { font-size: 8.5pt; margin: 1mm 0 1mm 0; }
+  table.tab.e07-tab td { padding: 0.7mm 1.2mm; }
+  table.tab.e07-tab td:first-child { width: 6mm; text-align: center; font-weight: 800; }
+
+  /* Blätter */
+  .e07-kopf { display: flex; align-items: center; gap: 6mm; }
+  .e07-kopf p { margin: 0 0 1.5mm 0; }
+  .e07-merk { display: inline-block; background: var(--akzent-hell); border: 0.5mm solid var(--akzent); border-radius: 3mm; padding: 1mm 3.5mm; font-weight: 700; }
+  .e07-zwei { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm 8mm; }
+  .e07-zwei .e07-aufg { flex-direction: column; align-items: flex-start; gap: 3mm; }
+  .e07-profi-reihe { display: flex; align-items: flex-end; gap: 6mm; }
+  .e07-profi-reihe > .profi { flex: 1; }
+  .e07-unten { display: flex; align-items: center; gap: 8mm; }
+  .e07-unten > p { flex: 1; margin: 0; }
+  .e07-name { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 3mm 8mm; }
+  .e07-name .e07-merk { font-size: 15pt; line-height: 1.2; }
+  .e07-zentriert { display: flex; justify-content: center; }
+
+  /* Bastelvorlage: große Scheibe links oben, kleine rechts unten */
+  .e07-bastel { position: relative; height: 236mm; }
+  .e07-bastel > .e07-aussen { position: absolute; left: 0; top: 0; line-height: 0; }
+  .e07-bastel > .e07-innen { position: absolute; right: 0; bottom: 0; line-height: 0; }
+  .e07-bastel > .e07-schritte { position: absolute; right: 0; top: 1mm; width: 42mm; margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4mm; }
+  .e07-schritte li { display: flex; flex-direction: column; align-items: flex-start; gap: 1mm; line-height: 1.15; }
+  .e07-schritte .e07-nr { display: inline-flex; align-items: center; justify-content: center; width: 8mm; height: 8mm; border-radius: 50%; background: var(--akzent); color: white; font-family: var(--text); font-weight: 900; font-size: 14pt; }
+  .e07-bastel > .knobel { position: absolute; left: 0; bottom: 0; width: 76mm; }
+</style>
+
+<!-- Spickzettel: Kurzfassung der Anleitung zum Mitnehmen, höchstens zwei Seiten. Ablauf als Drehbuch (Minuten wie in der Anleitung) -->
+<section class="spick nur-buch" data-einheit="7" data-titel="Geheimschrift der Feen">
+  <p class="spick-kern"><b>Darum geht’s:</b> In Geheimschrift wird jeder Buchstabe um die <b>Schlüssel-Zahl</b> im ABC weitergeschoben, nach dem Z geht es mit A weiter. Heute ist die Schlüssel-Zahl immer 3 (so wird aus MOND <m-e7-text schreibe="MOND" k="3" soll="PRQG"></m-e7-text>). Das <b>Geheimschrift-Rad</b> macht es leicht: außen die normalen Buchstaben, innen die Geheim-Buchstaben, die kleine 3 steht beim Stern. <b>Lesen: innen suchen, außen ablesen. Schreiben: außen suchen, innen ablesen.</b> Dazu kommen die Feen-Zeichen: eine Form mit Punkten wie beim Würfel.</p>
+
+  <div class="spick-zwei breit-links">
+    <div class="spick-block vorher">
+      <h2>Vorher, ohne {{KIND}} <small>· etwa 25 Min</small></h2>
+      <ul class="check">
+        <li><a class="blattref" href="#blatt-7-1"></a> und <a class="blattref" href="#blatt-7-2"></a> in Farbe drucken, <a class="blattref" href="#blatt-7-3"></a> auf dickes Papier, am besten zweimal. <span class="min">3 Min</span></li>
+        <li>Beide Scheiben genau ausschneiden, die kleine auf Karton kleben und nochmal ausschneiden, Löcher in die Mitten stechen. <span class="min">10 Min</span></li>
+        <li>Feen-Post: 3 oder 4 Verstecke aus der Tabelle wählen, Geheimwörter auf Zettel schreiben (3 Sterne in die Ecke), verstecken. Zettel 1 ins Kuvert „Für {{KIND}}“, Schatz ins letzte Versteck. <span class="min">12 Min</span></li>
+      </ul>
+    </div>
+    <div class="spick-block vorher">
+      <h2>Bereitlegen</h2>
+      <ul class="check">
+        <li>Rad-Teile, Pappteller oder Karton, Klebestift, Musterklammer</li>
+        <li>gelber Buntstift, Bleistift, Wäschekluppe</li>
+        <li>Kuvert mit Zettel 1 an {{KIND}}s Platz</li>
+        <li>kleiner Schatz (Zuckerl, Sticker) im letzten Versteck</li>
+        <li>Stempel oder Sticker</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="spick-block vorher" style="margin-bottom:3mm">
+    <h2>Feen-Post zum Abschreiben <small>· Schlüssel-Zahl 3, auf jeden Zettel 3 Sterne</small></h2>
+    <m-e7-post raetsel="e7-post" spick></m-e7-post>
+  </div>
+
+  <h2>Gemeinsam</h2>
+  <ol class="spick-ablauf">
+    <li data-min="2"><div><b>Post von der Fee.</b> {{KIND}} findet das Kuvert mit Zettel 1. Nicht gleich erklären, lass sie eine halbe Minute rätseln.
+      <div class="sag">
+        <p class="du">„Schau, ein Brief für dich. Was steht da?“</p>
+        <p class="sie">„S, R, O … Das ist ja Quatsch!“</p>
+        <p class="du">„Vielleicht eine Geheimschrift? Die Fee hat drei Sterne dazugemalt. Das ist ihre Schlüssel-Zahl.“</p>
+      </div>
+    </div></li>
+    <li data-min="6"><div><b>Das Geheimschrift-Rad.</b> Große Scheibe auf den Pappteller kleben, Stern gelb anmalen, Musterklammer durch beide Löcher. Rad auf 3 stellen, Zettel 1 gemeinsam lesen: <m-e7-text schreibe="POLSTER" k="3" soll="SROVWHU"></m-e7-text> heißt POLSTER.
+      <div class="spick-spiel"><h3>So geht das Rad</h3>
+        <ul>
+          <li><b>Einstellen:</b> innen drehen, bis die Schlüssel-Zahl beim Stern (beim äußeren A) steht. Bei 3 steht dort das innere D.</li>
+          <li><b>Lesen:</b> Geheim-Buchstabe innen suchen, außen ablesen. <b>Schreiben:</b> außen suchen, innen ablesen.</li>
+          <li><b>Ohne Rad:</b> im ABC 3 weiter zählen (schreiben) oder 3 zurück (lesen), nach Z kommt A.</li>
+        </ul>
+      </div>
+      <div class="sag">
+        <p class="du">„Die Fee hat S geschrieben. Such das S innen. Was steht außen?“</p>
+        <p class="sie">„Ein P! Und beim R steht O …“</p>
+        <p class="dann">Sucht sie außen statt innen: „Das S auf dem Zettel ist ein Geheim-Buchstabe. Wo wohnen die?“</p>
+      </div>
+    </div></li>
+    <li data-min="7"><div><b>Feen-Post.</b> Jeder Zettel nennt das nächste Versteck: lesen, hinlaufen, nächsten Zettel lesen, bis zum Schatz.
+      <div class="spick-spiel"><h3>Feen-Post</h3>
+        <ul>
+          <li><b>Ein Zettel:</b> {{KIND}} liest Buchstabe für Buchstabe mit dem Rad, du schreibst mit, wenn sie will. Gelaufen wird, wenn das Wort dasteht (oder sicher erraten ist).</li>
+          <li><b>Ende:</b> Im letzten Versteck liegt der Schatz mit dem Zettel <m-e7-text schreibe="DU BIST SUPER" k="3" soll="GX ELVW VXSHU"></m-e7-text>.</li>
+          <li><b>Danach:</b> Rollentausch, wenn noch Zeit ist: {{KIND}} versteckt einen Zettel für dich (schreiben: außen suchen, innen ablesen).</li>
+        </ul>
+      </div>
+      <div class="sag">
+        <p class="sie">„N, D, V … KASTEN! Ich lauf zum Kasten!“</p>
+        <p class="dann">Laufen lassen, das ist der Spaß. Errät sie das Wort nach drei Buchstaben, ist das schlau.</p>
+      </div>
+    </div></li>
+    <li data-min="5"><div><b>Blatt „Feen-Post lesen“.</b> <a class="blattref" href="#blatt-7-1"></a>: Rad auf 3 lassen. Das passende Bild ist die Probe: Kommt ein echtes Wort heraus? Die Profi-Aufgabe ist freiwillig.
+      <div class="sag">
+        <p class="du">„Welches Bild passt? Wenn kein Wort herauskommt, schau, ob die 3 noch beim Stern steht.“</p>
+      </div>
+    </div></li>
+    <li data-min="6"><div><b>Blatt „Kobold und Feen-Zeichen“.</b> <a class="blattref" href="#blatt-7-2"></a>: zuerst der Kobold-Brief. Bei Aufgabe 2 (ihr Name) dreht sich die Richtung um: außen suchen, innen ablesen. Bei den Feen-Zeichen kurz die Tabelle zeigen: Form und Punkte. Passt nicht alles, kommt der Rest beim nächsten Mal dran.
+      <div class="sag">
+        <p class="sie">„SCHOTZ? Das heißt doch SCHATZ! Da war der Kobold!“</p>
+        <p class="du">„Erwischt! Und jetzt schreibst du selbst Geheimschrift. Wo suchst du jetzt?“</p>
+        <p class="sie">„Mein Name ist normal, also außen!“</p>
+      </div>
+    </div></li>
+    <li data-min="2"><div><b>Sammelpass.</b> Feld „Einheit&nbsp;7“ stempeln, Sterne anmalen. Das Rad kommt in die Werkzeugkiste.
+      <div class="sag">
+        <p class="du">„Wem schreiben wir als Nächstes einen Geheimbrief?“</p>
+      </div>
+    </div></li>
+  </ol>
+
+  <div class="spick-zwei">
+    <div class="spick-block stolper">
+      <h2>Wenn es hakt</h2>
+      <ul>
+        <li><b>Falsche Richtung:</b> Geheim-Buchstaben wohnen innen. Lesen: innen suchen.</li>
+        <li><b>Rad verrutscht:</b> Wäschekluppe an den Rand. Vor jedem Wort schauen: Steht die 3 beim Stern?</li>
+        <li><b>Buchstabe steht kopf:</b> ganzes Rad drehen, bis er oben ist (W und M, N und Z).</li>
+        <li><b>Verzählt ohne Rad:</b> Der Start-Buchstabe zählt nicht mit.</li>
+        <li><b>Zu lang:</b> Du liest jedes zweite Wort.</li>
+      </ul>
+    </div>
+    <div class="spick-block schwerer">
+      <h2>Zu leicht?</h2>
+      <ul>
+        <li><b>Andere Schlüssel-Zahl</b> (Sterne auf dem Zettel), Feen-Post mit wechselnden Zahlen.</li>
+        <li><b>3 und dann 4</b> ist wie 7. Was macht 26? Und 13 zweimal?</li>
+        <li><b>Knacken:</b> Zahl nicht verraten, alle ausprobieren. Profi auf <a class="blattref" href="#blatt-7-1"></a>.</li>
+        <li><b>Häufigster Buchstabe</b> ist meist das E.</li>
+        <li><b>Eigenes Feen-Alphabet</b> erfinden.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="spick-block" style="margin-bottom:2.5mm">
+    <h2>Für einen anderen Tag: Feen-Briefe tauschen <small>· zwei Räder, Zettel, 10 Muggelsteine</small></h2>
+    <ul>
+      <li><b>Ein Zug:</b> Die Schreib-Fee schreibt heimlich ein Wort (3 bis 5 Buchstaben, ohne Ä, Ö, Ü, ß) mit Schlüssel-Zahl 3. Sie darf genau einen Buchstaben absichtlich falsch schreiben (Kobold). Die Lese-Fee liest und sagt das Wort und ob ein Kobold drin ist. Dann Rollen tauschen.</li>
+      <li><b>Steine:</b> Wort richtig gelesen: 1 für die Lese-Fee. Kobold gefunden und gezeigt: noch 1. Kobold übersehen oder falscher Alarm: 1 für die Schreib-Fee. Aus Versehen verzählt zählt wie ein Kobold, ohne Ärger.</li>
+      <li><b>Ende:</b> nach 6 Briefen, mehr Steine gewinnt. Dein Kobold macht ein Unsinn-Wort (MOND wird MONX), damit {{KIND}} eine faire Chance hat.</li>
+    </ul>
+  </div>
+
+  <div class="spick-block schluss">
+    <h2>Zum Schluss nicht vergessen</h2>
+    <ul class="check">
+      <li><b>Bildschirm-Bonus,</b> nur wenn ihr mögt (höchstens 15 Min, nach den Blättern): Paket 7, QR-Code unten rechts auf <a class="blattref" href="#blatt-7-1"></a>. Das Rad dreht sich mit zwei Tasten. Nach dem Ende-Bild kommt das Gerät weg.</li>
+      <li>Feen-Briefkasten aus einer Schachtel basteln (Extra): Die ganze Woche Geheimbriefe hineinwerfen.</li>
+      <li>Rad, Befehlskarten und Zauber-Kasten in die Werkzeugkiste.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="anleitung" data-einheit="7" data-titel="Geheimschrift der Feen">
+
+  <div class="kasten ziel">
+    <p>{{KIND}} lernt die <span class="begriff">Geheimschrift</span> der Feen: Jeder Buchstabe wird ein paar Plätze im ABC weitergeschoben. Um wie viele Plätze, sagt die <span class="begriff">Schlüssel-Zahl</span>. Mit der Schlüssel-Zahl 3 wird aus A ein D, aus B ein E und aus MOND <m-e7-text schreibe="MOND" k="3" soll="PRQG"></m-e7-text>. Wer die Schlüssel-Zahl kennt, kann den Brief lesen, alle anderen sehen nur Buchstaben-Salat. So ein geheimes Zeichen-System heißt <span class="begriff">Geheimcode</span>.</p>
+    <p>Damit das Verschieben leicht geht, bastelt ihr ein <span class="begriff">Geheimschrift-Rad</span> aus zwei Scheiben. Mit ihm liest {{KIND}} Feen-Post, die du im Haus versteckt hast, und schreibt ihren eigenen Namen in Geheimschrift. Dazu lernt sie eine zweite Geheimschrift, die <b>Feen-Zeichen</b> (eine Form mit Punkten statt eines Buchstabens), und jagt den Kobold in einem Feen-Brief. Im Schwerer-Teil wird geknackt: Welche Schlüssel-Zahl hat die Fee genommen, wenn sie sie nicht verrät? Fürs Kind heißt es immer <b>„in Geheimschrift schreiben“</b> und <b>„Geheimschrift lesen“</b>, die Fachwörter stehen nur im Kasten „Hintergrund“.</p>
+  </div>
+
+  <div class="kasten tipp" data-titel="Die Regeln der Geheimschrift (für euch beide gleich)">
+    <ul>
+      <li><b>Nur Großbuchstaben A bis Z.</b> Umlaute und ß gibt es am Rad nicht. Braucht ein Wort eines, schreibt ihr Ä als AE, Ö als OE, Ü als UE und ß als SS, oder ihr nehmt ein anderes Wort. Zwischen den Wörtern bleibt eine Lücke.</li>
+      <li><b>In Geheimschrift schreiben:</b> Jeder Buchstabe geht so viele Plätze im ABC weiter, wie die Schlüssel-Zahl sagt. Nach dem Z geht es wieder mit A los, das ABC ist wie ein Kreis: Mit 3 wird X zu A, Y zu B und Z zu C.</li>
+      <li><b>Geheimschrift lesen:</b> genau umgekehrt, jeder Buchstabe geht so viele Plätze zurück. Vor dem A kommt wieder das Z.</li>
+      <li><b>Die Schlüssel-Zahl</b> ist eine Zahl von 1 bis 25. Die Fee malt sie als kleine Sterne in die Ecke des Briefs (3 Sterne heißt 3). Heute ist sie immer 3, im Schwerer-Teil auch andere.</li>
+      <li><b>Das Rad:</b> außen die normalen Buchstaben, innen (drehbar) die Geheim-Buchstaben mit kleinen Zahlen. Steht die kleine 3 beim Stern, ist das Rad auf 3 gestellt. <b>Lesen: innen suchen, außen ablesen. Schreiben: außen suchen, innen ablesen.</b></li>
+    </ul>
+  </div>
+
+  <div class="kasten material darf-brechen e07-bricht">
+    <p><b>Vorher, ohne {{KIND}} (etwa 25 Minuten):</b></p>
+    <ul>
+      <li><b>Drucken (3 Minuten):</b> <a class="blattref" href="#blatt-7-1"></a> und <a class="blattref" href="#blatt-7-2"></a> (Arbeitsblätter) <b>in Farbe</b>, <a class="blattref" href="#blatt-7-3"></a> (Bastelvorlage) auf dickerem Papier (160&nbsp;g), in Originalgröße (100&nbsp;%, nicht „an Seite anpassen“). Am besten druckst du die Bastelvorlage <b>zweimal</b>: Dann hat jede von euch ein Rad, das braucht ihr beim Spiel „Feen-Briefe tauschen“.</li>
+      <li><b>Rad vorbereiten (10 Minuten):</b> Schneide beide Scheiben genau an der äußeren Linie aus, langsam und ohne Ecken, sonst dreht sich das Rad nicht rund. Die kleine Scheibe klebst du auf Karton (z. B. eine Müslischachtel) oder auf einen zweiten Pappteller und schneidest sie noch einmal aus, so wird sie fest. Die große Scheibe bleibt aus Papier, sie kommt mit {{KIND}} auf den Pappteller. Stich dann in die Mitte beider Scheiben ein kleines Loch (beim Kreuz), am besten mit einer Bleistiftspitze, unter dem Papier ein Radiergummi. Das Kleben und Zusammenstecken macht ihr gemeinsam in Schritt 2.</li>
+      <li><b>Feen-Post (12 Minuten):</b> Such dir aus der Tabelle unten 3 oder 4 Verstecke aus, die es bei euch gibt. Schreib die Geheimwörter auf kleine Zettel, groß und in Blockbuchstaben, und mal in eine Ecke 3 kleine Sterne (das ist die Schlüssel-Zahl). Jeder Zettel nennt das <b>nächste</b> Versteck. Zettel 1 kommt in ein Kuvert „Für {{KIND}}“ und liegt an ihrem Platz. Zettel 2 versteckst du im ersten Versteck und so weiter. Ins letzte Versteck kommt der Schatz mit dem Zettel <m-e7-text schreibe="DU BIST SUPER" k="3" soll="GX ELVW VXSHU"></m-e7-text> („du bist super“). Ein Beispiel mit 3 Verstecken: Im Kuvert steht POLSTER, unter dem Polster KASTEN, im Kasten SACKERL, im Sackerl liegt der Schatz.</li>
+    </ul>
+    <m-e7-post raetsel="e7-post"></m-e7-post>
+    <p><b>Material in der Einheit:</b> ein Pappteller (oder ein Stück Karton), Klebestift, eine <b>Musterklammer</b> (die Klammer mit den zwei Beinchen aus dem Papierfachgeschäft), ein gelber Buntstift für den Stern, Bleistift, eine Wäschekluppe (hält das Rad fest), ein kleiner Schatz (Zuckerl, Sticker, ein schöner Muggelstein), Stempel oder Sticker für den Sammelpass.</p>
+    <p><b>Extra, außerhalb der Einheit:</b> den Rand des Papptellers mit Feen-Sternen bemalen, ein zweites Rad für dich, und ein <b>Feen-Briefkasten</b> aus einer Schuhschachtel mit Schlitz (15 Minuten). In den werft ihr euch die ganze Woche Geheimbriefe ein, das ist das beste Training.</p>
+  </div>
+
+  <h2>Ablauf Schritt für Schritt</h2>
+  <ol class="ablauf e07-ablauf">
+    <li data-min="2"><span class="schritt-titel">Post von der Fee</span>An {{KIND}}s Platz liegt das Kuvert mit Zettel 1. Sie macht es auf und findet Buchstaben-Salat mit drei Sternen in der Ecke (bei POLSTER steht <m-e7-text schreibe="POLSTER" k="3" soll="SROVWHU"></m-e7-text> darauf). Erklär nicht gleich, lass sie eine halbe Minute rätseln (Beispielsätze). Viele Kinder kommen selbst auf die Idee, dass die Buchstaben vertauscht sind.</li>
+    <li data-min="6"><span class="schritt-titel">Das Geheimschrift-Rad</span>{{KIND}} klebt die große Scheibe in die Mitte des Papptellers und malt den Stern beim A gelb an. Dann steckt ihr die Musterklammer durch die kleine Scheibe, durch die große Scheibe und durch den Teller und biegt hinten die Beinchen auseinander (Kasten „Basteln“). Jetzt dreht sie die innere Scheibe, bis die kleine 3 beim Stern steht. Zeig ihr die Regel mit dem ersten Buchstaben: „Das S auf dem Zettel ist ein Geheim-Buchstabe. Such es innen. Was steht außen?“ (P.) Den Rest von Zettel 1 liest sie selbst, du schreibst die Buchstaben mit, bis POLSTER dasteht.</li>
+    <li data-min="7"><span class="schritt-titel">Feen-Post</span>Jetzt geht es los: Unter dem Polster liegt Zettel 2, und so weiter bis zum Schatz (Kasten „Spiel: Feen-Post“). {{KIND}} liest, rennt, findet, liest. Lass sie laufen, so schnell sie mag, das ist der Bewegungsteil der Einheit. Ist noch Zeit, tauscht ihr die Rollen: Sie schreibt ein Versteck für dich in Geheimschrift (jetzt außen suchen, innen ablesen) und du suchst.</li>
+    <li data-min="5"><span class="schritt-titel">Blatt „Feen-Post lesen“</span><a class="blattref" href="#blatt-7-1"></a>. Das Rad bleibt auf 3. Bei Aufgabe 1 malt sie das passende Bild an, das ist eine schöne Probe: Kommt ein echtes Wort heraus? Kommt Buchstaben-Salat heraus, ist meist das Rad verrutscht. Aufgabe 2 ist ein ganzer Feen-Brief. Die Profi-Aufgabe (die vergessene Schlüssel-Zahl) ist freiwillig.</li>
+    <li data-min="6"><span class="schritt-titel">Blatt „Kobold und Feen-Zeichen“</span><a class="blattref" href="#blatt-7-2"></a>. Zuerst der Kobold-Brief: Ein Buchstabe ist falsch, sie liest den Brief und findet ihn. Bei Aufgabe 2 schreibt sie ihren eigenen Namen in Geheimschrift. Achtung, da dreht sich die Richtung um: Jetzt sucht sie außen und liest innen ab. Dann zeigst du ihr die Feen-Zeichen-Tabelle: „Jede Form hat 5 Buchstaben. Die Punkte zählst du wie beim Würfel.“ Ein Kreis mit 2 Punkten ist B, ein Dreieck mit 1 Punkt ist F. Passt nicht mehr alles hinein, kommt der Rest beim nächsten Mal dran.</li>
+    <li data-min="2"><span class="schritt-titel">Sammelpass</span>Feld „Einheit&nbsp;7“ stempeln oder bekleben, Sterne anmalen. Frag: „Wem schreiben wir als Nächstes einen Geheimbrief?“ (Oma, der Freundin aus der Schule, dem Kuscheltier.) Das Rad kommt zu den Befehlskarten und zum Zauber-Kasten in die Werkzeugkiste.</li>
+  </ol>
+
+  <div class="kasten tipp" data-titel="So steht das Rad auf der Schlüssel-Zahl 3">
+    <div class="e07-radtipp">
+      <m-e7-rad teil="beide" schluessel="3" gr="62"></m-e7-rad>
+      <div>
+        <p>Beim Stern (beim äußeren A) steht innen das D mit der kleinen 3. Jetzt steht neben jedem normalen Buchstaben außen sein Geheim-Buchstabe innen: neben dem A das D, neben dem M das <m-e7-text schreibe="M" k="3" soll="P"></m-e7-text>, neben dem Z das <m-e7-text schreibe="Z" k="3" soll="C"></m-e7-text>.</p>
+        <p><b>Lesen:</b> Geheim-Buchstabe innen suchen, den Buchstaben außen daneben aufschreiben. <b>Schreiben:</b> normalen Buchstaben außen suchen, den Geheim-Buchstaben innen daneben aufschreiben.</p>
+        <p>Die Buchstaben unten am Rad stehen kopf. Wer unsicher ist, dreht das ganze Rad (beide Scheiben zusammen), bis der Buchstabe oben steht. Die kleine Zahl beim Stern ändert sich dabei nicht.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>Beispielsätze</h3>
+  <div class="sag">
+    <p class="du">„Schau mal, da liegt ein Brief für dich. Was steht da?“</p>
+    <p class="sie">„S, R, O, V … Das ist kein Wort. Das ist Quatsch!“</p>
+    <p class="du">„Hm. Vielleicht ist es eine Geheimschrift. Die Fee hat drei Sterne dazugemalt. Ich glaube, das ist ihre Schlüssel-Zahl.“</p>
+    <p class="sie">„Was ist eine Schlüssel-Zahl?“</p>
+    <p class="dann">„Die Fee hat jeden Buchstaben 3 Plätze im ABC weitergeschoben. Wer die 3 kennt, kann zurückschieben.“ Probiert es mit einem Buchstaben ohne Rad: Vom S drei zurück ist R, Q, P. Dann zeigst du ihr, wie das Rad das Zählen abnimmt.</p>
+  </div>
+  <div class="sag">
+    <p class="du">„Das ist dein Geheimschrift-Rad. Außen stehen die normalen Buchstaben, innen die Geheim-Buchstaben. Dreh die innere Scheibe, bis die kleine 3 beim Stern steht.“</p>
+    <p class="sie">„Fertig! Beim A steht jetzt das D.“</p>
+    <p class="du">„Genau. Die Fee hat S geschrieben. Such das S innen. Was steht außen daneben?“</p>
+    <p class="sie">„P! … Und beim R steht O, beim O steht L. P, O, L … POLSTER! Ich lauf zum Polster!“</p>
+    <p class="dann">Sucht sie das S außen und liest innen (dann kommt <m-e7-text schreibe="S" k="3" soll="V"></m-e7-text> heraus), frag: „Das S auf dem Zettel ist ein Geheim-Buchstabe. Wo wohnen die Geheim-Buchstaben?“ Der Merksatz für heute: <b>Lesen: innen suchen, außen ablesen.</b></p>
+  </div>
+  <div class="sag">
+    <p class="du">(Profi-Aufgabe auf <a class="blattref" href="#blatt-7-1"></a>) „Oje, die Fee hat ihre Schlüssel-Zahl vergessen. Es war 1, 2, 3, 4 oder 5. Was machen wir?“</p>
+    <p class="sie">„Alle ausprobieren!“</p>
+    <p class="dann">Genau so knackt man eine Geheimschrift. Tipp: Für jede Zahl nur die ersten zwei Buchstaben lesen. Erst wenn der Anfang nach einem Wort aussieht, liest sie weiter.</p>
+  </div>
+
+  <div class="sag">
+    <p class="sie">(<a class="blattref" href="#blatt-7-2"></a>, Kobold-Brief) „S, C, H, O … SCHOTZ? Das heißt doch SCHATZ! Da war der Kobold!“</p>
+    <p class="du">„Super, du hast ihn erwischt. Welcher Geheim-Buchstabe wäre richtig gewesen?“</p>
+    <p class="sie">„Richtig ist A. Das A außen suchen, innen steht … D!“</p>
+    <p class="dann">Das ist schon eine Profi-Frage, denn sie muss die Richtung wechseln. Sagt sie nur „das O ist falsch“, ist die Kobold-Jagd trotzdem geschafft.</p>
+  </div>
+  <div class="sag">
+    <p class="du">(<a class="blattref" href="#blatt-7-2"></a>, Aufgabe 2) „Jetzt drehen wir es um: Du schreibst deinen Namen in Geheimschrift. Wo suchst du jetzt?“</p>
+    <p class="sie">„Mein Name ist normal … also außen! Und innen steht der Geheim-Buchstabe.“</p>
+    <p class="dann">Genau, schreiben ist der umgekehrte Weg. Wer will, liest danach den Geheim-Namen zur Probe zurück: Kommt wieder der Name heraus, stimmt alles.</p>
+  </div>
+  <h2>Spiele, Bewegung und Basteln</h2>
+
+  <div class="kasten spiel darf-brechen e07-bricht" data-titel="Feen-Post">
+    <p class="spiel-meta">{{KIND}} sucht, du bist die Fee · 7–10 Minuten · Geheimschrift-Rad, 4 oder 5 kleine Zettel, ein Kuvert, ein kleiner Schatz</p>
+    <ol class="regeln">
+      <li><b>Vorbereitung (ohne {{KIND}}):</b> 3 oder 4 Verstecke aussuchen und die Zettel schreiben wie im Kasten „Material“. Jeder Zettel nennt das <b>nächste</b> Versteck. Prüf selbst einmal mit dem Rad, ob jeder Zettel stimmt: Ein falscher Buchstabe passiert schnell (und wäre ein echter Kobold).</li>
+      <li><b>Ziel:</b> den Schatz der Fee finden.</li>
+      <li><b>Ein Zettel:</b> {{KIND}} stellt das Rad auf die Zahl der Sterne, liest Buchstabe für Buchstabe und sagt jeden laut. Du schreibst mit, wenn sie will. Wenn das ganze Wort dasteht, läuft sie zum Versteck. Errät sie das Wort schon vorher, darf sie losrennen. Liegt sie falsch, kommt sie zurück und liest weiter.</li>
+      <li><b>Ende:</b> Im letzten Versteck liegen der Schatz und der Zettel <m-e7-text schreibe="DU BIST SUPER" k="3" soll="GX ELVW VXSHU"></m-e7-text>. Den liest sie natürlich auch noch.</li>
+    </ol>
+    <p><b>Varianten:</b></p>
+    <ul>
+      <li><b>Rollentausch:</b> {{KIND}} versteckt einen Zettel für dich. Jetzt schreibt sie in Geheimschrift (außen suchen, innen ablesen). Du liest laut und machst ruhig einmal einen Lese-Fehler, den sie findet.</li>
+      <li><b>Wechselnde Schlüssel-Zahl (schwerer):</b> Jeder Zettel hat eine andere Zahl Sterne, z. B. 1, dann 2, dann 4. {{KIND}} muss das Rad jedes Mal neu stellen.</li>
+      <li><b>Kobold-Post:</b> Auf einem Zettel ist ein Buchstabe falsch, z. B. KASTEN mit <m-e7-text schreibe="KASTEO" k="3" soll="NDVWHR"></m-e7-text> statt <m-e7-text schreibe="KASTEN" k="3" soll="NDVWHQ"></m-e7-text>. Sie liest KASTEO, lacht und findet trotzdem hin.</li>
+      <li><b>Feen-Zeichen-Post:</b> Die Zettel stehen in Feen-Zeichen (Tabelle auf <a class="blattref" href="#blatt-7-2"></a>). Ein schöner Anfang beim nächsten Mal.</li>
+      <li><b>Draußen:</b> im Garten oder Hof mit Straßenkreide: Das Geheimwort steht am Boden, und am Ende wartet der Schatz.</li>
+    </ul>
+  </div>
+
+  <div class="kasten spiel darf-brechen e07-bricht" data-titel="Feen-Briefe tauschen">
+    <p class="spiel-meta">2 Personen · 10 Minuten (für einen anderen Tag oder statt Blatt 7-2) · zwei Geheimschrift-Räder (oder eines zum Teilen), Zettel, Bleistifte, 10 Muggelsteine als Punkte</p>
+    <ol class="regeln">
+      <li><b>Rollen:</b> Eine Person ist die <b>Schreib-Fee</b>, die andere die <b>Lese-Fee</b>. Nach jedem Brief tauscht ihr.</li>
+      <li><b>Ein Zug:</b> Die Schreib-Fee denkt sich heimlich ein Wort mit 3 bis 5 Buchstaben aus (ohne Ä, Ö, Ü und ß) und schreibt es mit der Schlüssel-Zahl 3 in Geheimschrift, ohne dass die andere zuschaut. Sie darf einen <b>Kobold</b> verstecken: genau einen Buchstaben absichtlich falsch. Dann bekommt die Lese-Fee den Zettel, liest ihn mit dem Rad und sagt das Wort und ob ein Kobold drin ist.</li>
+      <li><b>Punkte (Muggelsteine):</b>
+        <ul>
+          <li>Wort richtig gelesen: 1 Stein für die Lese-Fee.</li>
+          <li>Kobold gefunden und gezeigt, welcher Buchstabe es ist: noch 1 Stein für die Lese-Fee.</li>
+          <li>Kobold übersehen, oder „Kobold!“ gerufen, wo keiner ist: 1 Stein für die Schreib-Fee.</li>
+          <li>Hat sich die Schreib-Fee aus Versehen verzählt, zählt der falsche Buchstabe wie ein Kobold. Darüber ärgert sich niemand: Auch echten Programmierern passiert das ständig, darum lesen sie ihre Sachen zur Probe.</li>
+        </ul>
+      </li>
+      <li><b>Ende:</b> Nach 6 Briefen (jede 3-mal Schreib-Fee) gewinnt, wer mehr Steine hat. Bei Gleichstand schreibt ihr zusammen einen Geheimbrief an Oma oder Opa.</li>
+    </ol>
+    <p>Tipp für dich als Schreib-Fee: Mal ein Kobold, mal keiner. Mach den Kobold so, dass ein lustiges Unsinn-Wort herauskommt (aus MOND wird MONX), dann hat {{KIND}} eine faire Chance. Bei ihren Briefen liest du laut und ehrlich, auch wenn du das Wort schon ahnst.</p>
+    <p><b>Varianten:</b> <b>Knacken</b> (schwerer): Die Schreib-Fee verrät die Schlüssel-Zahl nicht, sie ist 1 bis 5. Wer die Zahl findet, bekommt einen Extra-Stein. <b>Feen-Zeichen-Briefe:</b> Das Wort steht in Feen-Zeichen. <b>Zwei Wörter</b> pro Brief, z. B. „KOMM MIT“.</p>
+  </div>
+
+  <div class="sag">
+    <p class="sie">(schreibt für dich) „Ich hab einen Kobold versteckt. Den findest du nie!“</p>
+    <p class="du">(liest) „F, I, S, C, … FISCX? Ha! Das X ist der Kobold, es heißt FISCH.“</p>
+    <p class="dann">Wenn {{KIND}} absichtlich Kobolde versteckt, muss sie richtig gut wissen, wie der echte Geheim-Buchstabe heißt. Das ist das beste Training für die Geheimschrift, viel besser als ein weiteres Blatt.</p>
+  </div>
+
+  <div class="kasten basteln" data-titel="Geheimschrift-Rad bauen">
+    <ol>
+      <li>Die beiden Scheiben von <a class="blattref" href="#blatt-7-3"></a> hast du schon ausgeschnitten, die kleine auf Karton geklebt und Löcher in die Mitten gestochen (Kasten „Material“). Die große Scheibe ist 13 cm breit, die kleine knapp 10 cm. Beide haben 26 gleich große Felder, darum passen die Buchstaben genau nebeneinander.</li>
+      <li>{{KIND}} klebt die große Scheibe genau in die Mitte des Papptellers. Kein Teller da? Dann auf Karton kleben und ausschneiden, wie die kleine.</li>
+      <li>Mit der Bleistiftspitze das Loch im Teller durchstechen (durch das Loch der Scheibe hindurch).</li>
+      <li>Kleine Scheibe darauf, Musterklammer von vorne durch alle Löcher, hinten die Beinchen auseinanderbiegen. Nicht zu fest drücken, sonst dreht sich die Scheibe schwer.</li>
+      <li><b>Probe:</b> Steht die 0 beim Stern, steht innen bei jedem Buchstaben derselbe Buchstabe. Steht die 3 beim Stern, steht beim A das D.</li>
+      <li><b>Keine Musterklammer?</b> Ein Reißnagel durch beide Mitten in einen Korken auf der Rückseite, oder ihr legt die kleine Scheibe einfach auf und haltet sie mit einer Wäschekluppe am Rand fest.</li>
+    </ol>
+  </div>
+
+  <div class="kasten bewegung" data-titel="Buchstaben-Hüpfer">
+    <p>Für zwischendurch oder wenn das Rad noch nicht fertig ist: {{KIND}} steht in der Mitte des Zimmers. Du sagst einen Buchstaben und eine Zahl: „M und 3!“ Sie hüpft 3-mal nach vorne und sagt bei jedem Hüpfer den nächsten Buchstaben im ABC: „N, O, P!“ P ist der Geheim-Buchstabe. Zum Lesen hüpft sie kleine Hüpfer zurück und sagt das ABC rückwärts. Spannend wird es am Ende: „Y und 3!“ (Z, A, B: Nach dem Z fängt das ABC wieder vorne an, genau wie am Rad.) Dann tauscht ihr: Sie sagt Buchstabe und Zahl, du hüpfst, und manchmal hüpfst du absichtlich einmal zu weit.</p>
+  </div>
+
+  <h2>Wenn es hakt oder zu leicht ist</h2>
+
+  <div class="zwei">
+    <div class="kasten leichter">
+      <ul>
+        <li><b>Schlüssel-Zahl 1:</b> Jeder Buchstabe wird zum nächsten im ABC (schreiben) bzw. zum vorigen (lesen). Aus EIS wird <m-e7-text schreibe="EIS" k="1" soll="FJT"></m-e7-text>.</li>
+        <li><b>Nachschlage-Streifen:</b> Schreib das ABC in eine Zeile und darunter jeden Geheim-Buchstaben (bei 3: D unter A, E unter B …). Dann muss sie nur noch nachschauen.</li>
+        <li>Nur kurze Wörter mit 3 oder 4 Buchstaben, beim Feen-Brief nur die erste Zeile.</li>
+        <li>Du hältst die innere Scheibe fest, sie sucht und liest ab.</li>
+        <li>Feen-Zeichen zuerst nur mit Kreisen (A bis E).</li>
+      </ul>
+    </div>
+    <div class="kasten bonus" data-titel="Bonus-Knobelei">
+      <p class="klein"><i>Für zwischendurch: im Auto, beim Abendessen, beim Zähneputzen.</i></p>
+      <p><b>Geheimwort im Kopf:</b> „Schlüssel-Zahl 1. Ich buchstabiere: B, V, U, P. Welches Wort ist das?“</p>
+      <p><b>Nach dem Z:</b> „Mit Schlüssel-Zahl 1: Was wird aus Z?“</p>
+      <p><b>Schreib selbst:</b> „Wie heißt OPA mit Schlüssel-Zahl 1?“</p>
+      <p><b>Für Profis:</b> „Ich lese J, A mit Schlüssel-Zahl 6. Was steht da?“</p>
+      <p class="klein"><b>Kurz-Lösungen:</b> <m-e7-text lies="BVUP" k="1" soll="AUTO"></m-e7-text>; A; <m-e7-text schreibe="OPA" k="1" soll="PQB"></m-e7-text>; <m-e7-text lies="JA" k="6" soll="DU"></m-e7-text> (aus JA wird DU). Mehr bei den Lösungen am Ende.</p>
+    </div>
+  </div>
+
+  <div class="kasten stolper darf-brechen e07-bricht">
+    <ul>
+      <li><b>Sie verwechselt die Richtung</b> (sucht beim Lesen außen und liest innen ab): Das ist der häufigste Stolperstein. Merksatz: „Geheim-Buchstaben wohnen innen.“ Was auf dem Feen-Zettel steht, ist geheim, also sucht sie es innen. Hilft auch: Die innere Scheibe ist farbig, wie bunte Feen-Post.</li>
+      <li><b>Das Rad verrutscht</b> beim Suchen: Vor jedem Wort kurz schauen, ob die 3 noch beim Stern steht. Eine Wäschekluppe am Rand der kleinen Scheibe klemmt beide Scheiben zusammen.</li>
+      <li><b>Buchstaben stehen kopf:</b> Unten am Rad sehen manche Buchstaben anders aus (W wie M, N wie Z, U wie n). Das ganze Rad drehen, bis der Buchstabe oben steht, oder einfach das Blatt drehen. Die Einstellung bleibt dabei gleich.</li>
+      <li><b>Sie verzählt sich ohne Rad:</b> Der Buchstabe, bei dem man startet, zählt nicht mit. „Von M aus 3 weiter: N ist eins, O ist zwei, P ist drei.“ Mit den Fingern mitzählen hilft, oder die Buchstaben-Hüpfer.</li>
+      <li><b>Nach dem Z weiß sie nicht weiter:</b> „Das ABC ist am Rad ein Kreis. Nach dem Z kommt wieder das A.“ Zeig es am Rad.</li>
+      <li><b>Sie möchte ein Wort mit Ä, Ö, Ü oder ß schreiben</b> (SCHÖN, MÄDCHEN): Das gibt es am Rad nicht. Sie schreibt OE statt Ö (SCHOEN) oder sucht ein anderes Wort. Auch das ist eine schöne Denkaufgabe.</li>
+      <li><b>Der Feen-Brief ist ihr zu lang:</b> Du liest jedes zweite Wort, sie die anderen. Oder sie liest nur, bis sie das Wort errät, und prüft dann den Rest.</li>
+      <li><b>Bei den Feen-Zeichen verzählt sie die Punkte:</b> Die Punkte stehen wie auf einem Würfel. Hol einen Würfel dazu: 3 Punkte im Kreis sind wie die 3 am Würfel, also der dritte Buchstabe vom Kreis, C.</li>
+      <li><b>Sie ärgert sich über den Kobold:</b> „Wer den Kobold findet, hat gewonnen.“ Ein falscher Buchstabe ist kein Drama, sondern ein Rätsel, wie in Einheit 4.</li>
+    </ul>
+  </div>
+
+  <div class="kasten schwerer darf-brechen e07-bricht">
+    <p>Sitzt das Lesen und Schreiben mit 3 nach wenigen Minuten, wähle hier aus. Das ist kein Zusatz „für später“, sondern ein vollwertiger Hauptteil. Alles geht mit dem Rad, die Lösungen stehen gleich dabei.</p>
+    <ol class="e07-ganz">
+      <li><b>Andere Schlüssel-Zahlen:</b> Dasselbe Wort mit verschiedenen Zahlen schreiben. HALLO mit 1 ist <m-e7-text schreibe="HALLO" k="1" soll="IBMMP"></m-e7-text>, mit 5 ist es <m-e7-text schreibe="HALLO" k="5" soll="MFQQT"></m-e7-text>, mit 10 ist es <m-e7-text schreibe="HALLO" k="10" soll="RKVVY"></m-e7-text>. Frag: „Was bleibt immer gleich?“ (Die zwei gleichen Buchstaben in der Mitte bleiben zwei gleiche Buchstaben. Das verrät viel, siehe Punkt 7.) Dazu passt die Feen-Post mit wechselnder Schlüssel-Zahl (Varianten im Spiel).</li>
+      <li><b>Lesen mit der Gegen-Zahl:</b> Stell das Rad auf 23 und <b>schreib</b> PRQG in Geheimschrift. Was kommt heraus? (<m-e7-text schreibe="PRQG" k="23" soll="MOND"></m-e7-text>! Denn 3 und 23 sind zusammen 26, einmal ganz herum.) Lesen mit 3 ist also dasselbe wie Schreiben mit 23, das Rad wird nur in die andere Richtung gedreht. Frag: „Mit welcher Zahl schreibe ich, wenn ich etwas lesen will, das mit 5 geschrieben ist?“ (21.)</li>
+      <li><b>Zwei Schlüssel hintereinander:</b> {{KIND}} schreibt EIS mit 3 und das Ergebnis noch einmal mit 4: <m-e7-kette raetsel="e7-x1"></m-e7-kette>. Jetzt schreibt sie EIS gleich mit 7: <m-e7-text schreibe="EIS" k="7" soll="LPZ"></m-e7-text>. Dasselbe! 3 und dann 4 ist wie 7. Frag: „Wird es doppelt so geheim, wenn man zweimal verschiebt?“ (Nein, es ist nur eine andere Schlüssel-Zahl. Wer 7 ausprobiert, knackt es genauso.) Für Profis: 20 und dann 10 ist wie 4, weil 30 einmal ganz herum (26) und noch 4 ist.</li>
+      <li><b>Die Schlüssel-Zahl 26:</b> Knobel-Ecke auf <a class="blattref" href="#blatt-7-2"></a>. Mit 26 geht jeder Buchstabe einmal ganz um das Rad herum und landet bei sich selbst: OMA bleibt OMA. Am Rad steht deshalb beim inneren A die 0, und 26 ist wie 0. Eine Geheimschrift mit 26 ist gar nicht geheim.</li>
+      <li><b>Die Spiegel-Zahl 13:</b> Schreib OMA mit 13 und das Ergebnis noch einmal mit 13: <m-e7-kette raetsel="e7-x2"></m-e7-kette>. Wieder OMA! Mit 13 sind Schreiben und Lesen dasselbe, denn 13 und 13 sind 26. Frag: „Gibt es noch so eine Zahl?“ (Nein, von 1 bis 25 nur die 13.)</li>
+      <li><b>Knacken durch Ausprobieren:</b> Die Fee verrät die Schlüssel-Zahl nicht. Zuerst die Profi-Aufgabe auf <a class="blattref" href="#blatt-7-1"></a> (die Zahl ist 1 bis 5). Dann der echte Knacker-Brief: <m-e7-text schreibe="STERN" k="10" soll="CDOBX"></m-e7-text>, die Zahl kann alles von 1 bis 25 sein. Tipp: Für jede Zahl nur die ersten zwei Buchstaben lesen und schauen, ob ein Wort so anfangen kann. Bei 10 kommt STERN heraus. Wie viele Versuche braucht man höchstens? (25, dann hat man alle Zahlen durch.) Das ist auch Level 8 im Bildschirm-Bonus.</li>
+      <li><b>Detektiv-Tricks beim Knacken:</b> Doppelte Buchstaben bleiben doppelt: In <m-e7-text schreibe="SONNE" k="12" soll="EAZZQ"></m-e7-text> steht ZZ, das könnte NN, LL, SS, EE oder TT sein. Kurze Wörter verraten viel: Ein Wort aus zwei Buchstaben heißt oft DU, IM, AM oder ES. Und am Anfang eines Feen-Briefs steht oft HALLO.</li>
+      <li><b>Der häufigste Buchstabe:</b> Im Deutschen kommt das E am öftesten vor. Schreib diesen Brief auf: <m-e7-text schreibe="DER ESEL GEHT ZUM SEE" k="10" soll="NOB OCOV QORD JEW COO"></m-e7-text>. {{KIND}} zählt mit Strichen, welcher Geheim-Buchstabe am öftesten vorkommt. (Das O, 6-mal.) Wahrscheinlich ist das O ein E. Dann dreht sie das Rad, bis innen das O neben dem äußeren E steht, und liest die Zahl beim Stern ab: 10. Jetzt kann sie den Brief lesen: DER ESEL GEHT ZUM SEE. Der Löser hat geprüft, dass nur die 10 lauter echte Wörter ergibt.</li>
+      <li><b>Doppelt geheim:</b> Erst mit dem Rad in Geheimschrift schreiben, dann jeden Geheim-Buchstaben in Feen-Zeichen malen. Aus FEE wird mit 3 zuerst <m-e7-text schreibe="FEE" k="3" soll="IHH"></m-e7-text> und dann <m-e7-feen text="IHH"></m-e7-feen>. Wer das lesen will, muss beide Geheimschriften kennen und rückwärts gehen: zuerst die Feen-Zeichen, dann das Rad.</li>
+      <li><b>Ein eigenes Feen-Alphabet erfinden:</b> {{KIND}} erfindet für jeden Buchstaben ein eigenes Zeichen (Mond, Blitz, Blume, Schnecke …). Die wichtigste Regel: Jeder Buchstabe bekommt genau ein Zeichen, und keine zwei Buchstaben haben dasselbe Zeichen, sonst kann man nicht eindeutig lesen. Sie macht eine Tabelle wie auf <a class="blattref" href="#blatt-7-2"></a> und schreibt dir einen Brief. Schlau ist ein System wie bei den Feen-Zeichen (Form und Punkte): Dann muss man sich nur die Regel merken und nicht 26 Zeichen. Für Profis: Geht ihr Alphabet auch nur mit Punkten und Strichen?</li>
+      <li><b>Kobold-Brief für dich:</b> {{KIND}} schreibt dir einen Feen-Brief mit genau einem Kobold. Du findest ihn, oder auch nicht, und sie erklärt dir, wo er sich versteckt hat.</li>
+    </ol>
+  </div>
+
+  <h2>Hintergrund</h2>
+  <div class="kasten warum darf-brechen e07-bricht">
+    <p>Die Geheimschrift mit dem Rad ist eine der ältesten <span class="begriff">Verschlüsselungen</span> der Welt. Der römische Feldherr Julius Caesar soll vor über 2000 Jahren genau so seine Briefe geschrieben haben, sogar mit derselben Schlüssel-Zahl 3. Darum heißt sie <span class="begriff">Caesar-Verschlüsselung</span>. Die Fachwörter: Der normale Text heißt <b>Klartext</b>, der Buchstaben-Salat <b>Geheimtext</b>. „In Geheimschrift schreiben“ heißt <b>verschlüsseln</b>, „lesen“ heißt <b>entschlüsseln</b>, und die Schlüssel-Zahl ist der <b>Schlüssel</b>. Einen Geheimtext ohne Schlüssel zu lesen heißt <b>knacken</b>.</p>
+    <p>Für einen <span class="begriff">Computer</span> sind Buchstaben sowieso Zahlen (A ist dort die Nummer 65, B die 66 …). Die Caesar-Verschlüsselung ist für ihn ein ganz kurzer <span class="begriff">Algorithmus</span>: Für jeden Buchstaben die Nummer nehmen, den Schlüssel dazuzählen und nach dem Z wieder vorne anfangen. Genau dieses „wieder vorne anfangen“ macht das Rad, weil es rund ist. Und weil es nur 25 Schlüssel gibt, probiert ein Computer sie in einem Augenblick alle durch. Caesar ist also nicht sicher. Heute schützen Verschlüsselungen jede Nachricht am Handy und jeden Einkauf im Internet, mit Schlüsseln aus Hunderten von Ziffern, die niemand durchprobieren kann. Die Idee ist aber dieselbe: Nur wer den Schlüssel hat, kann lesen.</p>
+    <p>Der Trick mit dem häufigsten Buchstaben heißt <b>Häufigkeitsanalyse</b>. Der arabische Gelehrte al-Kindi hat ihn vor über 1100 Jahren aufgeschrieben. Er knackt jede Geheimschrift, bei der jeder Buchstabe immer durch dasselbe Zeichen ersetzt wird, auch die Feen-Zeichen. Die Feen-Zeichen sind eine <span class="begriff">Codierung</span>: Jeder Buchstabe wird durch ein Zeichen ersetzt, wie beim Morse-Code oder bei der Blindenschrift. Codierungen sind nicht unbedingt geheim, sie schreiben dasselbe nur anders auf. Darauf bauen die nächsten Einheiten auf: Bilder als Code aus Kästchen (Einheit 8) und Zahlen nur aus Ja und Nein (Einheit 9).</p>
+  </div>
+
+  <h2>Bildschirm-Bonus</h2>
+  <div class="kasten bildschirm darf-brechen e07-bricht">
+    <p><b>Paket 7 „Geheimschrift der Feen“.</b> Den QR-Code findest du auf <a class="blattref" href="#blatt-7-1"></a> unten rechts. Nur am Schluss, nach den Blättern, höchstens 15 Minuten. Die Einheit funktioniert auch ganz ohne Bildschirm.</p>
+    <p><b>8 Levels</b> mit einem digitalen Geheimschrift-Rad, das genauso aussieht wie das gebastelte. Level 1 bis 3: ein Geheimwort lesen und das passende von drei Bildern antippen (Schlüssel-Zahl 1, dann 3). Level 4 und 5: ein Wort in Geheimschrift schreiben, mit wenigen Buchstaben-Tasten. Level 6: ein Wort in Feen-Zeichen lesen. Level 7 und 8: knacken, die Schlüssel-Zahl ist nicht verraten. <b>Level 2 und 3 sind Aufgabe 1 von <a class="blattref" href="#blatt-7-1"></a>, Level 6 ist das Feen-Wort von <a class="blattref" href="#blatt-7-2"></a>, Level 7 ist die Profi-Aufgabe von Blatt 7-1.</b> Am besten spielt {{KIND}} sie nach den Blättern.</p>
+    <p><b>So geht es (geplant):</b> Das Rad dreht sich mit zwei Tasten (eine dreht vor, eine zurück), kein Ziehen. Die kleine Zahl beim Stern zeigt die Schlüssel-Zahl, wie am Papier. Die App liest nichts vor: {{KIND}} sucht und liest am Rad selbst und tippt dann das Bild oder die Buchstaben-Tasten an. Die App prüft das Ergebnis mit demselben Programm, das beim Bauen die Blätter prüft. Passt es nicht, kommt ein freundlicher Hinweis, und sie probiert weiter. Einen Stern gibt es für jedes geschaffte Level.</p>
+    <p><b>Wann weglegen:</b> Nach Level 8 kommt „Super! Jetzt zurück zum Papier.“ Dann ist Schluss, auch wenn noch Zeit wäre. Lieber noch einen Geheimbrief für den Feen-Briefkasten schreiben.</p>
+  </div>
+
+  <h2>Lösungen</h2>
+  <div class="e07-loes">
+    <m-loesungen einheit="7" skala="0.39"></m-loesungen>
+    <div class="kasten loesung">
+      <p><b><a class="blattref" href="#blatt-7-1"></a>, Aufgabe 1:</b> PRQG heißt MOND (Bild Mond), KHUC heißt HERZ (Bild Herz). <b>Aufgabe 2:</b> DER DRACHE MAG KEKSE.</p>
+      <p><b>Profi:</b> Die Schlüssel-Zahl ist 5, das Wort ist FISCH. Die Versuche: <m-e7-versuche raetsel="e7-p1" bis="5"></m-e7-versuche>. Nur die 5 ergibt ein Wort, auch mit allen Zahlen bis 25 (vom Löser geprüft).</p>
+      <p><b>Bildschirm-Levels:</b> Bei jedem Level passt genau ein Bild bzw. ein Geheimwort (vom Löser geprüft).</p>
+      <table class="tab e07-tab">
+        <tr><td>1</td><td>Lesen mit 1: FJT heißt EIS (Bild Eis)</td></tr>
+        <tr><td>2</td><td>wie <a class="blattref" href="#blatt-7-1"></a>, Aufgabe 1: PRQG heißt MOND</td></tr>
+        <tr><td>3</td><td>wie Blatt 7-1, Aufgabe 1: KHUC heißt HERZ</td></tr>
+        <tr><td>4</td><td>BALL mit 3 schreiben: <m-e7-text schreibe="BALL" k="3" soll="EDOO"></m-e7-text></td></tr>
+        <tr><td>5</td><td>BAUM mit 2 schreiben: <m-e7-text schreibe="BAUM" k="2" soll="DCWO"></m-e7-text></td></tr>
+        <tr><td>6</td><td>Feen-Zeichen wie <a class="blattref" href="#blatt-7-2"></a>, Aufgabe 3: KRONE</td></tr>
+        <tr><td>7</td><td>Knacken (1 bis 5) wie Blatt 7-1, Profi: KNXHM mit 5 heißt FISCH</td></tr>
+        <tr><td>8</td><td>Knacken (1 bis 25): CDOBX mit 10 heißt STERN</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="kasten loesung darf-brechen e07-bricht e07-weiter">
+    <p><b><a class="blattref" href="#blatt-7-2"></a>, Aufgabe 1:</b> Gelesen steht da SCHOTZ IM KASTEN. Der Kobold hat beim vierten Buchstaben R statt D geschrieben, darum liest man O statt A. Richtig heißt es SCHATZ IM KASTEN. Das ist der einzige falsche Buchstabe (vom Löser geprüft).</p>
+    <p><b>Aufgabe 2:</b> {{KIND}}s Name mit Schlüssel-Zahl 3 steht rot im Blatt. Zur Probe zurücklesen: Kommt wieder ihr Name heraus?</p>
+    <p><b>Aufgabe 3:</b> Das Feen-Wort heißt KRONE (Quadrat mit 1 Punkt, Herz mit 3, Quadrat mit 5, Quadrat mit 4, Kreis mit 5). Bild: Krone.</p>
+    <p><b>Knobel-Ecke:</b> OMA bleibt OMA. Mit 26 geht jeder Buchstabe einmal ganz herum.</p>
+    <p><b><a class="blattref" href="#blatt-7-3"></a>, Knobel-Ecke:</b> Steht die 3 beim Stern, steht beim A das <m-e7-text schreibe="A" k="3" soll="D"></m-e7-text> und beim Z das <m-e7-text schreibe="Z" k="3" soll="C"></m-e7-text>.</p>
+    <p><b>Bonus-Knobelei:</b> B, V, U, P mit 1 gelesen ist AUTO (jeder Buchstabe einen zurück). Aus Z wird mit 1 das A, weil das ABC am Rad ein Kreis ist. OPA mit 1 ist PQB. Für Profis: J, A mit 6 gelesen ist DU, aus „ja“ wird „du“. Solche Zufälle gibt es bei kurzen Wörtern öfter, darum knackt man mit langen Briefen sicherer.</p>
+    <p><b>Feen-Post:</b> Alle Geheimwörter stehen in der Tabelle im Kasten „Material“ (vom Löser aus denselben Daten ausgerechnet).</p>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 7-1: Feen-Post lesen (lesen, knacken)                    -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="7" data-titel="Feen-Post lesen" data-art="Arbeitsblatt" data-verteilt>
+  <div class="e07-kopf">
+    <m-e7-rad teil="beide" schluessel="3" gr="50"></m-e7-rad>
+    <div>
+      <p>{{KIND}}, stell dein Rad auf die Schlüssel-Zahl 3. Die kleine 3 steht beim Stern.</p>
+      <p class="e07-merk">Lesen: innen suchen, außen ablesen.</p>
+    </div>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">Lies die Geheim-Wörter. Mal das passende Bild an.</p>
+    <div class="e07-zwei">
+      <m-e7-lesen raetsel="e7-l1" bildgr="14"></m-e7-lesen>
+      <m-e7-lesen raetsel="e7-l2" bildgr="14"></m-e7-lesen>
+    </div>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">Die Fee schreibt dir einen Brief. Lies ihn!</p>
+    <m-e7-lesen raetsel="e7-b1" umbruch="2"></m-e7-lesen>
+  </div>
+
+  <div class="e07-profi-reihe">
+    <div class="profi" data-titel="Profi-Aufgabe: Die vergessene Schlüssel-Zahl">
+      <p>Die Fee hat ihre Schlüssel-Zahl vergessen. Ist es 1, 2, 3, 4 oder 5? Probier aus!</p>
+      <m-e7-knacken raetsel="e7-p1" bilder="nein"></m-e7-knacken>
+    </div>
+    <m-qr paket="e7"></m-qr>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 7-2: Kobold, Name in Geheimschrift, Feen-Zeichen         -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="7" data-titel="Kobold und Feen-Zeichen" data-art="Arbeitsblatt" data-verteilt>
+  <div class="aufg">
+    <p class="anw">{{KIND}}, lies den Feen-Brief (Schlüssel-Zahl 3). Ein Buchstabe ist falsch, da war der Kobold! Kreis ihn ein.</p>
+    <m-e7-kobold raetsel="e7-k1" gr="10"></m-e7-kobold>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">Jetzt du! Schreib deinen Namen in Geheimschrift.</p>
+    <div class="e07-name">
+      <m-e7-schreiben name schluessel="3"></m-e7-schreiben>
+      <span class="e07-merk">Rad auf 3. Schreiben:<br>außen suchen, innen ablesen.</span>
+    </div>
+  </div>
+
+  <div class="aufg ohne-nr">
+    <p class="anw">Das sind die Feen-Zeichen. Jede Form hat 5 Buchstaben. Die Punkte zählst du wie beim Würfel.</p>
+    <div class="e07-zentriert"><m-e7-alphabet gr="10.5" breite="13.5"></m-e7-alphabet></div>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">Lies das Feen-Wort. Mal das passende Bild an.</p>
+    <m-e7-zeichen raetsel="e7-z1" bildgr="15"></m-e7-zeichen>
+  </div>
+
+  <div class="knobel" data-titel="Knobel-Ecke: Die Schlüssel-Zahl 26">
+    <div class="e07-unten">
+      <p>Die Fee schreibt OMA mit der Schlüssel-Zahl 26. Was kommt heraus? Probier es am Rad!</p>
+      <m-e7-schreiben raetsel="e7-n1"></m-e7-schreiben>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 7-3: Bastelvorlage Geheimschrift-Rad (zwei Scheiben)      -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="7" data-titel="Mein Geheimschrift-Rad" data-art="Bastelvorlage">
+  <div class="e07-bastel">
+    <div class="e07-aussen"><m-e7-rad teil="aussen" anmalen></m-e7-rad></div>
+    <ol class="e07-schritte">
+      <li><span class="e07-nr">1</span>Beide Scheiben ausschneiden.</li>
+      <li><span class="e07-nr">2</span>Die große auf einen Pappteller kleben.</li>
+      <li><span class="e07-nr">3</span>Die kleine darauf, Musterklammer in die Mitte.</li>
+      <li><span class="e07-nr">4</span>Den Stern gelb anmalen.</li>
+    </ol>
+    <div class="e07-innen"><m-e7-rad teil="innen"></m-e7-rad></div>
+    <div class="knobel" data-titel="Knobel-Ecke">
+      <p>{{KIND}}, stell dein Rad auf 3. Welcher Geheim-Buchstabe steht beim A? Und beim Z?</p>
+      <p>A: <m-e7-feld schreibe="A" k="3"></m-e7-feld> &nbsp; Z: <m-e7-feld schreibe="Z" k="3"></m-e7-feld></p>
+    </div>
+  </div>
+</section>
