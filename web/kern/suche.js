@@ -199,7 +199,7 @@
     let s = '';
     // Beschriftung links
     if (opt.beschriftung !== false) {
-      const t = (y, txt) => '<text x="0.4" y="' + r2(y + f / 2) + '" font-size="3.9" font-weight="700" fill="' + GRAU + '" font-family="' + SCHRIFT + '" dominant-baseline="central">' + txt + '</text>';
+      const t = (y, txt) => '<text data-nebenschrift="" x="0.4" y="' + r2(y + f / 2) + '" font-size="3.9" font-weight="700" fill="' + GRAU + '" font-family="' + SCHRIFT + '" dominant-baseline="central">' + txt + '</text>';
       s += t(L.y0, 'Start') + t(L.zielY, 'Ziel');
     }
     // Bahnen
@@ -231,7 +231,7 @@
     // Maße für den Plan am Boden
     if (opt.masse) {
       const m = opt.masse;
-      const mtext = (x, y, txt, anker) => '<text x="' + r2(x) + '" y="' + r2(y) + '" font-size="3.6" font-weight="700" fill="' + GRAU + '" font-family="' + SCHRIFT + '" text-anchor="' + (anker || 'middle') + '" dominant-baseline="central">' + esc(txt) + '</text>';
+      const mtext = (x, y, txt, anker) => '<text data-nebenschrift="" x="' + r2(x) + '" y="' + r2(y) + '" font-size="3.6" font-weight="700" fill="' + GRAU + '" font-family="' + SCHRIFT + '" text-anchor="' + (anker || 'middle') + '" dominant-baseline="central">' + esc(txt) + '</text>';
       const pf = (x1, y1, x2, y2) => '<line x1="' + r2(x1) + '" y1="' + r2(y1) + '" x2="' + r2(x2) + '" y2="' + r2(y2) + '" stroke="' + GRAU + '" stroke-width="0.4"/>';
       if (m.quer && bahnen > 1) {
         const y = 3.4, x1 = L.x(1), x2 = L.x(2);
@@ -395,7 +395,7 @@
     return '<svg xmlns="http://www.w3.org/2000/svg" width="' + gr + 'mm" height="' + r2(gr * 0.8) + 'mm" viewBox="0 0 20 16" aria-hidden="true">' +
       '<path d="M2.5 13 Q10 -1.5 17 11.5" fill="none" stroke="' + farbe + '" stroke-width="2" stroke-linecap="round"/>' +
       '<path d="M12.6 10.6 L17.3 12 L18.2 7.2" fill="none" stroke="' + farbe + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
-      '<text x="9.8" y="14.6" font-size="7.4" font-weight="700" text-anchor="middle" fill="' + farbe + '" font-family="' + SCHRIFT + '">?</text></svg>';
+      '<text data-nebenschrift="" x="9.8" y="14.6" font-size="7.4" font-weight="700" text-anchor="middle" fill="' + farbe + '" font-family="' + SCHRIFT + '">?</text></svg>';
   }
 
   // Zahlenkarte (Tauschen in der App)
