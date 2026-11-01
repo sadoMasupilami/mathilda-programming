@@ -1,0 +1,13 @@
+{
+  "paket": "e17",
+  "einheit": 17,
+  "titel": "Zaubersprüche (Test)",
+  "web": {"titel": "Zaubersprüche", "art": "pfad", "levels": ["t17-1", "t17-2", "t17-3", "t17-4", "t17-5"]},
+  "raetsel": [
+    {"id": "t17-1", "art": "pfad", "aufgabe": "ankommen", "b": 4, "h": 4, "start": {"x": 0, "y": 3, "blick": "oben"}, "ziel": {"x": 2, "y": 3}, "hindernisse": [[1, 3], [1, 2]], "erlaubt": ["spruch"], "sprueche": {"stern": "vor vor rechts"}, "maxKarten": 3, "beispiel": "@stern @stern @stern"},
+    {"id": "t17-2", "art": "pfad", "aufgabe": "ankommen", "b": 4, "h": 4, "start": {"x": 0, "y": 3, "blick": "oben"}, "ziel": {"x": 3, "y": 0}, "hindernisse": [[0, 1], [0, 0], [1, 0], [1, 3], [2, 3], [3, 3], [2, 2], [3, 2], [3, 1]], "erlaubt": ["spruch"], "spruchFrei": ["mond"], "maxKarten": 8, "beispiel": "@mond @mond @mond", "beispielSprueche": {"mond": "vor rechts vor links"}},
+    {"id": "t17-3", "art": "pfad", "aufgabe": "ankommen", "b": 4, "h": 4, "start": {"x": 0, "y": 3, "blick": "oben"}, "ziel": {"x": 2, "y": 3}, "hindernisse": [[1, 3], [1, 2]], "erlaubt": ["spruch", "zauber"], "sprueche": {"stern": "vor vor rechts"}, "maxKarten": 2, "beispiel": "3[@stern]"},
+    {"id": "t17-4", "art": "pfad", "aufgabe": "ankommen", "b": 4, "h": 5, "start": {"x": 0, "y": 4, "blick": "oben"}, "ziel": {"x": 2, "y": 0}, "erlaubt": ["spruch"], "sprueche": {"stern": "vor vor", "mond": "rechts vor links"}, "maxKarten": 4, "beispiel": "@mond @stern @mond @stern"},
+    {"id": "t17-5", "art": "pfad", "aufgabe": "ankommen", "b": 5, "h": 4, "start": {"x": 0, "y": 3, "blick": "oben"}, "ziel": {"x": 4, "y": 0}, "hindernisse": [[1, 3], [2, 1], [3, 3]], "erlaubt": ["spruch", "zauber", "wenn", "bis"], "spruchFrei": ["krone"], "maxKarten": 12, "erzwingt": [], "beispiel": "bis[@krone]", "beispielSprueche": {"krone": "wenn[stein: rechts sonst vor]"}}
+  ]
+}

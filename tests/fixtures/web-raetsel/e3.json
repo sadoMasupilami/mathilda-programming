@@ -5,11 +5,11 @@
   "web": { "titel": "Erst das, dann das", "art": "ablauf", "levels": ["t3-1", "t3-2", "t3-3", "t3-4", "t3-5"] },
   "raetsel": [
     { "id": "t3-1", "art": "ablauf", "karten": [
-        { "id": "a", "text": "Socken an", "bild": "socken" }, { "id": "b", "text": "Schuhe an", "bild": "schuhe" }, { "id": "c", "text": "Masche binden", "bild": "masche" } ],
+        { "id": "a", "text": "Socken an", "bild": "socken" }, { "id": "b", "text": "Schuhe an", "bild": "schuhe" }, { "id": "c", "text": "Masche binden" } ],
       "regeln": [["a", "b"], ["b", "c"]] },
     { "id": "t3-2", "art": "ablauf", "karten": [
-        { "id": "a", "text": "Semmel aufschneiden", "bild": "semmel" }, { "id": "b", "text": "Butter drauf", "bild": "butter" },
-        { "id": "c", "text": "Käse drauf", "bild": "kaese" }, { "id": "d", "text": "Zuklappen", "bild": "semmel-zu" } ],
+        { "id": "a", "text": "Semmel aufschneiden", "bild": "brot" }, { "id": "b", "text": "Butter drauf", "bild": "butter" },
+        { "id": "c", "text": "Käse drauf", "bild": "kaese" }, { "id": "d", "text": "Zuklappen", "bild": "essen" } ],
       "regeln": [["a", "b"], ["b", "c"], ["c", "d"]] },
     { "id": "t3-3", "art": "ablauf", "karten": [
         { "id": "a", "text": "Zahnpasta auf die Bürste" }, { "id": "b", "text": "Zähne putzen" }, { "id": "c", "text": "Mund ausspülen" },

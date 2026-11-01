@@ -7,7 +7,7 @@ import { test, expect } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { K, kuerzeste, mitZauber, alleReparaturen, wendeReparaturAn, ablaufZaehlen } from '../werkzeuge/loeser.mjs';
+import { K, kuerzeste, mitZauber, mitRegeln, alleReparaturen, wendeReparaturAn, ablaufZaehlen } from '../werkzeuge/loeser.mjs';
 
 const WURZEL = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DATEN = JSON.parse(fs.readFileSync(path.join(WURZEL, '_site', 'daten.js'), 'utf8')
@@ -173,25 +173,70 @@ function weltVon(l) {
   for (const f of ['b', 'h', 'start', 'ziel', 'hindernisse', 'edelsteine']) if (l[f] !== undefined) w[f] = l[f];
   return w;
 }
+// Mehrere Gitter ("welten"): fehlende Felder kommen aus dem Level (wie werkzeuge/raetsel.mjs und web/app.js)
+function weltenVon(l) {
+  if (!Array.isArray(l.welten) || !l.welten.length) return [weltVon(l)];
+  return l.welten.map((w) => ({ ...weltVon(l), ...weltVon(w || {}) }));
+}
+// Pfad-Level mit erweiterten Befehlen (Wenn-dann, „bis zum Schatz“, Zaubersprüche) oder mehreren Gittern
+const erweitert = (l) => l.art === 'pfad' && (l.erlaubt !== undefined || l.welten !== undefined);
+const einfach = (l) => l.art === 'pfad' && !erweitert(l);
+// Lösung eines Pfad-Levels: { programm: [...], sprueche: { name: [...] } } (sprueche = die, die das Kind selbst schreibt).
+// Erweiterte Levels: der Löser sucht die kleinste Kartenzahl mit allem, was das Level erlaubt (die App kennt keine Lösung).
+const LOESUNGEN = new Map();
 function loesePfad(lv) {
+  if (erweitert(lv)) {
+    if (!LOESUNGEN.has(lv.id)) {
+      const m = mitRegeln(weltenVon(lv), lv.maxKarten || 12, lv.erlaubt || [], { bedingungen: lv.bedingungen, sprueche: lv.sprueche || {}, spruchFrei: lv.spruchFrei || [] });
+      if (!m.erreichbar) throw new Error('Löser findet keine Lösung für ' + lv.id + (m.grund ? ' (' + m.grund + ')' : ''));
+      const k = m.kuerzeste[0];
+      const sp = {};
+      for (const [n, t] of Object.entries(k.sprueche || {})) sp[n] = K.liesSpruch(t, n);
+      LOESUNGEN.set(lv.id, { programm: K.lies(k.programm), sprueche: sp });
+    }
+    return LOESUNGEN.get(lv.id);
+  }
   const w = weltVon(lv);
   if (lv.zauber) {
     const max = lv.maxKarten || 8;
     const z = mitZauber(w, max);
-    if (z.erreichbar) return K.lies(z.kuerzeste[0]);
+    if (z.erreichbar) return { programm: K.lies(z.kuerzeste[0]), sprueche: {} };
   }
-  return kuerzeste(w).programme[0];
+  return { programm: kuerzeste(w).programme[0], sprueche: {} };
 }
-async function gibProgrammEin(page, prog) {
-  for (const t of prog) {
+// Programmteile antippen: Befehle, Zauber-Kasten (Zahl oder „bis zum Schatz“), Wenn-dann-Kasten
+// (Wenn-Karte, dann, sonst, fertig) und Zauberspruch-Aufrufe – nur Antippen, wie ein Kind
+async function gibTeile(page, teile) {
+  for (const t of teile) {
     if (typeof t === 'string') await tippe(page, '.tasten [data-aktion="befehl"][data-befehl="' + t + '"]');
-    else {
+    else if (t.spruch) await tippe(page, '.tasten [data-aktion="ruf"][data-spruch="' + t.spruch + '"]');
+    else if (t.wenn) {
+      await tippe(page, '.tasten [data-aktion="wenn"]');
+      // Gibt es nur eine Wenn-Karte im Level, kommt keine Wahl
+      if (await page.locator('.tasten [data-aktion="bedingung"]').count()) await tippe(page, '.tasten [data-aktion="bedingung"][data-bedingung="' + t.wenn + '"]');
+      await gibTeile(page, t.dann);
+      if (t.sonst.length) { await tippe(page, '.tasten [data-aktion="sonst"]'); await gibTeile(page, t.sonst); }
+      await tippe(page, '.tasten [data-aktion="fertig"]');
+    } else {
       await tippe(page, '.tasten [data-aktion="zauber"]');
-      await tippe(page, '.tasten [data-aktion="zahl"][data-zahl="' + t.wdh + '"]');
-      for (const b of t.befehle) await tippe(page, '.tasten [data-aktion="befehl"][data-befehl="' + b + '"]');
+      // „Wie oft?“ kommt nur, wenn es auch Zahlen gibt; nur „bis zum Schatz“ legt den Kasten gleich hin
+      if (t.bis) { if (await page.locator('.tasten [data-aktion="bis"]').count()) await tippe(page, '.tasten [data-aktion="bis"]'); }
+      else await tippe(page, '.tasten [data-aktion="zahl"][data-zahl="' + t.wdh + '"]');
+      await gibTeile(page, t.befehle);
       await tippe(page, '.tasten [data-aktion="fertig"]');
     }
   }
+}
+// Ganzes Programm eingeben. sprueche: Zaubersprüche, die das Kind selbst schreibt (zuerst, in ihrer Spruch-Reihe)
+async function gibProgrammEin(page, prog, sprueche) {
+  for (const [n, teile] of Object.entries(sprueche || {})) {
+    if (!(await page.locator('.programm .spruch-reihe.schreiben[data-spruch="' + n + '"]').count())) await tippe(page, '.programm .spruch-reihe[data-spruch="' + n + '"]');
+    await gibTeile(page, teile);
+    await tippe(page, '.tasten [data-aktion="fertig"][data-was="spruch"]');
+  }
+  // Ein Level mit eigenem Spruch beginnt in der Spruch-Reihe: braucht die Lösung ihn nicht, gleich „fertig“
+  if (await page.locator('.programm .spruch-reihe.schreiben').count()) await tippe(page, '.tasten [data-aktion="fertig"][data-was="spruch"]');
+  await gibTeile(page, prog);
 }
 // In der App kann man einen Befehl nur austauschen
 function koboldReparatur(lv) {
@@ -226,7 +271,7 @@ async function doppeltipp(page, sel) {
   await page.touchscreen.tap(x, y);
   await page.waitForTimeout(450);
 }
-const H = { tippe, tippeGrau, ansicht, oeffnePaket, oeffneLevel, doppeltipp, schnell, suche, K, WURZEL, kachelSeite };
+const H = { tippe, tippeGrau, ansicht, oeffnePaket, oeffneLevel, doppeltipp, schnell, suche, K, WURZEL, kachelSeite, gibProgrammEin, loesePfad, weltenVon };
 
 async function spieleLevel(page, p, i, info, fotos) {
   const lv = p.levels[i];
@@ -253,7 +298,8 @@ async function spieleLevel(page, p, i, info, fotos) {
     await expect(page.locator('.tasten [data-aktion="weg"]')).toHaveCount(0);
     await tippe(page, '.tasten [data-befehl="' + r.befehl + '"]');
   } else {
-    await gibProgrammEin(page, loesePfad(lv));
+    const l = loesePfad(lv);
+    await gibProgrammEin(page, l.programm, l.sprueche);
     if (fotos) await ansicht(page, p.paket + '-programm', info);
   }
   await tippe(page, '.tasten [data-aktion="los"]');
@@ -313,10 +359,10 @@ for (const p of DATEN.pakete) {
   });
 }
 
-const pfadPaket = DATEN.pakete.find((p) => p.levels.some((l) => l.art === 'pfad' && !l.zauber)) || DATEN.pakete.find((p) => p.levels.some((l) => l.art === 'pfad'));
+const pfadPaket = DATEN.pakete.find((p) => p.levels.some((l) => einfach(l) && !l.zauber)) || DATEN.pakete.find((p) => p.levels.some(einfach));
 test('Drache läuft Schritt für Schritt, Kobold-Stoß', async ({ page }, info) => {
   test.skip(!pfadPaket, 'kein Pfad-Paket');
-  const i = pfadPaket.levels.findIndex((l) => l.art === 'pfad');
+  const i = pfadPaket.levels.findIndex(einfach);
   const lv = pfadPaket.levels[i];
   await oeffnePaket(page, pfadPaket);
   await page.goto('./#' + pfadPaket.paket + '/' + (i + 1));
@@ -366,7 +412,7 @@ test('Fast geschafft: angekommen, aber nicht das kürzeste Programm', async ({ p
   let f = null, prog = null;
   for (const p of DATEN.pakete) {
     p.levels.forEach((l, i) => {
-      if (f || l.art !== 'pfad' || l.zauber || l.aufgabe !== 'kuerzestes') return;
+      if (f || !einfach(l) || l.zauber || l.aufgabe !== 'kuerzestes') return;
       const k = kuerzeste(weltVon(l)).laenge;
       const g = finde(l, (e, x) => e.geschafft && x.length > k, Math.min(l.maxBefehle || 12, k + 3));
       if (g) { f = { p, i, lv: l }; prog = g; }
@@ -391,10 +437,15 @@ test('Fast geschafft: angekommen, aber nicht das kürzeste Programm', async ({ p
 test('Meldungen: Edelsteine fehlen, noch nicht beim Schatz', async ({ page }, info) => {
   await schnell(page);
   // Edelsteine: zum Schatz, ohne alle einzusammeln
-  const g = suche('pfad', (l) => l.edelsteine && l.edelsteine.length);
+  const g = suche('pfad', (l) => einfach(l) && l.edelsteine && l.edelsteine.length);
   if (g) {
+    // ein kürzestes Programm zum Schatz, das nicht alle Edelsteine einsammelt (passt in die Kartengrenze)
     const ohne = { ...g.lv, edelsteine: [] };
-    const prog = finde(ohne, (e) => e.geschafft, Math.min(g.lv.maxKarten || 12, 7));
+    const grenzeG = g.lv.maxKarten || g.lv.maxBefehle || 12;
+    const nichtAlle = (p) => !K.ausfuehren(weltVon(g.lv), p).geschafft;
+    const kurz = kuerzeste(weltVon(ohne));
+    const prog = (kurz.programme || []).find((p) => p.length <= grenzeG && nichtAlle(p)) ||
+      finde(ohne, (e, p) => e.geschafft && nichtAlle(p), Math.min(grenzeG, 7));
     expect(prog, 'Programm zum Schatz ohne Edelsteine').toBeTruthy();
     await oeffneLevel(page, g, info);
     await expect(page.locator('.meldung')).toContainText('Sammle alle Edelsteine');
@@ -406,7 +457,7 @@ test('Meldungen: Edelsteine fehlen, noch nicht beim Schatz', async ({ page }, in
     await ansicht(page, 'edelsteine-fehlen', info);
   }
   // Nur gedreht: der Drache bleibt am Start
-  const n = suche('pfad', (l) => !K.ausfuehren(weltVon(l), ['links']).stoss && !K.ausfuehren(weltVon(l), ['links']).geschafft);
+  const n = suche('pfad', (l) => einfach(l) && !K.ausfuehren(weltVon(l), ['links']).stoss && !K.ausfuehren(weltVon(l), ['links']).geschafft);
   await oeffneLevel(page, n, info);
   await gibProgrammEin(page, ['links']);
   await tippe(page, '.tasten [data-aktion="los"]');
@@ -415,7 +466,7 @@ test('Meldungen: Edelsteine fehlen, noch nicht beim Schatz', async ({ page }, in
 });
 
 test('Grenze der Programm-Reihe: freundliche Meldung statt stummer Tasten', async ({ page }, info) => {
-  const f = suche('pfad', (l) => !l.zauber && l.maxBefehle);
+  const f = suche('pfad', (l) => einfach(l) && !l.zauber && l.maxBefehle);
   test.skip(!f, 'kein Pfad-Level mit maxBefehle');
   await oeffneLevel(page, f, info);
   // Drehen stößt nie an: so viele Drehungen, wie am Blatt Platz haben, und eine mehr
@@ -459,7 +510,7 @@ test('Kobold: Neu stellt das Kobold-Programm wie am Anfang her', async ({ page }
 });
 
 test('Doppeltipp löst nie die Taste aus, die danach an derselben Stelle liegt', async ({ page }, info) => {
-  const z = suche('pfad', (l) => l.zauber);
+  const z = suche('pfad', (l) => einfach(l) && l.zauber);
   if (z) {
     await oeffneLevel(page, z, info);
     await doppeltipp(page, '.tasten [data-aktion="zauber"]');
@@ -498,7 +549,7 @@ test('Doppeltipp löst nie die Taste aus, die danach an derselben Stelle liegt',
 
 test('Gerät drehen und Zurück, während der Drache läuft', async ({ page }, info) => {
   await page.addInitScript(() => { window.WERKSTATT_TEMPO = 250; });
-  const f = suche('pfad', (l) => !l.zauber && kuerzeste(weltVon(l)).laenge >= 4);
+  const f = suche('pfad', (l) => einfach(l) && !l.zauber && kuerzeste(weltVon(l)).laenge >= 4);
   test.skip(!f, 'kein passendes Pfad-Level');
   await oeffneLevel(page, f, info);
   const prog = kuerzeste(weltVon(f.lv)).programme[0];
@@ -699,6 +750,364 @@ test.describe('Offline', () => {
     await ansicht(page, 'offline', info);
     await context.setOffline(false);
   });
+});
+
+// ---------------------------------------------------------------------
+// Erweiterte Befehle ab Block C (plan/lehrplan.md 7.8): Wenn-dann-Kasten, „bis zum Schatz“, Zaubersprüche,
+// mehrere Gitter. Mit den echten Rätseln gibt es solche Levels erst ab Einheit 11 (sonst werden die Tests
+// übersprungen). Zum Testen vorher die Test-Daten bauen:
+//   node werkzeuge/web-bauen.mjs --raetsel tests/fixtures/web-raetsel
+// ---------------------------------------------------------------------
+const darf = (l, x) => erweitert(l) && (l.erlaubt || []).includes(x);
+const bedingungenVon = (l) => l.bedingungen || ['stein', 'frei'];
+async function langsam(page, ms) { await page.addInitScript((t) => { window.WERKSTATT_TEMPO = t; }, ms); }
+// Auf einen kurzen Zustand während des Laufs warten (jedes Bild prüfen, nichts verpassen)
+const sobald = (page, fn, arg) => page.waitForFunction(fn, arg, { polling: 'raf', timeout: 30_000 });
+// Wie die App: erst im ersten Gitter, dann im nächsten; das erste, in dem es nicht klappt, zählt
+function lauf(lv, prog, sprueche) {
+  const sp = { ...(lv.sprueche || {}), ...(sprueche || {}) };
+  const welten = weltenVon(lv);
+  for (let wi = 0; wi < welten.length; wi++) {
+    const e = K.ausfuehren(welten[wi], prog, { sprueche: sp });
+    if (!e.geschafft || wi === welten.length - 1) return { ...e, welt: wi };
+  }
+  return null;
+}
+
+test('Wenn-dann-Kasten: Wenn-Karte wählen, dann, sonst, fertig; beim Laufen leuchten Zweig und angeschautes Feld', async ({ page }, info) => {
+  const f = suche('pfad', (l) => darf(l, 'wenn') && bedingungenVon(l).length >= 2 && (l.maxKarten || 12) >= 4);
+  test.skip(!f, 'kein Level mit Wenn-dann-Kasten (Test-Daten: --raetsel tests/fixtures/web-raetsel)');
+  await langsam(page, 700);
+  await oeffneLevel(page, f, info);
+  const n = weltenVon(f.lv).length;
+  await expect(page.locator('.feld .gitter-box')).toHaveCount(n);
+  if (n > 1) await expect(page.locator('.meldung')).toContainText('Ein Programm für ' + (n === 2 ? 'beide' : 'alle ' + n) + ' Gitter');
+  // Antippen → Wenn-Karte wählen (nur die Bedingungen des Levels)
+  await tippe(page, '.tasten [data-aktion="wenn"]');
+  await expect(page.locator('.tasten [data-aktion="bedingung"]')).toHaveCount(bedingungenVon(f.lv).length);
+  await expect(page.locator('.tasten-frage')).toContainText('Wenn-Karte');
+  await ansicht(page, 'wenn-wahl', info);
+  const c = bedingungenVon(f.lv)[0];
+  await tippe(page, '.tasten [data-aktion="bedingung"][data-bedingung="' + c + '"]');
+  await expect(page.locator('.programm .kasten-w.offen')).toHaveCount(1);
+  await expect(page.locator('.programm .kasten-w .karte.bed')).toHaveCount(1);
+  await expect(page.locator('.meldung')).toContainText('Was macht der Drache dann?');
+  // „sonst“ erst nach einem Befehl nach „dann“
+  await expect(page.locator('.tasten [data-aktion="sonst"]')).toHaveAttribute('aria-disabled', 'true');
+  await tippe(page, '.tasten [data-befehl="rechts"]');
+  await expect(page.locator('.tasten [data-aktion="sonst"]')).not.toHaveAttribute('aria-disabled', 'true');
+  await tippe(page, '.tasten [data-aktion="sonst"]');
+  await tippe(page, '.tasten [data-befehl="vor"]');
+  await expect(page.locator('.programm .kasten-w [data-ort="p0-dann"] .karte:not(.platzhalter)')).toHaveCount(1);
+  await expect(page.locator('.programm .kasten-w [data-ort="p0-sonst"] .karte:not(.platzhalter)')).toHaveCount(1);
+  await ansicht(page, 'wenn-sonst', info);
+  // Löschen geht Schritt für Schritt zurück: sonst-Befehl, „sonst“, dann-Befehl, der ganze Kasten
+  for (let j = 0; j < 3; j++) await tippe(page, '.tasten [data-aktion="loeschen"]');
+  await expect(page.locator('.programm .kasten-w.offen')).toHaveCount(1);
+  await expect(page.locator('.programm .kasten-w .karte:not(.platzhalter):not(.bed)')).toHaveCount(0);
+  await tippe(page, '.tasten [data-aktion="loeschen"]');
+  await expect(page.locator('.programm .kasten-w')).toHaveCount(0);
+  // Die Lösung des Lösers eingeben und laufen lassen
+  const l = loesePfad(f.lv);
+  await gibProgrammEin(page, l.programm, l.sprueche);
+  await expect(page.locator('.programm .kasten-w.offen')).toHaveCount(0);
+  await ansicht(page, 'wenn-programm', info);
+  const e = lauf(f.lv, l.programm, l.sprueche);
+  expect(e.geschafft, 'Lösung kommt an').toBe(true);
+  await tippe(page, '.tasten [data-aktion="los"]');
+  // Der Drache schaut: Wenn-Karte leuchtet, das angeschaute Feld ist umrandet (oder die Kante am Rand)
+  await sobald(page, () => document.querySelector('.programm .kasten-w.aktiv .karte.bed.aktiv') && document.querySelector('.drache-ebene .blick-feld > *'));
+  await ansicht(page, 'wenn-schaut', info);
+  // Ein Befehl im Zweig: der Zweig „dann“ oder „sonst“ leuchtet mit
+  const welten = weltenVon(f.lv);
+  const sp = { ...(f.lv.sprueche || {}), ...l.sprueche };
+  if (welten.some((w) => K.ausfuehren(w, l.programm, { sprueche: sp }).schritte.some((s) => s.zweig))) {
+    await sobald(page, () => document.querySelector('.programm .kasten-w.aktiv .zweig.aktiv .karte.aktiv'));
+    await ansicht(page, 'wenn-zweig', info);
+  }
+  if (n > 1) await sobald(page, () => document.querySelectorAll('.feld .gitter-box.ruht').length > 0);
+  await expect(page.locator('.dialog h2')).toHaveText('Geschafft!', { timeout: 60_000 });
+  await expect(page.locator('.feld .gitter-box.ruht')).toHaveCount(0);
+});
+
+test('Wenn-dann-Kasten: Kobold im Zweig, mehrere Gitter: das Gitter, in dem es nicht klappt', async ({ page }, info) => {
+  const f = suche('pfad', (l) => darf(l, 'wenn') && bedingungenVon(l).includes('stein') && bedingungenVon(l).includes('frei') && (l.maxKarten || 12) >= 6);
+  test.skip(!f, 'kein passendes Level mit Wenn-dann-Kasten');
+  await schnell(page);
+  await oeffneLevel(page, f, info);
+  // Ein Programm, das in einem Zweig anstößt (der Kobold sitzt im Wenn-dann-Kasten)
+  const kandidaten = ['wenn[frei: vor vor vor] wenn[stein: vor]', 'vor wenn[stein: vor]', 'wenn[frei: vor vor] wenn[stein: vor]', 'wenn[stein: vor sonst vor vor]',
+    'wenn[frei: vor] wenn[frei: vor] wenn[stein: vor]', 'rechts wenn[frei: vor vor vor]', 'links wenn[frei: vor vor vor]', 'links wenn[stein: vor]', 'rechts wenn[stein: vor]'];
+  const max = f.lv.maxKarten || 12;
+  const k = kandidaten.map((t) => K.lies(t)).find((p) => {
+    if (K.karten(p) > max) return false;
+    const e = lauf(f.lv, p);
+    return e.stoss && e.stoss.zweig;
+  });
+  if (k) {
+    const e = lauf(f.lv, k);
+    await gibProgrammEin(page, k);
+    await tippe(page, '.tasten [data-aktion="los"]');
+    await expect(page.locator('.meldung.stoss')).toContainText('Hier hat der Kobold zugeschlagen!', { timeout: 20_000 });
+    await expect(page.locator('.programm .kasten-w .zweig .karte.stoss')).toHaveCount(1);
+    await expect(page.locator('.programm .kasten-w .zweig[data-ort$="-' + e.stoss.zweig + '"] .karte.stoss')).toHaveCount(1);
+    if (weltenVon(f.lv).length > 1) {
+      await expect(page.locator('.feld .gitter-box.ruht')).toHaveCount(weltenVon(f.lv).length - 1);
+      await expect(page.locator('.feld .gitter-box[data-welt="' + e.welt + '"]')).not.toHaveClass(/ruht/);
+    }
+    await ansicht(page, 'wenn-kobold', info);
+    await tippe(page, '.tasten [data-aktion="nochmal"]');
+    await expect(page.locator('.programm .karte.stoss')).toHaveCount(0);
+    await expect(page.locator('.feld .gitter-box.ruht')).toHaveCount(0);
+    while (await page.locator('.tasten [data-aktion="loeschen"]:not([disabled])').count()) await tippe(page, '.tasten [data-aktion="loeschen"]');
+    await expect(page.locator('.programm .prog-zeile .karte:not(.platzhalter)')).toHaveCount(0);
+  }
+  // Nur gedreht: in welchem Gitter der Drache noch nicht beim Schatz ist
+  if (weltenVon(f.lv).length > 1 && !lauf(f.lv, ['links']).stoss) {
+    const e = lauf(f.lv, ['links']);
+    await gibProgrammEin(page, ['links']);
+    await tippe(page, '.tasten [data-aktion="los"]');
+    await expect(page.locator('.meldung')).toContainText('Im Gitter ' + (e.welt + 1) + ' ist der Drache noch nicht beim', { timeout: 20_000 });
+    await ansicht(page, 'welten-nicht-da', info);
+  }
+});
+
+test('Wiederhol-Zauber „bis zum Schatz“: Kasten, Runden, und „läuft im Kreis“ nach 60 Befehlen', async ({ page }, info) => {
+  const f = suche('pfad', (l) => darf(l, 'bis') && !darf(l, 'zauber') && (l.maxKarten || 12) >= 2);
+  test.skip(!f, 'kein Level mit „bis zum Schatz“');
+  await schnell(page);
+  await oeffneLevel(page, f, info);
+  // Nur „bis zum Schatz“ erlaubt: die Taste legt den Kasten gleich hin (kein „Wie oft?“)
+  await tippe(page, '.tasten [data-aktion="zauber"]');
+  await expect(page.locator('.tasten [data-aktion="zahl"]')).toHaveCount(0);
+  await expect(page.locator('.programm .kasten-z.kasten-bis.offen .mal')).toContainText('bis zum');
+  await tippe(page, '.tasten [data-befehl="rechts"]');
+  await ansicht(page, 'bis-offen', info);
+  await tippe(page, '.tasten [data-aktion="fertig"]');
+  // Immer nur drehen: findet den Schatz nie. Nach 60 Befehlen hört der Drache auf.
+  const e = lauf(f.lv, [{ bis: 'schatz', befehle: ['rechts'] }]);
+  expect(e.zuLang).toBe(true);
+  await tippe(page, '.tasten [data-aktion="los"]');
+  await expect(page.locator('.meldung')).toContainText('Der Drache läuft im Kreis. Er findet', { timeout: 30_000 });
+  await expect(page.locator('.meldung')).toContainText('so nicht.');
+  await expect(page.locator('.dialog')).toHaveCount(0);
+  await ansicht(page, 'im-kreis', info);
+  await tippe(page, '.tasten [data-aktion="loeschen"]');
+  await expect(page.locator('.programm .kasten-z')).toHaveCount(0);
+  // Die Lösung, langsamer (neu laden): im Kasten leuchtet „Runde n“
+  await langsam(page, 450);
+  await page.reload();
+  await expect(page.locator('.spiel')).toHaveAttribute('data-level', f.lv.id);
+  const l = loesePfad(f.lv);
+  await gibProgrammEin(page, l.programm, l.sprueche);
+  await tippe(page, '.tasten [data-aktion="los"]');
+  if (JSON.stringify(l.programm).includes('"bis"')) await sobald(page, () => /Runde \d/.test((document.querySelector('.programm .kasten-bis.aktiv .runde') || {}).textContent || ''));
+  await expect(page.locator('.dialog h2')).toHaveText('Geschafft!', { timeout: 30_000 });
+  // Mit Zauber-Kasten und „bis zum Schatz“: „Wie oft?“ hat 2 bis 5 und „bis zum Schatz“
+  const g = suche('pfad', (l2) => darf(l2, 'bis') && darf(l2, 'zauber'));
+  if (g) {
+    await oeffneLevel(page, g, info);
+    await tippe(page, '.tasten [data-aktion="zauber"]');
+    await expect(page.locator('.tasten [data-aktion="zahl"]')).toHaveCount(4);
+    await expect(page.locator('.tasten [data-aktion="bis"]')).toHaveCount(1);
+    await ansicht(page, 'bis-wahl', info);
+    await tippe(page, '.tasten [data-aktion="bis"]');
+    await expect(page.locator('.programm .kasten-z.kasten-bis.offen')).toHaveCount(1);
+  }
+});
+
+test('Zauberspruch vorgegeben: Spruch-Reihe zum Anschauen, Aufruf-Taste, beim Laufen leuchten Aufruf und Spruch', async ({ page }, info) => {
+  const f = suche('pfad', (l) => darf(l, 'spruch') && l.sprueche && Object.keys(l.sprueche).length && !(l.spruchFrei || []).length);
+  test.skip(!f, 'kein Level mit vorgegebenem Zauberspruch');
+  await langsam(page, 500);
+  await oeffneLevel(page, f, info);
+  const namen = Object.keys(f.lv.sprueche);
+  await expect(page.locator('.programm .spruch-reihe:not(.frei)')).toHaveCount(namen.length);
+  await expect(page.locator('.programm button.spruch-reihe')).toHaveCount(0);   // vorgegeben: nicht zum Schreiben
+  for (const [j, n] of namen.entries()) {
+    await expect(page.locator('.programm .spruch-reihe[data-ort="' + n + '"] .spruch-inhalt > .teil')).toHaveCount(K.liesSpruch(f.lv.sprueche[n], n).length);
+    await expect(page.locator('.tasten [data-aktion="ruf"]').nth(j)).toHaveAttribute('data-spruch', n);
+  }
+  await ansicht(page, 'spruch-vorgegeben', info);
+  const l = loesePfad(f.lv);
+  await gibProgrammEin(page, l.programm, l.sprueche);
+  await expect(page.locator('.programm .prog-zeile .karte.ruf')).toHaveCount((JSON.stringify(l.programm).match(/"spruch"/g) || []).length);
+  await tippe(page, '.tasten [data-aktion="los"]');
+  await sobald(page, () => document.querySelector('.programm .prog-zeile .karte.ruf.aktiv') && document.querySelector('.programm .spruch-reihe.aktiv .karte.aktiv'));
+  await ansicht(page, 'spruch-laeuft', info);
+  await expect(page.locator('.dialog h2')).toHaveText('Geschafft!', { timeout: 30_000 });
+});
+
+test('Zauberspruch selbst schreiben: zuerst die Spruch-Reihe, dann aufrufen; seine Karten zählen mit', async ({ page }, info) => {
+  const f = suche('pfad', (l) => darf(l, 'spruch') && (l.spruchFrei || []).length === 1 && l.maxKarten && Object.keys(loesePfad(l).sprueche).length);
+  test.skip(!f, 'kein Level mit selbst geschriebenem Zauberspruch');
+  await schnell(page);
+  await oeffneLevel(page, f, info);
+  const n = f.lv.spruchFrei[0];
+  const reihe = '.programm .spruch-reihe.frei[data-spruch="' + n + '"]';
+  await expect(page.locator(reihe + '.schreiben')).toHaveCount(1);
+  await expect(page.locator('.meldung')).toContainText('Schreib zuerst deinen ' + K.SPRUCH_WORT[n]);
+  await expect(page.locator('.tasten [data-aktion="ruf"]')).toHaveCount(0);   // kein Spruch im Spruch
+  await ansicht(page, 'spruch-frei-start', info);
+  // Leerer Spruch, trotzdem aufgerufen: freundliche Meldung statt Laufen
+  await tippe(page, '.tasten [data-aktion="fertig"][data-was="spruch"]');
+  await tippe(page, '.tasten [data-aktion="ruf"][data-spruch="' + n + '"]');
+  await expect(page.locator('.meldung')).toContainText('ist noch leer');
+  await tippe(page, '.tasten [data-aktion="los"]');
+  await expect(page.locator('.meldung')).toContainText('Dein ' + K.SPRUCH_WORT[n] + ' ist noch leer');
+  await expect(page.locator('.programm .karte.aktiv')).toHaveCount(0);
+  await tippe(page, '.tasten [data-aktion="loeschen"]');
+  await expect(page.locator('.programm .prog-zeile .karte.ruf')).toHaveCount(0);
+  // Spruch antippen, schreiben, fertig, aufrufen
+  const l = loesePfad(f.lv);
+  await gibProgrammEin(page, l.programm, l.sprueche);
+  await expect(page.locator(reihe + ' .spruch-inhalt > .teil')).toHaveCount(l.sprueche[n].length);
+  await expect(page.locator('.programm .zaehler')).toContainText(K.karten(l.programm, l.sprueche) + ' von ' + f.lv.maxKarten + ' Karten');
+  await ansicht(page, 'spruch-frei-programm', info);
+  await tippe(page, '.tasten [data-aktion="los"]');
+  await expect(page.locator('.dialog h2')).toHaveText('Geschafft!', { timeout: 30_000 });
+  // Nochmal: den Spruch wieder antippen, dann kommen die Karten dort hinein
+  await tippe(page, '.dialog [data-aktion="nochmal"]');
+  await tippe(page, reihe);
+  await expect(page.locator(reihe + '.schreiben')).toHaveCount(1);
+  await expect(page.locator('.meldung')).toContainText('Du schreibst den ' + K.SPRUCH_WORT[n]);
+});
+
+test('Doppeltipp bei den neuen Tastenwechseln löst nie die Taste aus, die danach dort liegt', async ({ page }, info) => {
+  let geprueft = 0;
+  const w = suche('pfad', (l) => darf(l, 'wenn') && bedingungenVon(l).length >= 2 && (l.maxKarten || 12) >= 4);
+  if (w) {
+    await oeffneLevel(page, w, info);
+    await doppeltipp(page, '.tasten [data-aktion="wenn"]');
+    await expect(page.locator('.tasten [data-aktion="bedingung"]')).toHaveCount(bedingungenVon(w.lv).length);
+    await expect(page.locator('.programm .kasten-w')).toHaveCount(0);
+    // Wenn-Karte: danach liegt dort „vor“ – der zweite Tipp legt keinen Befehl nach „dann“
+    await doppeltipp(page, '.tasten [data-aktion="bedingung"] >> nth=0');
+    await expect(page.locator('.programm .kasten-w.offen')).toHaveCount(1);
+    await expect(page.locator('.programm .kasten-w .zweig .karte:not(.platzhalter)')).toHaveCount(0);
+    await tippe(page, '.tasten [data-befehl="vor"]');
+    // „fertig“: danach liegt dort eine andere Taste (z. B. Löschen) – der Kasten bleibt
+    await doppeltipp(page, '.tasten [data-aktion="fertig"]');
+    await expect(page.locator('.programm .kasten-w')).toHaveCount(1);
+    await expect(page.locator('.programm .kasten-w.offen')).toHaveCount(0);
+    await ansicht(page, 'doppeltipp-wenn', info);
+    geprueft++;
+  }
+  const s = suche('pfad', (l) => darf(l, 'spruch') && (l.spruchFrei || []).length);
+  if (s) {
+    await oeffneLevel(page, s, info);
+    // Spruch „fertig“: danach liegt dort die Aufruf-Taste – kein Aufruf im Programm
+    await doppeltipp(page, '.tasten [data-aktion="fertig"][data-was="spruch"]');
+    await expect(page.locator('.programm .spruch-reihe.schreiben')).toHaveCount(0);
+    await expect(page.locator('.programm .prog-zeile .karte.ruf')).toHaveCount(0);
+    geprueft++;
+  }
+  const b = suche('pfad', (l) => darf(l, 'bis') && darf(l, 'zauber'));
+  if (b) {
+    await oeffneLevel(page, b, info);
+    await tippe(page, '.tasten [data-aktion="zauber"]');
+    // „bis zum Schatz“: danach liegt dort eine Kasten-Taste – keine neue Wahl, nichts im Kasten
+    await doppeltipp(page, '.tasten [data-aktion="bis"]');
+    await expect(page.locator('.programm .kasten-z.kasten-bis.offen')).toHaveCount(1);
+    await expect(page.locator('.tasten [data-aktion="bedingung"], .tasten [data-aktion="zahl"]')).toHaveCount(0);
+    await expect(page.locator('.programm .kasten-bis .karte:not(.platzhalter)')).toHaveCount(0);
+    geprueft++;
+  }
+  test.skip(!geprueft, 'keine Levels mit erweiterten Befehlen');
+});
+
+test('Grenzen: Kartenzahl, höchstens 3 Befehle nach „dann“, höchstens 4 Teile im Zauberspruch', async ({ page }, info) => {
+  let geprueft = 0;
+  // nach „dann“ höchstens 3 Befehle
+  const d = suche('pfad', (l) => darf(l, 'wenn') && (l.maxKarten || 12) >= 6);
+  if (d) {
+    await oeffneLevel(page, d, info);
+    await tippe(page, '.tasten [data-aktion="wenn"]');
+    if (await page.locator('.tasten [data-aktion="bedingung"]').count()) await tippe(page, '.tasten [data-aktion="bedingung"] >> nth=0');
+    for (let j = 0; j < K.MAX_DANN; j++) await tippe(page, '.tasten [data-befehl="vor"]');
+    await expect(page.locator('.tasten [data-befehl="vor"]')).toHaveAttribute('aria-disabled', 'true');
+    await tippeGrau(page, '.tasten [data-befehl="vor"]');
+    await expect(page.locator('.programm .kasten-w .karte:not(.platzhalter):not(.bed)')).toHaveCount(K.MAX_DANN);
+    await expect(page.locator('.meldung')).toContainText('Nach „dann“ passen höchstens ' + K.MAX_DANN + ' Befehle');
+    await ansicht(page, 'wenn-voll', info);
+    geprueft++;
+  }
+  // Kartengrenze: volle Reihe, dann sind Befehle und Kästen grau und sagen freundlich, warum
+  const k = suche('pfad', (l) => darf(l, 'wenn') && l.maxKarten && !(l.spruchFrei || []).length);
+  if (k) {
+    await oeffneLevel(page, k, info);
+    for (let j = 0; j < k.lv.maxKarten; j++) await tippe(page, '.tasten [data-befehl="' + (j % 2 ? 'links' : 'rechts') + '"]');
+    await expect(page.locator('.programm .zaehler')).toContainText(k.lv.maxKarten + ' von ' + k.lv.maxKarten + ' Karten');
+    await expect(page.locator('.programm .karte.platzhalter')).toHaveCount(0);
+    await tippeGrau(page, '.tasten [data-befehl="vor"]');
+    await expect(page.locator('.meldung')).toContainText('Mehr Karten gehen nicht');
+    await tippeGrau(page, '.tasten [data-aktion="wenn"]');
+    await expect(page.locator('.meldung')).toContainText('kein Platz mehr');
+    await expect(page.locator('.programm .zaehler')).toContainText(k.lv.maxKarten + ' von ' + k.lv.maxKarten + ' Karten');
+    await ansicht(page, 'karten-voll', info);
+    geprueft++;
+  }
+  // Zauberspruch: höchstens 4 Teile
+  const s = suche('pfad', (l) => darf(l, 'spruch') && (l.spruchFrei || []).length && (l.maxKarten || 12) >= K.MAX_SPRUCH + 2);
+  if (s) {
+    await oeffneLevel(page, s, info);
+    for (let j = 0; j < K.MAX_SPRUCH; j++) await tippe(page, '.tasten [data-befehl="' + (j % 2 ? 'links' : 'rechts') + '"]');
+    await tippeGrau(page, '.tasten [data-befehl="vor"]');
+    await expect(page.locator('.programm .spruch-reihe.schreiben .spruch-inhalt > .teil > .karte:not(.platzhalter)')).toHaveCount(K.MAX_SPRUCH);
+    await expect(page.locator('.meldung')).toContainText('ist voll. Tippe auf „fertig“.');
+    await ansicht(page, 'spruch-voll', info);
+    geprueft++;
+  }
+  test.skip(!geprueft, 'keine Levels mit erweiterten Befehlen');
+});
+
+test('Finde das kürzeste mit Kästen: der Stern erst mit der kleinsten Kartenzahl', async ({ page }, info) => {
+  const f = suche('pfad', (l) => erweitert(l) && l.aufgabe === 'kuerzestes' && l.minKarten && (l.maxKarten || 12) >= l.minKarten + 2);
+  test.skip(!f, 'kein „kürzestes“-Level mit Kästen');
+  await schnell(page);
+  await oeffneLevel(page, f, info);
+  await expect(page.locator('.meldung')).toContainText(weltenVon(f.lv).length > 1 ? 'Ein Programm für' : 'kürzeste');
+  // die kleinste Lösung und am Ende eine Drehung hin und zurück: kommt an, braucht 2 Karten mehr
+  const l = loesePfad(f.lv);
+  const prog = l.programm.concat(['links', 'rechts']);
+  expect(lauf(f.lv, prog, l.sprueche).geschafft).toBe(true);
+  await gibProgrammEin(page, prog, l.sprueche);
+  await tippe(page, '.tasten [data-aktion="los"]');
+  await expect(page.locator('.dialog h2')).toHaveText('Fast geschafft!', { timeout: 30_000 });
+  await expect(page.locator('.dialog p')).toContainText('mit ' + f.lv.minKarten + ' Karten');
+  await ansicht(page, 'kuerzeste-karten', info);
+  await tippe(page, '.dialog [data-aktion="nochmal"]');
+  await expect(page.locator('.punkte .punkt.voll')).toHaveCount(0);
+});
+
+test('Langes Programm mit Spruch-Reihe bleibt ganz sichtbar (auch auf dem kleinsten Handy quer)', async ({ page }, info) => {
+  const f = suche('pfad', (l) => darf(l, 'spruch') && (l.spruchFrei || []).length && ['zauber', 'wenn', 'bis'].every((x) => darf(l, x)) &&
+    ['stein', 'frei'].every((c) => bedingungenVon(l).includes(c)) && (l.maxKarten || 12) >= 12);
+  test.skip(!f, 'kein Level mit Zauberspruch und allen Kästen');
+  await oeffneLevel(page, f, info);
+  const n = f.lv.spruchFrei[0];
+  // Spruch: Wenn-dann-Kasten und Zauber-Kasten (7 Karten), Programm: Aufruf und „bis zum Schatz“ mit Wenn-dann und Aufruf (5 Karten)
+  const spruch = K.lies('wenn[stein: rechts sonst vor] 2[vor links]');
+  const prog = [{ spruch: n }, { bis: 'schatz', befehle: [{ wenn: 'frei', dann: ['vor'], sonst: [] }, { spruch: n }] }];
+  await gibProgrammEin(page, prog, { [n]: spruch });
+  await expect(page.locator('.programm .zaehler')).toContainText('12 von ' + (f.lv.maxKarten || 12) + ' Karten');
+  const r = await page.evaluate(() => {
+    const box = document.querySelector('.programm').getBoundingClientRect();
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const raus = [];
+    for (const el of document.querySelectorAll('.programm .karte, .programm .kasten-w, .programm .kasten-z, .programm .spruch-reihe, .programm .zaehler, .programm .teil-nr')) {
+      const q = el.getBoundingClientRect();
+      if (q.top < box.top - 0.5 || q.bottom > box.bottom + 0.5 || q.left < box.left - 0.5 || q.right > box.right + 0.5 || q.top < 0 || q.bottom > vh || q.left < 0 || q.right > vw) raus.push(el.className + ' ' + (el.dataset.ort || ''));
+    }
+    return { raus, rollen: document.querySelector('.programm').classList.contains('rollen'), k: getComputedStyle(document.querySelector('.programm')).getPropertyValue('--k') };
+  });
+  expect(r.raus, 'Teile des Programms außerhalb des Bildes').toEqual([]);
+  expect(r.rollen, 'Programm-Bereich muss nicht blättern').toBe(false);
+  await ansicht(page, 'langes-programm', info);
+  // Auch beim Laufen bleibt alles an seinem Platz
+  await tippe(page, '.tasten [data-aktion="los"]');
+  await expect(page.locator('.programm .karte.aktiv').first()).toBeVisible({ timeout: 10_000 });
+  await ansicht(page, 'langes-programm-laeuft', info);
 });
 
 // ---------------------------------------------------------------------

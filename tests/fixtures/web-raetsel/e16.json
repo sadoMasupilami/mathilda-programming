@@ -1,0 +1,13 @@
+{
+  "paket": "e16",
+  "einheit": 16,
+  "titel": "Labyrinth (Test)",
+  "web": {"titel": "Labyrinth-Meisterin", "art": "pfad", "levels": ["t16-1", "t16-2", "t16-3", "t16-4", "t16-5"]},
+  "raetsel": [
+    {"id": "t16-1", "art": "pfad", "aufgabe": "ankommen", "b": 5, "h": 2, "start": {"x": 0, "y": 1, "blick": "rechts"}, "ziel": {"x": 4, "y": 1}, "erlaubt": ["bis"], "maxKarten": 2, "beispiel": "bis[vor]"},
+    {"id": "t16-2", "art": "pfad", "aufgabe": "ankommen", "b": 4, "h": 3, "start": {"x": 0, "y": 2, "blick": "oben"}, "ziel": {"x": 3, "y": 2}, "hindernisse": [[1, 2], [2, 2]], "erlaubt": ["wenn", "bis"], "maxKarten": 4, "beispiel": "bis[wenn[stein: rechts sonst vor]]"},
+    {"id": "t16-3", "art": "pfad", "aufgabe": "ankommen", "b": 4, "h": 4, "start": {"x": 0, "y": 3, "blick": "oben"}, "ziel": {"x": 3, "y": 3}, "hindernisse": [[3, 0], [1, 1], [3, 1], [1, 2], [3, 2], [1, 3]], "erlaubt": ["wenn", "bis"], "bedingungen": ["stein", "frei", "stein-rechts", "frei-rechts"], "maxKarten": 6, "beispiel": "bis[wenn[frei-rechts: rechts] wenn[stein: links sonst vor]]"},
+    {"id": "t16-4", "art": "pfad", "aufgabe": "ankommen", "b": 4, "h": 3, "start": {"x": 3, "y": 2, "blick": "oben"}, "ziel": {"x": 0, "y": 0}, "erlaubt": ["wenn", "bis"], "bedingungen": ["stein", "frei", "stein-links", "stein-rechts", "frei-links", "frei-rechts"], "maxKarten": 4, "beispiel": "bis[wenn[stein: links sonst vor]]"},
+    {"id": "t16-5", "art": "pfad", "aufgabe": "ankommen", "b": 5, "h": 3, "start": {"x": 0, "y": 2, "blick": "oben"}, "ziel": {"x": 4, "y": 0}, "erlaubt": ["zauber", "wenn", "bis"], "maxKarten": 4, "beispiel": "bis[wenn[stein: rechts sonst vor]]"}
+  ]
+}

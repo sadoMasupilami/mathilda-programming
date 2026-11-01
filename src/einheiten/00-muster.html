@@ -16,6 +16,17 @@
   <div class="kasten warum"><p>Ein Programm ist eine genaue Folge von Befehlen.</p></div>
   <div class="kasten bildschirm"><p>Paket 0.</p></div>
   <p>Programm mit Wiederhol-Zauber: <m-programm befehle="vor 3[vor rechts] links" gr="9"></m-programm></p>
+  <h2>Erweiterte Befehle (ab Block C)</h2>
+  <p>Wenn-Karten: <m-symbol name="wenn-stein" gr="7"></m-symbol> Stein vor der Nase, <m-symbol name="wenn-frei" gr="7"></m-symbol> frei vor der Nase,
+    <m-symbol name="wenn-stein-links" gr="7"></m-symbol> Stein links, <m-symbol name="wenn-frei-links" gr="7"></m-symbol> frei links,
+    <m-symbol name="wenn-stein-rechts" gr="7"></m-symbol> Stein rechts, <m-symbol name="wenn-frei-rechts" gr="7"></m-symbol> frei rechts.
+    Allgemein <m-symbol name="wenn" gr="7"></m-symbol>, bis zum Schatz <m-symbol name="bis" gr="7"></m-symbol>,
+    Zaubersprüche <m-symbol name="spruch-stern" gr="7"></m-symbol> <m-symbol name="spruch-mond" gr="7"></m-symbol> <m-symbol name="spruch-krone" gr="7"></m-symbol>.</p>
+  <p>Wenn-dann-Kasten im Fließtext: <m-programm befehle="vor wenn[stein: rechts sonst vor] vor" gr="9"></m-programm></p>
+  <p>Wiederhol-Zauber „bis zum Schatz“: <m-programm befehle="bis[wenn[stein: rechts sonst vor]]" gr="9"></m-programm></p>
+  <p>Zauberspruch und Aufruf: <m-spruch name="stern" befehle="vor 2[rechts]" gr="9"></m-spruch> <m-programm befehle="@stern vor @stern" gr="9"></m-programm></p>
+  <p>Beispiel eines Rätsels gefüllt (teil="beispiel"): <m-programm raetsel="e0-welten" teil="beispiel" gr="9"></m-programm></p>
+  <p>Leerer Zauberspruch zum Erfinden: <m-spruch name="krone" leer="4" gr="9"></m-spruch></p>
   <h2>Lösungen</h2>
   <m-loesungen einheit="0"></m-loesungen>
 </section>
@@ -33,4 +44,33 @@
   <div class="reihe" style="justify-content:space-between;align-items:flex-end">
     <div class="profi" style="flex:1"><p>Wie viele Befehle hat das kürzeste Programm bei Aufgabe 1? <m-feld l="5"></m-feld></p></div>
     <m-qr paket="e0"></m-qr></div>
+</section>
+
+<section class="blatt" data-einheit="0" data-titel="Wenn-dann, bis zum Schatz">
+  <div class="aufg"><p class="anw">{{KIND}}, fülle den Wiederhol-Zauber „bis zum Schatz“ aus!</p>
+    <div class="reihe" style="gap:2mm;flex-wrap:nowrap"><m-gitter raetsel="e0-bis" feld="20"></m-gitter> <m-programm raetsel="e0-bis" teil="form" gr="12"></m-programm></div>
+  </div>
+  <div class="aufg"><p class="anw">Ein Programm für beide Gitter!</p>
+    <div class="reihe"><m-gitter raetsel="e0-welten" welt="1" feld="20"></m-gitter> <m-gitter raetsel="e0-welten" welt="2" feld="20"></m-gitter></div>
+    <m-programm raetsel="e0-welten" teil="form"></m-programm>
+  </div>
+  <div class="profi"><p>Der Kobold war im Wenn-dann-Kasten. Welche Karte ist falsch?</p>
+    <m-programm raetsel="e0-kobold-wenn"></m-programm>
+  </div>
+</section>
+
+<section class="blatt" data-einheit="0" data-titel="Zaubersprüche">
+  <div class="aufg"><p class="anw">{{KIND}}, hier ist der Stern-Spruch. Wie oft brauchst du ihn?</p>
+    <div class="reihe"><m-spruch raetsel="e0-spruch" name="stern"></m-spruch> <m-programm raetsel="e0-spruch" teil="form"></m-programm></div>
+  </div>
+  <div class="aufg"><p class="anw">Erfinde den Mond-Spruch!</p>
+    <div class="reihe"><m-spruch raetsel="e0-spruchfrei" name="mond"></m-spruch> <m-programm raetsel="e0-spruchfrei" teil="form"></m-programm></div>
+  </div>
+  <div class="aufg"><p class="anw">Schreib es kürzer mit dem Stern-Spruch.</p>
+    <m-programm raetsel="e0-kuerzer-spruch" teil="lang" gr="12"></m-programm>
+    <div class="reihe"><m-spruch raetsel="e0-kuerzer-spruch" name="stern"></m-spruch> <m-programm raetsel="e0-kuerzer-spruch" teil="kurz"></m-programm></div>
+  </div>
+  <div class="knobel"><p>Wo ist der Drache am Ende?</p>
+    <div class="reihe"><m-programm raetsel="e0-lesen-wenn"></m-programm> <m-gitter raetsel="e0-lesen-wenn" feld="20" loesung="ende"></m-gitter></div>
+  </div>
 </section>
