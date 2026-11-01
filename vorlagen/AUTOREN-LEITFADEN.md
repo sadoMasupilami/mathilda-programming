@@ -13,7 +13,7 @@ Reihenfolge im Buch: `src/buch.json`. Vorbild mit allen Bausteinen: `src/einheit
 werkzeuge/mit-nix.sh node werkzeuge/raetsel.mjs --bericht   # nur die Rätsel lösen und prüfen
 ```
 
-Der Build bricht mit ❌ ab, wenn ein Rätsel nicht eindeutig (und nicht gekennzeichnet) ist, eine Rechnung falsch ist, ein Blatt überläuft, ein Pflichtteil fehlt, die Schrift auf einem Blatt zu klein ist, ein Zeichen in der Schrift fehlt, ein QR-Code nicht lesbar ist oder der Name des Kindes in einer Quelldatei steht. Warnungen (⚠️) bitte auch beheben.
+Der Build bricht mit ❌ ab, wenn ein Rätsel nicht eindeutig (und nicht gekennzeichnet) ist, eine Rechnung falsch ist, ein Blatt überläuft, ein Pflichtteil fehlt, die Schrift auf einem Blatt zu klein ist (auch gezeichnete Schrift in SVG, Abschnitt 3), ein Zeichen in der Schrift fehlt, ein QR-Code nicht lesbar ist oder der Name des Kindes in einer Quelldatei steht. Warnungen (⚠️) bitte auch beheben.
 
 ## 0. Datenschutz: der Name
 
@@ -103,6 +103,7 @@ Aufbau: oben die Vorbereitung, dann der Ablauf als **Drehbuch** (pro Schritt: wa
 
 - **Eine A4-Seite pro Blatt**, nichts darf überlaufen (wird geprüft). Lieber weniger Aufgaben, dafür luftig.
 - Schrift mindestens 14 pt (geprüft; Standard 16 pt). Kleinerer Hilfstext nur mit `class="klein"`.
+- **Auch gezeichnete Schrift** (`<text>` in einem SVG, z. B. Fragen im Baum, Zahlen am Spielplan) muss auf Blättern mindestens 14 pt haben, gerechnet als Schriftgröße mal Maßstab der Zeichnung (geprüft in `src/components.js`, „Gezeichnete Schrift“). Nebenbeschriftungen einer Zeichnung (Kartenzahl, Zahlenring, verkleinertes Bild im Bild) tragen `data-nebenschrift` am `<text>` oder am Baustein, **nicht** `class="klein"`: Die CSS-Regel `.klein` würde die Schriftgröße der Zeichnung überschreiben.
 - Kurze Hauptsätze, „du“, das Kind namentlich („{{KIND}}, wo ist der Drache nach Befehl 3?“).
 - Unten eine `<div class="profi">` (Krone, „Profi-Aufgabe“) oder `<div class="knobel">` (Eule, „Knobel-Ecke“). Eigener Titel: `data-titel="Drachen-Profi"`.
 - Aufgaben: `<div class="aufg"><p class="anw">Anweisung</p> … </div>` → automatisch nummeriert. Ohne Nummer: `class="aufg ohne-nr"`.
@@ -284,7 +285,20 @@ Jede Einheit darf eigene Bausteine in einer eigenen Datei anmelden. Die bisherig
 | `e2-drache.js` | `<m-e2-ausmal gr>` | großer Drache zum Anmalen (rechte Pfote orange) |
 | `e3-ablauf.js` | `<m-ablaufbild>`, `<m-ablaufkarte>`, `<m-ablauf>`, `<m-ablaufpaar>`, `<m-ablaufanzahl>`, `<m-ablaufzuerst>` | Ablauf-Karten mit Bildern aus `web/kern/bilder.js` (auch in der Web-App), Nummern eintragen, falsche Reihenfolge, „egal?“ |
 | `e4-kobold.js` | `<m-e4-blick raetsel nach>`, `<m-e4-befehl raetsel>`, `<m-e4-art raetsel>` | Einkreisen: Blickrichtung nach Befehl n, richtiger Befehl, Art des Fehlers |
-| `e5-muster.js` | `<m-e5-muster art="malen|finden">`, `<m-e5-karten>` | Muster-Bilder auf 1-cm-Kästchen mit Wiederhol-Zauber, Karten zählen |
+| `e5-muster.js` | `<m-e5-muster art="malen\|finden">`, `<m-e5-karten>` | Muster-Bilder auf 1-cm-Kästchen mit Wiederhol-Zauber, Karten zählen |
+| `e6-muster.js` | `<m-e6-el name>`, `<m-e6-folge>`, `<m-e6-reihe raetsel [kern]>`, `<m-e6-zauber raetsel [zeige]>`, `<m-e6-programm programm>`, `<m-e6-wert raetsel wert>`, `<m-e6-janein raetsel>` | Perlen, Bewegungen und Muster aus `web/kern/muster.js`: fortsetzen und Lücken füllen, Kobold im Muster, Muster-Kern als Zauber-Kasten, Zahlen aus der Lösung im Text, „ja/nein“ zum Ankreuzen |
+| `e7-geheim.js` | `<m-e7-lesen>`, `<m-e7-knacken>`, `<m-e7-kobold>`, `<m-e7-schreiben [name]>`, `<m-e7-zeichen [schreiben]>`, `<m-e7-alphabet>`, `<m-e7-rad teil>`, `<m-e7-text>`, `<m-e7-feld>`, `<m-e7-feen>`, `<m-e7-bild>`, `<m-e7-post>`, `<m-e7-versuche>`, `<m-e7-kette>` | Geheimschrift lesen, schreiben (auch den eigenen Namen, aus `kind.json`), knacken, Feen-Zeichen, Geheimschrift-Rad zum Ausschneiden; Geheimschrift im Fließtext wird ausgerechnet (`<m-e7-text schreibe="MOND" k="3">`) |
+| `e8-kaestchen.js` | `<m-e8-bild raetsel>`, `<m-e8-code>`, `<m-e8-kasten>`, `<m-e8-zahlen>`, `<m-e8-text>` (auch `teil="auch" alle anzahl="2"`), `<m-e8-mini>`, `<m-e8-brett>`, `<m-e8-gitter>` | Kästchenbilder auf echten 1-cm-Kästchen mit Kästchen-Code (malen, schreiben, Kobold, kürzer), Zahlen zählen, Code in Worten für die Anleitung, Muggelstein-Brett |
+| `e9-janein.js` | `<m-e9-zahl raetsel>`, `<m-e9-zeige ja>`, `<m-e9-karte wert>`, `<m-e9-feld>`, `<m-e9-loesung>`, `<m-e9-tabelle>`, `<m-e9-liste karte>` | Ja/Nein-Zahlen als Karten, Lampen, Hand oder Nullen und Einsen (lesen, legen, Kobold), Karten der Bastelvorlage, Tabelle, alle Zahlen einer Gedankenlese-Karte |
+| `e12-logik.js` | `<m-e12-gitter raetsel>`, `<m-e12-hinweise>`, `<m-e12-legende>`, `<m-e12-szene>`, `<m-e12-aussagen>`, `<m-e12-bild>`, `<m-e12-leer>`, `<m-e12-zahl>`, `<m-e12-anzahl>`, `<m-e12-loesung>` | Logikgitter mit Bildern und Hinweis-Sätzen, „Wahr oder falsch?“ zu einem Bild, leeres Gitter zum Selbermachen; Zahlen im Text (Kreise, Kreuze, Lösungen ohne einen Hinweis) kommen vom Löser. Prüft selbst: Felder auf Blättern mindestens 20 mm |
+| `e13-baum.js` | `<m-e13-baum raetsel modus [pille="5"]>`, `<m-e13-reihe>`, `<m-e13-weg>`, `<m-e13-fragen>`, `<m-e13-optionen>`, `<m-e13-landet>`, `<m-e13-trennen>`, `<m-e13-bild>`, `<m-e13-fragekarte>`, `<m-e13-pille>`, `<m-e13-tabelle>`, `<m-e13-zahl>` | Ja-Nein-Bäume als SVG (leer, voll, fehlende Frage, Kobold), Wege mit Ja-/Nein-Schildern, Frage-Karten der Bastelvorlage, Merkmals-Tabelle für die Anleitung (prüft, dass die Antworten in allen Rätseln gleich sind). Prüft auf Blättern jede Schrift im Baum (ab 14 pt); für Bäume auf Blättern `pille="5"` (Ja/Nein-Schilder und Platz-Nummern in 5 mm) |
+| `e14-formen.js` | `<m-e14-quadrat raetsel [zeige] [mit-loesung]>`, `<m-e14-quadrat leer n [beispiel] [schraege]>`, `<m-e14-form name>`, `<m-e14-linie art formen>`, `<m-e14-antwort raetsel>` | Formen-Quadrate aus `web/kern/formen.js` (auch mit Schrägen und Farben), leere Quadrate zum Selbermachen, Formen im Text, Reihe oder Spalte zum Zeigen, Antwort-Kästchen beim Kobold-Quadrat. Prüft selbst: Felder auf Blättern mindestens 20 mm |
+| `e15-nim.js` | `<m-e15-steine>`, `<m-e15-stellung>`, `<m-e15-weg>`, `<m-e15-zahlen>`, `<m-e15-antwort>`, `<m-e15-regeln>`, `<m-e15-baum>`, `<m-e15-zugtabelle>`, `<m-e15-text>`, **`<m-e15-stimmt>`** | Muggelsteine, „Wer gewinnt hier?“, Zahlen-Weg für „Wer sagt 20?“, Gewinnzahlen, Wenn-dann-Regeln (auch mit Kobold), Spielbaum. **`<m-e15-stimmt>` ist das Muster für geprüfte Aussagen im Text** (siehe unten) |
+| `e18-spiel.js` | `<m-e18-plan>`, `<m-e18-strecke>`, `<m-e18-test>`, `<m-e18-pruefe>`, `<m-e18-zahl spiel was>` (auch `spiel="rennen"`, `was="zehntelVonBis"`), `<m-e18-felder>`, `<m-e18-kobold>`, `<m-e18-schnecken>`, `<m-e18-sieger>`, `<m-e18-bild>` | Spielplan (leer als Bastelvorlage) und Beispiel-Spiel „Wettflug zum Wolkenschloss“, beim Bauen ausgerechnet; jede Zahl im Text (Gewinnchancen, Zugzahlen, Testfälle) kommt aus der Rechnung oder wird mit `l="…"` dagegen geprüft. Ohne Rätsel-Datei |
+
+**Geprüfte Aussagen im Text.** Was der Build nicht von selbst nachrechnet (eine Zahl oder Aussage in Worten in der Anleitung), kommt aus der Lösung (`<m-e12-zahl>`, `<m-e13-zahl>`, `<m-e18-zahl>` …) oder steht in einem Prüf-Baustein. Muster ist `<m-e15-stimmt spiel="steine 1-2" haufen="4" dran="du" gewinner="du" nimm="1">Bei 4 Steinen nimmst du 1.</m-e15-stimmt>`: Der Text bleibt, wie er ist, und der Build rechnet die Aussage mit dem Spielbaum nach (Fehler, wenn sie nicht stimmt). So kann eine Zahl im Text nicht unbemerkt falsch werden. Neue Einheiten mit vielen Zahlen im Text bauen sich so einen Baustein.
+
+**Gitter in eigenen Bausteinen** (Logikgitter, Formen-Quadrate, Spielpläne) haben auf Blättern Felder von mindestens 20 mm wie `<m-gitter>` (Lehrplan 7.5, Regel 14); der Baustein prüft das selbst. Ausgenommen sind die echten 1-cm-Kästchen der Kästchenbilder (E8).
 
 Ablauf-Karten (`art: "ablauf"`) dürfen ohne `bild` sein (leere Karte zum Selbermalen); optional `titel` und `gemischt` (Startreihenfolge in der Web-App). Jedes `bild` muss es in `web/kern/bilder.js` geben (geprüft).
 
@@ -328,10 +342,18 @@ Ablauf-Karten (`art: "ablauf"`) dürfen ohne `bild` sein (leere Karte zum Selber
 | e3 | 3 Erst das, dann das | `…/#e3` | Bilder-Abläufe sortieren (antippen, kein Ziehen) |
 | e4 | 4 Der Fehler-Kobold | `…/#e4` | Kaputte Programme reparieren |
 | e5 | 5 Der Wiederhol-Zauber | `…/#e5` | Drachen-Pfade mit Zauber-Kasten und Kartengrenze |
+| e6 | 6 Muster-Detektivin | `…/#e6` | 9 Levels (`muster`): Muster fortsetzen (goldener Platz ist dran, Perle aus der Auswahl antippen), Kobold-Perle tauschen, Muster-Kern als Zauber-Kasten (malt sein Armband zum Vergleich) |
+| e7 | 7 Geheimschrift der Feen | `…/#e7` | 8 Levels (`geheim`): digitales Geheimschrift-Rad mit Dreh-Tasten; lesen, schreiben, Feen-Zeichen, knacken mit „Probe“ |
+| e8 | 8 Bilder aus Kästchen | `…/#e8` | 8 Levels (`kaestchen`): Kästchen-Maler, Code bauen mit Teil-Tasten (zu große Teile grau), Kobold-Zeile reparieren (Zahl mit Minus und Plus) |
+| e9 | 9 Nur Ja oder Nein | `…/#e9` | 9 Levels (`janein`): Zahl legen mit Karten, Lampen oder Fingern, Welche Zahl? (eine von drei), Kobold-Karte umdrehen |
+| e12 | 12 Logikrätsel | `…/#e12` | 9 Levels (`logik`), 2 · 2 bis 4 · 4: Feld antippen (leer, Kreuz, Kreis), Hinweise als Bilder-Sätze; „Wahr oder falsch?“ mit Daumen-Tasten, ein Level mit lila Kobold-Zeichen |
+| e13 | 13 Ja-Nein-Bäume | `…/#e13` | 8 Levels (`baum`): einem Wesen folgen (Ja/Nein antippen), alle an ihre Plätze, welche Frage fehlt |
+| e14 | 14 Formen-Quadrate | `…/#e14` | 9 Levels (`formen`): Feld antippen, Form wählen, „Los“; ein Kobold-Level (nur ein Feld änderbar), Level 9 mit der Schrägen-Regel |
+| e15 | 15 Gewinnen mit Plan | `…/#e15` | 8 Levels (`nim`): Strategiespiele gegen den Roboter; Stern nur bei Sieg, sonst „Nochmal?“ mit Tipp |
 
-Kein Schlüsselwort: Alle Pakete sind offen, der QR-Code führt direkt zum Paket. Jedes Paket hat 5–9 Levels (10–15 Minuten). Steine sollen nicht nur am Rand liegen, sondern auch mitten im Weg (direkt vor der Nase, Mauer mit Lücke, Slalom).
+Kein Schlüsselwort: Alle Pakete sind offen, der QR-Code führt direkt zum Paket. Jedes Paket hat 5–9 Levels (10–15 Minuten). Die Startseite zeigt die Blöcke A–D, darin die Pakete (`web/app.js`, `zeigeStart`, `zeigeBlock`). Welche Levels genau wie am Blatt sind: Lehrplan 7.7. Steine sollen nicht nur am Rand liegen, sondern auch mitten im Weg (direkt vor der Nase, Mauer mit Lücke, Slalom).
 
-**Sterne in der App:** 1 Stern pro geschafftem Level. Bei `pfad`-Levels mit `"aufgabe": "kuerzestes"` (ohne Zauber) gibt es den Stern nur mit einem kürzesten Programm, sonst zeigt die App „Fast geschafft! Es geht kürzer“. Bei `maxKarten` zählt die Grenze. Ab Block C (Wenn-dann, „bis zum Schatz“, Zaubersprüche, mehrere Gitter) zählen bei „kuerzestes“ die Karten (`minKarten`), siehe Abschnitt 4b. Texte im Kasten „bildschirm“ müssen diese Regel richtig wiedergeben. Danach kommt ein klares Ende: „Super! Jetzt zurück zum Papier.“
+**Sterne in der App:** 1 Stern pro geschafftem Level. Bei `pfad`-Levels mit `"aufgabe": "kuerzestes"` (ohne Zauber) gibt es den Stern nur mit einem kürzesten Programm, sonst zeigt die App „Fast geschafft! Es geht kürzer“. Bei `maxKarten` zählt die Grenze. Ab Block C (Wenn-dann, „bis zum Schatz“, Zaubersprüche, mehrere Gitter) zählen bei „kuerzestes“ die Karten (`minKarten`), siehe Abschnitt 4b. Bei den Spiel-Plugins ab Block B bewertet das Plugin nur das Ergebnis mit seinem Kern (z. B. e15: Stern nur bei Sieg gegen den Roboter). Texte im Kasten „bildschirm“ müssen diese Regel richtig wiedergeben. Danach kommt ein klares Ende: „Super! Jetzt zurück zum Papier.“
 
 ## 7. Qualität vor dem Abgeben
 
@@ -362,10 +384,19 @@ Ein Paket mit Levels verschiedener Arten (Einheit 20) hat `"art": "gemischt"`. E
 werkzeuge/mit-nix.sh node werkzeuge/raetsel.mjs --bericht                  # alle Rätsel, auch die neuen Arten
 ./baue.sh --nur 07 --png --dpi 110                                         # Einheit 7, Seitenbilder in out/seiten-07/
 werkzeuge/mit-nix.sh node werkzeuge/web-bauen.mjs                          # App bauen (prüft Zeichen, Adressen, Arten)
-WERKSTATT_TEST_PORT=4207 npx playwright test --grep "e7|geheim" --project=chromium-iphone-hoch --project=webkit-iphone-quer --project=chromium-ipad-quer
+WERKSTATT_TEST_PORT=4107 npx playwright test --grep "e7|geheim" --project=chromium-iphone-hoch --project=webkit-iphone-quer --project=chromium-ipad-quer
 ```
 
 Bildschirmfotos der Tests: `test-results/bilder/<projekt>/`. Jede Ansicht ansehen (wie die Seitenbilder der PDFs).
+
+**Erfahrungen aus den Einheiten 6–15:**
+
+- **Ladereihenfolge:** Die Spiel-Plugins laden **vor** `app.js` (`web/index.html`, Platzhalter `<!-- SPIELE -->`, eingesetzt von `werkzeuge/web-bauen.mjs`). Schon die erste Ansicht (QR-Code, Lesezeichen, Neuladen eines Levels) kennt also das Spiel. Ein Plugin braucht beim Laden nur seine Kern-Datei und `window.WerkstattSpiele` (legt es selbst an). Die Umgehung `neuZeichnen()` am Ende der Plugins der Einheiten 6–15 ist damit überflüssig (sie schadet nicht, neue Plugins brauchen sie nicht). Der Test „Direkt geöffnet“ in `tests/web.spec.mjs` öffnet jedes Paket und jedes Level über die Adresse, auch nach dem Neuladen, und erwartet im Level ein Element mit einer Klasse `<art>-…`.
+- **Doppeltipp-Schutz im Test:** Ein Element mit `data-umschalter` schaltet bei einem zweiten Tipp innerhalb von 350 ms nicht zurück (`SPERRE` in `web/app.js`; beim Kind ist das richtig). `h.tippe` wartet nur auf die Belegungs-Sperre (`#app[data-sperre]`), nicht auf diesen Schutz. Zwei Tipps auf dasselbe umschaltende Element brauchen im Test darum mehr als 350 ms Abstand (`await page.waitForTimeout(400)`) oder wechseln mit anderen Tasten ab (so in `tests/spiele/logik.mjs`, `tippeRunden`).
+- **Schnelle Gegenseite** (Roboter, Test-Tempo): Der Test wartet auf einen Zug-Zähler (z. B. `data-zug` in `web/spiele/nim.js`), nicht auf das Verschwinden eines Zustands, der nur kurz zu sehen ist. Umschaltende Tasten, die über mehrere Züge gleich bleiben, tragen den Zug-Zähler in `data-id` (`data-id="n2-5"`): Sonst schluckt der Doppeltipp-Schutz im schnellen Test den Tipp im nächsten Zug.
+- **Schriftzeichen in Kommentaren:** `web-bauen.mjs` prüft jedes Zeichen von `app.js`, `web/spiele/<art>.js` und `web/kern/<art>.js` gegen die gekürzte Schrift. Entfernt werden nur `/* … */` und ganze `//`-Zeilen; ein Kommentar hinter Code wird mitgeprüft. Dort also kein „→“ oder ähnliches Zeichen.
+- **Test-Port:** Für eigene Läufe `WERKSTATT_TEST_PORT=41NN` (NN = Nummer der Einheit, z. B. 4107), nie einen Port, auf dem schon der Server eines anderen läuft. Nicht 4190: WebKit sperrt ihn („restricted network port“).
+- **Nur die Aufgabe in die App-Daten:** `fuerApp` gibt nur weiter, was das Kind sehen soll, nie die Lösung und nichts, woraus die App sie bloß ablesen müsste (bei den Feen-Zeichen der Code aus Form und Punkten, nicht das Wort; bei Ja-Nein-Bäumen leere Plätze). Nach dem Bauen in `_site/daten.js` nachsehen.
 
 ## 9. Reihenfolge im Buch
 
