@@ -5,7 +5,7 @@
  "web": {
   "titel": "Wenn-dann-Regeln",
   "art": "pfad",
-  "levels": ["e11-p1", "e11-w1", "e11-w2", "e11-p2", "e11-w3", "e11-w4", "e11-w5", "e11-w6"]
+  "levels": ["e11-p1", "e11-w1", "e11-w3", "e11-p2", "e11-w2", "e11-w4", "e11-w5", "e11-w6"]
  },
  "raetsel": [
   {"id": "e11-l1", "art": "lesen", "b": 3, "h": 2, "start": {"x": 1, "y": 1, "blick": "oben"},
