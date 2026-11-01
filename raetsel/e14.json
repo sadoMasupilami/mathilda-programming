@@ -5,7 +5,7 @@
   "web": {
     "titel": "Formen-Quadrate",
     "art": "formen",
-    "levels": ["e14-a1", "e14-a2", "e14-p1", "e14-a3", "e14-w1", "e14-k1", "e14-w2", "e14-w3"]
+    "levels": ["e14-a1", "e14-a2", "e14-p1", "e14-a3", "e14-w1", "e14-k1", "e14-w2", "e14-w3", "e14-w4"]
   },
   "raetsel": [
     { "id": "e14-a1", "art": "formen", "titel": "Erstes Formen-Quadrat", "n": 3, "logik": 1,
@@ -37,6 +37,8 @@
       "vorgabe": ["S...", "...D", "..SK", ".DQ."] },
     { "id": "e14-w3", "art": "formen", "titel": "Nur fünf Formen", "n": 4, "logik": 2,
       "vorgabe": ["D...", ".Q..", "..S.", "..DQ"] },
+    { "id": "e14-w4", "art": "formen", "titel": "Blau und Gelb", "n": 4, "diagonale": true, "logik": 2,
+      "vorgabe": ["...Q", ".QS.", "....", "K..D"] },
 
     { "id": "e14-s16", "art": "formen", "titel": "Die große Karten-Knobelei", "n": 4, "farben": ["rot", "blau", "gelb", "gruen"],
       "vorgabe": ["K:rot D:blau Q:gelb S:gruen", "D:gelb . . .", "Q:gruen . . .", ". . . ."] },

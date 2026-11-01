@@ -317,9 +317,13 @@ function bericht(r) {
   return '';
 }
 
-// Für die App: nur das Rätsel, nie die Lösung (beim Kobold auch nicht, welches Feld falsch ist)
+// Für die App: nur das Rätsel, nie die Lösung (beim Kobold auch nicht, welches Feld falsch ist).
+// Die App (web/spiele/formen.js) kann Formen einzeichnen (loesen, auch mit Schrägen) und den Kobold
+// reparieren, aber keine Farben wählen: andere Web-Levels brechen den Bau ab.
 function fuerApp(r) {
   const a = r.aufgabe || 'loesen';
+  if (a !== 'loesen' && a !== 'kobold') throw new Error('Web-Level ' + r.id + ': aufgabe „' + a + '“ kann die App nicht (nur loesen und kobold)');
+  if (r.farben) throw new Error('Web-Level ' + r.id + ': Farben und Formen kann die App nicht (nur Formen)');
   const q = FQ.lies(r);
   return {
     id: r.id, art: r.art, titel: r.titel || '', aufgabe: a,

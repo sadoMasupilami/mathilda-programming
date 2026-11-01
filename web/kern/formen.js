@@ -41,6 +41,8 @@
     gruen: { name: 'grün', wert: '#3aa856' },
   };
   const FARB_LISTE = ['rot', 'blau', 'gelb', 'gruen'];
+  // Hintergrund der zwei Schrägen (Blatt und App gleich): nr 0 von links oben blau, nr 1 von rechts oben gelb
+  const SCHRAEGE = ['#c9defc', '#ffe7a3'];
   const MIN_N = 2;
   const MAX_N = 4;
 
@@ -182,8 +184,10 @@
   }
 
   // Freundliche Sätze für das Kind (App und Anleitung): „In dieser Reihe ist der Kreis zweimal.“
+  // Die Schrägen heißen wie auf dem Blatt nach ihrer Farbe (quadratSVG: nr 0 blau, nr 1 gelb).
   function fehlerText(d) {
-    const wo = { reihe: 'In dieser Reihe', spalte: 'In dieser Spalte', schraege: 'Auf dieser Schräge', 'farbe-reihe': 'In dieser Reihe', 'farbe-spalte': 'In dieser Spalte' }[d.art];
+    const schraege = d.nr === 1 ? 'In den gelben Feldern' : 'In den blauen Feldern';
+    const wo = { reihe: 'In dieser Reihe', spalte: 'In dieser Spalte', schraege, 'farbe-reihe': 'In dieser Reihe', 'farbe-spalte': 'In dieser Spalte' }[d.art];
     const anzahl = d.felder.length === 2 ? 'zweimal' : d.felder.length + '-mal';
     const maennlich = d.f === 'kreis' || d.f === 'stern';
     const gross = (t) => t.charAt(0).toUpperCase() + t.slice(1);
@@ -225,7 +229,7 @@
     if (e.grund === 'doppelt') return fehlerText(e.doppelt[0]);
     if (e.grund === 'leer') return e.leer.length === 1 ? 'Ein Feld ist noch leer.' : 'Noch ' + e.leer.length + ' Felder sind leer.';
     if (e.grund === 'vorgabe') return 'Die vorgegebenen Formen bleiben, wie sie sind.';
-    if (e.grund === 'keinTausch') return 'Der Kobold versteckt sich noch. Such die Reihe und die Spalte mit einer doppelten Form.';
+    if (e.grund === 'keinTausch') return 'Der Kobold ist noch da! Such eine Reihe mit zwei gleichen Formen.';
     if (e.grund === 'zuViele') return 'Der Kobold hat nur eine Form vertauscht. Ändere nur ein Feld.';
     return '';
   }
@@ -371,8 +375,8 @@
     let s = '<rect x="0" y="0" width="' + W + '" height="' + W + '" fill="#ffffff"/>';
     if (o.schraege) {
       for (let i = 0; i < n; i++) {
-        s += '<rect x="' + (i * 100) + '" y="' + (i * 100) + '" width="100" height="100" fill="#c9defc"/>';
-        s += '<rect x="' + ((n - 1 - i) * 100) + '" y="' + (i * 100) + '" width="100" height="100" fill="#ffe7a3"/>';
+        s += '<rect x="' + (i * 100) + '" y="' + (i * 100) + '" width="100" height="100" fill="' + SCHRAEGE[0] + '"/>';
+        s += '<rect x="' + ((n - 1 - i) * 100) + '" y="' + (i * 100) + '" width="100" height="100" fill="' + SCHRAEGE[1] + '"/>';
       }
     }
     for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) {
@@ -395,7 +399,7 @@
   }
 
   g.WerkstattFormen = {
-    FORMEN, INFO, BUCHSTABE, FARBEN, FARB_LISTE, MIN_N, MAX_N, ROT,
+    FORMEN, INFO, BUCHSTABE, FARBEN, FARB_LISTE, SCHRAEGE, MIN_N, MAX_N, ROT,
     form, formInhalt, formenVon, farbenVon, lies, kopie, alsText, zelleText, gleich,
     linien, pruefe, fehlerText, bewerte, bewertungText, werteVon, darf, kandidaten, loese, logikWeg, quadratSVG,
   };
