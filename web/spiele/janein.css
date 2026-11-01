@@ -1,0 +1,159 @@
+/* =====================================================================
+   Spiel-Plugin „janein“ (Einheit 9): Ja/Nein-Karten, Lampen, Hand, Nullen und Einsen
+   Hoch: Zahl oben, Karten in der Mitte, Rechnung darunter, Meldung und Tasten unten.
+   Quer: Karten und Rechnung links, Zahl und Tasten rechts.
+   Die Größe der Karten (--w, --g) rechnet web/spiele/janein.js aus dem Platz im Feld.
+   ===================================================================== */
+
+/* Hoch: die Zahl (Programm-Bereich) gleich unter dem Kopf, über den Karten */
+.art-janein .programm { order: 1; min-height: 0; flex: none; }
+.art-janein .feld { order: 2; }
+
+/* ----- Feld: Bühne mit den Karten, darunter die Rechnung ----- */
+.janein-feld { position: absolute; inset: 0; }
+.janein-buehne { position: absolute; inset: 0; }
+.janein-inhalt {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+}
+.janein-dinge { display: flex; align-items: center; justify-content: center; flex: none; }
+
+.janein-reihe { display: flex; gap: var(--g); align-items: flex-end; justify-content: center; }
+.janein-ding {
+  position: relative; flex: none;
+  width: var(--w); height: calc(var(--w) * 1.4);
+  padding: 0; margin: 0; border: 0; background: transparent;
+  border-radius: calc(var(--w) * 0.11);
+  color: inherit; font: inherit;
+  display: flex; align-items: center; justify-content: center;
+}
+.janein-ding > svg { width: 100%; height: 100%; display: block; }
+button.janein-ding { cursor: pointer; }
+button.janein-ding:disabled { opacity: 1; cursor: default; }
+button.janein-ding:active:not(:disabled) { transform: translateY(2px); }
+button.janein-ding:focus-visible, .janein-finger:focus-visible { outline: 4px solid var(--gold); outline-offset: 3px; }
+
+/* Gezählt (gold), gerade gezählt (gold, kräftiger), umgedreht beim Kobold (blau gestrichelt) */
+.janein-ding.janein-gezaehlt { box-shadow: 0 0 0 4px var(--gold); }
+.janein-ding.janein-zaehlt { box-shadow: 0 0 0 4px #fff, 0 0 0 9px var(--gold); }
+.janein-ding.janein-gedreht { outline: 4px dashed var(--akzent); outline-offset: 4px; }
+
+/* Karten liegen auf der Karten-Leiste (Malerkrepp mit 16, 8, 4, 2, 1) */
+.janein-karten-block { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.janein-leiste {
+  display: flex; gap: var(--g); justify-content: center;
+  padding: 0 4px; height: var(--lh);
+  background: #f3e6c1; border: 2px solid #d8c48f; border-radius: 4px;
+  box-shadow: 0 2px 0 rgba(31, 35, 64, 0.08);
+}
+.janein-leiste-zahl {
+  width: var(--w); flex: none;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: calc(var(--lh) * 0.62); line-height: 1; color: #6a5520;
+}
+
+/* Lampen am Abend: dunkles Fensterbrett, die Lampen leuchten */
+.janein-nacht {
+  background: #262b52; border-radius: 18px;
+  padding: var(--pad);
+  box-shadow: inset 0 -6px 0 #3b4170;
+}
+.janein-nacht .janein-ding.janein-gezaehlt { box-shadow: 0 0 0 4px var(--gold); }
+.janein-nacht .janein-ding.janein-zaehlt { box-shadow: 0 0 0 4px #262b52, 0 0 0 9px var(--gold); }
+.janein-nacht .janein-ding.janein-gedreht { outline-color: #9fb3ff; }
+
+/* Nullen und Einsen: Kästchen mit Ziffer, darüber die Punkte der Stelle */
+.janein-platz { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.janein-wert { height: var(--lh); display: flex; align-items: flex-end; font-weight: 700; font-size: calc(var(--lh) * 0.7); line-height: 1; color: var(--grau); }
+.janein-ding.janein-ziffer {
+  height: var(--w); background: #fff; border: 3px solid var(--tinte); border-radius: 12px;
+  box-shadow: 0 3px 0 rgba(31, 35, 64, 0.18);
+}
+.janein-ziffer-text { font-weight: 700; font-size: calc(var(--w) * 0.62); line-height: 1; }
+.janein-ziffer.janein-nein .janein-ziffer-text { color: #9a9fb4; }
+
+/* Die Hand: ein Bild, darüber für jeden Finger eine durchsichtige Taste (Spalte) */
+.janein-hand { position: relative; flex: none; }
+.janein-hand > svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.janein-finger {
+  position: absolute; z-index: 1;
+  padding: 0; margin: 0; border: 0; border-radius: 14px; background: transparent;
+  cursor: pointer;
+}
+.janein-finger:disabled { cursor: default; }
+.janein-finger:active:not(:disabled) { background: rgba(61, 92, 204, 0.08); }
+
+/* Rechnung unter den Karten: 16 + 4 + 1 = 21 */
+.janein-rechnung {
+  flex: none; min-height: 1.35em; max-width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.45rem; font-weight: 700; line-height: 1.2;
+}
+.janein-rechnung-zeile { display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 0 0.3em; padding: 0 10px; border-radius: 12px; }
+.janein-rechnung .janein-plus { color: var(--grau); font-weight: 400; }
+.janein-rechnung .janein-neu { background: var(--gold-hell); border-radius: 6px; padding: 0 4px; box-shadow: 0 0 0 2px var(--gold); }
+.janein-rechnung .janein-summe { font-size: 1.15em; }
+.janein-rechnung .janein-ziffernfolge { letter-spacing: 0.1em; }
+.janein-rechnung.janein-gut .janein-rechnung-zeile { background: var(--gold-hell); }
+.janein-rechnung.janein-anders .janein-rechnung-zeile { background: var(--akzent-hell); }
+
+/* ----- Zahl: oben (hoch) bzw. rechts über den Tasten (quer) ----- */
+.janein-ziel { display: flex; align-items: center; justify-content: center; gap: 12px; }
+.janein-ziel-text { font-weight: 700; font-size: 1.15rem; }
+.janein-blase {
+  min-width: 2.3em; height: 2.3em; padding: 0 0.35em; border-radius: 1.15em;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--akzent-hell); border: 3px solid var(--akzent);
+  font-weight: 700; font-size: 1.6rem; line-height: 1;
+}
+.janein-sprech {
+  position: relative; display: inline-flex; align-items: baseline; gap: 0.3em;
+  border: 3px solid var(--tinte); border-radius: 16px; background: #fff;
+  padding: 4px 16px; font-size: 1.15rem; line-height: 1.2; white-space: nowrap;
+}
+.janein-sprech b { font-size: 1.7rem; }
+.janein-gleich { font-size: 2rem; font-weight: 700; line-height: 1; }
+.janein-kasten {
+  min-width: 2.2em; height: 1.75em; padding: 0 0.3em;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 3px solid var(--tinte); border-radius: 12px; background: #fff;
+  font-size: 1.6rem; font-weight: 700; line-height: 1;
+}
+.janein-kasten.janein-leer { color: #b9bdd3; border-style: dashed; }
+.janein-kasten.janein-anders { border-color: var(--akzent); background: var(--akzent-hell); }
+
+/* ----- Tasten: Zahlen zur Wahl ----- */
+.taste.janein-zahl { min-width: calc(var(--t) * 1.35); font-size: 1.7rem; padding: 0 10px; }
+.taste.janein-zahl.janein-gewaehlt { border-color: var(--akzent); background: var(--akzent-hell); }
+
+/* ----- Quer: Karten links (unter dem Kopf bis ganz unten), rechts Zahl, Meldung und Tasten.
+   So bekommen die Karten (und die Hand) die ganze Höhe, auch am kleinen Handy quer. ----- */
+@media (orientation: landscape) {
+  .spiel.art-janein {
+    --rechts: clamp(276px, 34vw, 440px);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--rechts);
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
+    grid-template-areas: "kopf ziel" "feld ziel" "feld meldung" "feld tasten";
+    column-gap: 16px; row-gap: 10px;
+  }
+  .art-janein .spalte-links, .art-janein .spalte-rechts { display: contents; }
+  .art-janein .kopf { grid-area: kopf; }
+  .art-janein .feld { grid-area: feld; min-height: 0; }
+  .art-janein .programm { grid-area: ziel; align-self: center; }
+  .art-janein .meldung { grid-area: meldung; }
+  .art-janein .tasten { grid-area: tasten; }
+  .art-janein .janein-ziel { flex-direction: column; gap: 8px; }
+  .art-janein .janein-ziel-lesen { flex-direction: row; }
+  /* Das Geschafft-Fenster liegt nur über der rechten Spalte: Karten und Rechnung bleiben zu sehen */
+  .art-janein .dialog { width: min(100%, calc(var(--rechts) - 12px)); }
+}
+@media (orientation: landscape) and (max-height: 500px) {
+  .janein-rechnung { font-size: 1.25rem; }
+  .art-janein .spalte-rechts { gap: 16px; }
+  .janein-blase { font-size: 1.45rem; }
+}
+@media (min-width: 700px) and (min-height: 700px) {
+  .janein-rechnung { font-size: 1.6rem; }
+  .janein-blase { font-size: 2rem; }
+}

@@ -243,6 +243,7 @@
   }
 
   // Eine Lampe (Glühbirne) an oder aus, darunter die Punktzahl ihres Platzes
+  //   opt.hell: Punktzahl hell (für einen dunklen Hintergrund, Lampen am Abend in der Web-App)
   function lampe(v, opt) {
     opt = opt || {};
     const an = opt.an !== false;
@@ -263,7 +264,7 @@
     s += '<rect x="38" y="86" width="24" height="6" rx="2" fill="#a3a8b8" stroke="' + T + '" stroke-width="2"/>' +
       '<rect x="38" y="93" width="24" height="6" rx="2" fill="#a3a8b8" stroke="' + T + '" stroke-width="2"/>' +
       '<path d="M42 100 L58 100 L54 106 L46 106 Z" fill="' + T + '"/>';
-    if (opt.nummer !== false) s += '<text x="50" y="125" font-family="Andika, sans-serif" font-size="25" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="' + T + '">' + v + '</text>';
+    if (opt.nummer !== false) s += '<text x="50" y="125" font-family="Andika, sans-serif" font-size="25" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="' + (opt.hell ? '#fffdf8' : T) + '">' + v + '</text>';
     if (opt.markiert) s += '<rect x="2" y="2" width="96" height="136" rx="12" fill="none" stroke="' + ROT + '" stroke-width="5" stroke-dasharray="11 7"/>';
     return s + '</svg>';
   }
