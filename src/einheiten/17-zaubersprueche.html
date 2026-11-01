@@ -41,7 +41,8 @@
   /* Blätter */
   .e17-neben { display: flex; align-items: center; gap: 7mm; }
   .e17-stapel { display: flex; flex-direction: column; align-items: flex-start; gap: 4mm; }
-  .e17-stapel > p { margin: 0; display: flex; align-items: center; gap: 2.5mm; }
+  .e17-stapel > p { margin: 0; }
+  .e17-stapel > p.e17-frage { display: flex; align-items: center; gap: 2.5mm; }
   .e17-mitqr { gap: 8mm; }
   .e17-nw { white-space: nowrap; }
   .e17-profi-reihe { display: flex; align-items: flex-end; gap: 5mm; }
@@ -250,6 +251,7 @@
     <ol class="regeln">
       <li><b>Vorbereitung:</b> Tanz-Karten offen hinlegen: klatschen (2 Karten), hüpfen (2 Karten), stampfen, Kreisel, Arme hoch, verbeugen. Daneben die Stern-Kopf-Karte mit dem Stern-Band und die 3 Stern-Aufruf-Karten.</li>
       <li><b>Rollen:</b> Eine Person ist die <b>Spruch-Erfinderin</b>, die andere der <b>Tänzer</b>. Ihr tauscht nach jedem Tanz.</li>
+      <li><b>Ziel:</b> Als Erfinderin mit wenigen Karten einen langen, kniffligen Tanz bauen. Als Tänzer vorher richtig zählen und genau tanzen. Wer nach 6 Tänzen mehr Punkte hat, gewinnt.</li>
       <li><b>Ein Zug:</b> Die Erfinderin legt den Stern-Spruch: 2 oder 3 Tanz-Karten auf das Stern-Band. Darunter legt sie den Tanz: höchstens 4 Karten, Aufruf-Karten und Tanz-Karten gemischt. Der Tänzer zählt zuerst laut die Karten (Kopf-Karte und Spruch, dann der Tanz) und sagt, <b>wie viele Bewegungen</b> es werden. Dann tanzt er. Bei jeder Aufruf-Karte ruft er „Stern-Spruch!“ und tanzt den ganzen Spruch. Die Erfinderin zählt die Bewegungen mit.</li>
       <li><b>Punkte:</b>
         <ul>
@@ -373,8 +375,8 @@
   <h2>Bildschirm-Bonus</h2>
   <div class="kasten bildschirm darf-brechen e17-bricht">
     <p><b>Paket 17 „Zaubersprüche“.</b> Den QR-Code findest du auf <a class="blattref" href="#blatt-17-1"></a> rechts neben Aufgabe 2. Nur am Schluss, nach den Blättern, höchstens 15 Minuten. Die Einheit funktioniert auch ganz ohne Bildschirm.</p>
-    <p><b>8 Levels:</b> Drachen-Pfade mit Zaubersprüchen und <b>Kartengrenze</b>. Oben steht die Aufgabe, z. B. „Zum Schatz mit höchstens 4 Karten!“, unter dem Programm zählt die App mit („0 von 4 Karten“), genau wie am Papier. In Level 1 bis 5 sind die Sprüche geschenkt (sie zählen nicht), in Level 6 bis 8 schreibt {{KIND}} den Spruch selbst (er zählt mit). In Level 4 und 8 gibt es dazu den Zauber-Kasten, in Level 5 zwei Sprüche, in Level 7 zwei Gitter. <b>Level 2 ist Aufgabe 2 von <a class="blattref" href="#blatt-17-1"></a>, Level 4 die Profi-Aufgabe von diesem Blatt, Level 6 die Profi-Aufgabe von <a class="blattref" href="#blatt-17-2"></a>.</b> Am besten spielt {{KIND}} sie nach den Blättern: Dann sieht sie ihr eigenes Programm laufen.</p>
-    <p><b>So geht der geschenkte Spruch in der App:</b> Er steht als braune Spruch-Reihe über dem Programm (Siegel, Name, seine Befehle). Bei den Tasten stehen vor, links drehen, rechts drehen und daneben eine braune Taste mit dem Siegel: Sie legt eine Aufruf-Karte ins Programm. „Nochmal“ und „Los“ stehen immer an derselben Stelle, die Taste mit der Karte und dem roten X löscht die letzte Karte. Beim Laufen leuchtet die Aufruf-Karte und gleichzeitig der Befehl in der Spruch-Reihe, den der Drache gerade macht.</p>
+    <p><b>8 Levels:</b> Drachen-Pfade mit Zaubersprüchen und <b>Kartengrenze</b>. Unter dem Gitter steht die Aufgabe, z. B. „Zum Schatz mit höchstens 4 Karten!“, unter dem Programm zählt die App mit („0 von 4 Karten“), genau wie am Papier. In Level 1 bis 5 sind die Sprüche geschenkt (sie zählen nicht), in Level 6 bis 8 schreibt {{KIND}} den Spruch selbst (er zählt mit). In Level 4 und 8 gibt es dazu den Zauber-Kasten, in Level 5 zwei Sprüche, in Level 7 zwei Gitter. <b>Level 2 ist Aufgabe 2 von <a class="blattref" href="#blatt-17-1"></a>, Level 4 die Profi-Aufgabe von diesem Blatt, Level 6 die Profi-Aufgabe von <a class="blattref" href="#blatt-17-2"></a>.</b> Am besten spielt {{KIND}} sie nach den Blättern: Dann sieht sie ihr eigenes Programm laufen.</p>
+    <p><b>So geht der geschenkte Spruch in der App:</b> Er steht als braune Spruch-Reihe über dem Programm: das Siegel und seine Befehle (auf dem großen Bildschirm auch der Name). Bei den Tasten stehen vor, links drehen, rechts drehen und daneben eine braune Taste mit dem Siegel: Sie legt eine Aufruf-Karte ins Programm. „Nochmal“ und „Los“ stehen immer an derselben Stelle, die Taste mit der Karte und dem roten X löscht die letzte Karte. Beim Laufen leuchtet die Aufruf-Karte und gleichzeitig der Befehl in der Spruch-Reihe, den der Drache gerade macht.</p>
     <p><b>So schreibt sie einen eigenen Spruch (Level 6 bis 8):</b> Das Level beginnt in der gestrichelten Spruch-Reihe, die App sagt: „Schreib zuerst deinen Kronen-Spruch. Dann tippe auf ‚fertig‘.“ Sie tippt die Befehle des Spruchs an (höchstens 4), dann die braune Taste „fertig“. Jetzt ist die Siegel-Taste da, und sie legt das Programm. Will sie den Spruch ändern, tippt sie die Spruch-Reihe an und schreibt weiter. Ruft sie einen leeren Spruch auf, sagt die App freundlich: „Dein Kronen-Spruch ist noch leer. Tippe ihn oben an und schreib ihn!“</p>
     <p><b>Zauber-Kasten (Level 4 und 8):</b> lila Taste „?-mal“ antippen, bei „Wie oft?“ eine Zahl von 2 bis 5 wählen, dann die Siegel-Taste (und, wenn sie mag, Befehle) für den Kasten antippen, „fertig“. In Level 7 stehen zwei Gitter nebeneinander: „Ein Programm für beide Gitter!“ Der Drache läuft erst im Gitter 1, dann im Gitter 2.</p>
     <p><b>Wann gibt es einen Stern?</b> Die App prüft nur das Ergebnis, mit demselben Ausführer wie die Blätter, eine Lösung ist nicht gespeichert. Einen Stern gibt es, sobald der Drache mit der erlaubten Kartenzahl beim Schatz ankommt (in Level 7 in beiden Gittern). Mehr Karten als erlaubt lassen sich gar nicht hinlegen: Die App sagt freundlich „Mehr Karten gehen nicht“. Stößt der Drache an, kommt wie immer „Hier hat der Kobold zugeschlagen!“, auch mitten im Spruch.</p>
@@ -422,7 +424,7 @@
       <div class="e17-stapel">
         <m-spruch raetsel="e17-l1" name="stern"></m-spruch>
         <m-programm raetsel="e17-l1"></m-programm>
-        <p>Wie viele Befehle macht er? <m-e17-zahl raetsel="e17-l1" was="befehle" l="7"></m-e17-zahl></p>
+        <p class="e17-frage">Wie viele Befehle macht er? <m-e17-zahl raetsel="e17-l1" was="befehle" l="7"></m-e17-zahl></p>
       </div>
     </div>
   </div>
@@ -442,7 +444,7 @@
     <div class="e17-neben">
       <m-gitter raetsel="e17-p2" feld="20"></m-gitter>
       <div class="e17-stapel">
-        <p>Nur 2 Karten! Nimm den <span class="e17-nw">Zauber-Kasten.</span></p>
+        <p>Nur 2 Karten!<br>Nimm den <span class="e17-nw">Zauber-Kasten.</span></p>
         <m-programm raetsel="e17-p2" teil="form"></m-programm>
       </div>
     </div>
@@ -467,7 +469,7 @@
   </div>
 
   <div class="aufg">
-    <p class="anw">Der Kobold hat den Mond-Spruch verändert! Der Drache stößt an. Kreis die falsche Karte ein und mal die richtige darüber.</p>
+    <p class="anw">Der Kobold hat den Mond-Spruch verändert! Der Drache stößt an. Kreis die falsche Karte ein. Mal die richtige darunter.</p>
     <div class="e17-neben">
       <m-gitter raetsel="e17-kb1" feld="20"></m-gitter>
       <div class="e17-stapel">
@@ -481,7 +483,7 @@
     <div class="e17-neben">
       <m-gitter raetsel="e17-z1" feld="20"></m-gitter>
       <div class="e17-stapel">
-        <p>Nur 7 Karten! Dein Kronen-Spruch zählt mit.</p>
+        <p>Nur 7 Karten! Dein <span class="e17-nw">Kronen-Spruch</span> zählt mit.</p>
         <m-spruch raetsel="e17-z1" name="krone" plaetze="4"></m-spruch>
         <m-programm raetsel="e17-z1" plaetze="4"></m-programm>
       </div>
