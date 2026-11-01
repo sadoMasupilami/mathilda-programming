@@ -42,10 +42,12 @@
 /* ----- Sortier-Netz ----- */
 .suche-netz-bild { width: 100%; height: 100%; }
 .suche-netz-bild > svg { display: block; width: 100%; height: 100%; }
-.suche-vergleich { display: flex; align-items: center; justify-content: center; gap: 14px; }
+.suche-vergleich { display: flex; align-items: center; justify-content: center; gap: 6px 14px; flex-wrap: wrap; max-width: 100%; }
 .suche-vergleich-text { font-weight: 700; font-size: 1.05rem; line-height: 1.1; text-align: center; }
 .suche-vergleich-text small { display: block; font-weight: 400; font-size: 0.85em; color: var(--grau); }
-.suche-vergleich-bild { display: block; height: var(--vh, 62px); width: calc(var(--vh, 62px) * var(--vr, 1.9)); flex: none; }
+.suche-vergleich-bild { display: block; height: var(--vh, 62px); width: calc(var(--vh, 62px) * var(--vr, 1.9)); max-width: 100%; flex: none; }
+/* Am Ziel stehen alle Zahlen in einer Reihe: etwas kleiner */
+.suche-vergleich-bild.suche-ziel-bild { --vh: 46px; }
 .taste.suche-wahl {
   flex-direction: column; gap: 2px;
   min-width: calc(var(--t) * 1.9); min-height: calc(var(--t) * 1.2);
@@ -130,7 +132,6 @@ button.suche-zahl:focus-visible { outline: 4px solid var(--gold); outline-offset
   .art-suche .programm { grid-area: programm; align-self: center; }
   .art-suche .meldung { grid-area: meldung; }
   .art-suche .tasten { grid-area: tasten; }
-  .art-suche.suche-netz .suche-vergleich { flex-direction: column; gap: 6px; }
   /* Das Geschafft-Fenster liegt über der rechten Spalte: Feld und Ergebnis bleiben zu sehen */
   .art-suche .dialog { width: min(100%, calc(var(--rechts) - 6px)); }
 }
@@ -140,12 +141,13 @@ button.suche-zahl:focus-visible { outline: 4px solid var(--gold); outline-offset
   .spiel.art-suche.suche-tasta { --rechts: 316px; }
   .suche-blase { font-size: 1rem; padding: 2px 10px; }
   .suche-drache { width: 34px; height: 34px; }
-  .suche-vergleich-bild { --vh: 54px; }
+  .suche-vergleich-bild { --vh: 60px; }
 }
 @media (min-width: 700px) and (min-height: 700px) {
   .suche-blase { font-size: 1.25rem; }
   .suche-drache { width: 56px; height: 56px; }
   .suche-vergleich-bild { --vh: 84px; }
+  .suche-vergleich-bild.suche-ziel-bild { --vh: 60px; }
   .suche-steine-reihe i { width: 20px; height: 20px; }
   .suche-zaehler-bild { width: 44px; height: 44px; }
   .suche-p-klein { width: 16px; height: 16px; margin-left: calc(var(--p) * 0.5 - 8px); }

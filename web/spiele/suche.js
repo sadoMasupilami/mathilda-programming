@@ -139,21 +139,28 @@
   // ---------------------------------------------------------------------
   // Zeichnen: Feld
   // ---------------------------------------------------------------------
-  function zeichneFeld(api) {
+  // nurGroesse: Der Platz hat sich geändert (Drehen, längere Meldung). Dann nur die Größen anpassen und
+  // nichts neu anlegen: So bleibt eine Karte unter dem Finger dieselbe, auch mitten im Tippen.
+  function zeichneFeld(api, nurGroesse) {
     const z = api.zustand;
     const feld = api.feld;
     if (!feld) return;
     const W = feld.clientWidth, H = feld.clientHeight;
     if (W < 10 || H < 10) return;
     z.masse = { W, H };
+    if (nurGroesse) {
+      if (z.aufgabe === 'netz' && feld.querySelector('.suche-feld-netz')) return;   // das Netz-Bild wächst von selbst mit
+      const el = feld.querySelector(z.aufgabe === 'tauschen' ? '.suche-feld-tauschen' : '.suche-zahlen');
+      if (el) { el.setAttribute('style', z.aufgabe === 'tauschen' ? reiheStil(z, W, H) : zahlenStil(z, W, H)); return; }
+    }
     if (z.aufgabe === 'tauschen') return zeichneReihe(api, W, H);
     if (z.aufgabe === 'netz') return zeichneNetz(api);
     return zeichneZahlen(api, W, H);
   }
 
   // ----- Nachbarn tauschen -----
-  function zeichneReihe(api, W, H) {
-    const z = api.zustand;
+  // Größe der Karten aus dem Platz W · H (px): --w Breite, --h Höhe, --g Abstand, --p Platz für die Punkte
+  function reiheStil(z, W, H) {
     const n = z.reihe.length;
     const g = gross() ? 18 : 10;
     const punkt = gross() ? 34 : 22;              // Platz für den kleinen und den großen Punkt an den Enden
@@ -163,6 +170,11 @@
     const w = Math.floor(Math.max(48, Math.min((W - 2 * punkt - (n + 1) * g) / n, (H - boden - 22) / verh, gross() ? 150 : 100)));
     // Türme dürfen höher sein als im Kern gezeichnet (die Steine werden dann dicker): bis 2,6-mal
     const hoch = z.aussehen === 'turm' ? Math.floor(Math.max(w * verh, Math.min(w * verh * 2.6, H - boden - 40))) : Math.round(w * verh);
+    return '--w:' + w + 'px;--h:' + hoch + 'px;--g:' + g + 'px;--p:' + punkt + 'px;--boden:' + boden + 'px';
+  }
+  function zeichneReihe(api, W, H) {
+    const z = api.zustand;
+    const max = Math.max.apply(null, z.reihe);
     // vorher: wo standen die Karten (für die kleine Tausch-Bewegung)
     const alt = {};
     if (z.flip && !ruhig()) {
@@ -180,7 +192,7 @@
       r += '<button class="suche-karte suche-karte-' + z.aussehen + (gew ? ' suche-gewaehlt' : '') + '" data-aktion="suche-karte" data-i="' + i + '" data-umschalter' +
         ' aria-label="' + api.esc(name + (gew ? ', ausgewählt' : '')) + '"' + (z.fertig ? ' disabled' : '') + '>' + svg + '</button>';
     });
-    api.feld.innerHTML = '<div class="suche-feld suche-feld-tauschen" style="--w:' + w + 'px;--h:' + hoch + 'px;--g:' + g + 'px;--p:' + punkt + 'px;--boden:' + boden + 'px">' +
+    api.feld.innerHTML = '<div class="suche-feld suche-feld-tauschen" style="' + reiheStil(z, W, H) + '">' +
       '<div class="suche-reihe-block"><div class="suche-reihe">' + r + '</div>' +
       '<div class="suche-boden" aria-hidden="true"><i class="suche-p-klein"></i><i class="suche-linie"></i><i class="suche-p-gross"></i></div></div></div>';
     // Tausch-Bewegung: die zwei Karten gleiten von ihrem alten Platz an den neuen (FLIP, ohne Blinken)
@@ -236,22 +248,25 @@
     if (Number.isInteger(g) && g >= z.von && g < z.hi) return x <= g ? 'nein' : 'ja';
     return '';
   }
-  function zeichneZahlen(api, W, H) {
-    const z = api.zustand;
+  // Größe der Zahlen aus dem Platz W · H (px): --c Spalten, --zw und --zh Breite und Höhe, --g Abstand
+  function zahlenStil(z, W, H) {
     const n = z.bis;
-    let html = '';
     const g = z.tasta ? 2 : gross() ? 12 : 8;
-    let stil;
     if (z.tasta) {
       // Hunderter-Tafel: 10 Spalten, die Kästchen dürfen breiter als hoch sein
       const c = 10, r = Math.ceil(n / c);
       const ch = Math.floor((H - (r - 1) * g) / r);
       const cw = Math.floor(Math.min((W - (c - 1) * g) / c, ch * 1.7, gross() ? 64 : 48));
-      stil = '--c:' + c + ';--zw:' + cw + 'px;--zh:' + Math.min(ch, cw) + 'px;--g:' + g + 'px';
-    } else {
-      const m = raster(W, H, n, g, gross() ? 110 : 76);
-      stil = '--c:' + m.c + ';--zw:' + m.zelle + 'px;--zh:' + m.zelle + 'px;--g:' + g + 'px';
+      return '--c:' + c + ';--zw:' + cw + 'px;--zh:' + Math.min(ch, cw) + 'px;--g:' + g + 'px';
     }
+    const m = raster(W, H, n, g, gross() ? 110 : 76);
+    return '--c:' + m.c + ';--zw:' + m.zelle + 'px;--zh:' + m.zelle + 'px;--g:' + g + 'px';
+  }
+  function zeichneZahlen(api, W, H) {
+    const z = api.zustand;
+    const n = z.bis;
+    let html = '';
+    const stil = zahlenStil(z, W, H);
     for (let x = 1; x <= n; x++) {
       const art = zahlArt(z, x);
       const gew = (z.tasta ? parseInt(z.eingabe, 10) : z.gewaehlt) === x && art !== 'weg';
@@ -564,7 +579,8 @@
     z.groesse = () => {
       if (!feld.isConnected) return;
       const m = z.masse;
-      if (!m || Math.abs(feld.clientWidth - m.W) > 1 || Math.abs(feld.clientHeight - m.H) > 1) zeichneFeld(api);
+      if (!m) return zeichneFeld(api);
+      if (Math.abs(feld.clientWidth - m.W) > 1 || Math.abs(feld.clientHeight - m.H) > 1) zeichneFeld(api, true);
     };
     if (window.ResizeObserver) {
       z.beob = new ResizeObserver(z.groesse);

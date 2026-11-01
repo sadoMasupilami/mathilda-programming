@@ -34,6 +34,17 @@ function tipper(page, h) {
   };
 }
 
+// Nach dem Drehen passt die App die Größen an, sobald der Browser die neue Größe meldet (ResizeObserver,
+// in WebKit manchmal erst nach über 100 ms): warten, bis alles im Feld liegt
+async function passtInsFeld(page) {
+  await page.waitForFunction(() => {
+    const f = document.querySelector('.feld'), inhalt = document.querySelector('.feld .suche-feld > *');
+    if (!f || !inhalt) return false;
+    const a = f.getBoundingClientRect(), b = inhalt.getBoundingClientRect();
+    return b.left >= a.left - 0.5 && b.right <= a.right + 0.5 && b.top >= a.top - 0.5 && b.bottom <= a.bottom + 0.5;
+  });
+}
+
 async function bereich(page) {
   const f = page.locator(FELD_RATEN);
   return { von: Number(await f.getAttribute('data-von')), bis: Number(await f.getAttribute('data-bis')) };
@@ -209,6 +220,7 @@ export function tests({ test, expect: erwarte, DATEN, h }) {
     // Gerät drehen: das Netz zeichnet sich neu, alles bleibt, wie es war
     const g = page.viewportSize();
     await page.setViewportSize({ width: g.height, height: g.width });
+    await passtInsFeld(page);
     await erwarte(page.locator('.programm .suche-vergleich-text')).toContainText('Stelle ' + (k + 1));
     await h.ansicht(page, 'suche-netz-gedreht', info);
     await page.setViewportSize(g);
@@ -331,10 +343,12 @@ export function tests({ test, expect: erwarte, DATEN, h }) {
     await h.tippe(page, ZAHL(S.mitten(1, f.lv.bis)[0]));
     const g = page.viewportSize();
     await page.setViewportSize({ width: g.height, height: g.width });
+    await passtInsFeld(page);
     await erwarte(page.locator('.feld .suche-zahl')).toHaveCount(f.lv.bis);
     await erwarte(page.locator('.feld .suche-gewaehlt')).toHaveCount(1);
     await h.ansicht(page, 'suche-raten-gedreht', info);
     await page.setViewportSize(g);
+    await passtInsFeld(page);
     await h.ansicht(page, 'suche-raten-zurueck', info);
   });
 }
