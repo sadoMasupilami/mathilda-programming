@@ -40,9 +40,18 @@ if (erg.fehler.length) {
 const daten = webDaten(erg);
 // Die App bewertet nur nach dem Ergebnis: gemeinte Reparatur, Beispiel- und Lösungsprogramme gehören nicht in die Daten
 for (const p of daten.pakete) for (const l of p.levels) { delete l.reparatur; delete l.beispiel; delete l.loesung; }
-const SPIELBAR = ['pfad', 'kobold', 'ablauf'];
+// Spielbar sind die eingebauten Arten und jede Art mit einem Spiel-Plugin web/spiele/<art>.js
+// (meldet sich mit window.WerkstattSpiele['<art>'] = { … } an, siehe Kopf von web/app.js).
+// Ein Paket mit Levels verschiedener Arten hat web.art "gemischt".
+const SPIELE_ORDNER = path.join(WEB, 'spiele');
+const SPIEL_PLUGINS = fs.existsSync(SPIELE_ORDNER) ? fs.readdirSync(SPIELE_ORDNER).filter((d) => d.endsWith('.js')).map((d) => d.slice(0, -3)).sort() : [];
+const SPIELBAR = ['pfad', 'kobold', 'ablauf'].concat(SPIEL_PLUGINS);
 for (const p of daten.pakete) {
-  if (!SPIELBAR.includes(p.art)) fehler.push('Paket ' + p.paket + ': web.art „' + p.art + '“ kann die App nicht (' + SPIELBAR.join(', ') + ')');
+  if (!SPIELBAR.includes(p.art) && p.art !== 'gemischt') fehler.push('Paket ' + p.paket + ': web.art „' + p.art + '“ kann die App nicht (' + SPIELBAR.join(', ') + ', gemischt)');
+  if (p.art !== 'gemischt' && p.levels.some((l) => l.art !== p.art && !(p.art === 'pfad' && l.art === 'pfad'))) {
+    const andere = [...new Set(p.levels.map((l) => l.art).filter((a) => a !== p.art))];
+    if (andere.length) fehler.push('Paket ' + p.paket + ': Levels der Art ' + andere.join(', ') + ' in einem Paket der Art „' + p.art + '“ (dann web.art "gemischt")');
+  }
   if (p.levels.length < 1) fehler.push('Paket ' + p.paket + ': keine Levels');
   if (p.levels.length < 5 || p.levels.length > 9) warnungen.push('Paket ' + p.paket + ' hat ' + p.levels.length + ' Levels (geplant 5–9)');
   for (const l of p.levels) {
@@ -76,6 +85,14 @@ const indexPfad = path.join(ZIEL, 'index.html');
 let index = fs.readFileSync(indexPfad, 'utf8');
 const mitBildern = fs.existsSync(path.join(ZIEL, 'kern', 'bilder.js'));
 index = index.replace('<!-- BILDER -->', mitBildern ? '<script src="kern/bilder.js"></script>' : '');
+// Weitere Kern-Dateien (gemeinsam mit dem Löser, z. B. kern/geheim.js) und die Spiel-Plugins einbinden
+const KERN_FEST = ['ausfuehrer.js', 'symbole.js', 'bilder.js'];
+const kernExtra = fs.readdirSync(path.join(ZIEL, 'kern')).filter((d) => d.endsWith('.js') && !KERN_FEST.includes(d)).sort();
+index = index.replace('<!-- KERN -->', kernExtra.map((d) => '<script src="kern/' + d + '"></script>').join('\n'));
+index = index.replace('<!-- SPIELE -->', SPIEL_PLUGINS.map((a) => '<script src="spiele/' + a + '.js"></script>').join('\n'));
+index = index.replace('<!-- SPIELE-CSS -->', SPIEL_PLUGINS.filter((a) => fs.existsSync(path.join(ZIEL, 'spiele', a + '.css')))
+  .map((a) => '<link rel="stylesheet" href="spiele/' + a + '.css">').join('\n'));
+for (const ph of ['<!-- KERN -->', '<!-- SPIELE -->', '<!-- SPIELE-CSS -->']) if (!fs.readFileSync(path.join(WEB, 'index.html'), 'utf8').includes(ph)) fehler.push('web/index.html: Platzhalter ' + ph + ' fehlt');
 fs.writeFileSync(indexPfad, index);
 
 function alleDateien(ordner, basis = ordner) {
@@ -127,6 +144,8 @@ const ohneKommentare = (t) => t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/
 const texte = [];
 texte.push(['index.html', ohneKommentare(fs.readFileSync(path.join(ZIEL, 'index.html'), 'utf8'))]);
 texte.push(['app.js', ohneKommentare(fs.readFileSync(path.join(ZIEL, 'app.js'), 'utf8'))]);
+for (const a of SPIEL_PLUGINS) texte.push(['spiele/' + a + '.js', ohneKommentare(fs.readFileSync(path.join(ZIEL, 'spiele', a + '.js'), 'utf8'))]);
+for (const d of kernExtra) texte.push(['kern/' + d, ohneKommentare(fs.readFileSync(path.join(ZIEL, 'kern', d), 'utf8'))]);
 (function sammle(x, wo) {
   if (typeof x === 'string') texte.push([wo, x]);
   else if (Array.isArray(x)) x.forEach((y) => sammle(y, wo));

@@ -99,13 +99,18 @@ const name = nur ? 'teil-' + nur.replace(/[^\w-]+/g, '_') : 'denk-werkstatt';
 
 fs.mkdirSync(OUT, { recursive: true });
 // Stylesheet mit eingesetztem Namen (für „Beispielsätze: {{KIND}}“) nach out/, Schriften relativ zu src/
-fs.writeFileSync(path.join(OUT, 'styles.css'), setzeName(fs.readFileSync(path.join(SRC, 'styles.css'), 'utf8')).replace(/url\("fonts\//g, 'url("../src/fonts/'));
+// Eigene Datei pro Build (styles-<name>.css): so stören sich mehrere Teil-Builds gleichzeitig nicht
+const stilDatei = 'styles-' + name + '.css';
+fs.writeFileSync(path.join(OUT, stilDatei), setzeName(fs.readFileSync(path.join(SRC, 'styles.css'), 'utf8')).replace(/url\("fonts\//g, 'url("../src/fonts/'));
 const bausteine = fs.readdirSync(path.join(SRC, 'bausteine')).filter((d) => d.endsWith('.js')).sort();
-const kernDateien = ['ausfuehrer.js', 'symbole.js', 'bilder.js'].filter((d) => fs.existsSync(path.join(WURZEL, 'web', 'kern', d)));
+// Kern: zuerst Ausführer, Symbole, Bilder, dann alle weiteren Kern-Dateien (web/kern/*.js, z. B. geheim.js)
+const ERSTE = ['ausfuehrer.js', 'symbole.js', 'bilder.js'];
+const kernDateien = ERSTE.filter((d) => fs.existsSync(path.join(WURZEL, 'web', 'kern', d)))
+  .concat(fs.readdirSync(path.join(WURZEL, 'web', 'kern')).filter((d) => d.endsWith('.js') && !ERSTE.includes(d)).sort());
 const daten = { raetsel: raetsel.raetsel, pakete: raetsel.pakete, qr, kind: KIND, titel: werkstatt.titel, stand: werkstatt.stand, teilBuild: !!nur };
 const html =
   '<!doctype html>\n<html lang="de-AT">\n<head>\n<meta charset="utf-8">\n<title>' + KIND + 's ' + werkstatt.titel + '</title>\n' +
-  '<link rel="stylesheet" href="styles.css">\n' +
+  '<link rel="stylesheet" href="' + stilDatei + '">\n' +
   '<script>window.__WERKSTATT = ' + JSON.stringify(daten).replace(/</g, '\\u003c') + ';</script>\n' +
   kernDateien.map((d) => '<script src="../web/kern/' + d + '"></script>\n').join('') +
   bausteine.map((d) => '<script src="../src/bausteine/' + d + '"></script>\n').join('') +
@@ -152,7 +157,10 @@ function zeichenDerSchriften() {
     }
     zeichen[fam] = [...gemeinsam];
   }
-  fs.writeFileSync(cache, JSON.stringify({ stempel, zeichen }));
+  // atomar schreiben: parallele Builds lesen nie eine halbe Datei
+  const tmp = cache + '.' + process.pid;
+  fs.writeFileSync(tmp, JSON.stringify({ stempel, zeichen }));
+  fs.renameSync(tmp, cache);
   return zeichen;
 }
 

@@ -252,3 +252,33 @@ Kein Schlüsselwort: Alle Pakete sind offen, der QR-Code führt direkt zum Paket
 3. Jede Zahl im Text, in Spielregeln, Beispielsätzen und Lösungen nachrechnen (auch „nach 3 Befehlen steht er …“ in Worten: das prüft der Build nicht, also mit dem Ausführer nachrechnen).
 4. Spiele einmal gedanklich zu zweit durchspielen: Geht es auf? Gibt es ein Ende? Reicht das Material?
 5. Österreichisches Deutsch und Begriffe aus der Begriffsliste.
+
+## 8. Neue Rätselart (ab Block B): vier Dateien, nichts im gemeinsamen Kern ändern
+
+Eine Einheit mit einer neuen Rätselart (Muster, Geheimschrift, Kästchenbild, Ja/Nein-Zahlen, Logikgitter, Formen-Quadrat, Nim …) bringt alles in **eigenen Dateien** mit. `src/styles.css`, `src/components.js`, `src/bausteine/programmieren.js`, `web/app.js`, `web/app.css`, `web/kern/ausfuehrer.js`, `web/kern/symbole.js`, `werkzeuge/raetsel.mjs`, `werkzeuge/loeser.mjs` und `tests/web.spec.mjs` bleiben unverändert. `<art>` ist ein kurzes Wort ohne Umlaute (z. B. `geheim`), überall gleich:
+
+| Datei | Inhalt |
+|---|---|
+| `web/kern/<art>.js` | Die Logik, die **Löser, Blätter und App gemeinsam** brauchen (z. B. Buchstaben verschieben, Muster ausrollen, Spielzüge des Computers). Ohne Abhängigkeiten, wie `ausfuehrer.js` gebaut: `(function (g) { … g.WerkstattGeheim = { … }; })(typeof globalThis !== 'undefined' ? globalThis : this);`. Wird automatisch geladen: im PDF-Build (Chrome), in der Web-App und in Node per `import '../../web/kern/<art>.js'`. |
+| `werkzeuge/arten/<art>.mjs` | Prüfen und Lösen: `export default { art: '<art>', pruefe(r, F, ctx) { …; return loesung; }, bericht(r) { return 'kurz'; }, fuerApp(r) { return { …ohne Lösung… }; } }` (auch ein Array mehrerer Arten). `F('…')` meldet einen Fehler, der Build bricht dann ab. Hier wird bewiesen, was AUFTRAG.md Abschnitt 10 verlangt (genau eine Lösung, Gewinn-Strategie per Spielbaum …). Die Lösung landet in `r.loesung` und steht den Bausteinen der Blätter zur Verfügung (`H().DATEN.raetsel[id].loesung`). `fuerApp` gibt nur weiter, was die App braucht, **nie die Lösung** (ohne `fuerApp`: alles außer `loesung`, `paket` und den Feldern in `geheim: ['…']`). |
+| `web/spiele/<art>.js` (+ optional `web/spiele/<art>.css`) | Das Spiel in der App: `window.WerkstattSpiele['<art>'] = { icon, start, grundMeldung, klick, los, nochmal, stopp }`. Schnittstelle im Kopf von `web/app.js`. Spielfeld in `api.feld`, Anzeige in `api.programm`, Tasten in `api.tasten` (mit `api.taste(…)`, mindestens 48 · 48 px, 8 px Abstand, kein Ziehen, kein Hover). Bewertet wird nach dem Ergebnis mit `web/kern/<art>.js`, Erfolg mit `api.geschafft({})`, freundliche Hinweise mit `api.meldung(text, 'hinweis')`. CSS-Klassen mit Präfix `<art>-`. Hoch: Feld oben, Tasten unten. Quer: Feld links, Tasten rechts. Ohne Scrollen auf 375 · 667 und 667 · 375. |
+| `tests/spiele/<art>.mjs` | Test-Plugin: `export async function spiele(page, lv, h, info, fotos)` spielt ein Level per Antippen bis zum Geschafft-Fenster (Lösung selbst ausrechnen mit `web/kern/<art>.js`, die App kennt sie nicht). `export function tests({ test, expect, DATEN, h })` für weitere Tests: falsche Antwort → freundliche Meldung, Nochmal, Doppeltipp auf umschaltende Elemente. Jede neue Ansicht mit `h.ansicht(page, 'name', info)` fotografieren (prüft Scrollen, Tastengröße, Abstände). |
+
+Dazu wie immer `raetsel/eN.json` (Rätsel der Blätter und `"web": { "titel", "art": "<art>", "levels": […] }`), `src/einheiten/NN-name.html` und bei Bedarf `src/bausteine/eN-name.js` (Bausteine für die Blätter, die ihre Lösung aus `r.loesung` holen und in der Lösungsansicht rot zeigen).
+
+Ein Paket mit Levels verschiedener Arten (Einheit 20) hat `"art": "gemischt"`. Einheiten ohne neue Art (Wenn-dann, Labyrinth, Zaubersprüche) verwenden `pfad`, `lesen`, `kobold` mit den erweiterten Befehlen aus `plan/lehrplan.md` Abschnitt 7.8.
+
+**Prüfen:**
+
+```bash
+werkzeuge/mit-nix.sh node werkzeuge/raetsel.mjs --bericht                  # alle Rätsel, auch die neuen Arten
+./baue.sh --nur 07 --png --dpi 110                                         # Einheit 7, Seitenbilder in out/seiten-07/
+werkzeuge/mit-nix.sh node werkzeuge/web-bauen.mjs                          # App bauen (prüft Zeichen, Adressen, Arten)
+WERKSTATT_TEST_PORT=4207 npx playwright test --grep "e7|geheim" --project=chromium-iphone-hoch --project=webkit-iphone-quer --project=chromium-ipad-quer
+```
+
+Bildschirmfotos der Tests: `test-results/bilder/<projekt>/`. Jede Ansicht ansehen (wie die Seitenbilder der PDFs).
+
+## 9. Reihenfolge im Buch
+
+Alle Einheiten stehen schon in `src/buch.json` (Dateinamen `06-muster-detektivin.html` … `20-das-grosse-code-fest.html`). Eine noch nicht geschriebene Einheit ist eine Datei mit nur einem Kommentar. Die Einleitung verweist auf jeden Spickzettel (`#spick-N`); das ergänzt, wer die Rahmenseiten pflegt.

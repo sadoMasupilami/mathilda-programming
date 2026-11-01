@@ -8,6 +8,26 @@
    gespeicherten Lösungen in der App.
    Ruhig: kein Ton, keine Zeitlimits, kein Blinken, nach dem letzten
    Level ein klares Ende.
+
+   Spiel-Plugins für weitere Rätselarten (web/spiele/<art>.js, eine Datei pro Art,
+   optional web/spiele/<art>.css; web-bauen.mjs bindet sie ein):
+     window.WerkstattSpiele = window.WerkstattSpiele || {};
+     window.WerkstattSpiele['<art>'] = {
+       icon(paket, api)       Bild für Kachel und Paket-Seite (SVG-Text), optional
+       start(api)             Level aufbauen: api.feld, api.programm, api.tasten füllen
+       grundMeldung(api)      Meldung am Anfang, optional
+       klick(aktion, el, api) eigene Tasten (data-aktion="…"), alles außer heim/weiter/level/paket
+       los(api)               Taste data-aktion="los", optional
+       nochmal(api)           Taste data-aktion="nochmal" (auch im Geschafft-Fenster); ohne: start(api) neu
+       stopp(api)             Level wird verlassen, optional (api.spaeter-Timer stoppt der Kern selbst)
+     };
+   api: lv (Level-Daten), paket, nr (0-basiert), feld, programm, tasten (DOM), zustand ({} für das Plugin),
+        meldung(text, art, icon), geschafft({ stern = true, zusatz }), taste(aktion, inhalt, opt),
+        befehlsTaste(b, aus, grau), sym(name), esc(s), bild(name), K, S, spaeter(fn, ms), belegung(box),
+        sperren(), TEMPO, ICON, laeuft(true|false)
+   Antippen wie überall: data-aktion an <button>. Elemente, die beim Antippen umschalten (an/aus),
+   bekommen data-umschalter: ein Doppeltipp schaltet sie dann nicht gleich wieder zurück.
+   Bewertet wird nur nach dem Ergebnis, mit derselben Kern-Datei wie der Löser (web/kern/<art>.js).
    ===================================================================== */
 (function () {
   'use strict';
@@ -16,6 +36,15 @@
   const S = window.WerkstattSymbole;
   const BILDER = window.WerkstattBilder || null;
   const DATEN = window.WERKSTATT_DATEN || { pakete: [] };
+  const SPIELE = (window.WerkstattSpiele = window.WerkstattSpiele || {});
+  // Blöcke wie im Heft (src/components.js, blockVon): 1–5 A, 6–10 B, 11–14 C, ab 15 D
+  const BLOECKE = [
+    { b: 'a', titel: 'Befehle, Programme, Fehler', von: 1, bis: 5 },
+    { b: 'b', titel: 'Muster und Geheimcodes', von: 6, bis: 10 },
+    { b: 'c', titel: 'Wenn-dann und Logik', von: 11, bis: 14 },
+    { b: 'd', titel: 'Strategie und Projekte', von: 15, bis: 99 },
+  ];
+  const blockVon = (n) => BLOECKE.find((x) => n >= x.von && n <= x.bis) || BLOECKE[0];
   // Tempo des Drachen (ms pro Befehl). Tests dürfen es über window.WERKSTATT_TEMPO verkürzen.
   const TEMPO = Number(window.WERKSTATT_TEMPO) > 0 ? Number(window.WERKSTATT_TEMPO) : 600;
   const MAX_KARTEN = 12;   // eine Programm-Reihe am Papier
@@ -86,7 +115,7 @@
   let L = null;          // Level-Zustand
   let neueVersion = false; // ein neuer Service Worker hat übernommen: bei nächster Gelegenheit neu laden
   function neuLadenWennRuhig() {
-    if (neueVersion && ['start', 'paket', 'ende'].includes(document.body.dataset.ansicht)) {
+    if (neueVersion && ['start', 'block', 'paket', 'ende'].includes(document.body.dataset.ansicht)) {
       neueVersion = false;
       location.reload();
     }
@@ -96,6 +125,8 @@
 
   function stoppe() {
     if (L && L.timer) { clearTimeout(L.timer); L.timer = null; }
+    if (L && L.timers) { L.timers.forEach(clearTimeout); L.timers = []; }
+    if (L && L.spiel && L.spiel.stopp && !L.gestoppt) { L.gestoppt = true; try { L.spiel.stopp(L.api); } catch (e) { /* nichts */ } }
     if (L) L.laeuft = false;
   }
 
@@ -117,6 +148,11 @@
     if (h !== 'eltern' && h !== 'eltern/bereich') elternOffen = false;
     if (h === 'eltern') return zeigeElternFrage();
     if (h === 'eltern/bereich') return elternOffen ? zeigeEltern() : zeigeElternFrage();
+    const mb = /^block-([a-d])$/i.exec(h);
+    if (mb) {
+      const bl = BLOECKE.find((x) => x.b === mb[1].toLowerCase());
+      if (paketeIm(bl).length) return zeigeBlock(bl);
+    }
     const m = /^(e\d+)(?:\/(\d+|ende))?$/i.exec(h);
     if (m) {
       const p = paketVon(m[1].toLowerCase());
@@ -145,30 +181,63 @@
   // Startseite: Pakete der Einheiten, alle offen
   // ---------------------------------------------------------------------
   function paketIcon(p) {
+    const sp = SPIELE[p.art];
+    if (sp && sp.icon) { try { const i = sp.icon(p, apiBasis()); if (i) return i; } catch (e) { /* Standard-Bild */ } }
+    if (p.art === 'gemischt') return '<span class="fest-icon">' + sym('stern') + '</span>';
     if (p.art === 'kobold') return sym('kobold');
     if (p.art === 'ablauf') return ICON.karten;
     if (hatZauber(p)) return '<span class="zk-gross"><b>3-mal</b>' + sym('drache') + '</span>';
     return sym('drache');
   }
+  function paketKachel(p) {
+    const n = sterneVon(p);
+    return '<button class="kachel" data-aktion="paket" data-paket="' + p.paket + '" data-block="' + blockVon(p.einheit).b + '">' +
+      '<span class="kachel-nr">' + p.einheit + '</span>' +
+      '<span class="kachel-bild">' + paketIcon(p) + '</span>' +
+      '<span class="kachel-titel">' + esc(p.titel) + '</span>' +
+      '<span class="kachel-stand"><span class="mini-stern">' + sym(n === p.levels.length ? 'stern' : 'sternLeer') + '</span>' + n + ' von ' + p.levels.length + '</span>' +
+      '</button>';
+  }
+  function paketeIm(bl) { return DATEN.pakete.filter((p) => blockVon(p.einheit) === bl); }
+  // Startseite: liegen die Pakete in mehreren Blöcken, zuerst die Blöcke (so passt alles ohne Scrollen
+  // auf ein kleines Handy), sonst gleich die Pakete. Der QR-Code am Blatt führt immer direkt zum Paket.
   function zeigeStart() {
     const name = speicher.name ? ', ' + esc(speicher.name) : '';
+    const bloecke = BLOECKE.filter((bl) => paketeIm(bl).length);
     let kacheln = '';
-    for (const p of DATEN.pakete) {
-      const n = sterneVon(p);
-      kacheln += '<button class="kachel" data-aktion="paket" data-paket="' + p.paket + '">' +
-        '<span class="kachel-nr">' + p.einheit + '</span>' +
-        '<span class="kachel-bild">' + paketIcon(p) + '</span>' +
-        '<span class="kachel-titel">' + esc(p.titel) + '</span>' +
-        '<span class="kachel-stand"><span class="mini-stern">' + sym(n === p.levels.length ? 'stern' : 'sternLeer') + '</span>' + n + ' von ' + p.levels.length + '</span>' +
-        '</button>';
+    let n = 0;
+    if (bloecke.length > 1) {
+      for (const bl of bloecke) {
+        const ps = paketeIm(bl);
+        const st = ps.reduce((a, p) => a + sterneVon(p), 0), alle = ps.reduce((a, p) => a + p.levels.length, 0);
+        const von = Math.min(...ps.map((p) => p.einheit)), bis = Math.max(...ps.map((p) => p.einheit));
+        kacheln += '<button class="kachel block-kachel" data-aktion="block" data-block="' + bl.b + '">' +
+          '<span class="kachel-nr block-nr">' + bl.b.toUpperCase() + '</span>' +
+          '<span class="block-bilder">' + ps.slice(0, 3).map((p) => '<span class="kachel-bild">' + paketIcon(p) + '</span>').join('') + '</span>' +
+          '<span class="kachel-titel">' + esc(bl.titel) + '</span>' +
+          '<span class="kachel-stand"><span class="block-einheiten">' + (von === bis ? 'Einheit ' + von : 'Einheit ' + von + '–' + bis) + '</span>' +
+          '<span class="mini-stern">' + sym(st === alle ? 'stern' : 'sternLeer') + '</span>' + st + ' von ' + alle + '</span>' +
+          '</button>';
+        n++;
+      }
+    } else {
+      for (const p of DATEN.pakete) { kacheln += paketKachel(p); n++; }
     }
     if (!kacheln) kacheln = '<p class="leer-hinweis">Hier gibt es noch keine Pakete.</p>';
     ansicht('start',
       '<section class="ansicht start">' +
       '<header class="start-kopf"><span class="start-drache">' + sym('drache') + '</span>' +
-      '<div><h1>Denk-Werkstatt</h1><p class="gruss">Hallo' + name + '! Welches Paket?</p></div></header>' +
-      '<div class="kacheln" data-n="' + DATEN.pakete.length + '">' + kacheln + '</div>' +
+      '<div><h1>Denk-Werkstatt</h1><p class="gruss">Hallo' + name + '! ' + (bloecke.length > 1 ? 'Was spielst du?' : 'Welches Paket?') + '</p></div></header>' +
+      '<div class="kacheln" data-n="' + n + '">' + kacheln + '</div>' +
       '<footer class="start-fuss"><button class="taste klein-taste" data-aktion="eltern">Für Erwachsene</button></footer>' +
+      '</section>');
+  }
+  function zeigeBlock(bl) {
+    const ps = paketeIm(bl);
+    ansicht('block',
+      '<section class="ansicht start block-ansicht" data-block="' + bl.b + '">' +
+      '<header class="kopf">' + heimKnopf() + '<span class="kopf-titel">' + esc(bl.titel) + '</span></header>' +
+      '<div class="kacheln" data-n="' + ps.length + '">' + ps.map(paketKachel).join('') + '</div>' +
       '</section>');
   }
 
@@ -184,7 +253,7 @@
     });
     const naechstes = Math.max(0, p.levels.findIndex((l) => !speicher.sterne[l.id]));
     ansicht('paket',
-      '<section class="ansicht paket">' +
+      '<section class="ansicht paket" data-block="' + blockVon(p.einheit).b + '">' +
       '<header class="kopf">' + heimKnopf() + '<span class="kopf-titel">' + esc(p.titel) + '</span></header>' +
       '<div class="paket-inhalt">' +
       '<div class="paket-bild">' + paketIcon(p) + '</div>' +
@@ -275,15 +344,35 @@
     return w;
   }
 
+  // Schnittstelle für Spiel-Plugins (siehe Kopf der Datei)
+  function apiBasis() {
+    return { sym, esc, bild: bildVon, K, S, TEMPO, ICON, taste, befehlsTaste };
+  }
+  function pluginApi() {
+    const a = apiBasis();
+    Object.assign(a, {
+      lv: L.lv, paket: L.p, nr: L.i, zustand: L.zustand,
+      feld: app.querySelector('.feld'), programm: app.querySelector('.programm'), tasten: app.querySelector('.tasten'),
+      meldung,
+      geschafft: (o) => geschafftDialog(!o || o.stern !== false, (o && o.zusatz) || ''),
+      spaeter: (fn, ms) => { const t = setTimeout(() => { L.timers = (L.timers || []).filter((x) => x !== t); fn(); }, ms); (L.timers = L.timers || []).push(t); return t; },
+      belegung: (box) => belegungMerken(box || app.querySelector('.tasten')),
+      sperren,
+      laeuft: (j) => { if (j !== undefined) L.laeuft = !!j; return L.laeuft; },
+    });
+    return a;
+  }
+
   function zeigeLevel(p, i) {
     const lv = p.levels[i];
-    const art = lv.art === 'kobold' ? 'kobold' : lv.art === 'ablauf' ? 'ablauf' : 'pfad';
+    const sp = SPIELE[lv.art] || null;
+    const art = sp ? lv.art : lv.art === 'kobold' ? 'kobold' : lv.art === 'ablauf' ? 'ablauf' : 'pfad';
     let punkte = '';
     p.levels.forEach((l, j) => {
       punkte += '<span class="punkt' + (speicher.sterne[l.id] ? ' voll' : '') + (j === i ? ' jetzt' : '') + '"></span>';
     });
     ansicht('level',
-      '<section class="ansicht spiel art-' + art + '" data-level="' + esc(lv.id) + '" style="--tempo:' + Math.round(Math.min(450, TEMPO * 0.75)) + 'ms">' +
+      '<section class="ansicht spiel art-' + art + (sp ? ' plugin' : '') + '" data-level="' + esc(lv.id) + '" data-block="' + blockVon(p.einheit).b + '" style="--tempo:' + Math.round(Math.min(450, TEMPO * 0.75)) + 'ms">' +
       '<div class="spalte-links">' +
       '<header class="kopf">' + heimKnopf() +
       '<div class="kopf-mitte"><span class="kopf-titel">' + esc(p.titel) + '</span><span class="punkte" aria-hidden="true">' + punkte + '</span></div>' +
@@ -296,7 +385,15 @@
       '<div class="tasten"></div>' +
       '</div>' +
       '</section>');
-    L = { p, i, lv, art, laeuft: false, timer: null, ergebnis: null, auswahl: null, wahl: null };
+    L = { p, i, lv, art, laeuft: false, timer: null, timers: [], ergebnis: null, auswahl: null, wahl: null };
+    if (sp) {
+      L.spiel = sp;
+      L.zustand = {};
+      L.api = pluginApi();
+      sp.start(L.api);
+      if (sp.grundMeldung) sp.grundMeldung(L.api);
+      return;
+    }
     if (art === 'ablauf') starteAblauf();
     else {
       L.welt = weltVon(lv);
@@ -679,6 +776,12 @@
         zusatz = 'Profi-Frage: Geht es auch mit ' + lv.minKarten + ' Karten?';
       }
     }
+    geschafftDialog(stern, zusatz);
+  }
+  // Geschafft-Fenster (auch für Spiel-Plugins): Stern speichern, „Nochmal“ und „Weiter“
+  function geschafftDialog(stern, zusatz) {
+    const lv = L.lv;
+    if (app.querySelector('.dialog-hintergrund')) return;
     if (stern) { speicher.sterne[lv.id] = 1; sichere(); }
     const letztes = L.i === L.p.levels.length - 1;
     const punkte = app.querySelectorAll('.punkte .punkt');
@@ -693,7 +796,7 @@
       '<h2 id="dialog-titel">' + (stern ? 'Geschafft!' : 'Fast geschafft!') + '</h2></div>' +
       (zusatz ? '<p>' + esc(zusatz) + '</p>' : '') +
       '<div class="reihe">' +
-      taste('nochmal', '<span>Nochmal</span>', { cls: 'breit', label: L.art === 'ablauf' ? 'Nochmal: alle Karten zurück' : 'Nochmal: Drache zurück an den Start' }) +
+      taste('nochmal', '<span>Nochmal</span>', { cls: 'breit', label: L.spiel ? 'Nochmal' : L.art === 'ablauf' ? 'Nochmal: alle Karten zurück' : 'Nochmal: Drache zurück an den Start' }) +
       taste('weiter', '<span>' + (letztes ? 'Fertig' : 'Weiter') + '</span>' + ICON.los, { cls: 'breit los' }) +
       '</div></div>';
     app.querySelector('.spiel').appendChild(d);
@@ -852,6 +955,7 @@
   // Eingaben: alles über Antippen (click), kein Ziehen, kein Hover
   // ---------------------------------------------------------------------
   const UMSCHALTER = ['ablauf', 'karte', 'stelle'];
+  const KERN_AKTIONEN = ['heim', 'eltern', 'paket', 'block', 'level', 'loeschen-frage', 'loeschen-ja', 'loeschen-nein'];
   let letzterUmschalter = null;
   app.addEventListener('click', (ev) => {
     const b = ev.target.closest('[data-aktion]');
@@ -862,7 +966,7 @@
     if (L && b.closest('.programm, .tasten, .feld')) {
       const jetzt = Date.now();
       if (jetzt < sperreBis) return;
-      if (UMSCHALTER.includes(a)) {
+      if (UMSCHALTER.includes(a) || b.hasAttribute('data-umschalter')) {
         const wer = a + ':' + (b.dataset.id || b.dataset.i || '');
         if (letzterUmschalter && letzterUmschalter.wer === wer && jetzt - letzterUmschalter.zeit < SPERRE) return;
         letzterUmschalter = { wer, zeit: jetzt };
@@ -872,6 +976,7 @@
       case 'heim': return geh('#');
       case 'eltern': return geh('#eltern');
       case 'paket': return geh('#' + b.dataset.paket);
+      case 'block': return geh('#block-' + b.dataset.block);
       case 'level': return geh('#' + b.dataset.paket + '/' + (parseInt(b.dataset.i, 10) + 1));
       case 'loeschen-frage': return loeschenFrage();
       case 'loeschen-ja':
@@ -881,6 +986,24 @@
       case 'loeschen-nein': return zeigeEltern();
     }
     if (!L) return;
+    if (L.spiel && !KERN_AKTIONEN.includes(a)) {
+      const sp = L.spiel;
+      if (a === 'weiter') return geh('#' + L.p.paket + '/' + (L.i + 1 < L.p.levels.length ? L.i + 2 : 'ende'));
+      if (a === 'nochmal') {
+        const d = app.querySelector('.dialog-hintergrund');
+        if (d) { d.remove(); sperren(); }
+        if (L.timers) { L.timers.forEach(clearTimeout); L.timers = []; }
+        L.laeuft = false;
+        if (sp.nochmal) return sp.nochmal(L.api);
+        L.zustand = {}; L.api = pluginApi();
+        sp.start(L.api);
+        if (sp.grundMeldung) sp.grundMeldung(L.api);
+        return;
+      }
+      if (a === 'los' && sp.los) return sp.los(L.api);
+      if (sp.klick) return sp.klick(a, b, L.api);
+      return;
+    }
     switch (a) {
       case 'befehl': return befehlDazu(b.dataset.befehl);
       case 'loeschen': return loeschen();

@@ -203,8 +203,22 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
 .zk-gross b { font-size: 12px; color: var(--zauber); line-height: 1; white-space: nowrap; flex: none; }
 .zk-gross svg { flex: 1 1 0; min-height: 0; width: 100%; height: auto; }
 
+/* Blöcke (Farben wie im Heft): Startseite mit Block-Kacheln, Block-Ansicht mit den Paketen */
+[data-block="b"] { --akzent: #0f8f87; --akzent-hell: #e3f6f4; }
+[data-block="c"] { --akzent: #c45f12; --akzent-hell: #fff0e3; }
+[data-block="d"] { --akzent: #c23a8c; --akzent-hell: #fde9f4; }
+.kachel-nr.block-nr { font-size: 1.05rem; }
+.block-bilder { display: flex; gap: 4px; align-items: center; justify-content: center; width: 100%; flex: 0 1 auto; min-height: 0; }
+.block-bilder .kachel-bild { width: min(64px, 31%); }
+.block-kachel .kachel-stand { flex-wrap: wrap; justify-content: center; row-gap: 2px; }
+.block-einheiten { width: 100%; text-align: center; }
+.fest-icon { display: flex; width: 100%; height: 100%; }
+.fest-icon svg { width: 100%; height: 100%; }
+.block-ansicht .kacheln { flex: 1 1 auto; }
+
 @media (orientation: landscape) {
   .kacheln { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .kacheln[data-n="5"] { grid-template-columns: repeat(5, minmax(0, 1fr)); }
   .kacheln[data-n="1"], .kacheln[data-n="2"], .kacheln[data-n="3"] { grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); }
   .start-drache { width: 52px; height: 52px; }
   .start h1 { font-size: 1.4rem; }

@@ -13,6 +13,30 @@ const WURZEL = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DATEN = JSON.parse(fs.readFileSync(path.join(WURZEL, '_site', 'daten.js'), 'utf8')
   .replace(/^[\s\S]*?window\.WERKSTATT_DATEN\s*=\s*/, '').replace(/;\s*$/, ''));
 const SCHNELL = 40; // ms pro Befehl beim Durchspielen
+const PORT = String(Number(process.env.WERKSTATT_TEST_PORT) || 4173);
+
+// Blöcke wie in web/app.js: liegen die Pakete in mehreren Blöcken, zeigt die Startseite Block-Kacheln
+const BLOCK = (n) => (n <= 5 ? 'a' : n <= 10 ? 'b' : n <= 14 ? 'c' : 'd');
+const MEHRERE_BLOECKE = new Set(DATEN.pakete.map((p) => BLOCK(p.einheit))).size > 1;
+// Seite mit der Kachel eines Pakets: Block-Ansicht oder Startseite
+const kachelSeite = (p) => (MEHRERE_BLOECKE ? './#block-' + BLOCK(p.einheit) : './');
+
+// ---------------------------------------------------------------------
+// Test-Plugins für weitere Rätselarten: tests/spiele/<art>.mjs (gleicher Name wie web/spiele/<art>.js)
+//   export async function spiele(page, lv, h, info, fotos)
+//       spielt das Level per Antippen, bis das Geschafft-Fenster offen ist (Lösung selbst ausrechnen,
+//       mit derselben Kern-Datei web/kern/… wie Löser und App; die App kennt keine Lösungen)
+//   export function tests({ test, expect, DATEN, h })   weitere Tests (optional): falsche Antwort,
+//       freundliche Meldung, Nochmal, Doppeltipp … Jede Ansicht mit h.ansicht fotografieren und prüfen.
+//   h: { tippe, tippeGrau, ansicht, oeffnePaket, oeffneLevel, doppeltipp, schnell, suche, K, WURZEL }
+// ---------------------------------------------------------------------
+const SPIEL_TESTS = {};
+const SPIEL_ORDNER = path.join(WURZEL, 'tests', 'spiele');
+if (fs.existsSync(SPIEL_ORDNER)) {
+  for (const d of fs.readdirSync(SPIEL_ORDNER).filter((x) => x.endsWith('.mjs')).sort()) {
+    SPIEL_TESTS[d.slice(0, -4)] = await import(new URL('./spiele/' + d, import.meta.url).href);
+  }
+}
 
 // ---------------------------------------------------------------------
 // Wachen: fremde Hosts, Konsole
@@ -24,7 +48,7 @@ test.beforeEach(async ({ page, context }) => {
   konsole = [];
   await context.route('**/*', (route) => {
     const u = new URL(route.request().url());
-    if (u.protocol === 'data:' || u.protocol === 'blob:' || ((u.hostname === 'localhost' || u.hostname === '127.0.0.1') && u.port === '4173')) return route.continue();
+    if (u.protocol === 'data:' || u.protocol === 'blob:' || ((u.hostname === 'localhost' || u.hostname === '127.0.0.1') && u.port === PORT)) return route.continue();
     fremd.push(u.href);
     return route.abort();
   });
@@ -179,10 +203,45 @@ function koboldReparatur(lv) {
   throw new Error('Keine Reparatur für ' + lv.id);
 }
 
+async function oeffneLevel(page, f, info) {
+  await oeffnePaket(page, f.p);
+  await page.goto('./#' + f.p.paket + '/' + (f.i + 1));
+  await expect(page.locator('.spiel')).toHaveAttribute('data-level', f.lv.id);
+}
+// Suche ein Level einer Art (auch Plugin-Arten): { p, i, lv } oder null
+function suche(art, bedingung) {
+  for (const p of DATEN.pakete) {
+    const i = p.levels.findIndex((l) => l.art === art && bedingung(l));
+    if (i >= 0) return { p, i, lv: p.levels[i] };
+  }
+  return null;
+}
+// Doppeltipp: zwei echte Touch-Tipps 60 ms hintereinander auf dieselbe Stelle
+async function doppeltipp(page, sel) {
+  await page.locator('#app:not([data-sperre])').waitFor({ state: 'attached' });
+  const r = await page.locator(sel).first().boundingBox();
+  const x = r.x + r.width / 2, y = r.y + r.height / 2;
+  await page.touchscreen.tap(x, y);
+  await page.waitForTimeout(60);
+  await page.touchscreen.tap(x, y);
+  await page.waitForTimeout(450);
+}
+const H = { tippe, tippeGrau, ansicht, oeffnePaket, oeffneLevel, doppeltipp, schnell, suche, K, WURZEL, kachelSeite };
+
 async function spieleLevel(page, p, i, info, fotos) {
   const lv = p.levels[i];
   await expect(page.locator('.spiel')).toHaveAttribute('data-level', lv.id);
   await ansicht(page, p.paket + '-level' + (i + 1), info);
+  if (!['pfad', 'kobold', 'ablauf'].includes(lv.art)) {
+    const pl = SPIEL_TESTS[lv.art];
+    expect(pl && pl.spiele, 'Test-Plugin tests/spiele/' + lv.art + '.mjs mit spiele()').toBeTruthy();
+    await pl.spiele(page, lv, H, info, fotos);
+    await expect(page.locator('.dialog')).toBeVisible({ timeout: 20_000 });
+    await expect(page.locator('.dialog h2')).toHaveText('Geschafft!');
+    if (fotos) await ansicht(page, p.paket + '-geschafft', info);
+    await tippe(page, '.dialog [data-aktion="weiter"]');
+    return;
+  }
   if (lv.art === 'ablauf') {
     const reihe = ablaufZaehlen(lv.karten.map((k) => k.id), lv.regeln || []).loesungen[0];
     for (const id of reihe) await tippe(page, '.ablauf-karte[data-id="' + id + '"]');
@@ -211,15 +270,28 @@ test('Startseite und Paket-Auswahl', async ({ page }, info) => {
   await page.goto('./');
   await expect(page.locator('body')).toHaveAttribute('data-ansicht', 'start');
   await expect(page.locator('meta[name=robots]')).toHaveAttribute('content', /noindex/);
-  await expect(page.locator('.kachel')).toHaveCount(DATEN.pakete.length);
+  const bloecke = [...new Set(DATEN.pakete.map((p) => BLOCK(p.einheit)))];
+  if (MEHRERE_BLOECKE) await expect(page.locator('.kachel[data-aktion="block"]')).toHaveCount(bloecke.length);
+  else await expect(page.locator('.kachel')).toHaveCount(DATEN.pakete.length);
   await ansicht(page, 'start', info);
+  // Jeder Block zeigt seine Pakete, alle passen ohne Scrollen auf den Bildschirm
+  if (MEHRERE_BLOECKE) {
+    for (const b of bloecke) {
+      await tippe(page, '.kachel[data-block="' + b + '"][data-aktion="block"]');
+      await expect(page.locator('body')).toHaveAttribute('data-ansicht', 'block');
+      await expect(page.locator('.kachel[data-paket]')).toHaveCount(DATEN.pakete.filter((p) => BLOCK(p.einheit) === b).length);
+      await ansicht(page, 'block-' + b, info);
+      await tippe(page, '[data-aktion="heim"]');
+    }
+  }
   // Alle Pakete sind gleich offen: Antippen öffnet die Level-Auswahl, ohne Schlüsselwort
   const p = DATEN.pakete[0];
+  await page.goto(kachelSeite(p));
   await tippe(page, '.kachel[data-paket="' + p.paket + '"]');
   await expect(page).toHaveURL(new RegExp('#' + p.paket + '$'));
   await expect(page.locator('body')).toHaveAttribute('data-ansicht', 'paket');
   await ansicht(page, 'paket', info);
-  await tippe(page, '[data-aktion="heim"]');
+  await page.goto(kachelSeite(p));
   await expect(page.locator('.kachel[data-paket="' + p.paket + '"] .kachel-stand')).toContainText('0 von ' + p.levels.length);
 });
 
@@ -235,6 +307,8 @@ for (const p of DATEN.pakete) {
     await ansicht(page, p.paket + '-ende', info);
     // kein automatisches nächstes Paket: nur zurück zur Startseite
     await tippe(page, '.ende [data-aktion="heim"]');
+    await expect(page.locator('body')).toHaveAttribute('data-ansicht', 'start');
+    await page.goto(kachelSeite(p));
     await expect(page.locator('.kachel[data-paket="' + p.paket + '"] .kachel-stand')).toContainText(p.levels.length + ' von ' + p.levels.length);
   });
 }
@@ -286,18 +360,7 @@ function finde(lv, pruefe, maxLaenge) {
   for (let n = 1; n <= maxLaenge; n++) for (const p of programme(n)) if (pruefe(K.ausfuehren(w, p), p)) return p;
   return null;
 }
-function suche(art, bedingung) {
-  for (const p of DATEN.pakete) {
-    const i = p.levels.findIndex((l) => l.art === art && bedingung(l));
-    if (i >= 0) return { p, i, lv: p.levels[i] };
-  }
-  return null;
-}
-async function oeffneLevel(page, f, info) {
-  await oeffnePaket(page, f.p);
-  await page.goto('./#' + f.p.paket + '/' + (f.i + 1));
-  await expect(page.locator('.spiel')).toHaveAttribute('data-level', f.lv.id);
-}
+
 
 test('Fast geschafft: angekommen, aber nicht das kürzeste Programm', async ({ page }, info) => {
   let f = null, prog = null;
@@ -395,16 +458,6 @@ test('Kobold: Neu stellt das Kobold-Programm wie am Anfang her', async ({ page }
   await ansicht(page, 'kobold-neu', info);
 });
 
-// Doppeltipp: zwei echte Touch-Tipps 60 ms hintereinander auf dieselbe Stelle
-async function doppeltipp(page, sel) {
-  await page.locator('#app:not([data-sperre])').waitFor({ state: 'attached' });
-  const r = await page.locator(sel).first().boundingBox();
-  const x = r.x + r.width / 2, y = r.y + r.height / 2;
-  await page.touchscreen.tap(x, y);
-  await page.waitForTimeout(60);
-  await page.touchscreen.tap(x, y);
-  await page.waitForTimeout(450);
-}
 test('Doppeltipp löst nie die Taste aus, die danach an derselben Stelle liegt', async ({ page }, info) => {
   const z = suche('pfad', (l) => l.zauber);
   if (z) {
@@ -575,6 +628,7 @@ test('Für Erwachsene: Eltern-Frage, Name, Fortschritt löschen', async ({ page 
   // ein Stern aus einem früheren Spiel
   await page.goto('./');
   await page.evaluate((id) => localStorage.setItem('denk-werkstatt-v1', JSON.stringify({ sterne: { [id]: true }, name: '' })), p.levels[0].id);
+  await page.goto(kachelSeite(p));
   await page.reload();
   await expect(page.locator('.kachel[data-paket="' + p.paket + '"] .kachel-stand')).toContainText('1 von ' + p.levels.length);
   await page.goto('./#eltern');
@@ -598,8 +652,9 @@ test('Für Erwachsene: Eltern-Frage, Name, Fortschritt löschen', async ({ page 
   await tippe(page, '[data-aktion="loeschen-ja"]');
   await expect(page.locator('.hinweis')).toContainText('Gelöscht');
   await tippe(page, '[data-aktion="heim"]');
-  await expect(page.locator('.kachel[data-paket="' + p.paket + '"] .kachel-stand')).toContainText('0 von ' + p.levels.length);
   await expect(page.locator('.gruss')).toContainText('Testkind');
+  await page.goto(kachelSeite(p));
+  await expect(page.locator('.kachel[data-paket="' + p.paket + '"] .kachel-stand')).toContainText('0 von ' + p.levels.length);
 });
 
 test.describe('Offline', () => {
@@ -638,10 +693,18 @@ test.describe('Offline', () => {
       return;
     }
     await expect(page.locator('body')).toHaveAttribute('data-ansicht', 'start');
-    await expect(page.locator('.kachel')).toHaveCount(DATEN.pakete.length);
+    await expect(page.locator('.kachel')).toHaveCount(MEHRERE_BLOECKE ? new Set(DATEN.pakete.map((p) => BLOCK(p.einheit))).size : DATEN.pakete.length);
     const schrift = await page.evaluate(async () => { await document.fonts.ready; return document.fonts.check('700 20px Andika'); });
     expect(schrift).toBe(true);
     await ansicht(page, 'offline', info);
     await context.setOffline(false);
   });
 });
+
+// ---------------------------------------------------------------------
+// Weitere Tests der Spiel-Plugins (tests/spiele/<art>.mjs)
+// ---------------------------------------------------------------------
+for (const [art, pl] of Object.entries(SPIEL_TESTS)) {
+  if (!DATEN.pakete.some((p) => p.levels.some((l) => l.art === art))) continue;
+  if (pl.tests) test.describe('Spiel ' + art, () => pl.tests({ test, expect, DATEN, h: H }));
+}

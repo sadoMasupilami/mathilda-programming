@@ -331,6 +331,24 @@ Rätsel stehen immer in `raetsel/eN.json` und werden beim Bauen gelöst und gepr
 - Die Adresse ist `<pagesBasis>#eN` (`werkstatt.json`, lokal überschreibbar in `kind.json`). Die volle Adresse steht nie im Text der Blätter oder der Anleitung, nur im QR-Code.
 
 
+### 7.8 Erweiterte Befehle ab Block C (Wenn-dann-Kasten, Wiederhol-Zauber „bis zum Schatz“, Zaubersprüche)
+
+Gilt für Blätter, Löser und App gleich (`web/kern/ausfuehrer.js`). Die drei Befehle vor, links drehen, rechts drehen und der Zauber-Kasten „2-mal“ bis „5-mal“ bleiben unverändert. Neu kommen drei Kästen dazu, jeder mit eigener Farbe und eigenem Symbol (SVG, nie als Schriftzeichen):
+
+| Kinderwort | Text in den Rätsel-Daten | Was passiert | ab Einheit |
+|---|---|---|---|
+| **Wenn-dann-Kasten** (Wenn-dann-Regel) | `wenn[stein: rechts]`, mit sonst: `wenn[stein: rechts sonst vor]` | Der Drache schaut, was vor seiner Nase ist. Stimmt die Bedingung, macht er die Befehle nach „dann“ (1 bis 3), sonst die nach „sonst“ (0 bis 3). | 11 |
+| Bedingungen | `stein` = vor der Nase ist ein Stein oder der Rand; `frei` = vor der Nase ist ein freies Feld; im Schwerer-Teil auch `stein-links`, `stein-rechts`, `frei-links`, `frei-rechts` (neben dem Drachen, von ihm aus gesehen) | Der Rand zählt wie ein Stein („Am Rand liegen unsichtbare Steine“). | 11 (links/rechts ab 16) |
+| **Wiederhol-Zauber „bis zum Schatz“** | `bis[wenn[stein: rechts sonst vor]]` | Zauber-Kasten, auf dem statt einer Zahl „bis zum Schatz“ steht. Er wiederholt seinen Inhalt, **bis der Drache auf dem Schatz steht** (geprüft nach jedem ausgeführten Befehl, dann hört der Kasten sofort auf). Höchstens 3 Teile im Kasten. | 16 |
+| **Zauberspruch** | in den Daten `"sprueche": { "stern": "vor vor links" }`, im Programm `@stern` | Eine Befehlsgruppe mit Namen. Steht `@stern` im Programm, macht der Drache alle Befehle des Stern-Spruchs. Namen mit eigenem Symbol: `stern` (Stern-Spruch), `mond` (Mond-Spruch), `krone` (Kronen-Spruch). Ein Spruch hat 1 bis 4 Teile (Befehle, Zauber-Kasten, Wenn-dann-Kasten), **kein Spruch in einem Spruch**. | 17 |
+
+- **Erlaubte Verschachtelung:** Ein Zauber-Kasten (Zahl oder „bis zum Schatz“) darf Befehle, Wenn-dann-Kästen und Spruch-Aufrufe enthalten (zusammen höchstens 3 Teile). Ein Wenn-dann-Kasten enthält nur Befehle und Spruch-Aufrufe. Kein Zauber-Kasten in einem Zauber-Kasten, kein Wenn-dann-Kasten in einem Wenn-dann-Kasten.
+- **Karten zählen:** Befehl, Spruch-Aufruf = 1 Karte. Zauber-Kasten = 1 Karte plus sein Inhalt. Wenn-dann-Kasten = 1 Karte (die Wenn-Karte mit der Bedingung) plus die Befehle nach „dann“ und nach „sonst“. Ein Zauberspruch zählt einmal: 1 Karte (Spruch-Name) plus sein Inhalt, jeder Aufruf 1 Karte.
+- **Nummern beim Nachfragen** („nach Befehl 5“) zählen weiter nur ausgeführte Befehle (vor, links drehen, rechts drehen).
+- **Höchstens 60 ausgeführte Befehle** pro Programm. Läuft ein Programm länger (z. B. ein „bis zum Schatz“-Kasten, der den Schatz nie erreicht), hört der Drache auf: „Der Drache läuft im Kreis. Er findet den Schatz so nicht.“ Das ist nicht geschafft.
+- **Anstoßen** bleibt wie in Regel 6: Ein vor in einen Stein oder den Rand beendet das Programm („Hier hat der Kobold zugeschlagen!“). Ein Wenn-dann-Kasten mit `stein` schaut nur, er stößt nie an.
+- **Prüfen im Löser:** Bei Rätseln mit erweiterten Befehlen prüft der Löser das angegebene Beispiel-Programm (muss ankommen, Kartenzahl stimmt) und mit einer Kartengrenze, dass es **ohne** den neuen Kasten nicht geht (sonst ist die Grenze zu groß). „Finde das kürzeste“ nur, wenn der Löser die Eindeutigkeit beweisen kann, sonst „Mehrere Lösungen möglich“.
+
 ---
 
 ## 8. Material für alle Einheiten

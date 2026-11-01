@@ -8,12 +8,14 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import * as LOESER from './loeser.mjs';
 import { K, kuerzeste, mitZauber, koboldPruefen, ablaufZaehlen } from './loeser.mjs';
 import '../web/kern/bilder.js';
 
 const WURZEL = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const ORDNER = path.join(WURZEL, 'raetsel');
+const ARTEN_ORDNER = path.join(WURZEL, 'werkzeuge', 'arten');
 const MAX_BEFEHLE = 12;          // eine Programm-Reihe am Papier
 const WELT_FELDER = ['b', 'h', 'start', 'ziel', 'hindernisse', 'edelsteine'];
 
@@ -137,8 +139,40 @@ function pruefeKuerzer(r, F) {
 
 const ARTEN = { pfad: pruefePfad, lesen: pruefeLesen, kobold: pruefeKobold, ablauf: pruefeAblauf, kuerzer: pruefeKuerzer };
 
+// ---------------------------------------------------------------------
+// Weitere Rätselarten als Plugins: werkzeuge/arten/<name>.mjs (eine Datei pro Art oder Einheit)
+//   export default { art: 'geheim', pruefe(r, F, ctx), bericht(r)?, fuerApp(r)? }   (oder ein Array davon)
+//   pruefe:  prüft und löst das Rätsel r, meldet Fehler mit F('…'), gibt die Lösung zurück (r.loesung)
+//   bericht: kurze Zeile für --bericht
+//   fuerApp: was die Web-App von einem Level bekommt (ohne Lösungen!). Standard: alles außer
+//            loesung, paket und den Feldern in geheim: ['…'] des Plugins
+//   ctx:     { K, LOESER, weltVon, MAX_BEFEHLE, bildDa }
+// Die Logik, die auch die Web-App braucht (z. B. Geheimschrift verschieben), gehört nach web/kern/<name>.js
+// und wird hier wie der Ausführer importiert: import '../../web/kern/<name>.js'
+// ---------------------------------------------------------------------
+const PLUGINS = {};
+const PLUGIN_FEHLER = [];
+if (fs.existsSync(ARTEN_ORDNER)) {
+  for (const d of fs.readdirSync(ARTEN_ORDNER).filter((x) => x.endsWith('.mjs')).sort()) {
+    try {
+      const m = await import(pathToFileURL(path.join(ARTEN_ORDNER, d)).href);
+      const liste = Array.isArray(m.default) ? m.default : [m.default];
+      for (const p of liste) {
+        if (!p || !p.art || typeof p.pruefe !== 'function') { PLUGIN_FEHLER.push('werkzeuge/arten/' + d + ': export default { art, pruefe } fehlt'); continue; }
+        if (ARTEN[p.art] || PLUGINS[p.art]) { PLUGIN_FEHLER.push('werkzeuge/arten/' + d + ': Art „' + p.art + '“ gibt es schon'); continue; }
+        PLUGINS[p.art] = { ...p, datei: d };
+      }
+    } catch (e) {
+      PLUGIN_FEHLER.push('werkzeuge/arten/' + d + ': lässt sich nicht laden: ' + e.message);
+    }
+  }
+}
+const CTX = { K, LOESER, weltVon, MAX_BEFEHLE, bildDa: (n) => globalThis.WerkstattBilder.hat(n) };
+export const alleArten = () => Object.keys(ARTEN).concat(Object.keys(PLUGINS));
+export const plugin = (art) => PLUGINS[art] || null;
+
 export function pruefeAlle(ordner = ORDNER) {
-  const fehler = [];
+  const fehler = PLUGIN_FEHLER.slice();
   const raetsel = {};
   const pakete = {};
   const dateien = fs.existsSync(ordner) ? fs.readdirSync(ordner).filter((d) => d.endsWith('.json')).sort() : [];
@@ -151,10 +185,11 @@ export function pruefeAlle(ordner = ORDNER) {
       const F = (m) => { fehler.push(d + ' › ' + (r.id || '?') + ': ' + m); };
       if (!r.id) { F('Rätsel ohne id'); continue; }
       if (raetsel[r.id]) { F('id doppelt'); continue; }
-      const fn = ARTEN[r.art];
-      if (!fn) { F('Unbekannte art „' + r.art + '“ (' + Object.keys(ARTEN).join(', ') + ')'); continue; }
+      const pl = PLUGINS[r.art];
+      const fn = ARTEN[r.art] || (pl && ((x, f) => pl.pruefe(x, f, CTX)));
+      if (!fn) { F('Unbekannte art „' + r.art + '“ (' + alleArten().join(', ') + ')'); continue; }
       let loesung;
-      try { loesung = fn(r, F); } catch (e) { F(e.message); }
+      try { loesung = fn(r, F); } catch (e) { F(e.message + (pl ? ' (werkzeuge/arten/' + pl.datei + ')' : '')); }
       raetsel[r.id] = { ...r, paket, loesung: loesung || null };
     }
     if (daten.web) {
@@ -178,6 +213,14 @@ export function webDaten(erg) {
       paket: p.paket, einheit: p.einheit, titel: p.web.titel || p.titel, art: p.web.art,
       levels: p.web.levels.map((id) => {
         const r = erg.raetsel[id];
+        const pl = PLUGINS[r.art];
+        if (pl) {
+          // Plugin-Arten: fuerApp entscheidet, sonst alles außer Lösung, Paket und den geheimen Feldern
+          if (pl.fuerApp) return pl.fuerApp(r, CTX);
+          const aus = { ...r };
+          for (const f of ['loesung', 'paket'].concat(pl.geheim || [])) delete aus[f];
+          return aus;
+        }
         // keine Lösungen in die App: sie bewertet nur nach dem Ergebnis
         const { loesung, paket, reparatur, beispiel, ...rest } = r;
         void paket; void reparatur; void beispiel;
@@ -207,7 +250,8 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
       if (r.art === 'ablauf') t = l.anzahl + ' Reihenfolge(n)';
       if (r.art === 'lesen') t = 'Ende ' + JSON.stringify(l.ende);
       if (r.art === 'kuerzer') t = l.kartenLang + ' → ' + l.kartenKurz + ' Karten';
-      console.log('  ' + r.id.padEnd(20) + r.art.padEnd(9) + t);
+      if (PLUGINS[r.art]) { try { t = PLUGINS[r.art].bericht ? String(PLUGINS[r.art].bericht(r, CTX)) : JSON.stringify(l).slice(0, 90); } catch (e) { t = '(bericht: ' + e.message + ')'; } }
+      console.log('  ' + r.id.padEnd(20) + r.art.padEnd(10) + t);
     }
   }
   if (erg.fehler.length) {
