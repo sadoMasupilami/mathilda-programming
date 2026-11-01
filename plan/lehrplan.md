@@ -8,7 +8,7 @@ Langfristiger Plan für 20 Einheiten plus Extras. Er ist ein **Vorschlag** und w
 - **Wie es sich anfühlen soll:** Spaß, Neugier, Bewegung, Basteln. Fantasie-Flair in einzelnen Aufgaben (ein Drache sucht den Schatz, ein Fehler-Kobold versteckt Fehler, eine Fee schreibt Geheimbriefe), aber **keine durchgehende Geschichte**.
 - **Belohnung:** Sammelpass (ein Feld pro Einheit, Stempel oder Sticker, 1–3 Sterne „Wie hat's dir gefallen?“), Urkunden nach Einheit 10 („Drachen-Programmiererin“) und nach Einheit 20 („Code-Meisterin“). Sterne in der Web-App zählen nur als Extra, der Sammelpass am Papier zählt.
 
-Status: **Einheiten 1–5 ausformuliert** (`src/einheiten/01-…` bis `05-…`, Rätsel in `raetsel/e1.json` bis `raetsel/e5.json`, Web-Pakete e2–e5). Ab Einheit 6 erst nach der Rückmeldung.
+Status: **Einheiten 1–5 ausformuliert** (`src/einheiten/01-…` bis `05-…`, Rätsel in `raetsel/e1.json` bis `raetsel/e5.json`, Web-Pakete e2–e5). **Ausformuliert sind auch die Einheiten 6–9, 12–15 und 18** (Web-Pakete e6–e9, e12–e15; Stand-Tabellen in Abschnitt 5). Noch in Arbeit: Einheiten 10, 11, 16, 17, 19 und 20.
 
 ---
 
@@ -71,7 +71,7 @@ Die Blockgrenzen sind im Code fest (`src/components.js`, `blockVon`: 1–5 A, 6�
 
 ### 3.2 Bildschirm-Bonus (Web-App)
 
-Ein Level-Paket pro Einheit ab E2 (E1, E18 ohne), 5–9 Levels, 10–15 Minuten, ohne Schlüsselwort (alle Pakete sind offen). Mindestens 2 Levels sind genau Rätsel von den Blättern. Die Levels stehen in derselben Datei `raetsel/eN.json` wie die Rätsel der Blätter (`"web": { "titel", "art", "levels": […] }`). Bewertet wird nach dem Ergebnis mit demselben Ausführer (`web/kern/ausfuehrer.js`), nie durch Vergleich mit einer gespeicherten Lösung. Am Paket-Ende: „Super! Jetzt zurück zum Papier.“
+Ein Level-Paket pro Einheit ab E2 (E1, E18 ohne), 5–9 Levels, 10–15 Minuten, ohne Schlüsselwort (alle Pakete sind offen). Mindestens 2 Levels sind genau Rätsel von den Blättern. Die Levels stehen in derselben Datei `raetsel/eN.json` wie die Rätsel der Blätter (`"web": { "titel", "art", "levels": […] }`). Bewertet wird nach dem Ergebnis mit demselben Ausführer (`web/kern/ausfuehrer.js`; bei den Rätselarten ab Block B mit demselben Kern `web/kern/<art>.js` wie der Löser), nie durch Vergleich mit einer gespeicherten Lösung. Am Paket-Ende: „Super! Jetzt zurück zum Papier.“
 
 ### 3.3 Querverweise zur Rechen-Werkstatt
 
@@ -152,19 +152,29 @@ Die Rechen-Werkstatt (anderes Heft, gleiches Format) läuft parallel. Was dort s
 
 ---
 
-## 5. Blöcke B bis D (Einheiten 6–20) – Planung
+## 5. Blöcke B bis D (Einheiten 6–20) – teils ausformuliert, teils Planung
 
-Die Einheiten werden erst nach der Rückmeldung ausformuliert. Titel stehen schon im Sammelpass (`src/rahmen/04-sammelpass.html`) und können sich noch ändern.
+Unter jeder Block-Tabelle steht eine **Stand-Tabelle**: welche Einheiten ausformuliert sind, mit Datei, Rätsel-Datei, Web-Paket und Blättern. Bei ausformulierten Einheiten beschreibt die Zeile der Block-Tabelle, was wirklich in der Einheit steht; die übrigen Zeilen sind noch Planung. Ist eine Einheit fertig, wird ihre Zeile in der Stand-Tabelle ausgefüllt und die Zeile darüber angepasst. Titel stehen im Sammelpass (`src/rahmen/04-sammelpass.html`) und können sich bei noch geplanten Einheiten ändern.
 
 ### Block B: Muster und Geheimcodes (Einheiten 6–10)
 
 | Nr | Titel | Ziel und Inhalt | Spiel / Bewegung / Basteln | Bildschirm-Bonus | Neue Begriffe | Rechen-Werkstatt |
 |---|---|---|---|---|---|---|
-| 6 | Muster-Detektivin | Muster erkennen und fortsetzen (Farben, Formen, Bewegungen), den „Kern“ eines Musters finden und mit Zauber-Kasten aufschreiben („3-mal: rot, blau, blau“), Kobold im Muster finden | Muster-Armband fädeln (Perlen, Nudeln), Klatsch-Muster, Muster-Tanz | Muster fortsetzen (e6) | Muster, Muster-Kern | R17 Muster fortsetzen (Zahlenmuster) |
-| 7 | Geheimschrift der Feen | Buchstaben verschieben mit dem Geheimschrift-Rad (A–Z, nur Großbuchstaben, Geheimtexte ohne Umlaute und ß), Symbol-Alphabet, Nachrichten ver- und entschlüsseln, Schlüssel (Verschiebe-Zahl) | Geheimschrift-Rad basteln (zwei Pappteller, Musterklammer), geheime Feen-Briefe im Haus verstecken | Geheimschrift-Rad digital (e7) | Geheimcode, Geheimschrift-Rad, Schlüssel-Zahl, verschlüsseln/entschlüsseln (als Kinderwort: „in Geheimschrift schreiben“ / „lesen“) | – |
-| 8 | Bilder aus Kästchen | Pixelbilder nach Code malen („3 weiß, 2 schwarz“), eigene Bilder als Code aufschreiben, Code mit Zauber-Kasten kürzer schreiben | Kästchenbild auf 1-cm-Kästchenpapier, mit Muggelsteinen legen, Code-Diktat zu zweit | Kästchen-Maler (e8) | Kästchenbild, Kästchen-Code | 1-cm-Kästchen wie dort |
-| 9 | Nur Ja oder Nein | Ja/Nein-Zahlen: Karten 1, 2, 4, 8, 16 an oder aus, bis 31 mit den Fingern einer Hand zählen, Lampen-Code (an/aus) | Ja/Nein-Karten basteln, Finger-Zählen, Taschenlampen-Botschaft | Ja/Nein-Zahlen (e9) | Ja/Nein-Zahlen, Ja/Nein-Karten, an/aus | R19 Gedankenlese-Karten 1–31: erklärt, **warum** der Trick funktioniert |
+| 6 | Muster-Detektivin | Muster erkennen und fortsetzen (Farben, Formen, Bewegungen), Lücken füllen, den Muster-Kern finden und mit Zauber-Kasten aufschreiben („3-mal: rot, blau, blau“), Kobold im Muster finden (eine Perle ist gegen eine falsche ausgetauscht). Schwerer: Farbe und Form wechseln verschieden schnell, wachsende Muster (passen in keinen Zauber-Kasten), kürzester Zauber-Kasten für ein langes Armband | Klatsch-Muster, Muster-Duell mit Perlen, Muster-Tanz (Tanz-Karten von Blatt 5-3), Muster-Armband fädeln (Perlen oder gefärbte Nudeln) | Muster fortsetzen, Kobold im Muster, Zauber-Kasten bauen (e6) | Muster, Muster-Kern, Kobold im Muster | R17 Muster fortsetzen (Zahlenmuster) |
+| 7 | Geheimschrift der Feen | Buchstaben verschieben mit dem Geheimschrift-Rad (A–Z, nur Großbuchstaben, Geheimtexte ohne Umlaute und ß), Schlüssel-Zahl, Feen-Post lesen, den eigenen Namen in Geheimschrift schreiben, Feen-Zeichen (eine Form mit Punkten statt eines Buchstabens), Kobold im Feen-Brief. Schwerer: andere Schlüssel-Zahlen, 26 und die Spiegel-Zahl 13, zwei Schlüssel hintereinander, knacken (durchprobieren, häufigster Buchstabe) | Geheimschrift-Rad bauen (Pappteller und Karton, Musterklammer), Feen-Post (Geheimwörter führen zu Verstecken im Haus), Feen-Briefe tauschen, Buchstaben-Hüpfer | Geheimschrift-Rad digital: lesen, schreiben, Feen-Zeichen, knacken (e7) | Geheimcode, Geheimschrift, Geheimschrift-Rad, Schlüssel-Zahl, „in Geheimschrift schreiben“ / „Geheimschrift lesen“ (verschlüsseln/entschlüsseln nur in der Anleitung), Feen-Zeichen, knacken | – |
+| 8 | Bilder aus Kästchen | Kästchenbilder nach Code malen („3 weiß, 2 schwarz“), zu einem Bild den Code schreiben, Kobold-Zeile finden (Kobold-Probe: jede Zeile so breit wie das Bild), Code mit Zauber-Kasten kürzer schreiben (Zahlen zählen). Schwerer: 10 · 10 Kästchen und zwei Farben, Rekord-Codes, Spalte für Spalte, Code nur aus Zahlen | Code-Diktat zu zweit (mit Sichtschutz), Code-Bote (Bewegung), Kästchenbilder mit Muggelsteinen legen (Blatt 8-3), Kästchen-Karte (Extra, wie X4) | Kästchen-Maler, Code bauen, Kobold-Zeile reparieren (e8) | Kästchenbild, Kästchen-Code, Zahlen zählen | 1-cm-Kästchen wie dort |
+| 9 | Nur Ja oder Nein | Ja/Nein-Zahlen: Karten 16, 8, 4, 2, 1 da (Ja) oder umgedreht (Nein), jede Zahl von 0 bis 31 auf genau eine Art; bis 31 mit den Fingern einer Hand zählen, Lampen-Botschaft (an/aus), Kobold-Karte finden, warum der Gedankenlese-Trick geht. Schwerer: 32er-Karte, Umdreh-Regel, Nullen und Einsen, Buchstaben als Zahlen | Ja/Nein-Karten basteln (Blatt 9-1), Zahlen-Wettlegen, Finger-Zählen und Ja/Nein-Hüpfer, Gedankenlesen mit Durchblick, Lampen-Botschaft am Abend (Extra) | Ja/Nein-Zahlen mit Karten, Lampen und Fingern (e9) | Ja/Nein-Zahlen, Ja/Nein-Karten, an/aus | R19 Gedankenlese-Karten 1–31: erklärt, **warum** der Trick funktioniert |
 | 10 | Sortieren und Suchen | Sortieren nach Regeln (Größe, Farbe), Vergleichen zu zweit, Suchen durch Halbieren als Strategie („Wie viele Fragen brauche ich höchstens?“) | Sortier-Netz mit Kreide im Hof (Kuscheltiere tauschen Plätze nach Regel), Halbier-Raten. **Urkunde 1** | Halbier-Suche gegen den Computer (e10) | sortieren, Sortier-Netz, Halbier-Suche | R8 Zahl raten (größer/kleiner) aus Programmier-Sicht |
+
+**Stand Block B:**
+
+| Nr | Stand | Dateien | Web-Paket (Art, Levels) | Blätter |
+|---|---|---|---|---|
+| 6 | ✅ ausformuliert | `src/einheiten/06-muster-detektivin.html`, `raetsel/e6.json`, `src/bausteine/e6-muster.js` | e6 (`muster`, 9) | 6-1 Muster-Detektivin (QR-Code e6), 6-2 Kobold im Muster, 6-3 Muster als Zauber-Kasten |
+| 7 | ✅ ausformuliert | `src/einheiten/07-geheimschrift-der-feen.html`, `raetsel/e7.json`, `src/bausteine/e7-geheim.js` | e7 (`geheim`, 8) | 7-1 Feen-Post lesen (QR-Code e7), 7-2 Kobold und Feen-Zeichen, 7-3 Mein Geheimschrift-Rad (Bastelvorlage) |
+| 8 | ✅ ausformuliert | `src/einheiten/08-bilder-aus-kaestchen.html`, `raetsel/e8.json`, `src/bausteine/e8-kaestchen.js` | e8 (`kaestchen`, 8) | 8-1 Bilder aus Kästchen, 8-2 Kobold und Zauber-Kasten, 8-3 Muggelstein-Brett (Spielplan mit Kästchen-Karte, QR-Code e8) |
+| 9 | ✅ ausformuliert | `src/einheiten/09-nur-ja-oder-nein.html`, `raetsel/e9.json`, `src/bausteine/e9-janein.js` | e9 (`janein`, 9) | 9-1 Meine Ja/Nein-Karten (Bastelvorlage), 9-2 Ja oder Nein? (QR-Code e9), 9-3 Finger, Lampen, Kobold |
+| 10 | in Arbeit | – | – | – |
 
 **Urkunde 1 nach Einheit 10:** „Drachen-Programmiererin“ (`src/rahmen/80-urkunden.html`, erste Seite). Feierlich überreichen, z. B. beim Abendessen; {{KIND}} darf der Familie ein Programm vorführen (Roboter-Spiel mit Oma oder Opa als Roboter).
 
@@ -173,20 +183,40 @@ Die Einheiten werden erst nach der Rückmeldung ausformuliert. Titel stehen scho
 | Nr | Titel | Ziel und Inhalt | Spiel / Bewegung / Basteln | Bildschirm-Bonus | Neue Begriffe | Rechen-Werkstatt |
 |---|---|---|---|---|---|---|
 | 11 | Wenn-dann-Regeln | Bedingungen: „Wenn ich klatsche, hüpfst du“, Roboter mit Regel „Wenn Stein vor dir, dann rechts drehen“, Regeln mit „sonst“ (Schwerer) | Regel-Spiel mit Bewegung, Regel-Karten basteln, Drache am Boden-Gitter mit einer Regel | Drache mit Wenn-dann-Regeln (e11) | Wenn-dann-Regel, sonst | – |
-| 12 | Logikrätsel | Kleine Logikgitter mit Bildern statt Wörtern: zuerst 2 · 2, normal höchstens 3 Personen/Tiere und 3 Dinge, 4 · 4 nur im Schwerer-Teil. Jeder Hinweis ein kurzer Satz. Wahr oder falsch, und/oder | Rätsel für die Familie erfinden, „Wer bin ich?“ mit und/oder | Logikgitter (e12) | wahr, falsch, und, oder, Logikgitter | – |
-| 13 | Ja-Nein-Bäume | Entscheidungsbäume: Tiere raten mit Ja/Nein-Fragen, Dinge sortieren, „Welche Frage teilt am besten?“ | Ratebaum basteln (Schnur und Wäscheklammern), Knöpfe sortieren | Tier-Ratebaum (e13) | Ja-Nein-Baum, Frage, Ast | Verbindung zu E10 (Halbieren) |
-| 14 | Formen-Quadrate | 4 · 4-Rätsel mit Formen (jede Form einmal pro Reihe und Spalte), zuerst 3 · 3; genau eine Lösung (Löser prüft) | Rätsel mit Spielkarten oder Muggelsteinen legen | Formen-Quadrat-Rätsel (e14) | Formen-Quadrat, Reihe, Spalte | R17 magische Quadrate (dort Summen, hier keine) |
+| 12 | Logikrätsel | Sätze sind wahr oder falsch: mit „und“ müssen beide Teile stimmen, mit „oder“ reicht einer, „nicht“ dreht den Satz um (Daumen-Regel). Logikgitter mit Bildern statt Wörtern: zuerst 2 · 2, dann 3 · 3, Kreuz heißt Nein, Kreis heißt Ja (Kreis-Regel, Letztes-Feld-Regel), jeder Hinweis ein kurzer Satz, Kobold-Zeichen im Gitter. Schwerer (Blatt 12-3): 4 · 4, ein überflüssiger Hinweis, ein Hinweis, der nicht stimmt, ein eigenes Rätsel | Steh auf, wenn’s wahr ist (Bewegung), Kuscheltier-Gitter am Boden, „Wer bin ich?“ mit und/oder, Rätsel für die Familie erfinden | Logikgitter und „Wahr oder falsch?“ (e12) | wahr, falsch, und, oder, Logikgitter, Hinweis, Kreis (Ja), Kreuz (Nein), Daumen-Regel, Kreis-Regel, Letztes-Feld-Regel | – |
+| 13 | Ja-Nein-Bäume | Entscheidungsbäume: Fragen mit Ja-Ast (links, grün) und Nein-Ast (rechts, orange), einem Wesen durch den Baum folgen, Wesen an ihre Plätze setzen, fehlende Frage finden, Kobold-Frage (Ja und Nein vertauscht), Fragen zählen. Schwerer: „Welche Frage teilt am besten?“, 8 Drachen-Kinder mit 3 Fragen, 3 Fragen ergeben 8 Möglichkeiten | Kuscheltier-Baum am Boden (Wollfaden, Wäschekluppen), Ja-Haufen, Nein-Haufen (Drachen-Kinder von Blatt 13-3), Familien-Ratebaum und Knopf-Baum (Extra) | Ja-Nein-Bäume: einem Wesen folgen, alle an ihre Plätze, welche Frage fehlt (e13) | Ja-Nein-Baum, Frage, Ja-Ast, Nein-Ast, Platz | Verbindung zu E10 (Halbieren) und E9 (3 Fragen, 8 Möglichkeiten) |
+| 14 | Formen-Quadrate | Formen-Quadrate zuerst 3 · 3 mit Kreis, Dreieck, Quadrat, dann 4 · 4 mit Stern: jede Form einmal pro Reihe und Spalte; genau eine Lösung, ohne Raten (Löser prüft). Kobold-Quadrat mit einem falschen Feld, ein Rätsel selbst erfinden. Schwerer (Blatt 14-3): Schrägen-Regel, Farben und Formen, mit wie wenigen Formen es noch genau eine Lösung gibt | Reihe, Spalte, hüpf! (Bewegung), Karten-Quadrat mit Spielkarten am Boden-Gitter (mit Kobold-Karte), Formen-Duell 3 · 3 mit einem Kuscheltier als Stein (ohne Stein gewinnt immer, wer anfängt; großes Duell 4 · 4 mit Spiegel-Trick), Riesen-Formen basteln (Extra) | Formen-Quadrate mit Kobold-Level und Schrägen-Regel (e14) | Formen-Quadrat, Reihe, Spalte, Schräge (Schwerer-Teil) | R17 magische Quadrate (dort Summen, hier keine) |
+
+**Stand Block C:**
+
+| Nr | Stand | Dateien | Web-Paket (Art, Levels) | Blätter |
+|---|---|---|---|---|
+| 11 | in Arbeit | – | – | – |
+| 12 | ✅ ausformuliert | `src/einheiten/12-logikraetsel.html`, `raetsel/e12.json`, `src/bausteine/e12-logik.js` | e12 (`logik`, 9) | 12-1 Wer mag was? (QR-Code e12), 12-2 Wahr oder falsch?, 12-3 Logik-Profi |
+| 13 | ✅ ausformuliert | `src/einheiten/13-ja-nein-baeume.html`, `raetsel/e13.json`, `src/bausteine/e13-baum.js` | e13 (`baum`, 8) | 13-1 Der Wesen-Baum (QR-Code e13), 13-2 Kobold im Baum, 13-3 Die Drachen-Kinder (Bastelvorlage) |
+| 14 | ✅ ausformuliert | `src/einheiten/14-formen-quadrate.html`, `raetsel/e14.json`, `src/bausteine/e14-formen.js` | e14 (`formen`, 9) | 14-1 Formen-Quadrate, 14-2 Der Kobold im Quadrat (QR-Code e14), 14-3 Formen-Profi |
 
 ### Block D: Strategie und Projekte (Einheiten 15–20)
 
 | Nr | Titel | Ziel und Inhalt | Spiel / Bewegung / Basteln | Bildschirm-Bonus | Neue Begriffe | Rechen-Werkstatt |
 |---|---|---|---|---|---|---|
-| 15 | Gewinnen mit Plan | Nim-Spiele mit Muggelsteinen (eigene Varianten), „Wer sagt 20?“ (1 oder 2 weiterzählen), Gewinn-Strategie entdecken und als Wenn-dann-Regel aufschreiben; Strategie per Spielbaum geprüft | Turniere zu zweit, Strategie-Karte basteln | Strategiespiel gegen den Computer (e15) | Gewinn-Strategie, Gewinnzahl | Nim (dort im Ideen-Parkplatz) |
+| 15 | Gewinnen mit Plan | Strategiespiele zu zweit: „Der letzte Edelstein“ (10 Muggelsteine, 1 oder 2 nehmen) und „Wer sagt 20?“ (1 oder 2 weiterzählen). Gewinnzahlen rückwärts finden, die Gewinn-Strategie als Wenn-dann-Regel aufschreiben, die Kobold-Regel finden, gegen einen Roboter mit fester Regel testen; Strategie per Spielbaum geprüft. Schwerer: Wer sagt 30?, 1 bis 3 nehmen, Kobold-Stein (wer den letzten nimmt, verliert), zwei Haufen, Spielbaum | Der letzte Edelstein, Wer sagt 20?, Zähl-Hüpfen (Bewegung), Der Roboter mit der festen Regel, Turnier zu zweit, Strategie-Karte basteln (Blatt 15-3) | 8 Strategiespiele gegen den Roboter (e15) | Gewinn-Strategie, Gewinnzahl, Strategie-Karte | Nim (dort im Ideen-Parkplatz) |
 | 16 | Labyrinth-Meisterin | Labyrinth-Regeln (Hand an der Wand), kürzesten Weg finden, Labyrinth als Programm, Sackgassen | Labyrinth mit Kreide oder Malerkrepp, eigenes Labyrinth zeichnen | Labyrinth-Programmierer (e16) | Labyrinth, Sackgasse, Hand-an-der-Wand-Regel | – |
 | 17 | Zaubersprüche | Eine Befehlsgruppe bekommt einen Namen („Hüpf-Zauberspruch“ = vor, vor, links drehen) und wird wiederverwendet; Zauberspruch und Zauber-Kasten zusammen | Zauberspruch-Karten basteln, Tanz mit Zaubersprüchen | Drache mit eigenen Zaubersprüchen (e17) | Zauberspruch | – |
-| 18 | Ich erfinde ein Spiel | Eigenes Spiel mit klaren Regeln (Regeln sind ein Programm), testen, Kobold in den Regeln finden, verbessern | Brettspiel basteln, Familie testet | – (bewusst ohne Bildschirm) | Spielregel, testen | – |
+| 18 | Ich erfinde ein Spiel | Eine Spielregel ist ein Programm für Menschen (Reihenfolge, Wenn-dann-Regeln, ein Wiederhol-Zauber „bis jemand gewinnt“). Beispiel-Spiel „Wettflug zum Wolkenschloss“, Kobold in Spielregeln finden (unklar, hört nie auf, unfair), eigenes Spiel auf einem leeren Spielplan erfinden, testen und verbessern | Kobold-Wettrennen (Bewegung), Wettflug zum Wolkenschloss, eigenes Spiel basteln (Blatt 18-2), Familien-Test mit dem Testbogen | – (bewusst ohne Bildschirm) | Spielregel, testen, fair | – |
 | 19 | Großer Roboter-Parcours | Alles zusammen: Wiederhol-Zauber, Wenn-dann, Zaubersprüche im Garten-Parcours, zwei Roboter | Parcours im Garten oder Gang | Parcours-Levels (e19) | – | – |
 | 20 | Das große Code-Fest | Stationen zu allen Themen (je 3–4 Minuten), Fest-Rätsel mit Geheimcode-Schatz | Stationen im Haus. **Urkunde 2 („Code-Meisterin“)** | Fest-Level-Paket (e20) | – | – |
+
+**Stand Block D:**
+
+| Nr | Stand | Dateien | Web-Paket (Art, Levels) | Blätter |
+|---|---|---|---|---|
+| 15 | ✅ ausformuliert | `src/einheiten/15-gewinnen-mit-plan.html`, `raetsel/e15.json`, `src/bausteine/e15-nim.js` | e15 (`nim`, 8) | 15-1 Wer sagt 20? (Spielplan, QR-Code e15), 15-2 Wer gewinnt hier?, 15-3 Meine Strategie-Karte (Bastelvorlage) |
+| 16 | in Arbeit | – | – | – |
+| 17 | in Arbeit | – | – | – |
+| 18 | ✅ ausformuliert | `src/einheiten/18-ich-erfinde-ein-spiel.html`, `src/bausteine/e18-spiel.js` (keine Rätsel-Datei) | – (bewusst ohne Bildschirm, kein QR-Code) | 18-1 Der Regel-Kobold, 18-2 Mein Spielplan (Bastelvorlage), 18-3 Meine Regel-Karte (mit Testbogen) |
+| 19 | in Arbeit | – | – | – |
+| 20 | in Arbeit | – | – | – |
 
 **Urkunde 2 nach Einheit 20:** „Code-Meisterin“ (`src/rahmen/80-urkunden.html`, zweite Seite).
 
@@ -233,20 +263,32 @@ Die Spalte **Kinderwort** wird auf den Blättern, in den Beispielsätzen und in 
 | **reparieren** (tauschen, streichen, einfügen) | Bugfix | einen Befehl tauschen, streichen oder einen fehlenden einfügen | korrigieren | 4 |
 | **Wiederhol-Zauber**, **Zauber-Kasten** („3-mal“) | Schleife (Loop) | Befehle im Kasten werden so oft ausgeführt, wie oben steht | Schleife, Zaubertrick, „mal“ mit Malpunkt | 5 |
 | **Karten** (beim Zählen von Programmen) | Programmlänge | wie viele Karten man zum Hinlegen braucht (Abschnitt 7.5) | Befehle zählen (beim Zauber-Kasten mehrdeutig) | 5 |
-| **Muster**, **Muster-Kern** | Periode, Wiederholungseinheit | was sich wiederholt | – | 6 |
+| **Muster**, **Muster-Kern** | Periode, Wiederholungseinheit | was sich wiederholt; der Muster-Kern ist das kürzeste Stück vom Anfang, das sich immer wiederholt (in einem Muster mindestens zweimal ganz zu sehen) | – | 6 |
+| **Kobold im Muster** | – | genau eine Perle (oder Bewegung) ist gegen eine falsche **ausgetauscht** | „vertauscht“ (heißt seit Einheit 3: zwei Karten tauschen die Plätze) | 6 |
 | **Geheimcode**, **Geheimschrift** | Verschlüsselung, Codierung | Nachricht so schreiben, dass nur Eingeweihte sie lesen | geheim „verzaubern“ | 7 |
+| „**in Geheimschrift schreiben**“, „**Geheimschrift lesen**“, **Geheimschrift-Rad** | verschlüsseln, entschlüsseln; Klartext, Geheimtext | mit dem Rad jeden Buchstaben um die Schlüssel-Zahl weiter- bzw. zurückschieben | verschlüsseln, entschlüsseln (nur in der Anleitung) | 7 |
 | **Schlüssel-Zahl** | Schlüssel (Caesar-Verschiebung) | um wie viele Buchstaben verschoben wird | – | 7 |
+| **Feen-Zeichen** | Codierung (ein Zeichen pro Buchstabe) | zweite Geheimschrift: statt eines Buchstabens eine Form mit 1 bis 5 Punkten (Abschnitt 7.4) | – | 7 |
+| **knacken** | Schlüssel durchprobieren, Häufigkeitsanalyse | einen Geheimtext ohne Schlüssel-Zahl lesen (Zahlen ausprobieren, den häufigsten Buchstaben suchen); das Wort sagen auch die Profis | – | 7 |
 | **Kästchenbild**, **Kästchen-Code** | Pixelgrafik, Lauflängencodierung | Bild aus 1-cm-Kästchen und sein Code („3 weiß, 2 schwarz“) | Pixel (nur in der Anleitung) | 8 |
-| **Ja/Nein-Zahlen**, **Ja/Nein-Karten** | Binärzahlen (Bits) | Zahlen nur mit „Karte da“ und „Karte weg“ | Nullen und Einsen (erst Schwerer-Teil) | 9 |
+| **Zahlen zählen** (beim Kästchen-Code) | Länge des Codes, Komprimieren | wie viele Zahlen man schreiben muss: jeder Teil („3 weiß“) ist 1 Zahl, ein Zauber-Kasten 1 Zahl („3-mal“) plus alles darin, wie Karten zählen | – | 8 |
+| **Ja/Nein-Zahlen**, **Ja/Nein-Karten**, **an**/**aus** | Binärzahlen (Bits) | Zahlen nur mit „Karte da“ und „Karte weg“ (Lampe an oder aus, Finger oben oder eingeklappt) | Nullen und Einsen (erst Schwerer-Teil) | 9 |
 | **sortieren**, **Halbier-Suche** | Sortieralgorithmus, binäre Suche | ordnen nach Regel / immer in der Mitte fragen | – | 10 |
 | **Wenn-dann-Regel**, **sonst** | Bedingung (if), else | „Wenn …, dann …“ | falls | 11 |
 | **wahr**, **falsch**, **und**, **oder** | Wahrheitswerte, logische Operatoren | – | richtig/falsch für Aussagen | 12 |
-| **Ja-Nein-Baum** | Entscheidungsbaum | Fragen mit Ja- und Nein-Ast | – | 13 |
+| **Daumen-Regel** | – | pro Teil des Satzes ein Daumen, hoch heißt wahr: bei „und“ müssen beide Daumen hoch sein, bei „oder“ reicht einer | – | 12 |
+| **Logikgitter**, **Hinweis**, **Kreis** (Ja), **Kreuz** (Nein) | Suchproblem mit Bedingungen, Backtracking | links Tiere, oben Dinge; jeder Hinweis ist ein kurzer Satz; ein Kreis heißt Ja, ein Kreuz heißt Nein | – | 12 |
+| **Kreis-Regel**, **Letztes-Feld-Regel** | – | Kommt ein Kreis in ein Feld, gibt es in seiner Reihe und Spalte nur noch Kreuze. Ist in einer Reihe oder Spalte nur noch ein Feld frei, kommt dort der Kreis hin | – | 12 |
+| **Ja-Nein-Baum** | Entscheidungsbaum | Fragen mit Ja- und Nein-Ast; der Baum fängt oben an und wächst nach unten | – | 13 |
+| **Frage**, **Ja-Ast**, **Nein-Ast**, **Platz** | Knoten (die erste Frage: Wurzel), Blatt, Tiefe | jede Frage hat einen Ja-Ast (immer links, grün) und einen Nein-Ast (immer rechts, orange), wie links drehen und rechts drehen; unten an einem Platz steht die Antwort | – | 13 |
 | **Formen-Quadrat** | lateinisches Quadrat | jede Form einmal pro Reihe und Spalte | magisches Quadrat (das ist in der Rechen-Werkstatt) | 14 |
+| **Schräge**, **Schrägen-Regel** (Schwerer-Teil) | Diagonale | auch auf den zwei Schrägen von Ecke zu Ecke jede Form einmal; auf dem Blatt und in der App heißt es „die blauen Felder“, „die gelben Felder“ | – | 14 |
 | **Gewinn-Strategie** | Strategie, Spielbaum | ein Plan, mit dem man immer gewinnt | Trick | 15 |
+| **Gewinnzahl** | Verlust-Stellung für den, der dran ist (P-Position) | eine Zahl, die man mit seinem Zug „macht“ (so viele Steine lässt man liegen; bei „Wer sagt 20?“ die Zahl, die man zuletzt sagt). Wer eine Gewinnzahl machen kann und danach gut weiterspielt, gewinnt immer | – | 15 |
+| **Strategie-Karte** | – | Bastelname (Blatt 15-3): Karte mit der eigenen Gewinn-Strategie als Wenn-dann-Regeln. Auf Blättern erlaubt, obwohl „Strategie“ allein ein Fachwort ist | „Strategie“ allein auf Blättern | 15 |
 | **Labyrinth**, **Sackgasse** | Graph, Suche | – | Irrgarten (geht auch, nicht als Hauptwort) | 16 |
 | **Zauberspruch** | Funktion, Unterprogramm | eine Befehlsgruppe mit Namen, die man wiederverwenden kann | Funktion | 17 |
-| **Spielregel**, **testen** | Spezifikation, Test | – | – | 18 |
+| **Spielregel**, **testen**, **fair** | Spezifikation, Test, Testfall | eine Spielregel ist ein Programm für Menschen; testen heißt ausprobieren, ob jede Regel klar ist, ob das Spiel aufhört und ob es fair ist (nicht immer derselbe gewinnt) | – | 18 |
 
 ### 7.2 Die drei Befehle (Einheiten 1–5, bleiben für immer)
 
@@ -292,6 +334,22 @@ Weitere feste Farben: Zauber-Kasten Lila `#7a4fd1` (hell `#f1ebff`), Weg und Lö
 
 **Strichzeichnungen** (`<m-bild name="…">`, aus der Rechen-Werkstatt, nur Deko und Kasten-Symbole): stern, zauberstab, krone, mond, edelstein, trank, zauberhut, schloss, drache, einhorn, fee, schere, gluehbirne, eule, wuerfel, rakete, karten, ei, kreide, haken, ziel, achtung, feder, huepfen, lupe, medaille, tablet, roboter. Feste Bedeutungen: **Krone** = Profi-Aufgabe, **Eule** = Knobel-Ecke, **Medaille** = Urkunde, **Tablet** = Bildschirm-Bonus, **Roboter** = „Was hat das mit echtem Programmieren zu tun?“, **Lupe** = Hilfen für links und rechts / Einschätzen.
 
+**Feste Bilder der Einheiten ab Block B.** Jede neue Rätselart zeichnet ihre Bilder einmal in `web/kern/<art>.js`; Blätter, Anleitung und Web-App verwenden genau diese Zeichnungen. Spätere Einheiten, die dieselben Dinge zeigen, nehmen dieselben Bilder und Bedeutungen:
+
+| Einheit (Kern) | Bild | Bedeutung |
+|---|---|---|
+| E6 Muster (`web/kern/muster.js`) | Perlen mit fester Form: **rot = Kreis**, **blau = Quadrat**, **gelb = Dreieck**, **grün = Herz** | so sind die Perlen auch schwarz-weiß gedruckt zu unterscheiden. Farben rot `#e0453a`, blau `#3a7be0`, gelb `#f5c518`, grün `#3aa856` |
+| E6 Muster | Bewegungen: **Hand = klatschen**, **Fuß = stampfen**, **Finger = schnipsen** | Klatsch-Muster am Blatt und in der App |
+| E6 Muster | **Doppel-Muster** (Schwerer-Teil): eine Perle mit Form und Farbe (`kreis-blau`, …) | Form und Farbe wechseln verschieden schnell; für Schwarz-weiß am besten Blau (dunkel) und Gelb (hell) |
+| E7 Geheimschrift (`web/kern/geheim.js`) | Geheimschrift-Rad: außen die normalen Buchstaben mit dem **Stern beim A**, innen die Geheim-Buchstaben mit den Zahlen 0 bis 25 | die Zahl beim Stern ist die Schlüssel-Zahl. Schreiben: außen suchen, innen ablesen; lesen: innen suchen, außen ablesen |
+| E7 Geheimschrift | **Feen-Zeichen**: A–E Kreis, F–J Dreieck, K–O Quadrat, P–T Herz, U–Y Tropfen, jeweils mit 1 bis 5 Punkten wie am Würfel; Z ist ein Stern ohne Punkte | ein Zeichen pro Buchstabe |
+| E8 Kästchen (`web/kern/kaestchen.js`) | Code-Teil = Zahl und Farb-Kästchen („3 weiß“); Zauber-Kasten lila wie in E5; zwischen zwei schwarzen Kästchen eine helle Linie | Kästchen bleiben auch in schwarzen Flächen zählbar |
+| E9 Ja/Nein-Zahlen (`web/kern/janein.js`) | Karten 16, 8, 4, 2, 1 Punkte, die **größte links**. Ja = Punkte oben, Lampe an, Finger oben, Ziffer 1; Nein = umgedreht, Lampe aus, Finger eingeklappt, Ziffer 0 | Hand: kleiner Finger 16, Ringfinger 8, Mittelfinger 4, Zeigefinger 2, Daumen 1, gezeichnet mit dem Daumen rechts (wie die 1er-Karte). Kartensätze: **türkis für {{KIND}}**, **orange für Mama oder Papa** |
+| E12 Logik (`web/kern/logik.js`) | **Kreis = Ja**, **Kreuz = Nein**; vorgegebene Zeichen des Kobolds **lila**; **Daumen hoch = wahr**, **Daumen runter = falsch** | Logikgitter und „Wahr oder falsch?“ |
+| E13 Ja-Nein-Baum (`web/kern/baum.js`) | **Ja-Ast immer links und grün** `#1f9d55`, **Nein-Ast immer rechts und orange** `#e8731a` (wie links drehen und rechts drehen), Ja- und Nein-Schilder in denselben Farben; Fragen oben in hellgelben Kästchen, Plätze unten | der Baum steht auf dem Kopf: erste Frage oben |
+| E14 Formen (`web/kern/formen.js`) | **Kreis rot**, **Dreieck blau**, **Quadrat grün**, **Stern gelb**; Schräge von links oben hellblau, Schräge von rechts oben hellgelb hinterlegt | Achtung: andere Zuordnung als bei den Muster-Perlen aus E6 (dort ist Blau ein Quadrat). Die beiden Bildsätze nicht mischen |
+| E15 Strategiespiele (`web/kern/nim.js`) | Muggelsteine in Reihen zu 5; Gewinnzahlen werden gelb angemalt (Lösung: rote Ringe); in der App gelb „Du“, blau „Roboter“ | Zahlen-Weg für „Wer sagt 20?“ mit Drache am Start und Schatz am Ende |
+
 ### 7.5 Gitter-Regeln (Blätter, Boden-Gitter und Web-App)
 
 1. **Felder:** Die Figur (der Drache) steht immer **in einem Feld**, nie auf einer Linie. Am Papier mindestens **20 mm** pro Feld (geprüft), am Boden etwa **40–50 cm** (Malerkrepp oder Kreide). In der Wohnung ohne Gitter ist „vor“ **ein großer Schritt** bzw. eine Fliese.
@@ -307,10 +365,11 @@ Weitere feste Farben: Zauber-Kasten Lila `#7a4fd1` (hell `#f1ebff`), Weg und Lö
 11. **Nummern beim Nachfragen:** „nach Befehl 3“ zählt ausgeführte Befehle; im Zauber-Kasten zählt jede Wiederholung mit („3-mal: vor“ sind 3 ausgeführte Befehle).
 12. **Koordinaten in den Rätsel-Daten** (`raetsel/eN.json`, nur für Autoren, nie auf den Blättern): `x` wächst nach rechts, `y` nach unten, Feld `(0, 0)` ist **links oben**. Ein 3 · 3-Gitter hat links unten `(0, 2)` und rechts oben `(2, 0)`. `blick`: `oben`, `rechts`, `unten`, `links`. Hindernisse und Edelsteine als `[[x, y], …]`. Was in Worten in der Anleitung steht („nach Befehl 3 steht er im Feld rechts oben“), wird mit dem Ausführer nachgerechnet.
 13. **Gleiche Regeln überall:** Blätter, Boden-Gitter und Web-App verwenden denselben Ausführer (`web/kern/ausfuehrer.js`). Das Gitter dreht sich in der App **nie mit** (oben bleibt oben wie am Papier), nur die Tasten ordnen sich um.
+14. **Andere Gitter auf Blättern (ab Block B):** Die 20-mm-Regel gilt auch für Felder ohne Drachen, in die {{KIND}} etwas einträgt: Logikgitter (E12), Formen-Quadrate und ihre Antwort-Kästchen (E14), Spielpläne (E18). Die Bausteine der Einheit prüfen das selbst (`m-e12-gitter` ohne `zeige`, `m-e12-leer`, `m-e14-quadrat` und `m-e14-antwort` auf Blättern, `m-e18-plan`). Kleiner nur in der Anleitung und in der Lösungsansicht (verkleinerte Beispiele). Keine Felder in diesem Sinn sind die **1-cm-Kästchen** der Kästchenbilder (E8, Abschnitt 7.1 „Kästchen“): Dort wird wie im Rechenheft auf echten 1-cm-Kästchen gemalt (geprüft, `zelle="10"`).
 
 ### 7.6 Rätselarten und was „eindeutig“ heißt
 
-Rätsel stehen immer in `raetsel/eN.json` und werden beim Bauen gelöst und geprüft (`werkzeuge/raetsel.mjs`). Kurzfassung (Details im Leitfaden, Abschnitt 4):
+Rätsel stehen immer in `raetsel/eN.json` und werden beim Bauen gelöst und geprüft (`werkzeuge/raetsel.mjs`). Kurzfassung (Details im Leitfaden, Abschnitt 4; für die Arten ab Block B im Kopf von `werkzeuge/arten/<art>.mjs`). Bei allen Arten bekommt die App nur die Aufgabe, nie die Lösung, und bewertet nach dem Ergebnis mit demselben Kern wie der Löser:
 
 | Art | Was es ist | Eindeutig heißt |
 |---|---|---|
@@ -319,7 +378,16 @@ Rätsel stehen immer in `raetsel/eN.json` und werden beim Bauen gelöst und gepr
 | `kobold` | Kobold-Programm mit genau einem Fehler | kaputt kommt nicht an, die gemeinte Reparatur schon; alle anderen Ein-Schritt-Reparaturen gelten auch |
 | `ablauf` | Ablauf-Karten ordnen | alle gültigen Reihenfolgen gezählt; mehrere nur gekennzeichnet |
 | `kuerzer` | Programm mit Zauber-Kasten kürzer schreiben | macht genau dasselbe und braucht weniger Karten |
-| später | Logikgitter, Formen-Quadrate, Geheimtexte (genau eine Lösung); Strategiespiele (Gewinn-Strategie per Spielbaum) | – |
+| `muster` (E6) | Muster aus Perlen (rot, blau, gelb, grün; im Schwerer-Teil Form und Farbe) oder Bewegungen (klatschen, stampfen, schnipsen). Aufgaben `fortsetzen` (auch mit Lücken in der Mitte), `kobold`, `zauber`, `kuerzester`, `lesen`, `wachsend` | Der kürzeste Kern ist bestimmt und steht mindestens zweimal ganz da (sonst `kernNurEinmal`); jede Lücke und Fortsetzung hat genau eine Füllung (alle Füllungen durchprobiert). `kobold`: von allen Ein-Element-Reparaturen macht genau eine ein sauberes Muster, die angegebene. `zauber`: genau ein Zauber-Kasten (2- bis 5-mal, 1–3 Elemente) malt die Folge. `kuerzester`: wenigste Karten, gezählt, mehrere nur mit `mehrereLoesungen`. `wachsend`: kein sauberes Muster, kein einzelner Kasten. App (`fortsetzen`, `kobold`, `zauber`): nur `folge`, `palette` und `weiter`, keine Kartenzahl |
+| `geheim` (E7) | Geheimschrift-Rad (Buchstaben um die Schlüssel-Zahl verschieben, nur A–Z ohne Umlaute und ß) und Feen-Zeichen. Aufgaben `lesen`, `schreiben`, `kobold`, `knacken`, `zeichen`, `kette` (zwei Schlüssel hintereinander), `liste` (Feen-Post) | Klartext und Schlüssel-Zahl ergeben genau den gedruckten Geheimtext (und zurück); mit Bildern passt genau eines. `knacken`: genau eine Schlüssel-Zahl 1–25 ergibt nur Wörter der Wortliste (`web/kern/geheim.js`). `kobold`: genau ein Buchstabe ist falsch, und nur an dieser Stelle macht ein anderer Buchstabe lauter Wörter der Wortliste. App (`lesen`, `schreiben`, `knacken`, `zeichen`): nur die Aufgabe (Geheimtext mit Schlüssel-Zahl bzw. ohne, beim Schreiben das Wort, bei Feen-Zeichen nur die Zeichen), nie das gelesene Wort |
+| `kaestchen` (E8) | Kästchenbild und Kästchen-Code (Zeile für Zeile, auch Spalte für Spalte, mit Zauber-Kasten in der Zeile oder für Zeilen, im Schwerer-Teil nur Zahlen). Aufgaben `malen`, `schreiben`, `kobold`, `kuerzer`, `zaehlen` | Code und Bild passen exakt (jede Zeile genau so breit wie das Bild), nie zwei Teile derselben Farbe nebeneinander. `kobold`: genau eine Zeile weicht ab; stimmt ihre Summe, muss das Bild links und rechts gleich sein (`spiegel`); weitere spiegelgleiche Reparaturen nennt die Lösung als „auch richtig“ (`loesung.auch`), mit `verschoben` ist die gemeinte die einzige mit gleich vielen Kästchen jeder Farbe. `kuerzer`: dasselbe Bild mit weniger Zahlen, der kürzeste Code per Suche. App (`malen`, `schreiben`, `kobold`): malen nur den Code, schreiben nur das Bild, kobold den Code mit Kobold-Zeile und das Bild, wie es aussehen soll; optional `artikel` (ein/eine) für den Satz „Es ist ein Hase!“ |
+| `janein` (E9) | Ja/Nein-Zahlen mit 3 bis 6 Karten (Standard 5: 16, 8, 4, 2, 1), Aussehen `karten`, `lampen`, `finger`, `ziffern`. Aufgaben `lesen`, `legen`, `kobold` | `legen`: die Zahl hat genau eine Schreibweise (alle Möglichkeiten durchprobiert). `lesen`: Summe der Ja-Karten; mit `wahl` ist genau eine von drei Zahlen richtig. `kobold`: genau eine Karte liegt falsch, genau ein Umdrehen repariert es. Keine Hand mit nur dem Mittelfinger. App: legen nur die Zahl, lesen die Karten und die Wahl, kobold die gemeinte Zahl und die falsch gelegten Karten |
+| `logik` (E12) | Logikgitter n · n (2 bis 4) mit Bildern und Hinweis-Sätzen (Regeln `a=x`, `a!=x`, `&`, `\|`), Aufgabe `gitter` (Standard; auch mit Kobold-Vorgabe, überflüssigem oder falschem Hinweis), und `wahrfalsch` (Sätze zu einem Bild) | `gitter`: Backtracking findet genau eine Lösung; jeder Hinweis ist nötig (außer den in `ueberfluessig` genannten); Satz und Regel passen zusammen („kein/nicht“, „und“, „oder“, auch an der Stelle im Satz); ein Oder-Hinweis mit zwei wahren Teilen nur mit `beideWahr`; Kobold-Vorgabe mit genau einem falschen Zeichen; `falscherHinweis`: ohne ihn genau eine Lösung. `wahrfalsch`: jeder Satz am Bild ausgerechnet. Die App spielt beides nur nach dem Ergebnis; nie `soll`, `kobold` oder `ueberfluessig` |
+| `baum` (E13) | Ja-Nein-Baum mit Merkmals-Tabelle (welches Ding welche Frage mit Ja beantwortet). Aufgaben `folgen`, `einsortieren`, `frage` (eine Frage fehlt), `kobold` (Ja und Nein vertauscht oder falsche Frage), `neu` (ein neues Ding), `bauen` (eigener Baum), `zeigen` | Jedes Ding landet an genau einem Platz, keine zwei am selben, kein Platz leer, jede Frage passt zur Merkmals-Tabelle. `frage`: genau eine Option passt. `kobold`: nur eine Stelle repariert den Baum. `bauen`: die Zahl der Bäume wird gezählt, mehr als einer nur mit „Mehrere Lösungen“ (Option `einmal`: jede Frage höchstens einmal). App (`folgen`, `einsortieren`, `frage`): Merkmals-Tabelle und Baum, bei folgen und einsortieren mit leeren Plätzen |
+| `formen` (E14) | Formen-Quadrat n · n (2 bis 4; Kreis, Dreieck, Quadrat, Stern), Zusatzregeln `diagonale` (Schrägen) und `farben`. Aufgaben `loesen` (Standard), `kobold`, `mindestens`, `zaehlen`, `duell` | Backtracking: genau eine Lösung (sonst `mehrereLoesungen`), mit `logik` ohne Raten lösbar, `diagonale` wirklich nötig. `kobold`: genau eine Änderung eines Felds ergibt ein Formen-Quadrat, genau beim Kobold-Feld. `mindestens` und `zaehlen` durch Durchzählen bewiesen, `duell` per Spielbaum (3 · 3 auch mit Stein). App: nur `loesen` (auch mit Schrägen) und `kobold`, keine Farben |
+| `nim` (E15) | Strategiespiele: Steine-Spiel (1 oder 2, 1 bis 3, 1 oder 3 nehmen; Kobold-Stein: wer den letzten nimmt, verliert; zwei Haufen) und „Wer sagt 20?“. Aufgaben `stellung`, `gewinnzahlen`, `regeln` (mit Kobold-Regel), `spiel` (gegen den Roboter), `baum` | Für jede Stellung der ganze Spielbaum: Jede Aussage (Gewinner, Gewinnzug, Gewinnzahlen, Wenn-dann-Regeln) wird bestätigt, Gewinnzüge eindeutig oder gekennzeichnet. `spiel`: {{KIND}} kann sicher gewinnen, und der Roboter nimmt jeden Gewinnzug. Zahlen im Anleitungstext prüft `<m-e15-stimmt>`. App: Spiel, Stellung, wer anfängt, Titel und Tipp, keine Gewinnzüge oder Gewinnzahlen |
+
+Bringt eine der noch offenen Einheiten eine neue Art mit, bekommt sie hier eine eigene Zeile.
 
 `pfad`, `lesen`, `kobold` und `kuerzer` verstehen ab Block C auch die erweiterten Befehle aus Abschnitt 7.8 (Wenn-dann-Kasten, „bis zum Schatz“, Zaubersprüche) und `pfad` mehrere Gitter auf einmal („ein Programm für alle“). Felder und Prüfungen: Leitfaden Abschnitt 4.
 
@@ -331,10 +399,19 @@ Rätsel stehen immer in `raetsel/eN.json` und werden beim Bauen gelöst und gepr
 | e3 | 3 Erst das, dann das | `…/#e3` | Bilder-Abläufe sortieren (antippen, kein Ziehen) |
 | e4 | 4 Der Fehler-Kobold | `…/#e4` | Kaputte Programme reparieren (einen Befehl tauschen) |
 | e5 | 5 Der Wiederhol-Zauber | `…/#e5` | Drachen-Pfade mit Zauber-Kasten und Kartengrenze |
+| e6 | 6 Muster-Detektivin | `…/#e6` | 9 Levels: Muster fortsetzen (Level 1–3, 8, 9; der Platz mit goldenem Rand ist dran, Perle aus der Auswahl antippen), Kobold im Muster (4, 6; falsche Perle antippen, dann die richtige), Muster-Kern als Zauber-Kasten (5, 7; der Kasten malt sein Armband zum Vergleich darunter). Level 1, 3, 4, 5, 7 wie am Blatt |
+| e7 | 7 Geheimschrift der Feen | `…/#e7` | 8 Levels mit dem digitalen Geheimschrift-Rad (zwei Dreh-Tasten statt Ziehen): Geheimwort lesen und Bild antippen (1–3), schreiben (4, 5), Feen-Zeichen lesen (6), knacken mit „Probe“ (7, 8). Level 2, 3, 6, 7 wie am Blatt |
+| e8 | 8 Bilder aus Kästchen | `…/#e8` | 8 Levels: Kästchen-Maler (1, 2, 6, 7; Kästchen antippen, Farbe wählen, „Fertig“), Code bauen mit Teil-Tasten (3, 4; Zahl und Farbe auf einer Taste, zu große Teile grau), Kobold-Zeile reparieren (5, 8; Zeile antippen, Zahl mit Minus und Plus ändern, Stern, sobald das Bild heil ist). Level 2, 4, 5, 6 wie am Blatt |
+| e9 | 9 Nur Ja oder Nein | `…/#e9` | 9 Levels: Zahl legen mit Karten, Lampen oder Fingern (1, 3, 4, 6, 9; „Los“ zählt langsam zusammen; Level 9 mit sechs Karten), Welche Zahl? (2, 5; eine von drei Zahlen antippen), Kobold-Karte umdrehen (7, 8). Level 2, 3, 5, 7 wie am Blatt |
+| e12 | 12 Logikrätsel | `…/#e12` | 9 Levels von 2 · 2 bis 4 · 4: Feld antippen (leer, Kreuz, Kreis), Hinweise als Bilder-Sätze; Level 5 „Wahr oder falsch?“ mit Daumen-Tasten, Level 6 mit lila Kobold-Zeichen. Level 1, 3, 6, 9 wie am Blatt |
+| e13 | 13 Ja-Nein-Bäume | `…/#e13` | 8 Levels: einem Wesen folgen (1, 2, 6; Ja oder Nein antippen), alle an ihre Plätze (3, 4; Wesen, dann Platz, „Los“), welche Frage fehlt (5, 7, 8; Frage-Taste, „Los“). Level 3 und 5 wie am Blatt |
+| e14 | 14 Formen-Quadrate | `…/#e14` | 9 Levels, 3 · 3 (1–3) und 4 · 4 mit Stern (4–9): Feld antippen, Form wählen, „Los“. Level 6 Kobold-Quadrat (nur ein Feld darf anders werden), Level 9 mit der Schrägen-Regel (blaue und gelbe Felder). Level 1–4 und 6 wie am Blatt |
+| e15 | 15 Gewinnen mit Plan | `…/#e15` | 8 Strategiespiele gegen den Roboter: Steine-Spiel mit 4, 7, 10 Steinen, „Wer sagt 20?“, „Wer sagt 30?“, 1, 2 oder 3 nehmen, Kobold-Stein, zwei Haufen. Steine oder Zahl-Taste antippen, „Nehmen“. Stern nur bei Sieg, sonst „Nochmal?“ mit Tipp. Level 1, 4, 5, 6 wie am Blatt |
 
 - Kein Schlüsselwort: Alle Pakete sind offen. Der QR-Code auf dem Blatt führt direkt zum Paket.
+- Die Startseite zeigt die Blöcke wie im Heft (A–D, `web/app.js`, `zeigeStart`), ein Tipp auf einen Block seine Pakete. Einheit 1 und 18 haben kein Paket. Pakete der Einheiten 10, 11, 16, 17, 19 und 20 kommen in diese Tabelle, wenn die Einheit fertig ist.
 - Jedes Paket hat 5–9 Levels (10–15 Minuten), danach ein klares Ende: „Super! Jetzt zurück zum Papier.“
-- Steine liegen nicht nur am Rand, sondern auch mitten im Weg (direkt vor der Nase, Mauer mit Lücke, Slalom).
+- Bei Drachen-Pfaden liegen Steine nicht nur am Rand, sondern auch mitten im Weg (direkt vor der Nase, Mauer mit Lücke, Slalom).
 - Die Adresse ist `<pagesBasis>#eN` (`werkstatt.json`, lokal überschreibbar in `kind.json`). Die volle Adresse steht nie im Text der Blätter oder der Anleitung, nur im QR-Code.
 
 
@@ -366,24 +443,29 @@ Gilt für Blätter, Löser und App gleich (`web/kern/ausfuehrer.js`, umgesetzt u
 
 | Material | wofür | ab Einheit |
 |---|---|---|
-| Drucker, Papier, etwas dickeres Papier (160 g) oder Karton (Müslischachtel) | Blätter; Befehlskarten (1-1), Drachen-Figur (2-3), Ablauf-Karten (3-1), Zauber-Kasten (5-3) verstärken | 1 |
-| Schere, Kleber, Bleistift, Bunt- oder Filzstifte (Blau, Grün, Orange, Lila, Rot) | Karten ausschneiden, Basteln, Sterne anmalen | 1 |
-| Kuvert oder Sackerl für die Befehlskarten | Karten aufheben (werden oft wieder gebraucht) | 1 |
+| Drucker, Papier, etwas dickeres Papier (160 g) oder Karton (Müslischachtel) | Blätter; verstärken: Befehlskarten (1-1), Drachen-Figur (2-3), Ablauf-Karten (3-1), Zauber-Kasten (5-3), Geheimschrift-Rad (7-3, am besten zweimal), Ja/Nein-Karten (9-1, einseitig drucken), Drachen-Kinder und Frage-Karten (13-3), Strategie-Karten (15-3), Spielplan (18-2, zweimal) | 1 |
+| Schere, Kleber, Bleistift, Radiergummi, Bunt- oder Filzstifte (Blau, Grün, Orange, Lila, Rot, Gelb; in Einheit 8 auch Braun) | Karten ausschneiden, Basteln, Sterne anmalen; Filzstift für die Karten-Leisten (9) | 1 |
+| Kuvert oder Sackerl für die Befehlskarten | Karten aufheben (werden oft wieder gebraucht); später auch Ja/Nein-Karten (9) und die Geheim-Plättchen der Drachen-Kinder (13) | 1 |
 | Gummiringerl oder Sticker | rechte Hand markieren (Hilfen für links und rechts) | 1 |
-| Kuscheltier, Platz im Gang oder Wohnzimmer | Roboter-Spiel, Ziel für den Roboter | 1 |
-| Malerkrepp (oder Straßenkreide für draußen), Maßband | Start-Kreuz (1), Boden-Gitter 3 · 3 bzw. 4 · 4, Felder 40–50 cm | 1 |
-| Polster, einige Kuscheltiere oder Schuhe | Polster zeigt am Boden-Gitter, wo oben ist; Kuscheltiere als Steine am 4 · 4-Gitter | 2 |
-| 3 Becher (Plastik- oder Joghurtbecher), Würfel | Spiel „Schatz-Versteck“ | 2 |
-| Zuckerl als Schatz, Muggelsteine (etwa 15) | Schatz im Zielfeld; Muggelsteine zum Mittippen und als Punkte | 2 |
+| Kuscheltier, Platz im Gang oder Wohnzimmer | Roboter-Spiel, Ziel für den Roboter; später mehrere: Kuscheltier-Gitter mit 3 Kuscheltieren und 3 Dingen (Löffel, Socke, Buch) und „Wer bin ich?“ mit 6–8 Kuscheltieren (12), Kuscheltier-Baum mit 5 Kuscheltieren (13), Stein beim Formen-Duell (14), Ziel beim Kobold-Wettrennen (18) | 1 |
+| Malerkrepp (oder Straßenkreide für draußen), Maßband | Start-Kreuz (1, 13, 18), Boden-Gitter 3 · 3 bzw. 4 · 4 mit Feldern 40–50 cm (2, wieder in 12 und 14), Karten-Leisten (9), 6 Querstreifen für das Kobold-Wettrennen (18) | 1 |
+| Polster, einige Kuscheltiere oder Schuhe | Polster zeigt am Boden-Gitter, wo oben ist (2, 14); ein Polster pro Person bei „Steh auf, wenn’s wahr ist“ (12); Kuscheltiere als Steine am 4 · 4-Gitter | 2 |
+| 3 Becher (Plastik- oder Joghurtbecher), Würfel | Spiel „Schatz-Versteck“ (2); der Würfel auch für den Wettflug zum Wolkenschloss (18) | 2 |
+| Zuckerl als Schatz, Muggelsteine (etwa 15, ab Einheit 8 etwa 20; Knöpfe gehen auch) | Schatz im Zielfeld (2) und am Ende der Feen-Post (7); Muggelsteine zum Mittippen und als Punkte, Kästchenbilder legen (8), Ja im Kuscheltier-Gitter (12), Steine-Spiele (15) | 2 |
 | Semmel oder Brot, Butter, Schinken oder Käse, Gurke, stumpfes Messer, Teller | Roboter-Koch | 3 |
-| Wollfaden (etwa 2 m), Wäschekluppen | Schwerer-Teil Einheit 3 | 3 |
-| Wäschekluppe, leeres Marmeladeglas | Kobold-Kluppe, Fehler-Schatzglas | 4 |
-| Kästchenpapier (Rechenheft) | Muster-Bild, Kästchenbilder | 5 |
+| Wollfaden oder Schnur | Schwerer-Teil Einheit 3 (etwa 2 m), Kuscheltier-Baum am Boden (13, etwa 5 m) | 3 |
+| Wäschekluppen (etwa 6) | Schwerer-Teil Einheit 3; Kobold-Kluppe (4); hält das Geheimschrift-Rad fest (7); Nein im Kuscheltier-Gitter (12, 6 Stück); Gabeln im Kuscheltier-Baum (13, 4 Stück); Figurenständer (18) | 3 |
+| leeres Marmeladeglas | Fehler-Schatzglas | 4 |
+| Kästchenpapier (Rechenheft) | Muster-Bild (5); Kästchenbilder und 4 Diktier-Felder mit 6 · 6 Kästchen für das Code-Diktat (8) | 5 |
 | Musik (optional) | Bewegungsspiele, Wiederhol-Tanz | 4 |
-| Perlen oder Nudeln, Schnur | Muster-Armband | 6 |
-| zwei Pappteller, Musterklammer | Geheimschrift-Rad | 7 |
-| Taschenlampe | Lampen-Code, Morsecode | 9 |
-| Spielkarten, Würfel | Formen-Quadrate, Strategiespiele | 14 |
+| Perlen-Schüssel: 3 oder 4 Farben, je etwa 10 (Holzperlen, Muggelsteine, Legosteine, Knöpfe oder Nudeln); Schnur (etwa 40 cm, Wolle oder Paketschnur), Tixo | Muster legen und fortsetzen, Muster-Armband fädeln (Tixo um ein Schnur-Ende ist die Fädel-Spitze) | 6 |
+| Extra: Nudeln (Penne, Hörnchen), Lebensmittelfarbe, Essig, Gefriersackerl | Nudel-Perlen färben (optional, außerhalb der Einheit) | 6 |
+| ein Pappteller (oder ein Stück Karton) für die große Scheibe, Karton (Müslischachtel) oder ein zweiter Pappteller für die kleine, Musterklammer, Klebestift | Geheimschrift-Rad (7-3), die Musterklammer hält beide Scheiben in der Mitte zusammen | 7 |
+| kleine Zettel, dicker Stift | Feen-Post (7), Fragen im Kuscheltier-Baum (13), Roboter-Regel (15) | 7 |
+| großes Buch oder aufgestellter Ordner | Sichtschutz beim Code-Diktat | 8 |
+| Taschenlampe | Lampen-Botschaft am Abend (9), Morsecode (X3) | 9 |
+| Knopfdose (Extra) | Knopf-Baum | 13 |
+| Spielkarten (ein normales Kartenspiel: Rommé, Bridge oder Schnapsen) | Karten-Quadrat und Formen-Duell: 4 Herz, 3 Pik, 3 Karo (eine Herz-Karte ist die Kobold-Karte); für das große Duell 4 · 4 von jeder Farbe 4 (dazu 1 Pik, 1 Karo, 4 Kreuz) | 14 |
 | Stempel oder Sticker | Sammelpass | 1 |
 | Handy oder Tablet (optional) | Bildschirm-Bonus | 2 |
 
