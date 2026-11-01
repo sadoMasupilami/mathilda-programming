@@ -9,7 +9,7 @@
                      Lösung (rot): alle Zahlen in den Kästchen.
                      ohne start: nur das Netz (Start- und Ziel-Kästchen leer, keine in der Mitte)
          netzKobold  alle Zahlen gedruckt, wie der Kobold sie gelegt hat.
-                     Lösung: die falsche Vergleichs-Stelle rot umrandet und ein Satz darunter.
+                     Lösung: die falsche Vergleichs-Stelle rot umrandet (Satz dazu in der Anleitung).
          netzFrage   Start-Kästchen leer (das Kind schreibt die Reihenfolge hinein).
                      Lösung: die eine passende Reihenfolge und alle Zahlen in den Kästchen.
          masse: Maße für den Plan am Boden (Abstand der Bahnen, Abstand der Vergleichs-Stellen)
@@ -47,8 +47,6 @@ m-e10-wert, m-e10-fragen { display: inline; }
 m-e10-netz svg, m-e10-punkt svg, m-e10-leiter svg, m-e10-halbier svg { display: block; }
 m-e10-punkt svg { display: inline-block; vertical-align: -0.12em; }
 .e10-netz { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 1.5mm; line-height: 1.2; }
-.e10-lsg { display: none; }
-.loesungsmodus .e10-lsg { display: block; color: var(--rot); font-family: var(--kind); font-weight: 700; font-size: 14pt; line-height: 1.2; max-width: 80mm; }
 .e10-halbier { display: flex; flex-direction: column; gap: 3mm; line-height: 1.2; }
 .e10-halbier .e10-leiste { margin-bottom: 1mm; }
 .e10-frage { display: flex; align-items: center; gap: 2.5mm; font-size: 16pt; }
@@ -111,20 +109,17 @@ m-e10-punkt svg { display: inline-block; vertical-align: -0.12em; }
       const m = el.getAttribute('masse').split(',').map((x) => x.trim());
       opt.masse = { quer: m[0] || '', laengs: m[1] || '' };
     }
-    let unten = '';
     if (r.aufgabe === 'netz') {
       if (l.start) { opt.start = l.start; opt.loesung = l.werte; }
       else opt.leer = true;
     } else if (r.aufgabe === 'netzKobold') {
       opt.werte = l.gezeigt;
       opt.kreis = l.kobold;
-      const st = l.stelle;
-      unten = 'Hier! Die ' + st.raus[0] + ' steht am kleinen Punkt, die ' + st.raus[1] + ' am großen. Richtig wäre tauschen, dann am Ziel: ' + l.ende.join(', ') + '.';
     } else {
       opt.loesung = l.werte;
     }
     try {
-      el.innerHTML = '<span class="e10-netz">' + S().netzSVG(r.bahnen, r.vergleiche, opt) + (unten ? '<span class="e10-lsg">' + h.esc(unten) + '</span>' : '') + '</span>';
+      el.innerHTML = '<span class="e10-netz">' + S().netzSVG(r.bahnen, r.vergleiche, opt) + '</span>';
     } catch (e) { return h.fehler(el, e.message); }
     el.classList.add('komp', 'geprueft');
   };
