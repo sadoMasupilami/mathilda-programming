@@ -13,9 +13,10 @@
          die falsche Karte rot umrandet mit „umdrehen“.
          gr = Breite einer Karte in mm (Höhe 1,4-mal so viel), bei der Hand: Breite der Hand.
      <m-e9-zeige ja="8 4 1" [aussehen="karten|lampen|finger|ziffern"] [anzahl="5"] [gr="12"]
-                 [zahl="13"] [rechnung] [nummern] [farbe="orange"] [markiert="4"]>
+                 [zahl="13"] [rechnung] [nummern] [farbe="orange"] [markiert="4"] [text]>
          Eine Ja/Nein-Zahl nur zeigen (Anleitung, Beispiele). zahl prüft die Summe,
-         rechnung schreibt „8 + 4 + 1 = 13“ dazu (ausgerechnet), nummern: Hand mit Punktzahlen.
+         rechnung schreibt „8 + 4 + 1 = 13“ dazu (ausgerechnet), nummern: Hand mit Punktzahlen,
+         text: Nullen und Einsen als Text („01101“) statt in Kästchen.
      <m-e9-karte wert="16" [farbe="tuerkis|orange"] [ja="nein"] [form="leer"] [gr="36"] [voll] [rahmen="nein"]>
          Eine einzelne Karte (Bastelvorlage: voll = füllt die Karte von <m-karten>, rahmen="nein":
          ohne eigenen Rand, die Schnittlinie ist der Rand).
@@ -55,6 +56,8 @@ m-e9-karte.e09-voll { display: flex; width: 100%; height: 100%; align-items: cen
 .e09-rechnung { font-family: var(--kind); font-size: 14pt; line-height: 1.1; white-space: nowrap; }
 .e09-unter { font-family: var(--kind); font-size: 12pt; line-height: 1; white-space: nowrap; }
 .e09-rechn-text { font-family: inherit; white-space: nowrap; }
+.e09-nw { white-space: nowrap; }
+.e09-zifferntext { font-family: var(--kind); font-weight: 700; letter-spacing: 0.12em; white-space: nowrap; }
 .e09-ziffern { display: inline-flex; gap: 1.6mm; align-items: flex-end; }
 .e09-ziffer { display: inline-flex; flex-direction: column; align-items: center; gap: 1mm; }
 .e09-ziffer .e09-w.klein { font-family: var(--text); font-weight: 800; font-size: 10pt; color: var(--grau); line-height: 1; }
@@ -67,11 +70,11 @@ m-e9-karte.e09-voll { display: flex; width: 100%; height: 100%; align-items: cen
 .e09-hand { display: inline-block; line-height: 0; }
 .e09-beschr { font-family: var(--text); font-size: 9pt; color: var(--grau); line-height: 1.1; text-align: center; }
 .e09-tabs { display: flex; gap: 6mm; align-items: flex-start; }
-table.e09-tab { border-collapse: collapse; font-size: 10pt; }
-table.e09-tab th { font-weight: 800; font-size: 9pt; color: var(--grau); padding: 0.6mm 1.6mm; text-align: center; }
-table.e09-tab td { padding: 0.5mm 1.6mm; text-align: center; border-top: 0.25mm solid var(--linie); }
-table.e09-tab td.e09-z { font-weight: 800; text-align: right; }
-table.e09-tab td.e09-bin { font-family: var(--kind); letter-spacing: 0.08em; }
+table.e09-btab { border-collapse: collapse; font-size: 10pt; }
+table.e09-btab th { font-weight: 800; font-size: 9pt; color: var(--grau); padding: 0.6mm 1.6mm; text-align: center; }
+table.e09-btab td { padding: 0.5mm 1.6mm; text-align: center; border-top: 0.25mm solid var(--linie); }
+table.e09-btab td.e09-z { font-weight: 800; text-align: right; }
+table.e09-btab td.e09-bin { font-family: var(--kind); letter-spacing: 0.08em; }
 .e09-dot { display: inline-block; width: 3.2mm; height: 3.2mm; border-radius: 50%; border: 0.35mm solid #9a9fb4; background: white; vertical-align: middle; }
 .e09-dot.ja { background: #0f8f87; border-color: #0f8f87; }
 `;
@@ -104,12 +107,13 @@ table.e09-tab td.e09-bin { font-family: var(--kind); letter-spacing: 0.08em; }
   // Ein Bild einer Stelle: Karte, Lampe; zustand true = Ja
   function stelle(aussehen, v, zustand, gr, opt) {
     const j = J();
-    const o = Object.assign({ breite: mm(gr), hoehe: mm(gr * 1.4) }, opt || {});
+    // unter 8 mm Breite ist die Zahl auf der Karte nicht mehr lesbar: dann ohne Zahl
+    const o = Object.assign({ breite: mm(gr), hoehe: mm(gr * 1.4), nummer: gr >= 8 }, opt || {});
     if (aussehen === 'lampen') return j.lampe(v, Object.assign(o, { an: zustand }));
     return j.karte(v, Object.assign(o, { ja: zustand }));
   }
   function handHTML(ja, gr, opt) {
-    const o = Object.assign({ breite: mm(gr), hoehe: mm(gr * ((opt && opt.nummern ? 162 : 140) / 140)) }, opt || {});
+    const o = Object.assign({ breite: mm(gr), hoehe: mm(gr * ((opt && opt.nummern ? 154 : 140) / 140)) }, opt || {});
     return '<span class="e09-hand">' + J().hand(ja, o) + '</span>';
   }
   function ziffernHTML(ja, werte, zb, form, L) {
@@ -212,7 +216,7 @@ table.e09-tab td.e09-bin { font-family: var(--kind); letter-spacing: 0.08em; }
         if (n !== 5) return h.fehler(el, 'Finger nur mit 5 Karten');
         if (j.ziffern(ja) === '00100') return h.fehler(el, 'Hand mit nur dem Mittelfinger: bitte eine andere Zahl');
         bild = handHTML(ja, gr, { nummern: el.hasAttribute('nummern'), markiert: mark >= 0 ? mark : null });
-      } else if (ae === 'ziffern') bild = ziffernHTML(ja, W, gr, false, false);
+      } else if (ae === 'ziffern') bild = el.hasAttribute('text') ? '<span class="e09-zifferntext">' + j.ziffern(ja) + '</span>' : ziffernHTML(ja, W, gr, false, false);
       else bild = '<span class="e09-reihe" style="--abst:' + mm(Math.max(1, gr * 0.15)) + '">' + W.map((v, i) => '<span class="e09-platz">' + stelle(ae, v, ja[i], gr, { farbe, markiert: i === mark }) + '</span>').join('') + '</span>';
       let text = '';
       if (el.hasAttribute('rechnung')) text = '<span class="e09-rechn-text">' + h.esc(j.rechnung(ja, n)) + '</span>';
@@ -255,7 +259,7 @@ table.e09-tab td.e09-bin { font-family: var(--kind); letter-spacing: 0.08em; }
     const r = raetselVon(el);
     if (!r) return;
     const l = r.loesung;
-    const gr = parseFloat(h.attr(el, 'gr', '4.5'));
+    const gr = parseFloat(h.attr(el, 'gr', '5.5'));
     try {
       const ae = l.aussehen;
       const bild = (ja, mark) => {
@@ -265,11 +269,11 @@ table.e09-tab td.e09-bin { font-family: var(--kind); letter-spacing: 0.08em; }
       };
       let html;
       if (r.aufgabe === 'kobold') {
-        html = bild(l.gezeigtJa, l.falsch) + '<span class="e09-rechn-text">gelegt ' + h.esc(l.rechnungGezeigt) + ', die ' + l.falschWert + 'er-Karte ' +
-          (l.art === 'zuviel' ? 'muss weg' : 'fehlt') + ': ' + h.esc(l.rechnung) + '</span>';
+        html = bild(l.gezeigtJa, l.falsch) + '<span class="e09-rechn-text">gelegt <span class="e09-nw">' + h.esc(l.rechnungGezeigt) + '</span>, die ' + l.falschWert + 'er-Karte ' +
+          (l.art === 'zuviel' ? 'muss weg' : 'fehlt') + ': <span class="e09-nw">' + h.esc(l.rechnung) + '</span></span>';
       } else {
         const t = l.jaWerte.length > 1 ? l.rechnung : String(l.zahl);
-        html = bild(l.ja, -1) + '<span class="e09-rechn-text">' + h.esc(t) + (r.wahl ? ' (zur Wahl: ' + r.wahl.join(', ') + ')' : '') + '</span>';
+        html = bild(l.ja, -1) + '<span class="e09-rechn-text"><span class="e09-nw">' + h.esc(t) + '</span>' + (r.wahl ? ' <span class="e09-nw">(zur Wahl: ' + r.wahl.join(', ') + ')</span>' : '') + '</span>';
       }
       el.innerHTML = '<span class="e09-zeile" style="gap:2mm">' + html + '</span>';
     } catch (e) { return h.fehler(el, e.message); }
@@ -322,7 +326,7 @@ table.e09-tab td.e09-bin { font-family: var(--kind); letter-spacing: 0.08em; }
       for (let k = 0; k < spalten; k++) {
         const teil = zahlen.slice(k * proSpalte, (k + 1) * proSpalte);
         if (!teil.length) continue;
-        s += '<table class="e09-tab"><tr><th>Zahl</th>' + W.map((v) => '<th>' + v + '</th>').join('') + '<th>Nullen und Einsen</th></tr>';
+        s += '<table class="e09-btab"><tr><th>Zahl</th>' + W.map((v) => '<th>' + v + '</th>').join('') + '<th>1 und 0</th></tr>';
         for (const z of teil) {
           const ja = j.zerlege(z, n);
           s += '<tr><td class="e09-z">' + z + '</td>' + ja.map((x) => '<td><span class="e09-dot' + (x ? ' ja' : '') + '"></span></td>').join('') + '<td class="e09-bin">' + j.ziffern(ja) + '</td></tr>';

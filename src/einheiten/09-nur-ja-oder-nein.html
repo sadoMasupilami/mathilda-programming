@@ -22,10 +22,11 @@
   .e09-loes > .kasten.loesung { margin: 5mm 0 0 0; font-size: 9.5pt; }
   .e09-loes > .kasten.loesung p { margin-bottom: 1.6mm; }
   .kasten.loesung.e09-weiter p { margin-bottom: 1.6mm; }
-  .e09-tab td:first-child { width: 9%; }
-  .e09-tab td:nth-child(2) { width: 36%; }
-  .e09-tab td { vertical-align: middle; }
-  .anleitung .e09-tab .e09-rechn-text { font-size: 10pt; }
+  .e09-tab th, .e09-tab td { text-align: left; vertical-align: middle; }
+  .e09-tab th:first-child, .e09-tab td:first-child { width: 11%; text-align: center; }
+  .e09-tab td:nth-child(2) { width: 30%; }
+  .anleitung .e09-tab .e09-rechn-text { font-size: 10pt; white-space: normal; }
+  .e09-tab m-e9-loesung .e09-zeile { flex-wrap: wrap; row-gap: 1mm; }
   .e09-liste-box { font-size: 10pt; }
   .e09-liste-box m-e9-liste { font-family: var(--kind); }
 
@@ -40,7 +41,7 @@
   .e09-profi-reihe { display: flex; align-items: flex-end; gap: 6mm; }
   .e09-profi-reihe > .profi { flex: 1; }
   .e09-profi-reihe .profi p { display: flex; align-items: center; gap: 3mm; justify-content: space-between; }
-  .e09-haende { display: flex; align-items: center; justify-content: space-between; gap: 5mm; padding-left: 10mm; }
+  .e09-haende { display: flex; align-items: center; justify-content: space-between; gap: 6mm; padding-left: 4mm; }
   .e09-schluessel { display: flex; flex-direction: column; align-items: center; gap: 1mm; border: 0.5mm dashed var(--grau); border-radius: 3mm; padding: 2mm 3mm 1.5mm 3mm; }
   .e09-schluessel .klein { color: var(--grau); }
   .e09-einzug { padding-left: 10mm; }
@@ -55,7 +56,7 @@
 
 <!-- Spickzettel: Kurzfassung der Anleitung zum Mitnehmen, höchstens zwei Seiten. Ablauf als Drehbuch (Minuten wie in der Anleitung) -->
 <section class="spick nur-buch" data-einheit="9" data-titel="Nur Ja oder Nein">
-  <p class="spick-kern"><b>Darum geht’s:</b> Fünf Ja/Nein-Karten mit 1, 2, 4, 8 und 16 Punkten, die 16 liegt links. Jede Karte bleibt auf ihrem Platz und ist entweder da (Punkte oben: <b>Ja</b>) oder umgedreht (<b>Nein</b>). Die Zahl sind alle Punkte, die man sieht: <m-e9-zeige ja="8 4 1" zahl="13" gr="4.5" rechnung></m-e9-zeige>. Jede Zahl von 0 bis 31 geht, und zwar nur auf eine Art (größte Karte zuerst). Dasselbe mit Fingern (oben/unten) und Lampen (an/aus). Am Ende verstehen wir den Gedankenlese-Trick der Rechen-Werkstatt.</p>
+  <p class="spick-kern"><b>Darum geht’s:</b> Fünf Ja/Nein-Karten mit 1, 2, 4, 8 und 16 Punkten, die 16 liegt links. Jede Karte bleibt auf ihrem Platz und ist entweder da (Punkte oben: <b>Ja</b>) oder umgedreht (<b>Nein</b>). Die Zahl sind alle Punkte, die man sieht: 8er, 4er und 1er da, 16er und 2er umgedreht ist 8 + 4 + 1 = 13. Jede Zahl von 0 bis 31 geht, und zwar nur auf eine Art (größte Karte zuerst). Dasselbe mit Fingern (oben/unten) und Lampen (an/aus). Am Ende verstehen wir den Gedankenlese-Trick der Rechen-Werkstatt.</p>
 
   <div class="spick-zwei breit-links">
     <div class="spick-block vorher">
@@ -80,7 +81,7 @@
 
   <h2>Gemeinsam</h2>
   <ol class="spick-ablauf">
-    <li data-min="4"><div><b>Fünf Karten, ganz viele Zahlen.</b> Türkise Karten gemischt hinlegen. {{KIND}} zählt die Punkte und ordnet: die meisten links. „Was fällt dir auf?“ (immer doppelt so viele). Dann auf die Leiste, alle umdrehen: 0. Du drehst die 4 und die 1 um: 5. Sie legt 3, 6, 10. Zum Schluss: alle da ist 31, die 32 geht nicht.
+    <li data-min="4"><div><b>Fünf Karten, ganz viele Zahlen.</b> Türkise Karten gemischt hinlegen. {{KIND}} zählt die Punkte und ordnet: die meisten links. „Was fällt dir auf?“ (immer doppelt so viele). Dann auf die Leiste, alle umdrehen: 0. Du drehst die 4 und die 1 um: 5. Sie legt 3, 6, 10. Zum Schluss: alle da ist 31, die 32 geht nicht. Weitere Zahlen: leicht 5, 12; mittel 9, 14, 17, 20; knifflig 15, 23, 27, 30.
       <div class="sag">
         <p class="du">„Jede Karte darf nur zwei Sachen: da sein oder umgedreht sein. Ja oder Nein. Welche Zahl ist das?“</p>
         <p class="sie">„Vier und eins … fünf!“</p>
@@ -110,7 +111,16 @@
         <p class="dann">Kichern ist erlaubt. Die andere Hand darf die Finger festhalten.</p>
       </div>
     </div></li>
-    <li data-min="4"><div><b>Gedankenlesen mit Durchblick.</b> Mit den Gedankenlese-Karten der Rechen-Werkstatt: {{KIND}} liest deine Gedanken, dann legt ihr die Ja/Nein-Karten unter die Gedankenlese-Karten (1 unter die Karte, die mit 1 anfängt …). Ohne diese Karten: Du fragst „Liegt die 16er-Karte?“ … und zählst die Ja-Karten zusammen.
+    <li data-min="4"><div><b>Gedankenlesen mit Durchblick.</b> Der Höhepunkt: Warum funktioniert der Trick der Rechen-Werkstatt?
+      <div class="spick-spiel"><h3>Gedankenlesen mit Durchblick</h3>
+        <p class="meta">Gedankenlese-Karten der Rechen-Werkstatt (nicht neu drucken), Ja/Nein-Karten</p>
+        <ul>
+          <li><b>Trick:</b> {{KIND}} liest deine Gedanken (du denkst z. B. 13, sagst bei jeder Karte „steht drauf“ oder nicht, sie zählt die kleinsten Zahlen der Ja-Karten zusammen).</li>
+          <li><b>Durchblick:</b> Die kleinsten Zahlen der Gedankenlese-Karten sind 1, 2, 4, 8, 16. Ja/Nein-Karten darunterlegen.</li>
+          <li><b>Geheimnis:</b> Auf jeder Gedankenlese-Karte stehen genau die Zahlen, bei denen diese Ja/Nein-Karte da ist. „Steht drauf“ heißt „Karte ist da“.</li>
+          <li><b>Ohne Gedankenlese-Karten:</b> Sie legt heimlich eine Zahl, du fragst „Liegt die 16er-Karte?“ … bis zur 1er und zählst zusammen. Dann tauschen.</li>
+        </ul>
+      </div>
       <div class="sag">
         <p class="du">„Auf welchen Gedankenlese-Karten steht die 13?“</p>
         <p class="sie">„Auf der mit der 8, der mit der 4 und der mit der 1. Ah! 8 und 4 und 1, das sind ja die Ja-Karten!“</p>
@@ -151,7 +161,7 @@
     <h2>Zum Schluss nicht vergessen</h2>
     <ul class="check">
       <li><b>Bildschirm-Bonus,</b> nur wenn ihr mögt (höchstens 15 Min, nach den Blättern): Paket 9, QR-Code unten rechts auf <a class="blattref" href="#blatt-9-2"></a>. Karten, Lampen und Finger antippen, bis die Zahl stimmt. Nach dem Ende-Bild kommt das Gerät weg.</li>
-      <li><b>Am Abend:</b> Lampen-Botschaft mit der Taschenlampe (Spiel-Kasten in der Anleitung).</li>
+      <li><b>Am Abend:</b> Lampen-Botschaft mit der Taschenlampe (Spiel-Kasten in der Anleitung): Licht aus, gemeinsam langsam „Sechzehn … acht … vier … zwei … eins“ sagen, bei Ja leuchtet die Lampe an die Decke. {{KIND}} hebt die Finger und sagt die Zahl. 3 Botschaften für jeden, die letzte ist die Gute-Nacht-Zahl.</li>
       <li>Rückmeldebogen, Zeile 9.</li>
     </ul>
   </div>
@@ -160,7 +170,7 @@
 <section class="anleitung" data-einheit="9" data-titel="Nur Ja oder Nein">
 
   <div class="kasten ziel">
-    <p>{{KIND}} lernt die <span class="begriff">Ja/Nein-Zahlen</span> kennen. Dafür gibt es fünf <span class="begriff">Ja/Nein-Karten</span> mit 1, 2, 4, 8 und 16 Punkten. Jede Karte kann nur zwei Sachen: da sein (Ja) oder umgedreht sein (Nein). Trotzdem lassen sich mit diesen fünf Karten <b>alle Zahlen von 0 bis 31</b> legen, und jede Zahl auf genau eine Art. So sieht die 13 aus: <m-e9-zeige ja="8 4 1" zahl="13" gr="5" rechnung></m-e9-zeige>.</p>
+    <p>{{KIND}} lernt die <span class="begriff">Ja/Nein-Zahlen</span> kennen. Dafür gibt es fünf <span class="begriff">Ja/Nein-Karten</span> mit 1, 2, 4, 8 und 16 Punkten. Jede Karte kann nur zwei Sachen: da sein (Ja) oder umgedreht sein (Nein). Trotzdem lassen sich mit diesen fünf Karten <b>alle Zahlen von 0 bis 31</b> legen, und jede Zahl auf genau eine Art. So sieht die 13 aus: <m-e9-zeige ja="8 4 1" zahl="13" gr="5.5" rechnung></m-e9-zeige>.</p>
     <p>Dieselbe Idee steckt in den Fingern einer Hand (oben oder unten, damit zählt man bis 31) und in Lampen (<span class="begriff">an/aus</span>): eine Lampen-Botschaft mit der Taschenlampe. Der Fehler-Kobold dreht eine Karte falsch um, {{KIND}} findet sie. Und zum Schluss lüften wir ein Geheimnis: Warum funktioniert der Gedankenlese-Trick aus der Rechen-Werkstatt (Gedankenlese-Karten 1 bis 31, dort Einheit 19)? Weil jede Gedankenlese-Karte heimlich eine Ja/Nein-Karte ist. „Nullen und Einsen“ kommen erst im Schwerer-Teil.</p>
   </div>
 
@@ -168,7 +178,7 @@
     <ul>
       <li><b>So sehen sie aus:</b> fünf Karten mit 1, 2, 4, 8 und 16 Punkten. Jede Karte hat <b>doppelt so viele</b> Punkte wie ihre rechte Nachbarin, die Punkte stehen in Vierergruppen. Die Karten liegen immer in derselben Reihenfolge, die größte links: <m-e9-zeige ja="16 8 4 2 1" gr="6"></m-e9-zeige></li>
       <li><b>Ja oder Nein:</b> Jede Karte hat ihren festen Platz. Sie ist entweder <b>da</b> (Punkte oben, Ja) oder <b>umgedreht</b> (leere Rückseite, Nein). Verschoben wird nie, nur umgedreht. Weil man umgedreht nicht mehr sieht, welche Karte es ist, gibt es die Karten-Leiste aus Malerkrepp.</li>
-      <li><b>Die Zahl:</b> alle Punkte, die man sieht, zusammen. <m-e9-zeige ja="16 4 2" zahl="22" gr="5" rechnung></m-e9-zeige> Alle umgedreht ist 0, alle da ist 31.</li>
+      <li><b>Die Zahl:</b> alle Punkte, die man sieht, zusammen. <m-e9-zeige ja="16 4 2" zahl="22" gr="5.5" rechnung></m-e9-zeige> Alle umgedreht ist 0, alle da ist 31.</li>
       <li><b>Genau eine Schreibweise:</b> Jede Zahl von 0 bis 31 hat genau eine Ja/Nein-Schreibweise. Man findet sie mit <b>größte Karte zuerst</b>: „Passt die 16 noch hinein? Ja, dann umdrehen und weiter mit dem Rest.“</li>
       <li><b>Viele Kleider, eine Idee:</b> Finger oben oder unten, Lampe an oder aus, im Schwerer-Teil Ziffer 1 oder 0. Immer gilt: Ja zählt, Nein zählt nicht.</li>
     </ul>
@@ -197,7 +207,7 @@
   </ol>
 
   <div class="kasten tipp" data-titel="Zahlen zum Legen in Schritt 1 und 2">
-    <p>Zum Anfangen gut: 3, 5, 6, 10, 12. Mittel: 9, 14, 17, 20. Knifflig, weil fast alle Karten da sind: 15, 23, 27, 30. Lieblingszahlen machen besonders Spaß: ihr Alter, eure Hausnummer, ihr Geburtstag, die Zahl der Stufen auf der Stiege. Zum Kontrollieren: <m-e9-zeige ja="16 8 2 1" zahl="27" gr="5" rechnung></m-e9-zeige> und <m-e9-zeige ja="16 4 2 1" zahl="23" gr="5" rechnung></m-e9-zeige>.</p>
+    <p>Zum Anfangen gut: 3, 5, 6, 10, 12. Mittel: 9, 14, 17, 20. Knifflig, weil fast alle Karten da sind: 15, 23, 27, 30. Lieblingszahlen machen besonders Spaß: ihr Alter, eure Hausnummer, ihr Geburtstag, die Zahl der Stufen auf der Stiege. Zum Kontrollieren: <m-e9-zeige ja="16 8 2 1" zahl="27" gr="5.5" rechnung></m-e9-zeige> und <m-e9-zeige ja="16 4 2 1" zahl="23" gr="5.5" rechnung></m-e9-zeige>.</p>
   </div>
 
   <h3>Beispielsätze</h3>
@@ -270,7 +280,7 @@
       <li>0: Faust. 1: Daumen. 2: nur der Zeigefinger. 3: Zeigefinger und Daumen. 4: nur der Mittelfinger. 5: Mittelfinger und Daumen. 6: Mittel- und Zeigefinger. 7: Mittel-, Zeigefinger und Daumen.</li>
       <li>8: nur der Ringfinger (der ist störrisch, die andere Hand darf helfen). 16: nur der kleine Finger. 17: kleiner Finger und Daumen, die „Telefon-Hand“. 31: alle Finger oben.</li>
       <li>Beim Weiterzählen merkt ihr: Der Daumen geht <b>jedes Mal</b> auf oder zu. Bis 31 mit einer Hand ist der Schwerer-Teil.</li>
-      <li>Die 4 mit nur dem Mittelfinger sorgt oft für Gekicher. Sagt einfach: „Bei uns ist das die 4.“ Wer will, zeigt die 4 mit der Handfläche nach vorne und lacht kurz mit.</li>
+      <li>Die 4 mit nur dem Mittelfinger sorgt oft für Gekicher. Lacht kurz mit und sagt: „Bei uns ist das einfach die 4.“ Mit der Handfläche nach vorne sieht sie freundlicher aus.</li>
     </ul>
     <p><b>Ja/Nein-Hüpfer</b> (wenn {{KIND}} zappelig ist, statt einer zweiten Wettleg-Runde): Fünf Zettel mit 16, 8, 4, 2, 1 liegen in einer Reihe am Boden, einen großen Schritt auseinander. Du sagst eine Zahl, {{KIND}} hüpft von Zettel zu Zettel, von der 16 bis zur 1. Auf einem Ja-Zettel landet sie als <b>Stern</b> (Arme und Beine weit auseinander), auf einem Nein-Zettel als <b>Kugel</b> (in die Hocke). Du rufst nach dem letzten Sprung: „Welche Zahl bist du gehüpft?“ Dann tauscht ihr. Gut zum Hüpfen: 5, 10, 21 und 31 (fünf Sterne hintereinander).</p>
   </div>
@@ -280,7 +290,7 @@
     <ol class="regeln">
       <li><b>Der Trick:</b> {{KIND}} ist die Gedankenleserin. Du denkst dir eine Zahl von 1 bis 31, z. B. 13. Sie zeigt dir eine Gedankenlese-Karte nach der anderen, du sagst jedes Mal „Ja, meine Zahl steht drauf“ oder „Nein“. Sie zählt die erste (kleinste) Zahl der Ja-Karten zusammen und sagt deine Zahl. Staunen!</li>
       <li><b>Der Durchblick:</b> Legt die Gedankenlese-Karten nebeneinander und schaut nur auf die kleinste Zahl jeder Karte: 1, 2, 4, 8, 16. „Kommen dir die bekannt vor?“ Legt unter jede Gedankenlese-Karte die passende Ja/Nein-Karte.</li>
-      <li><b>Das Geheimnis:</b> Auf jeder Gedankenlese-Karte stehen genau die Zahlen, bei denen diese Ja/Nein-Karte da ist. Die 13 ist <m-e9-zeige ja="8 4 1" zahl="13" gr="4.5" rechnung></m-e9-zeige>, deshalb steht sie auf den Gedankenlese-Karten mit der 8, der 4 und der 1, und auf den anderen nicht. Wer „Ja, steht drauf“ sagt, verrät also: „Ja, diese Ja/Nein-Karte ist da.“ Die Gedankenleserin legt in Gedanken die Ja/Nein-Zahl und zählt zusammen. Und weil jede Zahl nur <b>eine</b> Ja/Nein-Schreibweise hat, kommt immer genau die richtige Zahl heraus.</li>
+      <li><b>Das Geheimnis:</b> Auf jeder Gedankenlese-Karte stehen genau die Zahlen, bei denen diese Ja/Nein-Karte da ist. Die 13 ist <m-e9-zeige ja="8 4 1" zahl="13" gr="5.5" rechnung></m-e9-zeige>, deshalb steht sie auf den Gedankenlese-Karten mit der 8, der 4 und der 1, und auf den anderen nicht. Wer „Ja, steht drauf“ sagt, verrät also: „Ja, diese Ja/Nein-Karte ist da.“ Die Gedankenleserin legt in Gedanken die Ja/Nein-Zahl und zählt zusammen. Und weil jede Zahl nur <b>eine</b> Ja/Nein-Schreibweise hat, kommt immer genau die richtige Zahl heraus.</li>
       <li><b>Probe:</b> „Auf welchen Gedankenlese-Karten muss die 22 stehen?“ (Auf der mit der 16, der 4 und der 2.) Nachschauen, es stimmt. „Und auf welchen die 31?“ (Auf allen.)</li>
       <li><b>Ohne Gedankenlese-Karten (Variante mit Fragen):</b> {{KIND}} denkt sich eine Zahl von 0 bis 31 und legt sie heimlich hinter einem Buch mit ihren Karten. Du fragst fünf Fragen: „Liegt die 16er-Karte?“, „Liegt die 8er-Karte?“ … bis zur 1er. Bei jedem Ja legst du die Karte bei dir hin. Dann sagst du ihre Zahl. Danach ist sie die Gedankenleserin. Und dann der Durchblick: „Die Gedankenlese-Karten der Rechen-Werkstatt stellen genau diese fünf Fragen, nur mit Zahlen-Listen.“</li>
     </ol>
@@ -347,15 +357,15 @@
   <div class="kasten schwerer darf-brechen e09-bricht">
     <p>Sitzen die fünf Karten nach wenigen Minuten, wähle hier aus. Das ist kein Zusatz „für später“, sondern ein vollwertiger Hauptteil, gut auch für ein zweites Mal mit den Karten. Hier kommen auch erst die „Nullen und Einsen“.</p>
     <ol class="e09-ganz">
-      <li><b>Die 32er-Karte:</b> „Welche Karte käme nach der 16?“ {{KIND}} malt sie selbst auf ein Stück Karton: 32 Punkte, zwei 16er-Muster untereinander (die Profi-Aufgabe auf <a class="blattref" href="#blatt-9-2"></a> fragt genau das). Mit sechs Karten geht es jetzt bis 63. Legt 33, 40, 50 und 63: <m-e9-zeige ja="32 8" anzahl="6" zahl="40" gr="4.5" rechnung></m-e9-zeige>. Frag: „Wie viele Zahlen kann man jetzt legen?“ (64, von 0 bis 63: doppelt so viele wie vorher.) Mit einer 64er-Karte wären es 128. Jede neue Karte verdoppelt.</li>
+      <li><b>Die 32er-Karte:</b> „Welche Karte käme nach der 16?“ {{KIND}} malt sie selbst auf ein Stück Karton: 32 Punkte, zwei 16er-Muster untereinander (die Profi-Aufgabe auf <a class="blattref" href="#blatt-9-2"></a> fragt genau das). Mit sechs Karten geht es jetzt bis 63. Legt 33, 40, 50 und 63: <m-e9-zeige ja="32 8" anzahl="6" zahl="40" gr="5.5" rechnung></m-e9-zeige>. Frag: „Wie viele Zahlen kann man jetzt legen?“ (64, von 0 bis 63: doppelt so viele wie vorher.) Mit einer 64er-Karte wären es 128. Jede neue Karte verdoppelt.</li>
       <li><b>Muster in der Tabelle:</b> Auf Kästchenpapier schreibt {{KIND}} die Zahlen 0 bis 15 untereinander und malt daneben für die vier Karten 8, 4, 2, 1 einen vollen Kreis (Ja) oder einen leeren (Nein). Was fällt ihr auf, wenn sie die Spalten von oben nach unten liest? Die 1er-Karte wechselt <b>jedes Mal</b> (nein, ja, nein, ja), die 2er alle 2 (nein, nein, ja, ja), die 4er alle 4, die 8er alle 8. Jede Spalte ist ein Muster, das sich wiederholt, wie ein Wiederhol-Zauber: Die 2er-Spalte ist „4-mal: nein, nein, ja, ja“. Wer mag, legt sie mit dem Zauber-Kasten von <a class="blattref" href="#blatt-5-3"></a>. Zum Vergleichen:
         <div class="e09-bsp"><m-e9-tabelle von="0" bis="15" anzahl="4" spalten="2"></m-e9-tabelle></div></li>
-      <li><b>Die Umdreh-Regel (Zählen mit Karten):</b> Wie kommt man von einer Zahl zur nächsten, ohne neu zu legen? Lass sie mit den Karten von 0 an weiterzählen und genau beobachten. Die Regel, die sie findet: „Dreh die 1er-Karte um. Ist sie jetzt weg (Nein), dreh auch die 2er um. Ist die jetzt weg, dreh auch die 4er um …“ Von 7 zur 8 drehen sich vier Karten auf einmal: <m-e9-zeige ja="4 2 1" zahl="7" gr="4.5"></m-e9-zeige> wird <m-e9-zeige ja="8" zahl="8" gr="4.5"></m-e9-zeige>. Diese Regel ist ein richtiges kleines Programm.</li>
+      <li><b>Die Umdreh-Regel (Zählen mit Karten):</b> Wie kommt man von einer Zahl zur nächsten, ohne neu zu legen? Lass sie mit den Karten von 0 an weiterzählen und genau beobachten. Die Regel, die sie findet: „Dreh die 1er-Karte um. Ist sie jetzt weg (Nein), dreh auch die 2er um. Ist die jetzt weg, dreh auch die 4er um …“ Von 7 zur 8 drehen sich vier Karten auf einmal: <m-e9-zeige ja="4 2 1" zahl="7" gr="5.5"></m-e9-zeige> wird <m-e9-zeige ja="8" zahl="8" gr="5.5"></m-e9-zeige>. Diese Regel ist ein richtiges kleines Programm.</li>
       <li><b>Finger-Zählen bis 31 vorführen:</b> Mit der Umdreh-Regel geht es auch mit den Fingern: von 0 bis 31, langsam, laut mitzählen. Der Daumen geht jedes Mal, der Zeigefinger jedes zweite Mal. Das ist eine tolle Vorführung für die Familie beim Abendessen. Und mit zwei Händen? (Die zweite Hand hat 32, 64, 128, 256 und 512: bis 1023!)</li>
-      <li><b>Nullen und Einsen:</b> „Roboter schreiben Ja als 1 und Nein als 0.“ Die 13 sind die Karten <m-e9-zeige ja="8 4 1" zahl="13" gr="4.5"></m-e9-zeige>, also schreibt der Roboter <m-e9-zeige ja="8 4 1" aussehen="ziffern" gr="5"></m-e9-zeige>: 16 nein, 8 ja, 4 ja, 2 nein, 1 ja. Lass sie ihr Alter, ihren Geburtstag und die 31 so schreiben. Das ist die Profi-Aufgabe auf <a class="blattref" href="#blatt-9-3"></a>. Frag dann: „Darf man die Null vorne weglassen?“ (Ja: 01101 und 1101 sind dieselbe Zahl, wie eine Lampe, die aus ist. Eine Null hinten darf man nicht weglassen, dann rutschen alle Karten auf andere Plätze.)</li>
+      <li><b>Nullen und Einsen:</b> „Roboter schreiben Ja als 1 und Nein als 0.“ Die 13 sind die Karten <m-e9-zeige ja="8 4 1" zahl="13" gr="5.5"></m-e9-zeige>, also schreibt der Roboter <m-e9-zeige ja="8 4 1" aussehen="ziffern" text></m-e9-zeige>: 16 nein, 8 ja, 4 ja, 2 nein, 1 ja. Lass sie ihr Alter, ihren Geburtstag und die 31 so schreiben. Das ist die Profi-Aufgabe auf <a class="blattref" href="#blatt-9-3"></a>. Frag dann: „Darf man die Null vorne weglassen?“ (Ja: 01101 und 1101 sind dieselbe Zahl, wie eine Lampe, die aus ist. Eine Null hinten darf man nicht weglassen, dann rutschen alle Karten auf andere Plätze.)</li>
       <li><b>Verdoppeln heißt schieben:</b> Legt die 3 (2er und 1er). Jetzt rückt jede Ja-Karte einen Platz nach links: Die Karte links daneben wird aufgedeckt, die alte wird umgedreht (von links nach rechts arbeiten). Heraus kommt die 6 (4er und 2er). Nochmal: 12, nochmal: 24. Warum? Jede Karte links daneben hat doppelt so viele Punkte. Mit der 13 klappt es auch: Aus 8, 4, 1 wird 16, 8, 2, also 26. Und mit der 16? (Dann bräuchte man die 32er-Karte.) Umgekehrt halbiert ein Schritt nach rechts: Aus 12 wird 6. Bei ungeraden Zahlen fällt die 1er-Karte rechts hinunter: Aus 13 wird 6, und 1 bleibt übrig.</li>
       <li><b>Warum gibt es genau eine Schreibweise?</b> Mit „größte Karte zuerst“ hat man nie eine Wahl. Beispiel 22: Passt die 16? Ja, Rest 6. Die 8? Nein. Die 4? Ja, Rest 2. Die 2? Ja, Rest 0. Die 1? Nein. Warum darf man die 16 nicht einfach weglassen? Weil alle kleineren Karten zusammen nur 8 + 4 + 2 + 1 = 15 Punkte haben, also weniger als 16. Ohne die 16er-Karte schafft man die 22 nie. Und bei der 12 darf man sie nicht nehmen, weil 16 schon zu viel ist. Bei jeder Karte ist es genauso: Jede Karte hat um 1 mehr Punkte als alle kleineren zusammen (2 + 1 = 3, die 4er-Karte hat 4). Das kann {{KIND}} mit den Karten nachprüfen.</li>
-      <li><b>Zusammenzählen mit zwei Sätzen:</b> Sie legt mit ihren Karten die 5, du mit deinen die 6. Jetzt schiebt ihr beide Reihen übereinander zu einer: Liegen auf einem Platz zwei Karten, tauscht ihr sie gegen eine einzige Karte links daneben (zwei 4er sind eine 8er). Aus <m-e9-zeige ja="4 1" zahl="5" gr="4.5"></m-e9-zeige> und <m-e9-zeige ja="4 2" zahl="6" gr="4.5"></m-e9-zeige> wird <m-e9-zeige ja="8 2 1" zahl="11" gr="4.5" rechnung></m-e9-zeige>, und 5 + 6 = 11 stimmt. Probiert auch 7 und 1 (da wandert der Tausch dreimal nach links, bis zur 8).</li>
+      <li><b>Zusammenzählen mit zwei Sätzen:</b> Sie legt mit ihren Karten die 5, du mit deinen die 6. Jetzt schiebt ihr beide Reihen übereinander zu einer: Liegen auf einem Platz zwei Karten, tauscht ihr sie gegen eine einzige Karte links daneben (zwei 4er sind eine 8er). Aus <m-e9-zeige ja="4 1" zahl="5" gr="5.5"></m-e9-zeige> und <m-e9-zeige ja="4 2" zahl="6" gr="5.5"></m-e9-zeige> wird <m-e9-zeige ja="8 2 1" zahl="11" gr="5.5" rechnung></m-e9-zeige>, und 5 + 6 = 11 stimmt. Probiert auch 7 und 1 (da wandert der Tausch dreimal nach links, bis zur 8).</li>
       <li><b>Zahlen-Detektivin mit fünf Fragen:</b> Du denkst dir eine Zahl von 0 bis 31. Sie darf nur fragen: „Liegt die 16er-Karte?“, „Liegt die 8er-Karte?“ … Nach genau fünf Fragen weiß sie die Zahl, jedes Mal. Mit sechs Karten (bis 63) braucht sie sechs Fragen. Jede Frage teilt die möglichen Zahlen in zwei Hälften. Darauf bauen die Einheiten 10 (Halbier-Suche) und 13 (Ja-Nein-Bäume) auf.</li>
       <li><b>Buchstaben als Ja/Nein-Zahlen:</b> Abmachen: A ist 1, B ist 2 … Z ist 26 (das Alphabet reicht, weil 26 kleiner als 31 ist). Jetzt kann die Lampen-Botschaft ein Wort schicken, Buchstabe für Buchstabe: OMA ist 15, 13, 1. So speichern auch Roboter Buchstaben, mit Nullen und Einsen. Passt gut zur Geheimschrift aus Einheit 7.</li>
       <li><b>Kobold-Karten für dich:</b> {{KIND}} legt eine Zahl, sagt eine andere und hat genau eine Karte falsch gedreht. Du suchst. Danach darf sie eine Zahl mit zwei falschen Karten bauen: Merkst du den Unterschied? (Mit zwei Fehlern sagt dir „um wie viel zu viel“ nicht mehr sofort, welche Karte es ist.)</li>
@@ -381,18 +391,18 @@
   <div class="e09-loes">
     <m-loesungen einheit="9" skala="0.39"></m-loesungen>
     <div class="kasten loesung">
-      <p><b><a class="blattref" href="#blatt-9-1"></a>, Knobel-Ecke:</b> Alle Punkte zusammen: 16 + 8 + 4 + 2 + 1 = 31. Alle Karten umgedreht: 0.</p>
-      <p><b><a class="blattref" href="#blatt-9-2"></a>, Aufgabe 1:</b> 4 + 2 = 6, 8 + 4 + 1 = 13, 16 + 8 + 2 = 26.</p>
-      <p><b>Aufgabe 2:</b> Für die 10 sind die 8er und die 2er da (8 + 2 = 10), für die 21 die 16er, die 4er und die 1er (16 + 4 + 1 = 21). Jede andere Karte bleibt umgedreht, es gibt keine zweite Möglichkeit (vom Löser geprüft).</p>
-      <p><b>Profi:</b> Die nächste Karte hat 32 Punkte (16 + 16 = 32). Mit 6 Karten ist 32 + 16 + 8 + 4 + 2 + 1 = 63 die größte Zahl.</p>
+      <p><b><a class="blattref" href="#blatt-9-1"></a>, Knobel-Ecke:</b> Alle Punkte zusammen: <span class="rechnung">16 + 8 + 4 + 2 + 1 = 31</span>. Alle Karten umgedreht: 0.</p>
+      <p><b><a class="blattref" href="#blatt-9-2"></a>, Aufgabe 1:</b> <span class="rechnung">4 + 2 = 6</span>, <span class="rechnung">8 + 4 + 1 = 13</span>, <span class="rechnung">16 + 8 + 2 = 26</span>.</p>
+      <p><b>Aufgabe 2:</b> Für die 10 sind die 8er und die 2er da (<span class="rechnung">8 + 2 = 10</span>), für die 21 die 16er, die 4er und die 1er (<span class="rechnung">16 + 4 + 1 = 21</span>). Jede andere Karte bleibt umgedreht, es gibt keine zweite Möglichkeit (vom Löser geprüft).</p>
+      <p><b>Profi:</b> Die nächste Karte hat 32 Punkte (<span class="rechnung">16 + 16 = 32</span>). Mit 6 Karten ist <span class="rechnung">32 + 16 + 8 + 4 + 2 + 1 = 63</span> die größte Zahl.</p>
     </div>
   </div>
   <div class="kasten loesung darf-brechen e09-bricht e09-weiter">
-    <p><b><a class="blattref" href="#blatt-9-3"></a>, Aufgabe 1:</b> Zeigefinger und Daumen: 2 + 1 = 3. Kleiner Finger und Daumen (die „Telefon-Hand“): 16 + 1 = 17.</p>
-    <p><b>Aufgabe 2:</b> Die Lampen 16, 8 und 1 leuchten: 16 + 8 + 1 = 25.</p>
-    <p><b>Aufgabe 3:</b> Der Kobold hat die <b>4er-Karte</b> umgedreht, sie muss weg. Gelegt ist 16 + 4 + 2 + 1 = 23, das sind 4 zu viel. Richtig ist 16 + 2 + 1 = 19. Genau diese eine Karte ist falsch (vom Löser geprüft).</p>
-    <p><b>Profi:</b> 10110 ist 16 + 4 + 2 = 22. Die 11 schreibt man 01011 (8 + 2 + 1 = 11), auch 1011 ohne die Null vorne ist richtig.</p>
-    <p><b>Bonus-Knobelei:</b> Zwei Karten: 8 + 2 = 10. Welche Karten: 4 + 2 + 1 = 7; für die 16 nur die 16er-Karte. Alle da: 31. Detektivin: die 1er-Karte. Ist sie da, ist die Zahl ungerade, ist sie weg, ist die Zahl gerade (alle anderen Karten haben gerade Punktzahlen). Für Profis: 24, denn 16 + 8 = 24. Mit zwei Karten über 20 geht nur das: 16 + 4 = 20 ist nicht größer als 20, und ohne die 16er-Karte schaffen zwei Karten höchstens 8 + 4 = 12.</p>
+    <p><b><a class="blattref" href="#blatt-9-3"></a>, Aufgabe 1:</b> Zeigefinger und Daumen: <span class="rechnung">2 + 1 = 3</span>. Kleiner Finger und Daumen (die „Telefon-Hand“): <span class="rechnung">16 + 1 = 17</span>.</p>
+    <p><b>Aufgabe 2:</b> Die Lampen 16, 8 und 1 leuchten: <span class="rechnung">16 + 8 + 1 = 25</span>.</p>
+    <p><b>Aufgabe 3:</b> Der Kobold hat die <b>4er-Karte</b> umgedreht, sie muss weg. Gelegt ist <span class="rechnung">16 + 4 + 2 + 1 = 23</span>, das sind 4 zu viel. Richtig ist <span class="rechnung">16 + 2 + 1 = 19</span>. Genau diese eine Karte ist falsch (vom Löser geprüft).</p>
+    <p><b>Profi:</b> 10110 ist <span class="rechnung">16 + 4 + 2 = 22</span>. Die 11 schreibt man 01011 (<span class="rechnung">8 + 2 + 1 = 11</span>), auch 1011 ohne die Null vorne ist richtig.</p>
+    <p><b>Bonus-Knobelei:</b> Zwei Karten: <span class="rechnung">8 + 2 = 10</span>. Welche Karten: <span class="rechnung">4 + 2 + 1 = 7</span>; für die 16 nur die 16er-Karte. Alle da: 31. Detektivin: die 1er-Karte. Ist sie da, ist die Zahl ungerade, ist sie weg, ist die Zahl gerade (alle anderen Karten haben gerade Punktzahlen). Für Profis: 24, denn <span class="rechnung">16 + 8 = 24</span>. Mit zwei Karten über 20 geht nur das: <span class="rechnung">16 + 4 = 20</span> ist nicht größer als 20, und ohne die 16er-Karte schaffen zwei Karten höchstens <span class="rechnung">8 + 4 = 12</span>.</p>
     <p><b>Bildschirm-Levels (zum Nachschauen):</b> Jede Zahl hat genau eine Ja/Nein-Schreibweise (vom Löser geprüft), es gibt also immer genau eine Lösung. Die App prüft nur, ob die Zahl stimmt.</p>
     <table class="tab e09-tab">
       <tr><th>Level</th><th>Was ist zu tun?</th><th>Lösung</th></tr>
@@ -454,7 +464,7 @@
 <!-- =============================================================== -->
 <section class="blatt" data-einheit="9" data-titel="Ja oder Nein?" data-art="Arbeitsblatt" data-verteilt>
   <div class="aufg">
-    <p class="anw">{{KIND}}, welche Zahl zeigen die Karten? Umgedrehte Karten zählen nicht.</p>
+    <p class="anw">{{KIND}}, welche Zahl zeigen die Karten? Umgedreht zählt nicht.</p>
     <div class="e09-stapel">
       <m-e9-zahl raetsel="e9-l1" gr="16"></m-e9-zahl>
       <m-e9-zahl raetsel="e9-l2" gr="16"></m-e9-zahl>
@@ -463,7 +473,7 @@
   </div>
 
   <div class="aufg">
-    <p class="anw">Lege die Zahl! Kreuze die Karten an, die da sind.</p>
+    <p class="anw">Lege die Zahl! Kreuze die Ja-Karten an. Größte Karte zuerst!</p>
     <div class="e09-stapel">
       <m-e9-zahl raetsel="e9-a1" gr="16"></m-e9-zahl>
       <m-e9-zahl raetsel="e9-a2" gr="16"></m-e9-zahl>
@@ -472,7 +482,7 @@
 
   <div class="e09-profi-reihe">
     <div class="profi" data-titel="Profi-Aufgabe: Die nächste Karte">
-      <p>Wie viele Punkte hat die nächste Karte? <m-e9-feld karte="6"></m-e9-feld></p>
+      <p>Wie viele Punkte hat die Karte nach der 16? <m-e9-feld karte="6"></m-e9-feld></p>
       <p>Größte Zahl mit 6 Karten? <m-e9-feld raetsel="e9-groesste6"></m-e9-feld></p>
     </div>
     <m-qr paket="e9"></m-qr>
@@ -486,9 +496,9 @@
   <div class="aufg">
     <p class="anw">{{KIND}}, deine Finger sind Ja/Nein-Karten! Finger oben: Ja. Finger unten: Nein. Welche Zahl zeigt die Hand?</p>
     <div class="e09-haende">
-      <div class="e09-schluessel"><m-e9-zeige aussehen="finger" ja="16 8 4 2 1" nummern gr="32"></m-e9-zeige><span class="klein">So zählen die Finger.</span></div>
-      <m-e9-zahl raetsel="e9-f1" gr="25"></m-e9-zahl>
-      <m-e9-zahl raetsel="e9-f2" gr="25"></m-e9-zahl>
+      <div class="e09-schluessel"><m-e9-zeige aussehen="finger" ja="16 8 4 2 1" nummern gr="36"></m-e9-zeige><span class="klein">So zählen die Finger.</span></div>
+      <m-e9-zahl raetsel="e9-f1" gr="28"></m-e9-zahl>
+      <m-e9-zahl raetsel="e9-f2" gr="28"></m-e9-zahl>
     </div>
   </div>
 

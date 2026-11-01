@@ -223,7 +223,7 @@
     if (ja) {
       const leer = opt.form === 'leer';
       s += opt.rahmen === false
-        ? '<rect x="0" y="0" width="100" height="140" fill="#ffffff"/>'
+        ? ''
         : '<rect x="3" y="3" width="94" height="134" rx="10" fill="#ffffff" stroke="' + (leer ? GRAU : f.rand) + '" stroke-width="' + (leer ? 3 : 4) + '"/>';
       const p = punkte(v);
       for (const [x, y] of p.liste) {
@@ -281,7 +281,7 @@
     opt = opt || {};
     if (!Array.isArray(ja) || ja.length !== 5) throw new Error('Hand: genau 5 Finger');
     const haut = '#f8d9bd', rand = T;
-    const oben = opt.nummern ? 26 : 4;
+    const oben = opt.nummern ? 18 : 4;
     let s = svgKopf(opt, 140, 136 + oben, 'Hand');
     s += '<g transform="translate(0 ' + oben + ')">';
     // Daumen oben: zuerst zeichnen, der Handballen deckt seinen Ansatz zu
@@ -301,11 +301,12 @@
     // Daumen eingeklappt: liegt quer über dem Handballen
     if (!ja[4]) s += '<rect x="56" y="88" width="44" height="18" rx="9" fill="' + haut + '" stroke="' + rand + '" stroke-width="3"/>';
     s += '</g>';
-    const xs = [24, 46, 68, 90, 124];
     if (opt.nummern) {
+      // Punktzahl über jeder Fingerspitze (gestaffelt wie die Finger), beim Daumen rechts daneben
       const w = werte(5);
-      xs.forEach((x, i) => {
-        s += '<text x="' + x + '" y="12" font-family="Andika, sans-serif" font-size="19" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="' + T + '">' + w[i] + '</text>';
+      const pos = HAND_FINGER.map((f, i) => [i === 0 ? f.x - 4 : f.x, oben + (ja[i] ? f.spitze : 54) - 11]).concat([[130, oben + (ja[4] ? 50 : 84)]]);
+      pos.forEach((p, i) => {
+        s += '<text x="' + p[0] + '" y="' + p[1] + '" font-family="Andika, sans-serif" font-size="18" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="' + T + '">' + w[i] + '</text>';
       });
     }
     if (Number.isInteger(opt.markiert) && opt.markiert >= 0 && opt.markiert <= 4) {
