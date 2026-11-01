@@ -1,1 +1,530 @@
-<!-- Einheit 13: noch nicht geschrieben (Platzhalter, damit Buch und --nur 13 schon funktionieren) -->
+<!--
+  Einheit 13: Ja-Nein-Bäume (Block C)
+  Entscheidungsbäume: einem Baum folgen, Dinge an ihre Plätze setzen, fehlende Frage finden,
+  Kobold im Baum (Ja und Nein vertauscht), „Welche Frage teilt am besten?“, 8 Drachen mit 3 Fragen.
+  Rätsel: raetsel/e13.json (Rätselart baum, Web-Paket e13)
+  Kern: web/kern/baum.js (Logik und Bilder, auch in der App), Löser: werkzeuge/arten/baum.mjs
+  Eigene Bausteine: src/bausteine/e13-baum.js
+  Blätter: 13-1 Der Wesen-Baum, 13-2 Kobold im Baum, 13-3 Die Drachen-Kinder (Bastelvorlage)
+-->
+<style>
+  .e13-ablauf > li { break-inside: avoid; }
+  .e13-ganz > li { break-inside: auto; orphans: 2; widows: 2; }
+  .kasten.e13-bricht { -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .kasten.e13-bricht > .kasten-titel { break-after: avoid; }
+  .kasten.e13-bricht > .kasten-titel + p, .kasten.e13-bricht > .kasten-titel + ul > li:first-child { break-before: avoid; break-inside: avoid; }
+  .e13-bild-mitte { display: flex; justify-content: center; margin: 2mm 0 3mm 0; }
+  .e13-loes { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm 4mm; align-items: start; margin: 2mm 0 4mm 0; }
+  .e13-loes m-loesungen, .e13-loes .loesungen-raster { display: contents; }
+  .e13-loes > .kasten.loesung { margin: 0; font-size: 9.5pt; }
+  .e13-loes > .kasten.loesung p, .kasten.loesung.e13-weiter p { margin-bottom: 1.6mm; }
+  .e13-tab td, .e13-tab th { text-align: center; }
+  table.tab.e13-merkmale { font-size: 8.5pt; }
+  table.tab.e13-merkmale th, table.tab.e13-merkmale td { padding: 0.8mm 1.4mm; }
+  .e13-var { break-after: avoid; margin-bottom: 1mm; }
+  .e13-tab td:first-child, .e13-tab th:first-child { text-align: left; }
+  .e13-lv td:first-child { width: 9%; text-align: center; }
+
+  /* Blätter */
+  .e13-neben { display: flex; align-items: center; justify-content: space-between; gap: 6mm; }
+  .e13-profi-reihe { display: flex; align-items: flex-end; gap: 6mm; }
+  .e13-profi-reihe > .profi { flex: 1; }
+  .e13-felder { display: flex; flex-wrap: wrap; gap: 2mm 10mm; margin: 0 0 2mm 0; }
+  .e13-felder > span { display: inline-flex; align-items: center; gap: 2mm; white-space: nowrap; }
+  .e13-wege { display: flex; justify-content: space-around; gap: 4mm 10mm; flex-wrap: wrap; }
+  .e13-neu { display: flex; align-items: flex-start; gap: 5mm; }
+  .e13-neu > div { flex: 1; }
+  .e13-neu p { margin: 0 0 2mm 0; }
+  .e13-hinweis { margin: 0 0 1mm 0; }
+  .e13-titel { font-family: var(--text); font-weight: 900; font-size: 14pt; margin: 0 0 2.5mm 0; }
+  .e13-titel .klein { font-weight: 700; color: var(--grau); }
+  .e13-karte-bild { line-height: 0; }
+</style>
+
+<!-- Spickzettel: Kurzfassung der Anleitung zum Mitnehmen, höchstens zwei Seiten -->
+<section class="spick nur-buch" data-einheit="13" data-titel="Ja-Nein-Bäume">
+  <p class="spick-kern"><b>Darum geht’s:</b> Ein Ja-Nein-Baum ist ein Rate-Plan aus Fragen. Oben fängt man an, bei jeder Frage geht es den <b>Ja-Ast</b> (links, grün) oder den <b>Nein-Ast</b> (rechts, orange) hinunter, bis unten eine Antwort steht. {{KIND}} läuft einen Baum am Boden ab, folgt Bäumen am Papier, findet den Kobold im Baum und entdeckt: Eine gute Frage teilt die Gruppe in zwei gleich große Hälften. Dann reichen 3 Fragen für 8 Drachen-Kinder.</p>
+
+  <div class="spick-zwei breit-links">
+    <div class="spick-block vorher">
+      <h2>Vorher, ohne {{KIND}} <small>· etwa 20 Min</small></h2>
+      <ul class="check">
+        <li><a class="blattref" href="#blatt-13-1"></a>, <a class="blattref" href="#blatt-13-2"></a> und <a class="blattref" href="#blatt-13-3"></a> in Farbe drucken, Blatt 13-3 auf dickes Papier. <span class="min">2 Min</span></li>
+        <li>Von Blatt 13-3 ausschneiden: 8 Drachen-Kinder, 8 Geheim-Plättchen (ins Sackerl), 12 Frage-Karten. Die Profi-Ecke bleibt am Rest. <span class="min">10 Min</span></li>
+        <li>Kuscheltier-Baum am Boden legen: 4 Kuscheltiere, 3 Frage-Zettel, Wollfäden, Kluppen. Ein 5. Kuscheltier verstecken. <span class="min">8 Min</span></li>
+      </ul>
+    </div>
+    <div class="spick-block vorher">
+      <h2>Bereitlegen</h2>
+      <ul class="check">
+        <li>Muggelsteine (etwa 15), Sackerl</li>
+        <li>Zettel, dicker Stift, Wollfaden, Schere, 1 Kluppe</li>
+        <li>Bleistift, Buntstifte grün und orange</li>
+        <li>Stempel oder Sticker</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Gemeinsam</h2>
+  <ol class="spick-ablauf">
+    <li data-min="3"><div><b>Ich denke an ein Tier.</b> Du denkst an ein Tier, {{KIND}} fragt, du sagst nur Ja oder Nein. Für jede Frage ein Muggelstein. Dann tauschen.
+      <div class="sag">
+        <p class="du">„Ich denke an ein Tier. Frag mich, was du willst, aber ich sage nur Ja oder Nein.“</p>
+        <p class="du">„Welche Frage hat dir am meisten verraten?“</p>
+        <p class="dann">Rät sie gleich „Ist es ein Hund?“, ist das in Ordnung. Nicht korrigieren, nur die Steine zählen.</p>
+      </div>
+    </div></li>
+    <li data-min="6"><div><b>Der Kuscheltier-Baum.</b> Erst denkst du, {{KIND}} läuft. Dann tauschen, du läufst einmal absichtlich falsch (Kobold!). Zum Schluss kommt das 5. Kuscheltier: Es landet bei einem anderen, also braucht der Baum eine neue Frage.
+      <div class="spick-spiel"><h3>Kuscheltier-Baum</h3>
+        <ul>
+          <li><b>Denkerin</b> denkt an eines der 4 Kuscheltiere und sagt es nicht.</li>
+          <li><b>Läuferin</b> steht am Start, geht zum ersten Zettel und liest die Frage laut vor.</li>
+          <li>Die Denkerin antwortet. Bei Ja geht die Läuferin den linken Faden, bei Nein den rechten.</li>
+          <li>Unten nimmt sie das Kuscheltier: „Du hast an … gedacht!“ Dann Rollen tauschen.</li>
+        </ul>
+      </div>
+      <div class="sag">
+        <p class="du">„Lies die Frage vor. Ich antworte, und du gehst den richtigen Ast.“</p>
+        <p class="du">„Die Katze will auch in den Baum. Wo landet sie?“</p>
+        <p class="sie">„Beim Teddy! Da ist aber schon wer.“</p>
+        <p class="du">„Welche Frage trennt die zwei?“</p>
+      </div>
+    </div></li>
+    <li data-min="6"><div><b>Blatt „Der Wesen-Baum“.</b> <a class="blattref" href="#blatt-13-1"></a>: Mit dem Finger von oben folgen, für jedes Wesen. Grün ist Ja (links), Orange ist Nein (rechts). Bei Aufgabe 2 antwortest du mit den Schildern, sie sucht das Wesen.
+      <div class="sag">
+        <p class="du">„Hat das Einhorn Flügel?“</p>
+        <p class="sie">„Nein. Also der orange Ast … Lebt es im Wasser? Nein. Platz 5!“</p>
+      </div>
+    </div></li>
+    <li data-min="6"><div><b>Ja-Haufen, Nein-Haufen.</b> Das Hauptspiel mit den 8 Drachen-Kindern, 4 Runden.
+      <div class="spick-spiel"><h3>Ja-Haufen, Nein-Haufen</h3>
+        <p class="meta">8 Drachen-Kinder, 8 Geheim-Plättchen im Sackerl, 3 Frage-Karten (grün, Flügel, Krone), Muggelsteine</p>
+        <ul>
+          <li><b>Denkerin</b> zieht ein Plättchen und legt es verdeckt vor sich.</li>
+          <li><b>Raterin</b> stellt eine Frage: eine Frage-Karte oder „Ist es der da?“ (zeigen).</li>
+          <li>Sie sortiert die Drachen: Ja-Haufen links, Nein-Haufen rechts. Dann antwortet die Denkerin.</li>
+          <li>Für jede Frage 1 Muggelstein. Weiter nur mit dem Haufen der Antwort.</li>
+          <li><b>Ende:</b> 1 Drache übrig, Plättchen umdrehen. Nach 4 Runden gewinnt, wer weniger Steine hat.</li>
+          <li><b>Tipp:</b> In deiner ersten Runde fragst du absichtlich „Ist es der da?“.</li>
+        </ul>
+      </div>
+      <div class="sag">
+        <p class="du">„Schau dir die zwei Haufen an. Welche Frage teilt am besten?“</p>
+        <p class="sie">„Die mit 4 und 4!“</p>
+      </div>
+    </div></li>
+    <li data-min="5"><div><b>Blatt „Kobold im Baum“.</b> <a class="blattref" href="#blatt-13-2"></a>: Bei Aufgabe 1 jede Frage-Karte mit Ente und Eule ausprobieren. Bei Aufgabe 2 jedes Tier einzeln durch den Baum schicken. Die Profi-Aufgabe ist freiwillig.
+      <div class="sag">
+        <p class="du">„Schick die Biene durch den Baum. Hat sie Beine? Kann sie fliegen? Hat sie Federn?“</p>
+        <p class="sie">„Nein! Aber sie steht beim Ja. Da ist der Kobold!“</p>
+      </div>
+    </div></li>
+    <li data-min="2"><div><b>Sammelpass.</b> Feld „Einheit&nbsp;13“, Sterne anmalen.
+      <div class="sag"><p class="du">„Welche Frage war heute die beste?“</p></div>
+    </div></li>
+  </ol>
+
+  <div class="spick-zwei">
+    <div class="spick-block stolper">
+      <h2>Wenn es hakt</h2>
+      <ul>
+        <li><b>Geht den falschen Ast:</b> Finger auf die Frage, „Ja ist grün und links“.</li>
+        <li><b>Fragt weiter, obwohl sie unten ist:</b> „Steht hier noch eine Frage?“</li>
+        <li><b>Unklare Frage</b> („Ist es groß?“): „Größer als ein Polster?“</li>
+        <li><b>Frage teilt nicht</b> („Ist es ein Drache?“): Haufen anschauen, einer ist leer.</li>
+        <li><b>Kobold-Aufgabe:</b> Jedes Tier einzeln prüfen, nicht raten.</li>
+      </ul>
+    </div>
+    <div class="spick-block schwerer">
+      <h2>Zu leicht?</h2>
+      <ul>
+        <li><b>Drachen-Profi</b> auf <a class="blattref" href="#blatt-13-3"></a>: alle 8 mit je 3 Fragen.</li>
+        <li><b>Ketten-Baum:</b> nur „Ist es der da?“: bis zu 7 Fragen.</li>
+        <li><b>Ja/Nein-Zahlen:</b> grün 4, Flügel 2, Krone 1, jeder Drache bekommt eine Zahl.</li>
+        <li><b>Familien-Baum</b> als Plakat.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="spick-zwei">
+    <div class="spick-block">
+      <h2>Kuscheltier-Baum: ein Beispiel</h2>
+      <ul>
+        <li><b>Oben:</b> „Hat es Fell?“ (Teddy, Hase: Ja; Ente, Fisch: Nein)</li>
+        <li><b>Ja-Ast:</b> „Hat es lange Ohren?“ Hase links, Teddy rechts</li>
+        <li><b>Nein-Ast:</b> „Hat es Federn?“ Ente links, Fisch rechts</li>
+        <li><b>Das fünfte:</b> Katze landet beim Teddy, neue Frage z. B. „Hat es Schnurrhaare?“</li>
+        <li>Jede Frage braucht für jedes Kuscheltier eine klare Antwort.</li>
+      </ul>
+    </div>
+    <div class="spick-block">
+      <h2>Lösungen auf einen Blick</h2>
+      <ul>
+        <li><b>13-1:</b> Drache 1, Flügelpferd 2, Fee 3, Meerjungfrau 4, Einhorn 5. Wege: Platz 3 (Fee), Platz 4 (Meerjungfrau). Profi: Drache 2, Fee 3; Fee und Flügelpferd.</li>
+        <li><b>13-2:</b> „Kann es schwimmen?“. Kobold bei „Hat es Federn?“. Marienkäfer landet bei der Biene.</li>
+        <li><b>13-3:</b> 7 Frage-Karten, jeder Drache 3 Fragen.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="spick-block schluss">
+    <h2>Zum Schluss nicht vergessen</h2>
+    <ul class="check">
+      <li><b>Bildschirm-Bonus,</b> nur wenn ihr mögt (höchstens 15 Min, nach den Blättern): Paket 13, QR-Code auf <a class="blattref" href="#blatt-13-1"></a>. Nach dem Ende-Bild kommt das Gerät weg.</li>
+      <li>Kuscheltier-Baum noch liegen lassen? Abends darf die Familie ihn ablaufen.</li>
+      <li>Drachen-Kinder, Plättchen und Frage-Karten ins Kuvert, sie kommen wieder.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="anleitung" data-einheit="13" data-titel="Ja-Nein-Bäume">
+
+  <div class="kasten ziel">
+    <p>{{KIND}} lernt den <span class="begriff">Ja-Nein-Baum</span> kennen: einen Rate-Plan aus Fragen, auf die man nur mit Ja oder Nein antwortet. Man fängt oben bei der ersten <span class="begriff">Frage</span> an. Bei Ja geht es den <span class="begriff">Ast</span> nach links hinunter (grün), bei Nein den Ast nach rechts (orange). Dort wartet die nächste Frage, bis man unten bei einer Antwort ankommt: einem Kuscheltier, einem Fantasie-Wesen oder einem Drachen-Kind. Der Baum steht also auf dem Kopf: Er fängt oben an und wächst nach unten.</p>
+    <p>Heute läuft {{KIND}} einen Baum am Boden ab, folgt Bäumen am Papier, ergänzt eine fehlende Frage und findet den Kobold, der bei einer Frage Ja und Nein vertauscht hat. Dann kommt die große Entdeckung: Eine gute Frage teilt die Gruppe in <b>zwei gleich große Hälften</b>, genau wie die Halbier-Suche aus Einheit&nbsp;10. Mit 3 solchen Fragen findet man einen von 8 Drachen, und 3 Fragen mit Ja oder Nein ergeben 8 Möglichkeiten wie bei den Ja/Nein-Zahlen aus Einheit&nbsp;9.</p>
+  </div>
+
+  <div class="kasten tipp darf-brechen e13-bricht" data-titel="Die Regeln des Ja-Nein-Baums (für euch beide gleich)">
+    <div class="e13-bild-mitte"><m-e13-baum raetsel="e13-w-drachen4" modus="voll" blatt-b="17" blatt-h="17" bild="15" frage-b="30" frage-h="11" ebene="19" schrift="3.6" luft="3"></m-e13-baum></div>
+    <ul>
+      <li><b>So sieht er aus:</b> Oben steht die erste Frage. Unter jeder Frage gehen zwei Äste weg: der <b>Ja-Ast immer links und grün</b> <m-e13-pille seite="ja"></m-e13-pille>, der <b>Nein-Ast immer rechts und orange</b> <m-e13-pille seite="nein"></m-e13-pille>. Das sind dieselben Farben wie bei links drehen und rechts drehen. Unten stehen die Antworten. Das Bild zeigt den Baum für 4 Drachen-Kinder aus der Web-App.</li>
+      <li><b>So folgt man ihm:</b> Oben anfangen, die Frage lesen, ehrlich mit Ja oder Nein antworten, den passenden Ast hinunter. Das geht so lange, bis man bei einer Antwort ankommt. Dann ist man fertig, auch wenn im Baum noch andere Fragen stehen.</li>
+      <li><b>Eine gute Frage</b> hat für jedes Ding eine klare Antwort: nicht „Ist es groß?“, sondern „Ist es größer als ein Polster?“. Und sie <b>teilt</b>: Bei manchen Dingen heißt es Ja, bei anderen Nein. Am besten teilt sie in zwei gleich große Hälften.</li>
+      <li><b>Fragen zählen:</b> Wie viele Fragen stellt der Baum, bis er ein Ding findet? Im Bild sind es bei jedem Drachen 2.</li>
+      <li><b>Es gilt, was man sieht:</b> Bei Fantasie-Wesen zählt das Bild. Unser Einhorn hat keine Flügel, auch wenn es in Büchern manchmal welche hat.</li>
+    </ul>
+  </div>
+
+  <div class="kasten material darf-brechen e13-bricht">
+    <p><b>Vorher, ohne {{KIND}} (etwa 20 Minuten):</b></p>
+    <ul>
+      <li><b>Drucken (2 Minuten):</b> <a class="blattref" href="#blatt-13-1"></a> und <a class="blattref" href="#blatt-13-2"></a> (Arbeitsblätter) und <a class="blattref" href="#blatt-13-3"></a> (Bastelvorlage) <b>in Farbe</b>, die Bastelvorlage am besten auf dickerem Papier (160&nbsp;g). Grün und Orange der Äste sollen gut zu sehen sein. Kein Farbdrucker? Dann fahr die Ja-Äste mit Grün und die Nein-Äste mit Orange nach, die Wörter „Ja“ und „Nein“ stehen ohnehin dabei.</li>
+      <li><b>Ausschneiden (10 Minuten):</b> Von <a class="blattref" href="#blatt-13-3"></a> die 8 Drachen-Kinder, die 8 kleinen Geheim-Plättchen und die 12 Frage-Karten (4-mal „Ist er grün?“, 4-mal „Hat er Flügel?“, 4-mal „Hat er eine Krone?“). Die Profi-Ecke unten bleibt am Rest des Blatts. Die Plättchen kommen in ein Sackerl oder einen Becher, alles andere ins Kuvert.</li>
+      <li><b>Kuscheltier-Baum legen (8 Minuten):</b> Such 4 Kuscheltiere aus, die sich gut unterscheiden, und schreib 3 Fragen auf Zettel (Kasten „Gute Fragen für den Kuscheltier-Baum“ unter dem Ablauf). Auf jeden Zettel unten links „Ja“ (grün) und unten rechts „Nein“ (orange). Leg im Gang oder Wohnzimmer einen Baum auf den Boden: ein Malerkrepp-Kreuz als Start, einen großen Schritt davor den ersten Zettel. Von dort führen zwei Wollfäden schräg nach vorne, der linke ist der Ja-Ast, der rechte der Nein-Ast, je etwa zwei große Schritte lang. An ihrem Ende liegen der zweite und dritte Zettel, und von jedem gehen wieder zwei kurze Fäden zu den Kuscheltieren. Eine Wäschekluppe hält Zettel und Fäden an jeder Gabel zusammen, dann verrutscht nichts. Statt Wolle geht auch Malerkrepp. Der Baum am Boden sieht aus wie das Bild im Kasten oben, nur mit Kuscheltieren statt Drachen. Ein <b>fünftes Kuscheltier</b> versteckst du in der Nähe, es kommt am Ende von Schritt 2 dazu. Du brauchst dafür etwa 5 m Wollfaden oder Schnur, 3 Wäschekluppen, 3 Zettel, einen dicken Stift und Malerkrepp für das Start-Kreuz.</li>
+    </ul>
+    <p><b>Material in der Einheit:</b> etwa 15 Muggelsteine, ein Sackerl für die Plättchen, ein paar leere Zettel, ein dicker Stift, Wollfaden, Schere und eine weitere Wäschekluppe (für die neue Frage), Bleistift, Buntstifte grün und orange, Stempel oder Sticker für den Sammelpass.</p>
+    <p><b>Extra, außerhalb der Einheit:</b> der Familien-Ratebaum als Plakat und der Knopf-Baum mit der Knopfdose (beide bei den Spielen). Das passt gut an einem anderen Tag.</p>
+  </div>
+
+  <h2>Ablauf Schritt für Schritt</h2>
+  <ol class="ablauf e13-ablauf">
+    <li data-min="3"><span class="schritt-titel">Ich denke an ein Tier</span>Zum Aufwärmen das alte Ratespiel: Du denkst an ein Tier, am besten eines, das man nicht sofort errät (Igel, Pinguin, Giraffe). {{KIND}} darf alles fragen, du antwortest aber nur mit Ja oder Nein. Für jede Frage legst du einen Muggelstein vor sie hin. Hat sie es erraten, zählt ihr die Steine. Dann tauscht ihr: Sie denkt, du fragst. Stell dabei absichtlich zuerst eine richtig gute Frage („Kann es fliegen?“), dann eine schwache („Ist es ein Hase?“). Zum Schluss nur eine Frage: „Welche Frage hat dir am meisten verraten?“ Die Antwort kommt später im Spiel wieder.</li>
+    <li data-min="6"><span class="schritt-titel">Der Kuscheltier-Baum</span>Zeig {{KIND}} den Baum am Boden: „Das ist ein Ja-Nein-Baum. Damit kann man raten, ohne nachzudenken. Man muss nur den Fragen folgen.“ Zuerst denkst du an ein Kuscheltier und sie läuft (Kasten „Bewegung: Der Kuscheltier-Baum“), dann tauscht ihr. Läufst du, gehst du einmal absichtlich den falschen Ast: Sie ruft „Kobold!“. Zum Schluss holst du das versteckte fünfte Kuscheltier: „Das will auch in den Baum. Wo landet es?“ Es landet bei einem anderen Kuscheltier. Jetzt erfindet {{KIND}} eine neue Frage, die die beiden trennt. Du schreibst sie auf einen Zettel, ihr legt an dieser Stelle eine neue Gabel mit zwei Fäden, und beide Kuscheltiere bekommen ihren eigenen Platz. So wächst der Baum.</li>
+    <li data-min="6"><span class="schritt-titel">Blatt „Der Wesen-Baum“</span><a class="blattref" href="#blatt-13-1"></a>. Bei Aufgabe 1 fährt {{KIND}} für jedes Wesen mit dem Finger von oben den Baum hinunter und schreibt die Nummer des Platzes. Lies die Fragen vor, wenn sie das möchte. Bei Aufgabe 2 gibst du die Antworten: Du liest die Schilder vor („Ja, Nein, Nein“), sie folgt dem Baum. Die Profi-Aufgabe (Fragen zählen) ist schon der Anfang vom großen Gedanken dieser Einheit.</li>
+    <li data-min="6"><span class="schritt-titel">Ja-Haufen, Nein-Haufen</span>Das Hauptspiel mit den 8 Drachen-Kindern (Kasten „Spiel: Ja-Haufen, Nein-Haufen“). Du rätst zuerst und fragst absichtlich nur „Ist es der da?“. Mit Glück bist du schnell, meistens brauchst du viele Steine. Dann ist {{KIND}} dran. Nach zwei oder drei Runden kommt die Frage: „Welche Frage teilt am besten?“ Die Antwort sieht man an den Haufen: 4 und 4 ist besser als 1 und 7.</li>
+    <li data-min="5"><span class="schritt-titel">Blatt „Kobold im Baum“</span><a class="blattref" href="#blatt-13-2"></a>. Bei Aufgabe 1 probiert sie jede der drei Frage-Karten aus: Kommt die Ente nach links und die Eule nach rechts? Bei Aufgabe 2 schickt sie jedes Tier einzeln durch den Baum, beginnend bei der Biene. Die Profi-Aufgabe ist freiwillig. Passt das Blatt heute nicht mehr hinein, kommt es beim nächsten Mal dran.</li>
+    <li data-min="2"><span class="schritt-titel">Sammelpass</span>Feld „Einheit&nbsp;13“ stempeln oder bekleben, Sterne anmalen. Frag: „Welche Frage war heute die beste?“</li>
+  </ol>
+
+  <div class="kasten tipp" data-titel="Gute Fragen für den Kuscheltier-Baum">
+    <ul>
+      <li><b>Vier Kuscheltiere,</b> die verschieden sind, z. B. Teddy, Hase, Ente, Fisch. Kuscheltiere, die gleich aussehen (zwei Teddys), lassen sich mit keiner guten Frage trennen.</li>
+      <li><b>Die erste Frage teilt die vier in zwei Paare:</b> 2-mal Ja, 2-mal Nein, z. B. „Hat es Fell?“ (Teddy und Hase: Ja, Ente und Fisch: Nein).</li>
+      <li><b>Dann für jedes Paar eine Frage,</b> die die beiden trennt: auf der Ja-Seite „Hat es lange Ohren?“ (Hase: Ja, Teddy: Nein), auf der Nein-Seite „Hat es Federn?“ (Ente: Ja, Fisch: Nein).</li>
+      <li><b>Die Kuscheltiere liegen dann von links nach rechts:</b> Hase, Teddy, Ente, Fisch. Ja ist immer links. Prüf es, bevor {{KIND}} kommt: Jedes Kuscheltier muss an seinem eigenen Platz landen.</li>
+      <li><b>Fragen, die fast immer gehen:</b> Hat es Fell? Hat es Federn? Hat es lange Ohren? Kann es fliegen? Lebt es im Wasser? Hat es Streifen oder Punkte? Ist es größer als ein Polster? Ist es rosa?</li>
+      <li><b>Das fünfte Kuscheltier</b> soll bei einem anderen landen, z. B. eine Katze: Fell, keine langen Ohren, also beim Teddy. Eine neue Frage ist dann z. B. „Hat es Schnurrhaare?“.</li>
+    </ul>
+  </div>
+
+  <h3>Beispielsätze</h3>
+  <div class="sag">
+    <p class="du">(am Start des Kuscheltier-Baums) „Ich denke an eines von den vier Kuscheltieren. Du liest die Frage auf dem Zettel vor, ich sage Ja oder Nein, und du gehst den richtigen Ast entlang.“</p>
+    <p class="sie">„Hat es Fell?“</p>
+    <p class="du">„Ja.“</p>
+    <p class="sie">(geht den linken Faden) „Hat es lange Ohren?“ … „Nein? Dann ist es der Teddy!“</p>
+    <p class="dann">Lass sie das Kuscheltier hochheben. Frag dann: „Hast du nachdenken müssen, oder hat der Baum für dich geraten?“ Genau das ist der Witz: Der Baum ist ein Plan, dem man einfach folgt.</p>
+  </div>
+  <div class="sag">
+    <p class="du">(du läufst und gehst bei „Ja“ absichtlich den rechten Faden) „Ja, also hier entlang …“</p>
+    <p class="sie">„Kobold! Ja ist links!“</p>
+    <p class="dann">Super. Gib ihr einen Muggelstein als Kobold-Fänger-Punkt, wenn sie mag.</p>
+  </div>
+  <div class="sag">
+    <p class="du">(holt die Katze) „Die Katze möchte auch in unseren Baum. Wo landet sie?“</p>
+    <p class="sie">„Fell? Ja. Lange Ohren? Nein. Beim Teddy! Aber da ist schon der Teddy.“</p>
+    <p class="du">„Welche Frage könnten wir hier stellen, damit Teddy und Katze verschiedene Plätze bekommen?“</p>
+    <p class="sie">„Ist es eine Katze?“</p>
+    <p class="dann">Das geht! Es ist eine echte Ja-Nein-Frage. Frag dann: „Und gibt es eine Frage, bei der man auf die Katze schaut, nicht auf den Namen?“ Vielleicht „Hat es Schnurrhaare?“ oder „Kann es miauen?“. Beides ist richtig.</p>
+  </div>
+  <div class="sag">
+    <p class="du">(beim Spiel „Ja-Haufen, Nein-Haufen“) „Schau dir meine Haufen an. Bei ‚Ist es der da?‘ ist links einer und rechts sind sieben. Und bei deiner Frage?“</p>
+    <p class="sie">„Vier und vier!“</p>
+    <p class="du">„Welche Frage ist besser?“</p>
+    <p class="sie">„Meine! Weil dann immer nur die Hälfte übrig bleibt.“</p>
+    <p class="dann">Genau das ist die Halbier-Suche aus Einheit&nbsp;10. Sagt sie „Deine, weil du Glück haben kannst“, hat sie auch recht: Mit Glück ist „Ist es der da?“ nach einer Frage fertig. Aber meistens nicht.</p>
+  </div>
+
+  <h2>Spiele, Bewegung und Basteln</h2>
+
+  <div class="kasten bewegung darf-brechen e13-bricht" data-titel="Der Kuscheltier-Baum">
+    <p class="spiel-meta">2 Personen · 5–10 Minuten · der Baum am Boden (Material), 4 Kuscheltiere, ein fünftes zum Dazukommen, Zettel und Stift</p>
+    <ol class="regeln">
+      <li><b>Ziel:</b> Mit dem Baum herausfinden, an welches Kuscheltier die andere denkt, ohne zu raten.</li>
+      <li><b>Rollen:</b> Die <b>Denkerin</b> sucht sich heimlich eines der 4 Kuscheltiere aus. Die <b>Läuferin</b> steht am Start.</li>
+      <li><b>Ein Zug:</b> Die Läuferin geht zum nächsten Zettel und liest die Frage laut vor. Die Denkerin antwortet ehrlich mit Ja oder Nein. Bei Ja geht die Läuferin den linken Faden entlang, bei Nein den rechten, bis zum nächsten Zettel oder zum Kuscheltier.</li>
+      <li><b>Ende einer Runde:</b> Die Läuferin hebt das Kuscheltier hoch: „Du hast an den Hasen gedacht!“ Stimmt es, haben beide gewonnen, denn der Baum hat funktioniert. Stimmt es nicht, war ein Kobold unterwegs: Ihr geht den Weg gemeinsam noch einmal und sucht die falsche Antwort oder den falschen Ast.</li>
+      <li><b>Wechsel:</b> Nach jeder Runde tauscht ihr die Rollen, insgesamt 4 Runden. Als Läufer gehst du einmal absichtlich falsch, sie ruft „Kobold!“.</li>
+      <li><b>Neues Kuscheltier:</b> Zum Schluss holst du das fünfte Kuscheltier. {{KIND}} schickt es durch den Baum. Es landet bei einem anderen. Ihr erfindet eine neue Frage, die die beiden trennt, schreibt sie auf einen Zettel und legt an diesem Platz eine neue Gabel: zwei kurze Fäden, links Ja, rechts Nein, an jedem Ende eines der beiden Kuscheltiere. Jetzt hat der Baum 5 Plätze. Probiert ihn gleich aus.</li>
+    </ol>
+    <p class="e13-var"><b>Varianten:</b></p>
+    <ul>
+      <li><b>Mit geschlossenen Augen:</b> Die Läuferin hält die Hand der Denkerin und wird geführt, die Fragen liest die Denkerin vor. Nur bei der Antwort darf sie schauen.</li>
+      <li><b>Hüpf-Baum:</b> Auf dem Ja-Ast wird gehüpft, auf dem Nein-Ast geschlichen.</li>
+      <li><b>Fragen zählen:</b> Die Läuferin legt an jedem Zettel einen Muggelstein ab. Wie viele Steine liegen am Ende? Bei 4 Kuscheltieren immer 2. Nach dem neuen Kuscheltier sind es bei zwei Kuscheltieren 3.</li>
+      <li><b>Draußen:</b> Mit Straßenkreide im Hof gezeichnet, mit Steinen als Antworten.</li>
+    </ul>
+  </div>
+
+  <div class="kasten spiel darf-brechen e13-bricht" data-titel="Ja-Haufen, Nein-Haufen">
+    <p class="spiel-meta">2 Personen · 5–10 Minuten · die 8 Drachen-Kinder und die 8 Geheim-Plättchen von <a class="blattref" href="#blatt-13-3"></a>, je eine Frage-Karte „Ist er grün?“, „Hat er Flügel?“, „Hat er eine Krone?“, ein Sackerl, etwa 15 Muggelsteine</p>
+    <ol class="regeln">
+      <li><b>Vorbereitung:</b> Die 8 Drachen-Kinder liegen offen in einer Gruppe oben am Tisch. Die Plättchen sind im Sackerl, die Muggelsteine daneben, die 3 Frage-Karten liegen bereit.</li>
+      <li><b>Rollen:</b> Die <b>Denkerin</b> zieht ohne Hinschauen ein Plättchen aus dem Sackerl, schaut es heimlich an und legt es verdeckt vor sich. Die <b>Raterin</b> will den Drachen auf dem Plättchen finden.</li>
+      <li><b>Ein Zug:</b> Die Raterin stellt eine Frage. Erlaubt sind die 3 Frage-Karten (jede höchstens einmal pro Runde) oder „Ist es der da?“, dabei zeigt sie auf einen Drachen. Bevor die Denkerin antwortet, sortiert die Raterin die Drachen der Gruppe in zwei Haufen: Alle, bei denen die Antwort Ja wäre, kommen nach links, alle mit Nein nach rechts. Die Frage-Karte liegt darüber. Die Denkerin passt auf, dass richtig sortiert ist. Dann antwortet sie, und die Raterin nimmt sich einen Muggelstein. Weiter geht es nur mit dem Haufen der Antwort, der andere bleibt liegen.</li>
+      <li><b>Ende einer Runde:</b> Liegt nur noch ein Drache im Haufen, sagt die Raterin: „Es ist der da!“ Die Denkerin dreht ihr Plättchen um. Passt es nicht, hat beim Sortieren ein Kobold zugeschlagen: Sucht ihn gemeinsam. Danach kommen alle Drachen zurück in die Gruppe und das Plättchen ins Sackerl.</li>
+      <li><b>Wer gewinnt:</b> Ihr spielt 4 Runden, jede ist zweimal Raterin. Die Muggelsteine sind die Fragen, also gewinnt, wer zusammen <b>weniger</b> Steine hat. Gleichstand: Ihr seid beide Baum-Profis.</li>
+      <li><b>Tipp für dich:</b> In deiner ersten Runde fragst du nur „Ist es der da?“. Mit viel Glück bist du nach 1 Frage fertig, oft brauchst du 5, 6 oder 7. {{KIND}} sieht so von selbst, warum die Frage-Karten besser sind: Sie teilen 8 Drachen in 4 und 4, dann 2 und 2, dann 1 und 1. Mit ihnen braucht man <b>immer genau 3</b> Fragen.</li>
+    </ol>
+    <p>Nach einer Runde liegt am Tisch ein Stück von einem Ja-Nein-Baum: oben die erste Frage, darunter die Haufen, dann die nächste Frage. Zeig ihr das: „Schau, du hast beim Raten einen Baum gebaut.“</p>
+    <p class="e13-var"><b>Varianten:</b></p>
+    <ul>
+      <li><b>Nur Frage-Karten:</b> Jetzt braucht jede Runde genau 3 Steine. Gewinnt dann niemand? Doch: Die Raterin sagt vorher, wie viele Steine sie braucht. Stimmt es, bekommt sie einen Stein zurück.</li>
+      <li><b>Glücks-Runde:</b> Nur „Ist es der da?“ ist erlaubt. Wer schafft es mit den wenigsten Steinen? Hier entscheidet das Glück.</li>
+      <li><b>Mit Kuscheltieren:</b> 8 Kuscheltiere statt der Drachen, die Fragen erfindet ihr selbst.</li>
+      <li><b>Kobold-Haufen:</b> Die Raterin sortiert einmal absichtlich einen Drachen in den falschen Haufen. Merkt die Denkerin es?</li>
+    </ul>
+  </div>
+
+  <div class="kasten basteln darf-brechen e13-bricht" data-titel="Familien-Ratebaum (Extra, an einem anderen Tag)">
+    <p>Auf ein großes Stück Packpapier (oder 4 zusammengeklebte Blätter) zeichnet {{KIND}} einen Ja-Nein-Baum für die Familie: Oma, Opa, Tante, Cousin, das Haustier. Ihr sucht gemeinsam die Fragen aus, du schreibst, sie malt die Antworten (Gesichter). Fragen, die gut teilen: „Trägt die Person eine Brille?“, „Ist sie größer als Papa?“, „Wohnt sie bei uns?“, „Hat sie lange Haare?“. Der Baum kommt an die Kühlschranktür. Bei Besuch darf jemand an eine Person denken und {{KIND}} rät mit dem Plakat. Die Fragen können auch auf Zettel, die mit Wäschekluppen an einer quer gespannten Schnur hängen: Dann kann man sie tauschen, wenn eine Frage nicht passt.</p>
+  </div>
+
+  <div class="kasten basteln darf-brechen e13-bricht" data-titel="Der Knopf-Baum: Sortieren (Extra)">
+    <p class="spiel-meta">2 Personen · 10 Minuten · eine Handvoll Knöpfe aus der Knopfdose (oder Bausteine), Wollfaden, 3 Zettel, Stift</p>
+    <ol class="regeln">
+      <li><b>Baum legen:</b> Am Tisch legt eine Person einen Ja-Nein-Baum aus Wollfaden mit 3 Fragen, die zu Knöpfen passen: „Ist er rund?“, „Hat er 4 Löcher?“, „Ist er rot?“ … Zuerst eine Frage oben, darunter zwei weitere.</li>
+      <li><b>Sortieren:</b> Die andere schickt einen Knopf nach dem anderen durch den Baum und legt ihn an seinen Platz. Am Ende liegen an den 4 Plätzen kleine Häufchen.</li>
+      <li><b>Prüfen:</b> Passen alle Knöpfe in einem Häufchen zusammen? Ist ein Häufchen leer, hat eine Frage nicht geteilt. Dann wird eine andere Frage gesucht.</li>
+      <li><b>Wechsel:</b> Jetzt legt die andere einen Baum. Wer schafft einen Baum, bei dem alle 4 Häufchen etwa gleich groß sind?</li>
+    </ol>
+    <p>Mit 8 Knöpfen, die alle verschieden sind (z. B. groß oder klein, rund oder eckig, 2 oder 4 Löcher), ist das dasselbe Rätsel wie mit den 8 Drachen-Kindern: 3 Fragen reichen für jeden Knopf.</p>
+  </div>
+
+  <h2>Wenn es hakt oder zu leicht ist</h2>
+
+  <div class="zwei">
+    <div class="kasten leichter">
+      <ul>
+        <li>Nur ein Baum mit einer Frage und 2 Kuscheltieren, dann mit 2 Fragen und 4.</li>
+        <li>Grüner Finger für Ja, oranger Finger für Nein: ein Stück Malerkrepp, angemalt, an je einem Zeigefinger.</li>
+        <li>Du liest alle Fragen vor, {{KIND}} zeigt nur den Weg.</li>
+        <li><a class="blattref" href="#blatt-13-1"></a>: Zuerst nur Einhorn und Drache, die anderen später.</li>
+        <li>Beim Spiel nur die 4 Drachen mit Flügeln verwenden: Dann reichen 2 Fragen.</li>
+      </ul>
+    </div>
+    <div class="kasten bonus" data-titel="Bonus-Knobelei">
+      <p class="klein"><i>Für zwischendurch: im Auto, beim Abendessen, beim Zähneputzen.</i></p>
+      <p><b>Zahl-Raten:</b> „Ich denke an eine Zahl von 1 bis 8. Wie viele Ja/Nein-Fragen brauchst du höchstens?“</p>
+      <p><b>Teilt sie?</b> „Wir raten nur Tiere. Ist ‚Ist es ein Tier?‘ eine gute Frage?“</p>
+      <p><b>Wie viele Fragen?</b> „2 Dinge brauchen 1 Frage, 4 Dinge brauchen 2. Und 16 Dinge?“</p>
+      <p><b>Für Profis:</b> „Welche eine Frage teilt unsere Familie in zwei gleich große Hälften?“</p>
+      <p class="klein"><b>Kurz-Lösungen:</b> 3 Fragen; nein, die Antwort ist immer Ja; 4 Fragen; mehrere Lösungen. Mehr bei den Lösungen am Ende.</p>
+    </div>
+  </div>
+
+  <div class="kasten stolper darf-brechen e13-bricht">
+    <ul>
+      <li><b>Sie antwortet richtig, geht aber den falschen Ast:</b> Finger auf die Frage legen, dann laut: „Ja, also der grüne Ast nach links.“ Am Papier hilft es, den Weg mit Bleistift mitzuzeichnen. Am Boden steht auf jedem Zettel links „Ja“ und rechts „Nein“.</li>
+      <li><b>Sie fragt weiter, obwohl sie schon unten ist:</b> „Steht hier noch eine Frage?“ Eine Antwort ist das Ende. Die anderen Fragen im Baum sind für die anderen Dinge da.</li>
+      <li><b>Sie beantwortet die Frage für sich statt für das Wesen</b> („Hat es Flügel? Ich hab keine!“): „Wir fragen immer das Ding, das wir suchen. Hat das <b>Einhorn</b> Flügel?“</li>
+      <li><b>Sie erfindet unklare Fragen</b> („Ist es groß?“, „Ist es lieb?“): Frag zurück: „Würden Oma und ich dasselbe antworten?“ Daraus wird „Ist es größer als ein Polster?“.</li>
+      <li><b>Ihre Frage teilt nicht</b> („Ist es ein Drache?“ bei lauter Drachen): Lass sie die Haufen legen. Einer bleibt leer, die Frage hat nichts verraten. Das ist kein Fehler, sondern eine Entdeckung.</li>
+      <li><b>Sie fragt nach Gefühlen</b> („Mag ich es?“): Die Antwort muss die Denkerin wissen und nicht die Raterin. Fragen gehen immer über das Ding.</li>
+      <li><b>Beim Kobold-Baum rät sie,</b> statt zu prüfen: Jedes Tier einzeln von oben durchschicken, mit dem Finger. Wo ein Tier woanders landet, als es steht, ist der Kobold nicht weit.</li>
+      <li><b>Streit über ein Wesen</b> („Einhörner können fliegen!“): Bei uns gilt das Bild. Auf dem Blatt hat das Einhorn keine Flügel, also Nein.</li>
+    </ul>
+  </div>
+
+  <div class="kasten schwerer darf-brechen e13-bricht">
+    <p>Sitzt das Folgen nach wenigen Minuten, wähle hier aus. Das ist kein Zusatz „für später“, sondern ein vollwertiger Hauptteil. Der Kern: Ein Baum ist umso besser, je gleichmäßiger seine Fragen teilen.</p>
+    <ol class="e13-ganz">
+      <li><b>8 Drachen, 3 Fragen</b> (Profi-Aufgabe auf <a class="blattref" href="#blatt-13-3"></a>): {{KIND}} legt mit allen 8 Drachen-Kindern und den Frage-Karten einen Ja-Nein-Baum auf den Tisch, bei dem man jeden Drachen nach 3 Fragen findet. Oben eine Frage, darunter zwei, darunter vier: Das sind 1 + 2 + 4 = 7 Frage-Karten, und bei jedem Drachen stellt der Baum genau 3 Fragen. Prüft danach jeden Drachen: Landet er an seinem Platz? Mit diesen 3 Fragen gibt es <m-e13-zahl raetsel="e13-drachen" was="anzahl" l="12"></m-e13-zahl> verschiedene Bäume (vom Löser gezählt). Findet sie einen zweiten, der oben mit einer anderen Frage anfängt? Mit nur 2 Fragen geht es nicht: 2 Fragen haben nur 4 Plätze.</li>
+      <li><b>Schlechter Baum gegen guten Baum:</b> Ihr legt einen <b>Ketten-Baum</b>: Jede Frage ist „Ist es der da?“ für einen Drachen, beim Nein geht es zur nächsten solchen Frage. Fragen zählen: Den ersten Drachen findet der Ketten-Baum nach 1 Frage, die letzten beiden erst nach 7. Für alle 8 Drachen zusammen sind das 1 + 2 + 3 + 4 + 5 + 6 + 7 + 7 = 35 Fragen. Der gute Baum braucht 8 · 3 = 24. Frag: „Welchen Baum nimmst du, wenn du nur einmal raten darfst?“ (Mit dem Ketten-Baum kann man Glück haben. Mit dem guten Baum ist man sicher nach 3 Fragen fertig.)</li>
+      <li><b>Welche Frage teilt am besten?</b> Bei den 5 Wesen von <a class="blattref" href="#blatt-13-1"></a>: „Hat es Flügel?“ teilt in 3 und 2, „Ist es ein Pferd?“ in 2 und 3, „Kann es Feuer speien?“ nur in 1 und 4, „Hat es ein Horn?“ auch in 1 und 4. Als erste Frage sind also Flügel oder Pferd am besten. Bei den 8 Drachen teilt „Hat er eine Krone?“ in 4 und 4, „Ist er grün und hat eine Krone?“ nur in 2 und 6. Regel für {{KIND}}: „Die beste Frage macht zwei gleich große Haufen.“ Das ist die Halbier-Suche aus Einheit&nbsp;10: immer in der Mitte fragen.</li>
+      <li><b>3 Fragen sind 8 Möglichkeiten:</b> Holt die Ja/Nein-Karten aus Einheit&nbsp;9. Jede Frage bekommt eine Karte: grün die 4, Flügel die 2, Krone die 1. Bei Ja liegt die Karte da, bei Nein nicht. So bekommt jeder Drache eine Zahl: Der blaue Drache ohne Flügel und ohne Krone ist die 0, der grüne mit Flügeln und Krone ist 4 + 2 + 1 = 7, der grüne mit Krone ohne Flügel ist 4 + 1 = 5. Alle 8 Drachen haben verschiedene Zahlen von 0 bis 7. Mit 4 Fragen könnte man 16 Dinge auseinanderhalten, mit 5 Fragen 32. Jede Frage mehr verdoppelt. Zum Staunen: Im Baum „grün, dann Flügel, dann Krone“ stehen die Drachen von rechts nach links genau in der Reihenfolge 0, 1, 2 bis 7.</li>
+      <li><b>Geht es mit weniger Fragen?</b> Der Wesen-Baum von <a class="blattref" href="#blatt-13-1"></a> braucht für alle 5 Wesen zusammen 2 + 3 + 3 + 2 + 2 = 12 Fragen. Kann {{KIND}} einen Baum für dieselben 5 Wesen bauen, der zusammen weniger braucht? (Nein, 12 ist das Beste: Nach 2 Fragen gibt es nur 4 Plätze, also muss sich ein Platz noch einmal teilen. Dann brauchen 2 Wesen 3 Fragen und 3 Wesen 2 Fragen.)</li>
+      <li><b>Der lernende Baum:</b> Spielt „Ich denke an ein Tier“ mit dem Kuscheltier-Baum und allen Kuscheltieren im Kinderzimmer. Immer wenn der Baum falsch rät, erfindet {{KIND}} eine neue Frage für diesen Platz und legt eine neue Gabel. Nach ein paar Runden ist der Baum groß. Wie viele Fragen braucht er höchstens?</li>
+      <li><b>Kobold-Baum für Mama oder Papa:</b> {{KIND}} legt einen Drachen-Baum und vertauscht heimlich bei einer Frage die zwei Haufen. Du findest den Kobold, indem du jeden Drachen durchschickst. Danach tauscht ihr.</li>
+      <li><b>Baum für die Familie:</b> Der Familien-Ratebaum (Kasten „Basteln“) mit 6 bis 8 Personen. Schafft {{KIND}} es, dass man jede Person mit höchstens 3 Fragen findet? Dafür muss die erste Frage die Familie ungefähr halbieren. Probiert es beim nächsten Besuch aus und zählt die Fragen.</li>
+      <li><b>Neue Frage, gleicher Baum:</b> Im Wesen-Baum wird „Lebt es im Wasser?“ durch „Hat es ein Horn?“ ersetzt. Was passiert? (Meerjungfrau und Einhorn tauschen ihre Plätze: Das Einhorn steht jetzt auf dem Ja-Ast links.) Eine Frage darf man ersetzen, wenn sie die Dinge an dieser Stelle genauso trennt, dann tauschen höchstens die Plätze.</li>
+    </ol>
+  </div>
+
+  <h2>Hintergrund</h2>
+  <div class="kasten warum darf-brechen e13-bricht">
+    <p>Ein Ja-Nein-Baum heißt beim Programmieren <span class="begriff">Entscheidungsbaum</span>. Er ist eine Reihe von <span class="begriff">Bedingungen</span>, die ineinander stecken: „Wenn es Flügel hat, dann frag nach Feuer, sonst frag nach Wasser.“ Das ist die Wenn-dann-Regel aus Einheit&nbsp;11 mit „sonst“, nur dass nach jedem Ast wieder eine Regel kommt. Fast jedes Programm verzweigt sich so, und ein Computer folgt seinen Ästen, ohne nachzudenken. Genau das hat {{KIND}} am Boden gespürt: Wer dem Baum folgt, muss nicht raten.</p>
+    <p>Programmierer sagen auch, der Baum steht auf dem Kopf: Die erste Frage oben heißt <span class="begriff">Wurzel</span>, die Antworten unten heißen <span class="begriff">Blätter</span>, jede Frage dazwischen ist ein <span class="begriff">Knoten</span>. Wie viele Fragen bis zu einem Blatt nötig sind, heißt <span class="begriff">Tiefe</span>. Ein guter Baum ist <span class="begriff">ausgeglichen</span>: Jede Frage teilt in zwei gleich große Hälften, dann bleibt die Tiefe klein. Mit 10 solchen Fragen findet man eines von 1024 Dingen, mit 20 Fragen eines von über einer Million. Die Halbier-Suche aus Einheit&nbsp;10 ist so ein ausgeglichener Baum, und jede Ja/Nein-Antwort ist ein <span class="begriff">Bit</span> wie bei den Ja/Nein-Zahlen aus Einheit&nbsp;9: 3 Bits ergeben 8 Möglichkeiten.</p>
+    <p>Entscheidungsbäume kommen überall vor: in Bestimmungsbüchern für Pflanzen und Tiere, bei der Fehlersuche („Leuchtet das Lämpchen? Nein: Ist der Stecker drin?“) und beim <span class="begriff">maschinellen Lernen</span>. Dort baut der Computer den Baum selbst: Er bekommt viele Beispiele und sucht bei jedem Knoten die Frage, die am besten teilt, genau wie {{KIND}} beim Spiel. Schon vor 50 Jahren gab es ein berühmtes kleines Programm, das Tiere riet und, wenn es falsch lag, nach einer neuen Frage fragte. So ist sein Baum gewachsen, genau wie euer Kuscheltier-Baum mit dem fünften Kuscheltier.</p>
+  </div>
+
+  <h2>Bildschirm-Bonus</h2>
+  <div class="kasten bildschirm darf-brechen e13-bricht">
+    <p><b>Paket 13 „Ja-Nein-Bäume“.</b> Den QR-Code findest du auf <a class="blattref" href="#blatt-13-1"></a> unten rechts. Nur am Schluss, nach den Blättern, höchstens 15 Minuten. Die Einheit funktioniert auch ganz ohne Bildschirm.</p>
+    <p><b>8 Levels</b> in drei Arten:</p>
+    <ul>
+      <li><b>Einem Wesen folgen</b> (Level 1, 2 und 6): Oben ist ein Wesen oder Tier zu sehen, im Baum leuchtet die Frage, bei der es gerade ist. {{KIND}} tippt Ja oder Nein, der Ast wird eingezeichnet. Unten öffnet sich der Platz: Wohnt dort das gesuchte Wesen, ist das Level geschafft. Sonst zeigt die App, wer dort wohnt, und es geht von vorne.</li>
+      <li><b>Alle an ihre Plätze</b> (Level 3, 4 und 8): Unter dem Baum stehen die Wesen. Erst ein Wesen antippen, dann seinen Platz im Baum. Sitzen alle, tippt sie „Los“: Die App schickt jedes Wesen durch den Baum und zeigt, wer richtig sitzt.</li>
+      <li><b>Welche Frage fehlt?</b> (Level 5 und 7): Im Baum ist ein leeres Frage-Kästchen. Sie tippt eine der Frage-Karten an, die Frage springt in das Kästchen, dann „Los“. Die App schickt alle Tiere durch den Baum. Landet eines falsch, sagt sie, welches.</li>
+    </ul>
+    <p><b>Level 3 ist Aufgabe 1 von <a class="blattref" href="#blatt-13-1"></a>, Level 5 ist Aufgabe 1 von <a class="blattref" href="#blatt-13-2"></a>.</b> Level 1 und 2 verwenden denselben Wesen-Baum. Level 6 ist der Tier-Baum von <a class="blattref" href="#blatt-13-2"></a> ohne Kobold, spielt es also erst nach dem Blatt. Level 8 ist der große Drachen-Baum mit 8 Plätzen und 3 Fragen. Einen Stern gibt es für jedes geschaffte Level, bewertet wird nur, ob alle am richtigen Platz landen.</p>
+    <p><b>Wann weglegen:</b> Nach Level 8 kommt „Super! Jetzt zurück zum Papier.“ Dann ist Schluss, auch wenn noch Zeit wäre. Lieber noch eine Runde „Ja-Haufen, Nein-Haufen“.</p>
+  </div>
+
+  <h2>Lösungen</h2>
+  <div class="e13-loes">
+    <m-loesungen einheit="13" skala="0.39"></m-loesungen>
+    <div class="kasten loesung">
+      <p><b><a class="blattref" href="#blatt-13-1"></a>, Aufgabe 1:</b> Drache Platz 1, Flügelpferd Platz 2, Fee Platz 3, Meerjungfrau Platz 4, Einhorn Platz 5. In der Reihe am Blatt also: Einhorn 5, Fee 3, Drache 1, Meerjungfrau 4, Flügelpferd 2.</p>
+      <p><b>Aufgabe 2:</b> Ja, Nein, Nein führt zu Platz 3, das ist die Fee (Flügel ja, Feuer nein, Pferd nein). Nein, Ja führt zu Platz 4, das ist die Meerjungfrau.</p>
+      <p><b>Profi:</b> Drache <m-e13-zahl raetsel="e13-wesen" was="tiefe" ding="drache" l="2"></m-e13-zahl> Fragen, Fee <m-e13-zahl raetsel="e13-wesen" was="tiefe" ding="fee" l="3"></m-e13-zahl> Fragen. 3 Fragen brauchen Fee und Flügelpferd, alle anderen 2.</p>
+      <p><b><a class="blattref" href="#blatt-13-2"></a>, Aufgabe 1:</b> „Kann es schwimmen?“ (Ente: Ja, nach links; Eule: Nein, nach rechts). „Kann es fliegen?“ passt nicht: Enten fliegen auch, die Eule würde bei der Ente landen. „Hat es einen Schnabel?“ passt auch nicht, beide haben einen.</p>
+    </div>
+  </div>
+  <div class="kasten loesung darf-brechen e13-bricht e13-weiter">
+    <p><b><a class="blattref" href="#blatt-13-2"></a>, Aufgabe 2:</b> Der Kobold steckt bei <b>„Hat es Federn?“</b>: Ja und Nein sind vertauscht, deshalb stehen Biene und Eule am falschen Platz. Reparieren: Ja und Nein tauschen (oder Biene und Eule tauschen). Alle anderen Tiere landen richtig. Der Löser hat geprüft, dass keine andere Frage den Baum mit einem Tausch repariert.</p>
+    <p><b>Die Merkmals-Tabelle der Tiere</b> (so hat der Löser die Bäume von <a class="blattref" href="#blatt-13-2"></a> geprüft; Ja heißt, das Tier beantwortet die Frage mit Ja):</p>
+    <m-e13-tabelle raetsel="e13-kobold e13-frage e13-neu" dinge="eule,ente,biene,katze,frosch,fisch,schnecke,marienkaefer" fragen="beine,fliegen,federn,fell,wasser,schwimmen,schnabel"></m-e13-tabelle>
+    <p class="klein">Ein Strich heißt: Diese Frage kommt bei diesem Tier in keinem Baum vor. „Lebt der Frosch im Wasser?“ ist nicht ganz eindeutig (am und im Teich). Deshalb wird diese Frage im Baum nur zwischen Fisch und Schnecke gestellt.</p>
+    <p><b>Profi:</b> Der Marienkäfer hat Beine, kann fliegen und hat keine Federn, er landet im reparierten Baum also bei der <b>Biene</b> (im Kobold-Baum wäre es die Eule; sagt sie Eule, frag: „Ist der Kobold noch drin?“). Eine neue Frage trennt die beiden, mehrere Lösungen sind möglich, z. B. „Hat es Punkte?“ (Ja: Marienkäfer, Nein: Biene), „Kann es stechen?“ (Ja: Biene, Nein: Marienkäfer), „Ist es rot?“ oder „Hat es Streifen?“. Die neue Frage kommt an den Platz der Biene, darunter die beiden Tiere.</p>
+    <p><b><a class="blattref" href="#blatt-13-3"></a>, Drachen-Profi:</b> <m-e13-zahl raetsel="e13-drachen" was="karten" l="7"></m-e13-zahl> Frage-Karten (1 oben, 2 in der Mitte, 4 unten), bei jedem Drachen 3 Fragen. Mehrere Lösungen möglich: Mit den 3 Fragen gibt es 12 verschiedene Bäume, z. B. oben „Ist er grün?“, darunter zweimal „Hat er Flügel?“, unten viermal „Hat er eine Krone?“.</p>
+    <p><b>Bonus-Knobelei:</b> Zahl-Raten: 3 Fragen, wenn jede Frage halbiert („Ist sie größer als 4?“, dann „größer als 6?“ oder „größer als 2?“, dann die letzte). „Ist es ein Tier?“ teilt nicht, die Antwort ist immer Ja, man weiß danach nichts Neues. 16 Dinge brauchen 4 Fragen (2, 4, 8, 16: jede Frage verdoppelt). Familie: mehrere Lösungen, gut sind Fragen, bei denen genau die Hälfte Ja sagt.</p>
+    <p><b>Bildschirm-Levels (zum Nachschauen):</b> Die App kennt die Lösungen nicht. Sie schickt jedes Wesen mit derselben Merkmals-Tabelle durch den Baum wie der Löser.</p>
+    <table class="tab e13-lv">
+      <tr><th>Level</th><th>Was ist zu tun?</th><th>Lösung</th></tr>
+      <tr><td>1</td><td>Einhorn im Wesen-Baum folgen</td><td>Nein (keine Flügel), Nein (nicht im Wasser): Platz 5</td></tr>
+      <tr><td>2</td><td>Fee im Wesen-Baum folgen</td><td>Ja (Flügel), Nein (kein Feuer), Nein (kein Pferd): Platz 3</td></tr>
+      <tr><td>3</td><td><a class="blattref" href="#blatt-13-1"></a>, Aufgabe 1</td><td>Drache 1, Flügelpferd 2, Fee 3, Meerjungfrau 4, Einhorn 5</td></tr>
+      <tr><td>4</td><td>4 Drachen-Kinder (grün? Krone?)</td><td>von links: grün mit Krone, grün ohne Krone, blau mit Krone, blau ohne Krone</td></tr>
+      <tr><td>5</td><td><a class="blattref" href="#blatt-13-2"></a>, Aufgabe 1</td><td>„Kann es schwimmen?“</td></tr>
+      <tr><td>6</td><td>Frosch im Tier-Baum folgen</td><td>Ja (Beine), Nein (fliegen), Nein (Fell): Platz 4</td></tr>
+      <tr><td>7</td><td>Welche Frage kommt ganz oben? (Eule, Katze, Fisch, Schnecke)</td><td>„Hat es Beine?“ („Kann es fliegen?“ schickt die Katze zur Schnecke, „Hat es Fell?“ die Eule)</td></tr>
+      <tr><td>8</td><td>8 Drachen-Kinder (Flügel? grün? Krone?)</td><td>von links: grün mit Flügeln und Krone, grün mit Flügeln, blau mit Flügeln und Krone, blau mit Flügeln, grün mit Krone, grün, blau mit Krone, blau</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 13-1: Der Wesen-Baum (Plätze, Wege, Fragen zählen)        -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="13" data-titel="Der Wesen-Baum" data-art="Arbeitsblatt" data-verteilt>
+  <div class="aufg">
+    <p class="anw">{{KIND}}, wo wohnen die Wesen? Fang oben an und folge dem Baum. Schreib zu jedem Wesen die Nummer seines Platzes.</p>
+    <div class="zentriert"><m-e13-baum raetsel="e13-wesen" modus="leer" nummern blatt-b="30" blatt-h="22" bild="18" ebene="24" frage-h="14"></m-e13-baum></div>
+    <m-e13-reihe raetsel="e13-wesen" reihe="einhorn,fee,drache,meerjungfrau,fluegelpferd" kreis-tiefe="3"></m-e13-reihe>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">Mama oder Papa denkt an ein Wesen und antwortet so. Bei welchem Platz landest du? Wer ist es?</p>
+    <div class="e13-wege">
+      <m-e13-weg raetsel="e13-wesen" nr="1"></m-e13-weg>
+      <m-e13-weg raetsel="e13-wesen" nr="2"></m-e13-weg>
+    </div>
+  </div>
+
+  <div class="e13-profi-reihe">
+    <div class="profi" data-titel="Profi-Aufgabe: Fragen zählen">
+      <p>Wie viele Fragen stellt der Baum, bis er das Wesen findet?</p>
+      <div class="e13-felder">
+        <span>Drache <m-e13-fragen raetsel="e13-wesen" ding="drache" l="2"></m-e13-fragen></span>
+        <span>Fee <m-e13-fragen raetsel="e13-wesen" ding="fee" l="3"></m-e13-fragen></span>
+      </div>
+      <p>Welche zwei Wesen brauchen 3 Fragen? Kreis sie oben ein.</p>
+    </div>
+    <m-qr paket="e13"></m-qr>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 13-2: Kobold im Baum (fehlende Frage, Kobold, neues Tier)  -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="13" data-titel="Kobold im Baum" data-art="Arbeitsblatt" data-verteilt>
+  <div class="aufg">
+    <p class="anw">{{KIND}}, welche Frage fehlt hier? Kreuz an.</p>
+    <div class="e13-neben">
+      <m-e13-baum raetsel="e13-frage" modus="frage" namen blatt-b="24" blatt-h="23" bild="15" luft="3" ebene="22" frage-h="14"></m-e13-baum>
+      <m-e13-optionen raetsel="e13-frage"></m-e13-optionen>
+    </div>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">Der Kobold hat Ja und Nein vertauscht. Kreis die Frage ein!</p>
+    <div class="zentriert"><m-e13-baum raetsel="e13-kobold" modus="kobold" namen blatt-b="24" blatt-h="23" bild="15" luft="3.5" ebene="22" frage-h="14"></m-e13-baum></div>
+  </div>
+
+  <div class="profi" data-titel="Profi-Aufgabe: Ein neues Tier">
+    <div class="e13-neu">
+      <m-e13-bild name="marienkaefer" gr="15"></m-e13-bild>
+      <div>
+        <p>Ein Marienkäfer krabbelt in den reparierten Baum von Aufgabe 2. Bei wem landet er? <m-e13-landet raetsel="e13-neu"></m-e13-landet></p>
+        <p>Welche neue Frage trennt die beiden? Sag sie laut.</p>
+        <m-e13-trennen raetsel="e13-neu" ohne-linie></m-e13-trennen>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 13-3: Bastelvorlage Drachen-Kinder, Plättchen, Frage-Karten -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="13" data-titel="Die Drachen-Kinder" data-art="Bastelvorlage">
+  <div>
+    <p class="e13-titel">8 Drachen-Kinder</p>
+    <m-karten spalten="4" zeilen="2" hoehe="34" breite="176">
+      <div class="e13-karte-bild"><m-e13-bild name="drachenkind-gruen-fluegel-krone" gr="30"></m-e13-bild></div>
+      <div class="e13-karte-bild"><m-e13-bild name="drachenkind-gruen-fluegel" gr="30"></m-e13-bild></div>
+      <div class="e13-karte-bild"><m-e13-bild name="drachenkind-gruen-krone" gr="30"></m-e13-bild></div>
+      <div class="e13-karte-bild"><m-e13-bild name="drachenkind-gruen" gr="30"></m-e13-bild></div>
+      <div class="e13-karte-bild"><m-e13-bild name="drachenkind-blau-fluegel-krone" gr="30"></m-e13-bild></div>
+      <div class="e13-karte-bild"><m-e13-bild name="drachenkind-blau-fluegel" gr="30"></m-e13-bild></div>
+      <div class="e13-karte-bild"><m-e13-bild name="drachenkind-blau-krone" gr="30"></m-e13-bild></div>
+      <div class="e13-karte-bild"><m-e13-bild name="drachenkind-blau" gr="30"></m-e13-bild></div>
+    </m-karten>
+  </div>
+
+  <div>
+    <p class="e13-titel">Geheim-Plättchen <span class="klein">für das Sackerl</span></p>
+    <m-karten spalten="8" zeilen="1" hoehe="22" breite="176">
+      <div class="e13-karte-bild"><m-e13-bild name="drachenkind-blau-krone" gr="19"></m-e13-bild></div>
+      <div class="e13-karte-bild"><m-e13-bild name="drachenkind-gruen-fluegel" gr="19"></m-e13-bild></div>
+      <div class="e13-karte-bild"><m-e13-bild name="drachenkind-blau" gr="19"></m-e13-bild></div>
+      <div class="e13-karte-bild"><m-e13-bild name="drachenkind-gruen-fluegel-krone" gr="19"></m-e13-bild></div>
+      <div class="e13-karte-bild"><m-e13-bild name="drachenkind-blau-fluegel" gr="19"></m-e13-bild></div>
+      <div class="e13-karte-bild"><m-e13-bild name="drachenkind-gruen-krone" gr="19"></m-e13-bild></div>
+      <div class="e13-karte-bild"><m-e13-bild name="drachenkind-blau-fluegel-krone" gr="19"></m-e13-bild></div>
+      <div class="e13-karte-bild"><m-e13-bild name="drachenkind-gruen" gr="19"></m-e13-bild></div>
+    </m-karten>
+  </div>
+
+  <div>
+    <p class="e13-titel">Frage-Karten</p>
+    <m-karten spalten="4" zeilen="3" hoehe="20" breite="176">
+      <div><m-e13-fragekarte raetsel="e13-drachen" frage="gruen"></m-e13-fragekarte></div>
+      <div><m-e13-fragekarte raetsel="e13-drachen" frage="gruen"></m-e13-fragekarte></div>
+      <div><m-e13-fragekarte raetsel="e13-drachen" frage="gruen"></m-e13-fragekarte></div>
+      <div><m-e13-fragekarte raetsel="e13-drachen" frage="gruen"></m-e13-fragekarte></div>
+      <div><m-e13-fragekarte raetsel="e13-drachen" frage="fluegel"></m-e13-fragekarte></div>
+      <div><m-e13-fragekarte raetsel="e13-drachen" frage="fluegel"></m-e13-fragekarte></div>
+      <div><m-e13-fragekarte raetsel="e13-drachen" frage="fluegel"></m-e13-fragekarte></div>
+      <div><m-e13-fragekarte raetsel="e13-drachen" frage="fluegel"></m-e13-fragekarte></div>
+      <div><m-e13-fragekarte raetsel="e13-drachen" frage="krone"></m-e13-fragekarte></div>
+      <div><m-e13-fragekarte raetsel="e13-drachen" frage="krone"></m-e13-fragekarte></div>
+      <div><m-e13-fragekarte raetsel="e13-drachen" frage="krone"></m-e13-fragekarte></div>
+      <div><m-e13-fragekarte raetsel="e13-drachen" frage="krone"></m-e13-fragekarte></div>
+    </m-karten>
+  </div>
+
+  <div class="profi" data-titel="Drachen-Profi: 8 Drachen, 3 Fragen">
+    <p>{{KIND}}, leg alle 8 Drachen-Kinder als Ja-Nein-Baum. Bis zu jedem Drachen stellt der Baum höchstens 3 Fragen. Wie viele Frage-Karten brauchst du? <m-e13-zahl raetsel="e13-drachen" was="karten" l="7" feld></m-e13-zahl></p>
+  </div>
+</section>
