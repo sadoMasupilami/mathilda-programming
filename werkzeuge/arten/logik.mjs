@@ -14,7 +14,9 @@
 //   - jeder Hinweis ist nötig: ohne ihn gäbe es mehr als eine Lösung. Ausnahmen nur, wenn sie
 //     in "ueberfluessig" stehen, und dann genau diese.
 //   - Satz und Regel passen zusammen: dieselben Bilder, „kein/nicht“ genau bei !=, „oder“ bei |, „und“ bei &
-//   - vorgabe/kobold: genau ein Zeichen der Vorgabe ist falsch, und zwar das angegebene
+//     („kein/nicht“ auch an der richtigen Stelle: direkt vor dem Bild des Dings oder als „nicht“ am Satzende)
+//   - Oder-Hinweis mit zwei wahren Teilen in der Lösung nur mit "beideWahr": true (wie bei wahrfalsch)
+//   - vorgabe/kobold: höchstens ein Zeichen pro Feld, genau ein Zeichen der Vorgabe ist falsch, und zwar das angegebene
 //   - falscherHinweis: mit allen Hinweisen keine Lösung, ohne diesen genau eine, ohne jeden anderen keine
 //
 // aufgabe "wahrfalsch": Sätze über ein Bild
@@ -30,6 +32,21 @@ const NEIN_WORT = /(^|[^\wäöüß])(kein|keine|keinen|keinem|keiner|nicht)([^\w
 const ODER_WORT = /(^|[^\wäöüß])oder([^\wäöüß]|$)/i;
 const UND_WORT = /(^|[^\wäöüß])(und|aber)([^\wäöüß]|$)/i;
 
+// Steht im Satz „kein/nicht“ genau bei diesem Teil der Regel (a=x bzw. a!=x)?
+// Gesucht wird das Bild {x} nach dem Bild {a}; „kein/nicht“ zählt zwischen dem vorigen Bild und {x},
+// „nicht“ hinter {x} nur am Satzende („… mag den {apfel} nicht.“). null: Satz ohne dieses Bild.
+function verneintImSatz(teile, at) {
+  const ia = teile.findIndex((t) => t.name === at.a);
+  let ix = teile.findIndex((t, i) => i > ia && t.name === at.x);
+  if (ix < 0) ix = teile.findIndex((t) => t.name === at.x);
+  if (ix < 0) return null;
+  let vor = '', nach = '', i;
+  for (i = ix - 1; i >= 0 && teile[i].text !== undefined; i--) vor = teile[i].text + vor;
+  for (i = ix + 1; i < teile.length && teile[i].text !== undefined; i++) nach += teile[i].text;
+  const amEnde = i >= teile.length;
+  return NEIN_WORT.test(vor) || (amEnde && /(^|[^\wäöüß])nicht([^\wäöüß]|$)/i.test(nach));
+}
+
 // Satz und Regel passen zusammen?
 function pruefeSatz(text, regel, F, wo, opt) {
   if (typeof text !== 'string' || !text.trim()) return F(wo + ': text fehlt');
@@ -38,11 +55,18 @@ function pruefeSatz(text, regel, F, wo, opt) {
   const at = L.atome(rg);
   const namenRegel = new Set(at.flatMap((a) => [a.a, a.x]));
   const namenText = L.tokenNamen(text);
+  const woerter = opt.woerter || {};
   for (const n of namenText) if (!namenRegel.has(n)) F(wo + ': {' + n + '} steht im Satz, aber nicht in der Regel „' + regel + '“');
-  if (!opt.ohneBilder) for (const n of namenRegel) if (L.hat(n) && !namenText.includes(n)) F(wo + ': ' + n + ' steht in der Regel, aber nicht als {' + n + '} im Satz');
+  if (!opt.ohneBilder) for (const n of namenRegel) if ((L.hat(n) || woerter[n]) && !namenText.includes(n)) F(wo + ': ' + n + ' steht in der Regel, aber nicht als {' + n + '} im Satz');
   const ohneToken = text.replace(/\{[^}]*\}/g, ' ');
   const neg = at.some((a) => a.nicht);
   if (neg !== NEIN_WORT.test(ohneToken)) F(wo + ': ' + (neg ? 'Regel mit != (nicht), aber im Satz fehlt „kein“ oder „nicht“' : 'im Satz steht „kein/nicht“, aber die Regel hat kein !='));
+  // „kein/nicht“ auch an der richtigen Stelle? („mag kein {eis} und den {apfel}“ ist nicht „drache!=eis & drache!=apfel“)
+  const teile = L.satz(text, woerter);
+  for (const a of at) {
+    const v = verneintImSatz(teile, a);
+    if (v !== null && v !== a.nicht) F(wo + ': Bei {' + a.x + '} steht im Satz ' + (v ? '„kein/nicht“, aber die Regel sagt ' + a.a + '=' + a.x : 'kein „kein/nicht“, aber die Regel sagt ' + a.a + '!=' + a.x));
+  }
   const oder = rg.oder.length > 1;
   if (oder !== ODER_WORT.test(ohneToken)) F(wo + ': ' + (oder ? 'Regel mit | (oder), aber im Satz fehlt „oder“' : 'im Satz steht „oder“, aber die Regel hat kein |'));
   const und = rg.oder.some((k) => k.und.length > 1);
@@ -65,7 +89,7 @@ function pruefeGitter(r, F) {
   if (hinweise.length > 6) F('Höchstens 6 Hinweise (ein Kind liest jeden Satz selbst)');
   hinweise.forEach((h, i) => {
     const wo = 'Hinweis ' + (i + 1);
-    const rg = pruefeSatz(h.text, h.regel, F, wo, { ohneBilder: r.ohneBilder });
+    const rg = pruefeSatz(h.text, h.regel, F, wo, { ohneBilder: r.ohneBilder, woerter: r.woerter });
     if (!rg) return;
     for (const a of L.atome(rg)) {
       if (!zeilen.includes(a.a)) F(wo + ': „' + a.a + '“ ist keine Zeile (' + zeilen.join(', ') + ')');
@@ -110,6 +134,17 @@ function pruefeGitter(r, F) {
     }
   }
 
+  // Oder-Hinweis mit zwei wahren Teilen? Im Alltag heißt „oder“ oft „entweder oder“: nur mit "beideWahr": true
+  hinweise.forEach((h, i) => {
+    if (i === ohneFalsch) return;
+    let rg;
+    try { rg = L.liesRegel(h.regel); } catch (e) { return; }
+    if (rg.oder.length < 2) return;
+    const beide = haupt.loesungen.some((zuo) => L.teilWerte(rg, (a, x) => zuo[a] === x).filter(Boolean).length > 1);
+    if (beide && !h.beideWahr) F('Hinweis ' + (i + 1) + ': Oder-Hinweis, bei dem in der Lösung beide Teile wahr sind. Im Alltag heißt „oder“ oft „entweder oder“: anders wählen oder "beideWahr": true');
+    if (!beide && h.beideWahr) F('Hinweis ' + (i + 1) + ': "beideWahr" gesetzt, aber in der Lösung sind nicht beide Teile wahr');
+  });
+
   const zu = haupt.anzahl === 1 ? haupt.loesungen[0] : null;
   const marken = {};
   if (zu) for (const a of zeilen) for (const x of spalten) marken[a + '|' + x] = zu[a] === x ? 'ja' : 'nein';
@@ -119,9 +154,12 @@ function pruefeGitter(r, F) {
   if (r.vorgabe) {
     if (!zu) F('vorgabe braucht ein eindeutiges Rätsel');
     const falsch = [];
+    const gesehen = new Set();
     for (const art of ['ja', 'nein']) {
       for (const [a, x] of r.vorgabe[art] || []) {
         if (!zeilen.includes(a) || !spalten.includes(x)) { F('vorgabe: Feld ' + a + '/' + x + ' gibt es nicht'); continue; }
+        if (gesehen.has(a + '|' + x)) F('vorgabe: Feld ' + a + '/' + x + ' hat zwei Zeichen');
+        gesehen.add(a + '|' + x);
         if (zu && marken[a + '|' + x] !== art) falsch.push({ art, feld: [a, x] });
       }
     }
@@ -154,7 +192,7 @@ function pruefeWahrFalsch(r, F) {
   const werte = [];
   (r.aussagen || []).forEach((a, i) => {
     const wo = 'Satz ' + (i + 1);
-    const rg = pruefeSatz(a.text, a.regel, F, wo, { ohneBilder: r.ohneBilder });
+    const rg = pruefeSatz(a.text, a.regel, F, wo, { ohneBilder: r.ohneBilder, woerter: r.woerter });
     if (!rg) { werte.push(null); return; }
     for (const at of L.atome(rg)) if (!tiere.includes(at.a)) F(wo + ': „' + at.a + '“ ist nicht in der Szene');
     const w = L.wert(rg, hatFn);

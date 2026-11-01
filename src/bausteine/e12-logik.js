@@ -184,7 +184,7 @@ m-e12-loesung, m-e12-anzahl { display: inline; }
     const l = r.loesung;
     const feld = parseFloat(el.getAttribute('feld') || '20');
     const bg = parseFloat(el.getAttribute('bild') || String(Math.min(13, feld * 0.68)));
-    if (!el.hasAttribute('zeige') && feld < 15) h.fehler(el, 'Logikgitter auf dem Blatt: Felder mindestens 15 mm (feld="' + feld + '")');
+    if (!el.hasAttribute('zeige') && feld < 20) h.fehler(el, 'Logikgitter auf dem Blatt: Felder mindestens 20 mm (feld="' + feld + '")');
     const zeigen = el.hasAttribute('zeige') || (istLoesung(el) && el.getAttribute('loesung') !== 'keine');
     if (zeigen && !l.zuordnung) return h.fehler(el, 'Rätsel „' + r.id + '“ hat keine eindeutige Lösung zum Zeigen');
     const zeichen = [];
@@ -216,6 +216,7 @@ m-e12-loesung, m-e12-anzahl { display: inline; }
     const n = parseInt(el.getAttribute('n') || '3', 10);
     const feld = parseFloat(el.getAttribute('feld') || '20');
     if (!(n >= 2 && n <= 4)) return H().fehler(el, 'n: 2 bis 4');
+    if (feld < 20) return H().fehler(el, 'Leeres Logikgitter: Felder mindestens 20 mm (feld="' + feld + '")');
     const z = Array.from({ length: n }, (_, i) => 'z' + i), s = Array.from({ length: n }, (_, i) => 's' + i);
     el.innerHTML = gitterSVG({ zeilen: z, spalten: s, feld, bg: 0, leer: true });
     el.classList.add('komp');

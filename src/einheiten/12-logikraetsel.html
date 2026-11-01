@@ -16,6 +16,7 @@
   .e12-tab td:nth-child(2) { width: 34%; }
   .e12-saetze td:nth-child(2) { width: 14%; white-space: nowrap; }
   .e12-saetze td:first-child { width: 16%; white-space: nowrap; }
+  .e12-vor-tab { break-after: avoid; }
   .e12-loes { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm 4mm; align-items: start; margin: 2mm 0 4mm 0; }
   .e12-loes m-loesungen, .e12-loes .loesungen-raster { display: contents; }
   .e12-loes > .kasten.loesung { margin: 5mm 0 0 0; font-size: 9.5pt; }
@@ -72,13 +73,13 @@
 
   <h2>Gemeinsam</h2>
   <ol class="spick-ablauf">
-    <li data-min="5"><div><b>Steh auf, wenn’s wahr ist.</b> Erst einfache Sätze, dann mit „und“, dann mit „oder“. Bei „und“ und „oder“ zuerst die Daumen zeigen lassen.
+    <li data-min="5"><div><b>Steh auf, wenn’s wahr ist.</b> Du sagst zuerst: zwei, drei einfache Sätze, dann einen mit „und“ und denselben mit „oder“. Bei „und“ und „oder“ zuerst die Daumen zeigen lassen. Dann sagt {{KIND}} 5 Sätze.
       <div class="spick-spiel"><h3>Steh auf, wenn’s wahr ist</h3>
         <p class="meta">2 Polster, etwa 10 Muggelsteine</p>
         <ul>
           <li><b>Ein Zug:</b> Der Springer hockt vor seinem Polster. Der Sager sagt einen Satz. Wahr: hochspringen, Arme hoch. Falsch: auf den Polster plumpsen.</li>
           <li><b>Punkte:</b> passende Bewegung: 1 Muggelstein für den Springer, sonst 1 für den Sager.</li>
-          <li><b>Ende:</b> Nach 5 Sätzen tauschen. Nach 2 Runden zählen, mehr Steine gewinnt.</li>
+          <li><b>Ende:</b> Nach 5 Sätzen tauschen, nach 10 Sätzen zählen: Mehr Steine gewinnt, bei Gleichstand gewinnen beide.</li>
         </ul>
       </div>
       <div class="sag">
@@ -113,6 +114,7 @@
           <li><b>Ein Zug:</b> Der Rätsel-Geber wählt heimlich ein Kuscheltier und sagt einen Satz mit „und“, „oder“ oder „nicht“: „Ich bin braun und weich.“ Der Rater legt alle weg, für die der Satz falsch ist. Höchstens 3 Sätze, dann raten.</li>
           <li><b>Punkte:</b> richtig geraten: 1 für den Rater. Nur noch eins übrig nach höchstens 2 Sätzen: 1 für den Rätsel-Geber.</li>
           <li><b>Kobold:</b> Liegt ein Tier weg, für das der Satz wahr ist, ruft der Rätsel-Geber „Kobold!“, und es kommt zurück.</li>
+          <li><b>Ende:</b> nach 2 Runden für jeden. Mehr Punkte gewinnt, bei Gleichstand gewinnen beide.</li>
         </ul>
       </div>
     </div></li>
@@ -178,11 +180,11 @@
     <p><b>Vorher, ohne {{KIND}} (etwa 12 Minuten):</b></p>
     <ul>
       <li><b>Drucken (2 Minuten):</b> <a class="blattref" href="#blatt-12-1"></a> und <a class="blattref" href="#blatt-12-2"></a> <b>in Farbe</b> (die Mützen und die lila Zeichen des Kobolds brauchen Farbe). <a class="blattref" href="#blatt-12-3"></a> gleich mitdrucken: Es ist für den Schwerer-Teil und für ein Familien-Rätsel beim Abendessen.</li>
-      <li><b>Kuscheltier-Gitter (5 Minuten):</b> ein Gitter mit 3 · 3 Feldern am Boden. Klebt das Boden-Gitter aus Einheit 2 noch, ist es perfekt. Sonst legt ihr 9 Blätter Papier in 3 Reihen auf den Boden oder klebt mit Malerkrepp ein Gitter auf den Tisch. Links neben jede Reihe kommt ein Kuscheltier, über jede Spalte ein Ding: ein Löffel, eine Socke, ein Buch. Im Beispiel heißen die Kuscheltiere von oben nach unten Teddy, Hase und Drache. Habt ihr andere, nehmt eure: Die Hinweise passen, wenn ihr für „Teddy“ den Namen des obersten Kuscheltiers sagt und so weiter.</li>
+      <li><b>Kuscheltier-Gitter (5 Minuten):</b> ein Gitter mit 3 · 3 Feldern am Boden. Klebt das Boden-Gitter aus Einheit 2 noch, ist es perfekt. Sonst legst du 9 Blätter Papier in 3 Reihen auf den Boden oder klebst mit Malerkrepp ein Gitter mit Feldern von etwa 40 cm (hineinhüpfen soll gehen). Links neben jede Reihe kommt ein Kuscheltier, über jede Spalte ein Ding: ein Löffel, eine Socke, ein Buch. Im Beispiel heißen die Kuscheltiere von oben nach unten Teddy, Hase und Drache. Habt ihr andere, nimm eure: Die Hinweise passen, wenn du für „Teddy“ den Namen des obersten Kuscheltiers sagst und so weiter.</li>
       <li><b>Kuscheltiere für „Wer bin ich?“ (2 Minuten):</b> 6 bis 8 Kuscheltiere oder Spielfiguren, die sich gut unterscheiden (groß und klein, braun und bunt, mit und ohne Flügel …), in ein Sackerl.</li>
       <li><b>Satz-Ideen lesen (3 Minuten):</b> Lies die Satz-Ideen im Kasten „Spiel: Steh auf, wenn’s wahr ist“ einmal durch. Dann fallen dir während des Spiels leicht eigene Sätze über das Zimmer ein.</li>
     </ul>
-    <p><b>Material in der Einheit:</b> Bleistift, Radiergummi und ein roter Buntstift, etwa 10 Muggelsteine (Ja) und 6 Wäschekluppen (Nein) für das Kuscheltier-Gitter, ein Polster pro Person, Stempel oder Sticker für den Sammelpass.</p>
+    <p><b>Material in der Einheit:</b> Bleistift, Radiergummi und ein roter Buntstift, etwa 10 Muggelsteine (Punkte beim Springen, danach Ja im Kuscheltier-Gitter) und 6 Wäschekluppen (Nein im Kuscheltier-Gitter), ein Polster pro Person, Stempel oder Sticker für den Sammelpass.</p>
     <p><b>Extra, außerhalb der Einheit:</b> ein Familien-Rätsel mit der Profi-Aufgabe von <a class="blattref" href="#blatt-12-3"></a> (Kasten „Basteln: Rätsel für die Familie erfinden“), am besten beim Abendessen, etwa 15 Minuten.</p>
   </div>
 
@@ -201,7 +203,7 @@
 
   <h2>Ablauf Schritt für Schritt</h2>
   <ol class="ablauf e12-ablauf">
-    <li data-min="5"><span class="schritt-titel">Steh auf, wenn’s wahr ist</span>Das Bewegungsspiel zum Aufwärmen (Kasten „Spiel: Steh auf, wenn’s wahr ist“). Zuerst sagst du einfache Sätze, und {{KIND}} springt hoch (wahr) oder plumpst auf den Polster (falsch). Nach 3 oder 4 Sätzen kommt „und“: Jetzt zeigt sie vor dem Springen mit zwei Daumen, welcher Teil stimmt. Dann „oder“, mit demselben Satz (Beispielsätze). Zum Schluss sagt sie dir 5 Sätze.</li>
+    <li data-min="5"><span class="schritt-titel">Steh auf, wenn’s wahr ist</span>Das Bewegungsspiel zum Aufwärmen (Kasten „Spiel: Steh auf, wenn’s wahr ist“). Du bist zuerst der Sager: Bei zwei, drei einfachen Sätzen springt {{KIND}} hoch (wahr) oder plumpst auf den Polster (falsch). Dann kommt ein Satz mit „und“: Jetzt zeigt sie vor dem Springen mit zwei Daumen, welcher Teil stimmt. Dann derselbe Satz mit „oder“ (Beispielsätze). Nach 5 Sätzen tauscht ihr, und sie sagt dir 5 Sätze.</li>
     <li data-min="6"><span class="schritt-titel">Kuscheltier-Gitter</span>Das erste Logikgitter, so groß, dass man hineinhüpfen kann (Kasten „Bewegung: Kuscheltier-Gitter“). Erklär die Regel: „Jedes Kuscheltier mag genau ein Ding, und jedes Ding mag genau ein Kuscheltier.“ Ein Muggelstein im Feld heißt Ja, eine Wäschekluppe heißt Nein. Du sagst die zwei Hinweise, {{KIND}} hüpft in das passende Feld und legt. Hier entdeckt sie die Kreis-Regel und die Letztes-Feld-Regel mit dem ganzen Körper.</li>
     <li data-min="7"><span class="schritt-titel">Blatt „Wer mag was?“</span><a class="blattref" href="#blatt-12-1"></a>. Dasselbe am Papier: Kreis statt Muggelstein, Kreuz statt Kluppe. Aufgabe 1 ist ein 2 · 2-Gitter mit einem Hinweis. Bei Aufgabe 2 malt sie zuerst alle Kreuze, die direkt in den Hinweisen stehen, dann sucht sie eine Reihe oder Spalte mit nur einem freien Feld. Lass sie für jeden Kreis sagen, welcher Hinweis oder welche Regel ihn verrät. Die Knobel-Ecke (Kreise und Kreuze zählen) geht schnell, wenn das Gitter fertig ist.</li>
     <li data-min="4"><span class="schritt-titel">Wer bin ich?</span>Eine kurze Pause vom Papier (Kasten „Spiel: Wer bin ich?“). Die Kuscheltiere aus dem Sackerl liegen in einer Reihe. Du beginnst als Rätsel-Geber, dann tauscht ihr. Hier zahlt sich die Daumen-Regel aus: Nach einem Oder-Satz bleiben mehr Kuscheltiere liegen als nach einem Und-Satz.</li>
@@ -254,12 +256,12 @@
       <li><b>Vorbereitung:</b> Jeder hat einen Polster am Boden. Die Muggelsteine liegen in der Mitte.</li>
       <li><b>Rollen:</b> Eine Person ist der <b>Sager</b>, die andere der <b>Springer</b>. Nach 5 Sätzen tauscht ihr.</li>
       <li><b>Ein Zug:</b> Der Springer hockt vor seinem Polster. Der Sager sagt einen Satz. Ist der Satz <b>wahr</b>, springt der Springer hoch und reißt die Arme in die Luft. Ist er <b>falsch</b>, plumpst er auf den Polster. Dann wieder in die Hocke. Bei Sätzen mit „und“ oder „oder“ darf der Springer zuerst die Daumen zeigen.</li>
-      <li><b>Punkte:</b> Passt die Bewegung, bekommt der Springer einen Muggelstein. Passt sie nicht, bekommt ihn der Sager, aber nur, wenn er mit den Daumen erklären kann, warum.</li>
-      <li><b>Ende:</b> wenn jeder zweimal Springer war (20 Sätze, oder 10, wenn die Zeit knapp ist). Wer mehr Steine hat, gewinnt. Bei Gleichstand sagt jeder noch einen Satz mit „oder“.</li>
+      <li><b>Punkte:</b> Passt die Bewegung, bekommt der Springer einen Muggelstein aus der Mitte. Passt sie nicht, bekommt ihn der Sager, aber nur, wenn er mit den Daumen erklären kann, warum. Sonst bleibt der Stein liegen.</li>
+      <li><b>Ende:</b> nach 10 Sätzen, wenn jeder einmal Springer war (10 Muggelsteine reichen). Wer mehr Steine hat, gewinnt, bei Gleichstand gewinnen beide. Noch Lust? Alle Steine zurück in die Mitte und noch eine Runde.</li>
     </ol>
-    <p><b>Satz-Ideen in Stufen</b> (dazu Sätze über das Zimmer, eure Kleidung, das Wetter):</p>
-    <table class="tab e12-saetze">
-      <tr><th>Stufe</th><th>Lösung</th><th>Satz</th></tr>
+    <p class="e12-vor-tab"><b>Satz-Ideen in Stufen</b> (dazu Sätze über das Zimmer, eure Kleidung, das Wetter):</p>
+    <table class="tab darf-brechen e12-saetze">
+      <thead><tr><th>Stufe</th><th>Lösung</th><th>Satz</th></tr></thead>
       <tr><td>einfach</td><td>wahr</td><td>Ein Fisch kann schwimmen. Eine Kuh hat vier Beine.</td></tr>
       <tr><td>einfach</td><td>falsch</td><td>Ein Hund kann fliegen. Schnee ist grün.</td></tr>
       <tr><td>mit „nicht“</td><td>wahr</td><td>Ein Elefant ist nicht klein. Eine Schnecke ist nicht schnell.</td></tr>
@@ -272,7 +274,7 @@
     </table>
     <p><b>Varianten:</b></p>
     <ul>
-      <li><b>Kobold-Springer:</b> Der Springer darf einmal pro Runde absichtlich verkehrt springen. Merkt es der Sager und ruft „Kobold!“, bekommt er 2 Steine.</li>
+      <li><b>Kobold-Springer:</b> Der Springer darf einmal pro Runde absichtlich verkehrt springen. Merkt es der Sager und ruft „Kobold!“, bekommt er den Stein aus der Mitte und dazu einen vom Springer. Merkt er es nicht, bekommt der Springer den Stein.</li>
       <li><b>Im Auto oder beim Essen:</b> statt Springen nur Daumen hoch (wahr) oder runter (falsch).</li>
       <li><b>Sätze über euch beide:</b> „Du hast Zöpfe und ich habe eine Brille.“ So schauen die zwei Daumen auf zwei verschiedene Personen.</li>
     </ul>
@@ -301,7 +303,7 @@
       <li><b>Ein Zug:</b> Der Rätsel-Geber sagt einen Satz über sein Kuscheltier, mit „und“, „oder“ oder „nicht“, zum Beispiel: „Ich bin braun und weich.“ „Ich habe Flügel oder lange Ohren.“ „Ich bin nicht rosa.“ Der Rater legt alle Kuscheltiere zur Seite, für die der Satz <b>falsch</b> ist. Höchstens 3 Sätze, dann muss der Rater raten: „Du bist der Teddy!“</li>
       <li><b>Kobold:</b> Legt der Rater ein Kuscheltier weg, für das der Satz wahr ist, ruft der Rätsel-Geber „Kobold!“, und es kommt zurück. Das kostet nichts.</li>
       <li><b>Punkte:</b> richtig geraten: 1 Punkt für den Rater. Liegt nach höchstens 2 Sätzen nur noch ein Kuscheltier da: 1 Punkt für den Rätsel-Geber (er hat besonders gute Sätze gefunden).</li>
-      <li><b>Ende:</b> nach 2 Runden für jeden (oder 4, wenn ihr mehr Zeit habt). Mehr Punkte gewinnt.</li>
+      <li><b>Ende:</b> nach 2 Runden für jeden (oder 4, wenn ihr mehr Zeit habt). Mehr Punkte gewinnt, bei Gleichstand gewinnen beide.</li>
     </ol>
     <p><b>Varianten:</b> nur Oder-Sätze (dann bleibt viel liegen, und man braucht kluge Sätze), nur Nicht-Sätze („Ich bin nicht groß. Ich bin nicht blau.“), 10 Kuscheltiere und 4 Sätze. Tipp für dich als Rätsel-Geber: Sag am Anfang einen Und-Satz, der wenig übrig lässt, damit {{KIND}} sieht, wie streng „und“ ist. Dann einen Oder-Satz, bei dem viele liegen bleiben.</p>
   </div>
@@ -391,7 +393,7 @@
 
   <h2>Lösungen</h2>
   <div class="e12-loes">
-    <m-loesungen einheit="12" skala="0.39"></m-loesungen>
+    <m-loesungen einheit="12" skala="0.37"></m-loesungen>
     <div class="kasten loesung">
       <p><b><a class="blattref" href="#blatt-12-1"></a>, Aufgabe 1:</b> Kreuz bei Drache und Eis (Hinweis). Dann ist beim Drachen nur noch der Apfel frei: Kreis (Letztes-Feld-Regel). Kreuz bei Einhorn und Apfel (Kreis-Regel), Kreis bei Einhorn und Eis. <m-e12-loesung raetsel="e12-a1" l="drache=apfel einhorn=eis"></m-e12-loesung>.</p>
       <p><b>Aufgabe 2:</b> Kreuze bei Hase und Karotte, Katze und Karotte, Katze und Fisch (Hinweise). In der Spalte der Karotte ist nur noch die Eule frei: Kreis. In der Reihe der Katze ist nur noch der Kuchen frei: Kreis. Bleibt für den Hasen der Fisch. <m-e12-loesung raetsel="e12-a2" l="katze=kuchen hase=fisch eule=karotte"></m-e12-loesung>.</p>
@@ -452,7 +454,7 @@
     <div class="knobel" data-titel="Knobel-Ecke: Kreise und Kreuze zählen">
       <div class="e12-zaehl">
         <span>Aufgabe 2</span><span>Kreise <m-e12-zahl raetsel="e12-a2" was="kreise" l="3"></m-e12-zahl></span><span>Kreuze <m-e12-zahl raetsel="e12-a2" was="kreuze" l="6"></m-e12-zahl></span>
-        <span>Mit 4 Tieren</span><span>Kreise <m-e12-zahl raetsel="e12-p1" was="kreise" l="4"></m-e12-zahl></span><span>Kreuze <m-e12-zahl raetsel="e12-p1" was="kreuze" l="12"></m-e12-zahl></span>
+        <span>4 Tiere, 4 Essen</span><span>Kreise <m-e12-zahl raetsel="e12-p1" was="kreise" l="4"></m-e12-zahl></span><span>Kreuze <m-e12-zahl raetsel="e12-p1" was="kreuze" l="12"></m-e12-zahl></span>
       </div>
     </div>
     <m-qr paket="e12"></m-qr>
@@ -471,7 +473,7 @@
 
   <div class="knobel" data-titel="Knobel-Ecke: Kobold-Jagd">
     <div class="e12-neben">
-      <m-e12-gitter raetsel="e12-k1" feld="19" kopf="stapel" bild="11"></m-e12-gitter>
+      <m-e12-gitter raetsel="e12-k1" feld="20" kopf="stapel" bild="11"></m-e12-gitter>
       <div class="e12-rechts">
         <p class="e12-frage">Der Kobold hat schon mit Lila angefangen. Ein lila Zeichen stimmt nicht! Mal es rot an. Dann mach das Gitter fertig.</p>
         <m-e12-hinweise raetsel="e12-k1" gr="7"></m-e12-hinweise>
@@ -500,7 +502,7 @@
 
   <div class="profi" data-titel="Profi-Aufgabe: Ein Rätsel für deine Familie">
     <div class="e12-neben">
-      <m-e12-leer n="3" feld="18"></m-e12-leer>
+      <m-e12-leer n="3" feld="20"></m-e12-leer>
       <div class="e12-rechts">
         <p class="e12-frage">Mal links 3 Leute oder Tiere, oben 3 Dinge. Denk dir aus, wer was mag. Schreib Hinweise.</p>
         <div class="e12-schreib"><div><b>1</b><span></span></div><div><b>2</b><span></span></div><div><b>3</b><span></span></div></div>
