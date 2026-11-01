@@ -1,8 +1,8 @@
 # Denk- und Programmier-Werkstatt
 
-Ein druckbarer Guide plus eine kleine Web-App, mit dem ein Elternteil mit seiner Tochter (6 Jahre, 1. Klasse Volksschule, Österreich) logisch denken und programmieren lernt: mit Befehlen, Programmen, Fehler-Kobolden, Wiederhol-Zauber, später Mustern, Geheimcodes, Wenn-dann-Regeln und Strategiespielen. Fast alles läuft am Papier, mit Bewegung und Basteln. Die Web-App ist ein kurzer, freiwilliger Bildschirm-Bonus am Ende einer Einheit.
+Ein druckbarer Guide plus eine kleine Web-App, mit dem ein Elternteil mit seiner Tochter (6 Jahre, 1. Klasse Volksschule, Österreich) logisch denken und programmieren lernt: mit Befehlen, Programmen, Fehler-Kobolden und dem Wiederhol-Zauber, dann mit Mustern, Geheimcodes, Sortieren und Suchen, Wenn-dann-Regeln, Logik, Labyrinthen, Zaubersprüchen und Strategiespielen. Fast alles läuft am Papier, mit Bewegung und Basteln. Die Web-App ist ein kurzer, freiwilliger Bildschirm-Bonus am Ende einer Einheit.
 
-Die Werkstatt entsteht in Blöcken. Jetzt fertig: **Block A, Einheiten 1–5** (Befehle, Programme, Fehler) mit den Web-Paketen e2–e5. Der Plan für 20 Einheiten steht in `plan/lehrplan.md`.
+Stand: **alle 20 Einheiten** sind ausformuliert, in vier Blöcken: A (1–5) Befehle, Programme, Fehler; B (6–10) Muster und Geheimcodes; C (11–14) Wenn-dann und Logik; D (15–20) Strategie und Projekte. Dazu die Web-Pakete **e2–e20** (ohne e18: Einheit 1 und 18 sind bewusst ohne Bildschirm). Plan, verbindliche Begriffe und Übersicht der Pakete: `plan/lehrplan.md`.
 
 ## Ergebnis
 
@@ -11,7 +11,7 @@ Die Werkstatt entsteht in Blöcken. Jetzt fertig: **Block A, Einheiten 1–5** (
 | `out/denk-werkstatt.pdf` | alles: Titel, Inhalt, Einleitung, Hallo-Seite, Sammelpass, Einheiten (Spickzettel + Anleitung + Blätter + Lösungen), Urkunden, Rückmeldebogen, Gerätetest-Checkliste |
 | `out/kopiervorlagen.pdf` | nur die Seiten des Kindes: Deckblatt, Hallo-Seite, Sammelpass, alle Blätter, Urkunden |
 | `out/spickzettel.pdf` | höchstens zwei Seiten pro Einheit zum Mitnehmen beim Durchführen (beidseitig drucken): Vorbereitung zum Abhaken, Ablauf als Drehbuch mit Minuten, Spielregeln in Kürze und Sätzen zum Sagen, Hilfen, „Zum Schluss nicht vergessen“ |
-| Web-App (`web/`, gebaut nach `_site/`) | Level-Pakete e2–e5 für Handy und Tablet, offline-fähig, über GitHub Pages veröffentlicht |
+| Web-App (`web/`, gebaut nach `_site/`) | 18 Level-Pakete (e2–e20 ohne e18, je 6–9 Levels) für Handy und Tablet; die Startseite zeigt die Blöcke A–D, ein Tipp auf einen Block seine Pakete; offline-fähig, über GitHub Pages veröffentlicht |
 
 Drucken in **Originalgröße (100 %)**, damit die Gitterfelder mindestens 2 cm groß sind.
 
@@ -59,18 +59,30 @@ Der Build prüft automatisch und bricht mit ❌ ab, wenn
 - eine Rechnung im Text falsch ist,
 - ein Blatt über die A4-Seite läuft, etwas in den Druckrand ragt oder eine Leerseite entsteht,
 - ein Spickzettel länger als zwei Seiten wird oder sein Ablauf (Schritte und Minuten) nicht mehr zur Anleitung passt,
-- die Schrift auf einem Blatt des Kindes kleiner als 14 pt ist,
+- die Schrift auf einem Blatt des Kindes kleiner als 14 pt ist, auch gezeichnete Schrift in SVG-Bildern (Nebenbeschriftungen tragen `data-nebenschrift`),
+- ein Gitterfeld auf einem Blatt kleiner als 20 mm ist oder eine Programm-Reihe mehr als 12 Kästchen hat,
 - ein Pflichtteil einer Anleitung fehlt (Ziel, Material, Ablauf, Beispielsätze, Stolpersteine, Leichter/Schwerer, Bonus-Knobelei, Hintergrund, Bildschirm-Bonus, Lösungen),
 - ein Symbol als Schriftzeichen statt als SVG geschrieben ist, ein Fachwort auf einem Blatt steht oder „Zauber“ außerhalb von Wiederhol-Zauber, Zauber-Kasten und Zauberspruch vorkommt,
 - ein Zeichen in der Schrift fehlt,
-- ein QR-Code aus dem Seitenbild nicht mehr gelesen werden kann,
+- ein QR-Code aus dem Seitenbild nicht mehr gelesen werden kann oder ein Verweis auf ein Blatt ins Leere zeigt,
 - der Name des Kindes in einer Quelldatei steht.
 
 Warnungen (⚠️, z. B. bundesdeutsche Wörter wie „Treppe“ statt „Stiege“) bitte auch beheben.
 
 ## Rätsel prüfen
 
-Alle Rätsel (Drachen-Pfade, Programme lesen, Kobold-Programme, Ablauf-Karten, Kürzer-Schreiben) stehen in `raetsel/eN.json`. Dieselben Daten gehen an die Blätter und an die Web-App. Ein Löser (`werkzeuge/loeser.mjs`, Breitensuche über Feld und Blickrichtung) prüft und löst sie mit demselben Ausführer, den auch die Web-App verwendet (`web/kern/ausfuehrer.js`).
+Alle Rätsel stehen in `raetsel/eN.json` (Einheit 18 hat keine). Dieselben Daten gehen an die Blätter und an die Web-App. Die Grundarten (Drachen-Pfade, Programme lesen, Kobold-Programme, Ablauf-Karten, Kürzer-Schreiben, ab Block C mit Wenn-dann-Kasten, „bis zum Schatz“, Zaubersprüchen und mehreren Gittern) löst `werkzeuge/loeser.mjs` mit demselben Ausführer, den auch die Web-App verwendet (`web/kern/ausfuehrer.js`).
+
+Die Rätselarten ab Block B sind **Plugins**, je Art bis zu vier Dateien (Anleitung: `vorlagen/AUTOREN-LEITFADEN.md`, Abschnitt 8):
+
+| Datei | Inhalt |
+|---|---|
+| `werkzeuge/arten/<art>.mjs` | prüfen und lösen (genau eine Lösung, Spielbaum …), nur die Aufgabe für die App |
+| `web/kern/<art>.js` | gemeinsame Logik und Zeichnungen für Löser, Blätter und App |
+| `web/spiele/<art>.js` (+ `.css`) | das Spiel in der App |
+| `tests/spiele/<art>.mjs` | Test-Plugin: spielt jedes Level per Antippen durch |
+
+Arten: `muster` (E6), `geheim` (E7), `kaestchen` (E8), `janein` (E9), `suche` (E10), `logik` (E12), `baum` (E13), `formen` (E14), `nim` (E15) und `zweidrachen` (E19, nur für die Blätter, ohne App-Spiel). Das Paket von Einheit 20 mischt Levels verschiedener Arten (`"art": "gemischt"`).
 
 ```bash
 werkzeuge/mit-nix.sh node werkzeuge/raetsel.mjs --bericht   # alle Rätsel lösen, Bericht ausgeben
@@ -83,10 +95,13 @@ Die Web-App liegt in `web/` (einfaches HTML/CSS/JavaScript, ohne Server, Schrift
 
 ```bash
 werkzeuge/mit-nix.sh node werkzeuge/web-bauen.mjs     # web/ + Rätsel-Daten → _site/
-werkzeuge/mit-nix.sh npx playwright test              # Tests in Chromium und WebKit (Handy, Tablet, hoch und quer)
+werkzeuge/mit-nix.sh npx playwright test              # alle Tests in Chromium und WebKit (Handy, Tablet, hoch und quer)
+# nur ein Paket und drei Geräte, auf einem eigenen Port:
+WERKSTATT_TEST_PORT=4110 werkzeuge/mit-nix.sh npx playwright test --grep "e10|suche" \
+  --project=chromium-iphone-hoch --project=webkit-iphone-quer --project=chromium-ipad-quer
 ```
 
-`web-bauen.mjs` löst und prüft dabei alle Rätsel, schreibt die Level-Daten nach `_site/`, setzt die Build-Version in den Cache-Namen des Service Workers und prüft, dass jedes Level spielbar ist und keine fremden Adressen geladen werden. Zum Ausprobieren im Browser `_site/` mit einem beliebigen lokalen Webserver ausliefern (Service Worker brauchen `http://localhost`, nicht `file://`). Die Playwright-Tests spielen jedes Level einmal durch, machen Bildschirmfotos und lassen jeden Zugriff auf fremde Hosts scheitern. Die Chromium-Tests nutzen das installierte Google Chrome (`channel: 'chrome'`, das braucht auch der PDF-Build); WebKit für Playwright einmalig mit `werkzeuge/mit-nix.sh npx playwright install webkit` holen.
+`web-bauen.mjs` löst und prüft dabei alle Rätsel, schreibt die Level-Daten nach `_site/`, setzt die Build-Version in den Cache-Namen des Service Workers und prüft, dass jedes Level spielbar ist und keine fremden Adressen geladen werden. Zum Ausprobieren im Browser `_site/` mit einem beliebigen lokalen Webserver ausliefern (Service Worker brauchen `http://localhost`, nicht `file://`). Die Playwright-Tests spielen jedes Level einmal durch (Pfad-Levels mit einer Lösung des Lösers, die anderen Arten über ihr Test-Plugin), öffnen jedes Paket und Level auch direkt über die Adresse, machen Bildschirmfotos (`test-results/bilder/<projekt>/`), prüfen Tastengröße, Feldgröße (mindestens 36 px) und dass nichts scrollt, und lassen jeden Zugriff auf fremde Hosts scheitern. Für die neuen Kästen gibt es zusätzlich Test-Levels in `tests/fixtures/web-raetsel/` (`node werkzeuge/web-bauen.mjs --raetsel tests/fixtures/web-raetsel`, danach wieder ohne `--raetsel` bauen). Die Chromium-Tests nutzen das installierte Google Chrome (`channel: 'chrome'`, das braucht auch der PDF-Build); WebKit für Playwright einmalig mit `werkzeuge/mit-nix.sh npx playwright install webkit` holen.
 
 Die Pakete sind ohne Schlüsselwort offen, der QR-Code auf dem Blatt führt direkt hin. Übersicht: `plan/lehrplan.md`, Abschnitt 7.7.
 
@@ -117,13 +132,15 @@ src/einheiten/NN-*.html          eine Datei pro Einheit (Anleitung + Blätter)
 src/einheiten/00-muster.html     Muster mit allen Bausteinen (nicht im Buch)
 src/styles.css                   Design (A4, Schriften, Farben pro Block)
 src/components.js                Kern-Bausteine, Lösungsansicht, Inhaltsverzeichnis, Prüfungen
-src/bausteine/                   Bausteine fürs Programmieren (Gitter, Programm-Reihe, QR-Code …)
+src/bausteine/                   Bausteine fürs Programmieren (Gitter, Programm-Reihe, QR-Code …) und eigene Bausteine der Einheiten (eN-*.js)
 src/fonts/                       Andika und Nunito (SIL Open Font License)
 raetsel/eN.json                  Rätsel und Web-Levels pro Einheit (eine Datenquelle für Papier und App)
 web/                             Web-App (index.html, Service Worker, Manifest, Schriften, Symbole)
-web/kern/                        Ausführer und Symbole, gemeinsam für Web-App, Build und Löser
+web/kern/                        Ausführer, Symbole und die Logik jeder Rätselart, gemeinsam für Web-App, Build und Löser
+web/spiele/                      Spiele der Rätselarten in der App (Plugins, eines pro Art)
 werkzeuge/                       mit-nix.sh, Löser, Rätsel-Prüfung, Namens-Prüfung, Web-App bauen, Schriften kürzen
-tests/                           Tests für Ausführer, Löser und Web-App
+werkzeuge/arten/                 Rätselarten ab Block B: prüfen und lösen (eine Datei pro Art)
+tests/                           Tests für Ausführer, Löser und Web-App; tests/spiele/ Test-Plugins pro Art, tests/fixtures/ Test-Levels
 build.mjs, baue.sh               PDFs bauen
 werkstatt.json                   Titel, Stand, Adresse der Web-App (ohne Namen)
 kind.beispiel.json               Vorlage für kind.json (lokal, nie einchecken)
