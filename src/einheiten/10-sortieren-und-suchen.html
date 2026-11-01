@@ -1,1 +1,517 @@
-<!-- Einheit 10: noch nicht geschrieben (Platzhalter, damit Buch und --nur 10 schon funktionieren) -->
+<!--
+  Einheit 10: Sortieren und Suchen (Block B, letzte Einheit des Blocks, danach Urkunde 1)
+  Sortieren nach Regeln, Vergleichen zu zweit, ein Sortier-Netz mit Kreide im Hof
+  (oder Malerkrepp im Gang), Suchen durch Halbieren als Strategie (Halbier-Suche).
+  Rätsel: raetsel/e10.json (Web-Paket e10, Rätselart "suche")
+  Kern: web/kern/suche.js, Löser: werkzeuge/arten/suche.mjs
+  Eigene Bausteine: src/bausteine/e10-suche.js (Sortier-Netz, Halbier-Suche, Halbier-Leiter, alle Reihenfolgen)
+  Blätter: 10-1 Das Sortier-Netz, 10-2 Die Halbier-Suche, 10-3 Mein Sortier-Netz (Spielplan mit Zahlenkärtchen)
+-->
+<style>
+  .e10-ablauf > li { break-inside: avoid; }
+  .e10-ganz > li { break-inside: auto; orphans: 2; widows: 2; }
+  .kasten.e10-bricht { -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .kasten.e10-bricht > .kasten-titel { break-after: avoid; }
+  .kasten.e10-bricht > .kasten-titel + p, .kasten.e10-bricht > .kasten-titel + ul > li:first-child, .kasten.e10-bricht > .kasten-titel + ol > li:first-child { break-before: avoid; break-inside: avoid; }
+  .e10-bilder { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 3mm 8mm; margin: 2mm 0 2.5mm 0; break-inside: avoid; }
+  .e10-bilder figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 1mm; }
+  .e10-bilder figcaption { font-size: 8.5pt; color: var(--grau); font-weight: 700; text-align: center; max-width: 48mm; line-height: 1.15; }
+  .e10-loes { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm 4mm; align-items: start; margin: 2mm 0 4mm 0; }
+  .e10-loes m-loesungen, .e10-loes .loesungen-raster { display: contents; }
+  .e10-loes > .kasten.loesung { margin: 5mm 0 0 0; font-size: 9.5pt; }
+  .e10-loes > .kasten.loesung p { margin-bottom: 1.6mm; }
+  .kasten.loesung.e10-weiter p { margin-bottom: 1.6mm; }
+  .e10-tab td:first-child { width: 9%; }
+  .e10-tab td:nth-child(3) { width: 40%; }
+  .e10-halb-tab td, .e10-halb-tab th { text-align: center; }
+  .e10-halb-tab td:first-child, .e10-halb-tab th:first-child { text-align: left; }
+
+  /* Blätter */
+  .e10-regel { display: block; border: 0.6mm solid var(--akzent); background: var(--akzent-hell); border-radius: 3mm; padding: 2mm 4mm; line-height: 1.35; margin: 0; }
+  .e10-paar { display: grid; grid-template-columns: 1fr 1fr; gap: 0 8mm; align-items: start; }
+  .e10-paar .aufg { display: flex; flex-direction: column; }
+  .e10-paar .aufg > m-e10-netz { align-self: center; }
+  .e10-profi-reihe { display: flex; align-items: center; gap: 6mm; }
+  .e10-profi-reihe > p { flex: 1; margin: 0; }
+  .e10-leitern { display: grid; grid-template-columns: auto auto auto; justify-content: start; gap: 3mm 4mm; align-items: center; }
+  .e10-leitern .e10-bis { white-space: nowrap; line-height: 1.1; }
+  .e10-leitern .e10-bsp { color: var(--grau); display: block; line-height: 1; }
+  .e10-leitern .e10-kopf { font-size: 14pt; color: var(--grau); text-align: center; line-height: 1; }
+  .e10-fee { position: relative; }
+  .e10-fee > m-qr { position: absolute; right: 0; bottom: 0; }
+  .e10-fee .qr-box { flex-direction: column; align-items: flex-start; gap: 1.2mm; width: 34mm; }
+  .e10-fee > m-bild { position: absolute; right: 4mm; top: 19mm; }
+  .e10-plan-reihe { display: flex; align-items: flex-start; gap: 5mm; }
+  .e10-plan-info { flex: 1; display: flex; flex-direction: column; gap: 4mm; margin: 0; padding-top: 12mm; }
+  .e10-plan-info .e10-legende { display: flex; flex-direction: column; gap: 2mm; }
+  .e10-plan-info p { margin: 0; }
+  .e10-titel { font-family: var(--text); font-weight: 900; font-size: 14pt; margin: 0 0 2mm 0; }
+  .karte .e10-kz { font-family: var(--kind); font-weight: 700; font-size: 46pt; line-height: 1; color: var(--tinte); border-bottom: 1.3mm solid var(--akzent); padding: 0 2mm 0.6mm 2mm; }
+  .e10-nw { white-space: nowrap; }
+</style>
+
+<!-- Spickzettel: Kurzfassung der Anleitung zum Mitnehmen, höchstens zwei Seiten. Ablauf als Drehbuch (Minuten wie in der Anleitung) -->
+<section class="spick nur-buch" data-einheit="10" data-titel="Sortieren und Suchen">
+  <p class="spick-kern"><b>Darum geht’s:</b> {{KIND}} sortiert nach Regeln und merkt: Ein Sortier-Roboter vergleicht immer nur <b>zwei</b> Dinge und tauscht sie, wenn nötig. Im Hof laufen 4 Kuscheltiere durch ein <b>Sortier-Netz</b> und kommen immer sortiert an. Dann wird aus Zahl-Raten ein Plan: die <b>Halbier-Suche</b>. Erlaubt ist nur „Ist deine Zahl größer als …?“, und wer immer in der Mitte fragt, braucht für 1 bis 16 höchstens 4 Fragen, für 1 bis 100 höchstens 7. Letzte Einheit von Block B: Heute gibt es die <b>Urkunde</b>.</p>
+
+  <div class="spick-zwei breit-links">
+    <div class="spick-block vorher">
+      <h2>Vorher, ohne {{KIND}} <small>· etwa 20 Min</small></h2>
+      <ul class="check">
+        <li><a class="blattref" href="#blatt-10-1"></a>, <a class="blattref" href="#blatt-10-2"></a> und <a class="blattref" href="#blatt-10-3"></a> drucken, die Urkunde 1 (hinten im Heft) auch. <span class="min">2 Min</span></li>
+        <li>Den Streifen mit den 8 Zahlenkärtchen unten von Blatt 10-3 abschneiden, die Kärtchen ausschneiden. <span class="min">4 Min</span></li>
+        <li>Sortier-Netz nach dem Plan auf Blatt 10-3 malen (Kreide im Hof: Bahnen 50 cm auseinander) oder kleben (Malerkrepp im Gang: 30 cm). Kleine Kreise immer links, vom Start aus gesehen. <span class="min">12 Min</span></li>
+        <li>Urkunde: Datum eintragen, unterschreiben, verstecken. <span class="min">2 Min</span></li>
+      </ul>
+    </div>
+    <div class="spick-block vorher">
+      <h2>Bereitlegen</h2>
+      <ul class="check">
+        <li>4 Kuscheltiere, 4 Wäschekluppen</li>
+        <li>6–8 Buntstifte (verschieden lang)</li>
+        <li>Maßband, 2 Wäschekluppen</li>
+        <li>10 Muggelsteine, ein Becher</li>
+        <li>Zettel, Bleistift, Stempel</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Gemeinsam</h2>
+  <ol class="spick-ablauf">
+    <li data-min="3"><div><b>Regel-Detektivin.</b> Du legst die Buntstifte nach einer geheimen Regel in eine Reihe (Länge, Regenbogen-Farben), {{KIND}} rät die Regel. Dann legt sie, du rätst.
+      <div class="sag">
+        <p class="du">„Nach welcher Regel habe ich sortiert?“</p>
+        <p class="sie">„Der kürzeste ist ganz vorne, dann immer länger!“</p>
+        <p class="du">„Wie macht das ein Roboter, der immer nur zwei Stifte anschauen kann?“</p>
+      </div>
+    </div></li>
+    <li data-min="7"><div><b>Das Sortier-Netz im Hof.</b> Plan auf <a class="blattref" href="#blatt-10-3"></a> zeigen. Kuscheltiere ziehen verdeckt ein Zahlenkärtchen (Kluppe ans Ohr), eins pro Bahn an den Start. Reihe für Reihe vergleichen. 2 Durchgänge, dann „Trick das Netz aus!“.
+      <div class="spick-spiel"><h3>Sortier-Netz</h3>
+        <ul>
+          <li><b>Eine Vergleichs-Stelle:</b> Zwei Kuscheltiere kommen zu den zwei Kreisen. Kleinere Zahl in den kleinen Kreis, größere in den großen. Stehen sie verkehrt: tauschen (aneinander vorbeigehen), dann auf der neuen Bahn weiter.</li>
+          <li><b>Reihe 1 und 3</b> haben zwei Vergleichs-Stellen: jede von euch eine. <b>Reihe 2 und 4</b> eine: gemeinsam.</li>
+          <li><b>Ziel:</b> Zahlen vorlesen, von der kleinen zur großen Seite. Immer sortiert!</li>
+          <li><b>Trick das Netz aus:</b> Abwechselnd stellt eine die Kuscheltiere so verkehrt wie möglich an den Start. Sortiert: Muggelstein für das Netz. Nicht sortiert: zuerst Kobold suchen (falsch getauscht?), sonst Muggelstein für die Austricks-Königin. 4 Starts.</li>
+        </ul>
+      </div>
+      <div class="sag">
+        <p class="du">„Das Netz kann nicht denken. Es vergleicht immer nur zwei. Kannst du es austricksen?“</p>
+        <p class="sie">„Ich stell die 8 ganz auf die kleine Seite. Das schafft es nie!“</p>
+        <p class="dann">Es schafft es. Ganz verkehrt herum (größte Zahl auf der kleinen Seite) wird an allen 6 Stellen getauscht.</p>
+      </div>
+    </div></li>
+    <li data-min="5"><div><b>Blatt „Das Sortier-Netz“.</b> <a class="blattref" href="#blatt-10-1"></a>: Finger fährt jede Bahn mit, Vergleichs-Stellen von oben nach unten. Bei Aufgabe 2 jede Vergleichs-Stelle prüfen: Steht die größere am kleinen Punkt?
+      <div class="sag">
+        <p class="du">„Welche zwei Zahlen treffen sich an der ersten Vergleichs-Stelle? Wer geht zum kleinen Punkt?“</p>
+        <p class="dann">Die Zahl bleibt auf ihrer Bahn, bis eine Vergleichs-Stelle kommt. Erledigte Stellen abhaken.</p>
+      </div>
+    </div></li>
+    <li data-min="6"><div><b>Halbier-Raten.</b> Erst 1 bis 16 (du bist Hüterin), dann tauschen, ab Runde 3 bis 100.
+      <div class="spick-spiel"><h3>Halbier-Raten</h3><p class="meta">Maßband, 2 Kluppen, Muggelsteine, Becher, Zettel</p>
+        <ul>
+          <li><b>Rollen:</b> Die Hüterin schreibt eine Zahl verdeckt auf, die Sucherin fragt.</li>
+          <li><b>Ein Zug:</b> Nur „Ist deine Zahl größer als …?“, Antwort Ja oder Nein. Muggelstein in den Becher. Ja: linke Kluppe auf die Zahl danach. Nein: rechte Kluppe auf die Zahl selbst.</li>
+          <li><b>Ende:</b> Beide Kluppen auf einer Zahl: „Deine Zahl ist …!“ (keine Frage mehr). Zettel umdrehen.</li>
+          <li><b>Punkt:</b> höchstens 4 Fragen (bis 16) bzw. 7 (bis 100): Punkt für die Sucherin, sonst für die Hüterin. 4 Runden.</li>
+        </ul>
+      </div>
+      <div class="sag">
+        <p class="du">„Ist deine Zahl größer als 8?“ – „Nein.“ – „Wo kommt jetzt die rechte Kluppe hin?“</p>
+        <p class="sie">„Auf die 8! Dann ist es 1 bis 8.“</p>
+        <p class="dann">Fragt sie „Ist es die 5?“: „Diese Frage gibt es heute nicht. Frag: Ist sie größer als …?“</p>
+      </div>
+    </div></li>
+    <li data-min="5"><div><b>Blatt „Die Halbier-Suche“.</b> <a class="blattref" href="#blatt-10-2"></a>: Aufgabe 1 die Fee-Zahl, nach jeder Antwort durchstreichen. Aufgabe 2: „Jeder Pfeil ist eine Frage.“ Profi 1 bis 100 freiwillig.</div></li>
+    <li data-min="2"><div><b>Sammelpass und Urkunde.</b> Feld „Einheit&nbsp;10“ (mit Medaille), Sterne anmalen. Ankündigen: „Heute Abend gibt es eine Überraschung.“</div></li>
+  </ol>
+
+  <div class="spick-zwei">
+    <div class="spick-block stolper">
+      <h2>Wenn es hakt</h2>
+      <ul>
+        <li><b>Vergisst eine Vergleichs-Stelle:</b> von oben nach unten mit dem Finger, jede abhaken.</li>
+        <li><b>Tauscht, obwohl es passt:</b> „Kleine Zahl, kleiner Punkt. Passt es schon? Dann bleiben.“</li>
+        <li><b>„Ist es die 7?“</b> Umformulieren: „Ist sie größer als 6?“</li>
+        <li><b>Mitte finden:</b> zwei Finger von den Kluppen aufeinander zu. Ungefähr reicht meist.</li>
+        <li><b>Bei Ja bleibt die Zahl stehen:</b> „Größer als 8“ heißt: die 8 nicht.</li>
+      </ul>
+    </div>
+    <div class="spick-block schwerer">
+      <h2>Zu leicht?</h2>
+      <ul>
+        <li><b>Plan am Papier:</b> 6, 9, 1, 4 auf <a class="blattref" href="#blatt-10-3"></a>.</li>
+        <li><b>Alle Reihenfolgen</b> von 1, 2, 3 (Knobel-Ecke 10-3), alle 6 im Netz von Blatt 10-1 prüfen.</li>
+        <li><b>Kaputtes Netz:</b> Eine Vergleichs-Stelle fehlt. Welche Reihenfolge geht schief?</li>
+        <li><b>Bis 1000:</b> höchstens 10 Fragen.</li>
+        <li><b>Immer 1 mehr</b> („größer als 1? größer als 2? …“) gegen Halbieren.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="spick-block schluss">
+    <h2>Zum Schluss nicht vergessen</h2>
+    <ul class="check">
+      <li><b>Bildschirm-Bonus,</b> nur wenn ihr mögt (höchstens 15 Min, nach den Blättern): Paket 10, QR-Code auf <a class="blattref" href="#blatt-10-2"></a>. Nach dem Ende-Bild kommt das Gerät weg.</li>
+      <li><b>Urkunde</b> beim Abendessen feierlich überreichen, {{KIND}} führt ein Programm vor.</li>
+      <li>Rückmeldebogen für Block B (Einheiten 6–10) ausfüllen.</li>
+      <li>Zahlenkärtchen ins Kuvert zu den Befehlskarten.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="anleitung" data-einheit="10" data-titel="Sortieren und Suchen">
+
+  <div class="kasten ziel">
+    <p>Heute geht es um zwei Dinge, die Computer ständig tun: <span class="begriff">sortieren</span> und suchen. {{KIND}} sortiert zuerst nach Regeln (der Länge nach, nach den Farben des Regenbogens, nach Zahlen). Dann entdeckt sie, wie ein Roboter sortiert, der nicht denken kann: Er vergleicht immer nur <b>zwei</b> Dinge und tauscht sie, wenn das größere auf der falschen Seite steht. Im Hof (oder im Gang) laufen vier Kuscheltiere mit Zahlenkärtchen durch ein <span class="begriff">Sortier-Netz</span> aus Kreide, treffen sich an Vergleichs-Stellen, tauschen und kommen am Ziel immer sortiert an. Egal, wie sie am Start stehen.</p>
+    <p>Danach wird aus dem Zahl-Raten ein Plan, die <span class="begriff">Halbier-Suche</span>: Erlaubt ist nur die Frage „Ist deine Zahl größer als …?“. Wer immer in der Mitte fragt, wirft mit jeder Antwort die Hälfte weg und braucht für 1 bis 16 höchstens 4 Fragen, für 1 bis 100 höchstens 7. Das Zahl-Raten mit „größer“ und „kleiner“ kennt {{KIND}} vielleicht schon aus der Rechen-Werkstatt (R8). Dort wird geraten, hier wird geplant und gezählt: „Wie viele Fragen brauche ich höchstens?“ Das ist die letzte Einheit von Block B. Zum Abschluss gibt es die erste Urkunde: <b>Drachen-Programmiererin</b>.</p>
+  </div>
+
+  <div class="kasten tipp darf-brechen e10-bricht" data-titel="Die Spielregeln von Sortier-Netz und Halbier-Suche (für euch beide gleich)">
+    <ul>
+      <li><b>Das Sortier-Netz:</b> Die Zahlen laufen auf ihren Bahnen vom Start nach unten zum Ziel. An einer <span class="begriff">Vergleichs-Stelle</span> treffen sich zwei Zahlen. Sie hat einen kleinen Punkt <m-e10-punkt art="klein" gr="4.5"></m-e10-punkt> und einen großen Punkt <m-e10-punkt art="gross" gr="4.5"></m-e10-punkt>: Die kleinere Zahl geht zum kleinen Punkt, die größere zum großen. Stehen sie schon so, bleiben sie, sonst tauschen sie die Bahn. Danach laufen beide auf ihrer (neuen) Bahn weiter. Am Papier liegt der kleine Punkt immer links. Wir sagen trotzdem „kleiner Punkt“ und „großer Punkt“ statt links und rechts: Das ist am Boden und am Papier gleich und hängt nicht davon ab, wo man steht.</li>
+      <li><b>Immer sortiert:</b> Ein gutes Sortier-Netz sortiert <b>jede</b> Reihenfolge. Das Netz für 4 Kuscheltiere hat 6 Vergleichs-Stellen und sortiert alle 24 Reihenfolgen, das für 3 Zahlen auf <a class="blattref" href="#blatt-10-1"></a> hat 3 Vergleichs-Stellen und sortiert alle 6 (beides vom Programm geprüft). Beide Netze vergleichen nur Nachbar-Bahnen, so muss nie eine Bahn über eine andere springen.</li>
+      <li><b>Die Halbier-Suche:</b> Eine denkt sich eine Zahl, die andere sucht. Gefragt wird nur: „Ist deine Zahl größer als …?“, geantwortet nur mit Ja oder Nein. „Größer als 8?“ mit der Antwort Ja heißt: 9 oder mehr, die 8 ist also auch weg. Wenn nur noch eine Zahl übrig ist, sagt die Sucherin sie: „Deine Zahl ist 11!“ Das ist keine Frage mehr und wird nicht gezählt.</li>
+      <li><b>Wie viele Fragen höchstens?</b> Jede Frage in der Mitte halbiert die Zahlen, die noch gehen. Also so oft halbieren, bis 1 übrig ist, und die Schritte zählen: 8, 4, 2, 1 sind 3 Fragen. Bei einer ungeraden Zahl nimmt man die größere Hälfte (aus 25 wird 13).</li>
+    </ul>
+    <table class="tab e10-halb-tab">
+      <tr><th>Zahlen von 1 bis</th><th>8</th><th>16</th><th>32</th><th>100</th><th>1000</th></tr>
+      <tr><td>höchstens so viele Fragen mit Halbieren</td><td><m-e10-wert raetsel="e10-l1" was="fragen"></m-e10-wert></td><td><m-e10-wert raetsel="e10-l2" was="fragen"></m-e10-wert></td><td><m-e10-wert raetsel="e10-l3" was="fragen"></m-e10-wert></td><td><m-e10-wert raetsel="e10-l4" was="fragen"></m-e10-wert></td><td><m-e10-wert raetsel="e10-l5" was="fragen"></m-e10-wert></td></tr>
+      <tr><td>mit „immer 1 mehr“ (größer als 1? größer als 2? …) bis zu</td><td><m-e10-wert raetsel="e10-l1" was="immerEinsMehr"></m-e10-wert></td><td><m-e10-wert raetsel="e10-l2" was="immerEinsMehr"></m-e10-wert></td><td><m-e10-wert raetsel="e10-l3" was="immerEinsMehr"></m-e10-wert></td><td><m-e10-wert raetsel="e10-l4" was="immerEinsMehr"></m-e10-wert></td><td><m-e10-wert raetsel="e10-l5" was="immerEinsMehr"></m-e10-wert></td></tr>
+    </table>
+    <p class="klein">Das Programm hat für jede dieser Zahlen alle möglichen Frage-Pläne durchgerechnet: Mit keinem Plan geht es im schlimmsten Fall mit weniger Fragen als mit Halbieren.</p>
+  </div>
+
+  <div class="kasten material darf-brechen e10-bricht">
+    <p><b>Vorher, ohne {{KIND}} (etwa 20 Minuten):</b></p>
+    <ul>
+      <li><b>Drucken (2 Minuten):</b> <a class="blattref" href="#blatt-10-1"></a> und <a class="blattref" href="#blatt-10-2"></a> (Arbeitsblätter), <a class="blattref" href="#blatt-10-3"></a> (Spielplan mit Zahlenkärtchen) und die <b>Urkunde 1</b> „Drachen-Programmiererin“ (hinten im Heft, auch in den Kopiervorlagen). Farbe ist schön, Schwarz-Weiß geht auch.</li>
+      <li><b>Zahlenkärtchen (4 Minuten):</b> Den Streifen mit den 8 Zahlenkärtchen (1 bis 8) unten von <a class="blattref" href="#blatt-10-3"></a> abschneiden, dann die Kärtchen ausschneiden. Der Plan und die Knobel-Ecke oben bleiben ganz.</li>
+      <li><b>Sortier-Netz malen oder kleben (12 Minuten):</b> nach dem Plan auf <a class="blattref" href="#blatt-10-3"></a>, genau beschrieben im Kasten „Basteln“ weiter unten. <b>Im Hof</b> mit Straßenkreide: 4 Bahnen, je 50 cm auseinander, die Reihen mit den Vergleichs-Stellen 60 cm hintereinander. <b>Im Gang</b> mit Malerkrepp: Bahnen 30 cm auseinander, Reihen 50 cm hintereinander.</li>
+      <li><b>Urkunde (2 Minuten):</b> Datum eintragen, unterschreiben und verstecken. Sie kommt am Abend dran (Kasten „Urkunde 1“).</li>
+    </ul>
+    <p><b>Material in der Einheit:</b> 4 Kuscheltiere (oder Puppen, Autos, Bauklötze) und 4 Wäschekluppen, mit denen die Zahlenkärtchen am Ohr oder am Bauch festgemacht werden. 6 bis 8 Buntstifte, die verschieden lang sind. Ein <b>Maßband</b> (Schneider-Maßband oder Rollmaßband bis 100 cm) und 2 weitere Wäschekluppen. 10 Muggelsteine und ein Becher zum Fragen-Zählen, ein Zettel und ein Bleistift. Stempel oder Sticker für den Sammelpass.</p>
+    <p><b>Extra, außerhalb der Einheit:</b> Die Zahlenkärtchen auf Karton kleben oder mit Tixo überziehen, dann halten sie im Hof länger. Wer kein Maßband hat: Auf einen langen Papierstreifen die Zahlen 1 bis 100 schreiben, zusammen mit {{KIND}} (das ist auch eine schöne Zähl-Übung, etwa 15 Minuten).</p>
+  </div>
+
+  <h2>Ablauf Schritt für Schritt</h2>
+  <ol class="ablauf e10-ablauf">
+    <li data-min="3"><span class="schritt-titel">Regel-Detektivin</span>Leg die Buntstifte nach einer geheimen Regel in eine Reihe, zum Beispiel der Länge nach (der kürzeste vorne, dann immer länger) oder nach den Farben des Regenbogens (rot, orange, gelb, grün, blau, lila). {{KIND}} rät die Regel. Dann sortiert sie nach ihrer eigenen geheimen Regel und du rätst. Frag dabei: „Wie hast du das gemacht? Hast du immer alle Stifte auf einmal angeschaut?“ Meist vergleicht man zwei und schiebt einen davon weiter. Genau so arbeitet gleich das Sortier-Netz.</li>
+    <li data-min="7"><span class="schritt-titel">Das Sortier-Netz im Hof</span>Zeig {{KIND}} den Plan auf <a class="blattref" href="#blatt-10-3"></a> und dann das Netz am Boden. Jedes Kuscheltier zieht verdeckt ein Zahlenkärtchen, das kommt mit einer Kluppe ans Ohr. Die Kuscheltiere stellen sich an den Start, eins pro Bahn. Dann lauft ihr das Netz Reihe für Reihe ab (Kasten „Bewegung“). Am Ziel liest {{KIND}} die Zahlen vor, von der kleinen zur großen Seite: sortiert! Macht 2 Durchgänge mit neuen Kärtchen, dann das Spiel „Trick das Netz aus!“ (gleicher Kasten). Kein Hof und kein Gang? Dann laufen Muggelsteine mit Zahlen-Zetteln über den Plan am Tisch.</li>
+    <li data-min="5"><span class="schritt-titel">Blatt „Das Sortier-Netz“</span><a class="blattref" href="#blatt-10-1"></a>. Aufgabe 1 ist dasselbe wie im Hof, nur mit 3 Zahlen und am Papier: Sie fährt mit dem Finger die Bahnen nach unten und schreibt nach jeder Vergleichs-Stelle die zwei Zahlen in die Kästchen darunter. Bei Aufgabe 2 hat der Fehler-Kobold einmal falsch getauscht: Sie prüft jede Vergleichs-Stelle, ob die kleinere Zahl wirklich am kleinen Punkt steht. Die Profi-Aufgabe dreht es um: Welche Start-Reihenfolge muss an jeder Stelle tauschen?</li>
+    <li data-min="6"><span class="schritt-titel">Halbier-Raten</span>Das Spiel mit dem Maßband (Kasten „Spiel: Halbier-Raten“). Die erste Runde geht mit den Zahlen 1 bis 16, du bist die Hüterin und {{KIND}} sucht. Hilf ihr bei der ersten Frage: „Was ist die Mitte zwischen 1 und 16?“ Dann tauscht ihr. Ab der dritten Runde geht es bis 100. Zählt die Muggelsteine im Becher, das sind die Fragen. Ganz nebenbei entdeckt sie: Wer bei 1 bis 16 genau in der Mitte fragt, braucht immer genau 4 Fragen.</li>
+    <li data-min="5"><span class="schritt-titel">Blatt „Die Halbier-Suche“</span><a class="blattref" href="#blatt-10-2"></a>. Bei Aufgabe 1 ist die Fee die Hüterin: {{KIND}} schreibt die Mitte in das Kästchen, liest die Antwort der Fee und streicht in der Zahlen-Reihe durch, was nicht mehr geht. Bei Aufgabe 2 halbiert sie, bis 1 übrig ist, und zählt die Pfeile: Jeder Pfeil ist eine Frage. Die Profi-Aufgabe (1 bis 100) ist freiwillig. Passt das Blatt heute nicht mehr hinein, kommt es beim nächsten Mal dran.</li>
+    <li data-min="2"><span class="schritt-titel">Sammelpass und Urkunde</span>Feld „Einheit&nbsp;10“ stempeln oder bekleben, Sterne anmalen. Das Feld hat eine Medaille: Block B ist geschafft! Frag: „Was war heute am lustigsten?“ Dann kündige an: „Heute Abend gibt es eine Überraschung.“ Die Urkunde kommt beim Abendessen (Kasten „Urkunde 1“).</li>
+  </ol>
+
+  <h3>Beispielsätze</h3>
+  <div class="sag">
+    <p class="du">(Buntstifte in einer Reihe, der Länge nach) „Ich habe die Stifte nach einer geheimen Regel sortiert. Welche Regel ist es?“</p>
+    <p class="sie">„Nach der Farbe? … Nein! Der kürzeste ist vorne, dann werden sie immer länger.“</p>
+    <p class="du">„Genau. Wie würde ein Roboter das machen? Er kann immer nur zwei Stifte gleichzeitig anschauen.“</p>
+    <p class="dann">Lass sie probieren: zwei nebeneinander vergleichen, den längeren nach hinten. Das ist schon die Idee des Sortier-Netzes. Sagt sie „Ich schau einfach alle an“: „Ein Roboter kann das nicht. Und bei tausend Stiften könntest du es auch nicht mehr.“</p>
+  </div>
+  <div class="sag">
+    <p class="du">(an der ersten Vergleichs-Stelle im Hof, jede hält ein Kuscheltier) „Mein Bär hat die 7, deine Ente die 2. Wer kommt in den kleinen Kreis?“</p>
+    <p class="sie">„Die Ente! 2 ist kleiner. Wir müssen tauschen!“</p>
+    <p class="du">„Dann gehen wir aneinander vorbei. Und ab jetzt läuft die Ente auf meiner Bahn weiter.“</p>
+    <p class="dann">Das Tauschen der Bahn ist der Knackpunkt: Das Kuscheltier wechselt wirklich die Bahn und läuft dort weiter. Am Papier ist es genauso, die Zahl steht nach der Vergleichs-Stelle im Kästchen der anderen Bahn.</p>
+  </div>
+  <div class="sag">
+    <p class="du">„Das Netz kann nicht denken. Es vergleicht immer nur zwei. Kannst du es austricksen?“</p>
+    <p class="sie">„Ich stell die 8 ganz auf die kleine Seite und die 1 ganz auf die große. Das schafft es nie!“</p>
+    <p class="dann">Es schafft es doch, und dabei wird an allen 6 Vergleichs-Stellen getauscht: Ganz verkehrt herum ist die schwerste Reihenfolge. Sag: „Das Netz ist ein Programm. Es macht immer dasselbe, und es klappt bei jeder Reihenfolge. Das Programm im Heft hat alle 24 ausprobiert.“</p>
+  </div>
+  <div class="sag">
+    <p class="du">„Ich denke mir eine Zahl von 1 bis 16. Du darfst nur fragen: Ist deine Zahl größer als …?“</p>
+    <p class="sie">„Ist sie größer als 15?“</p>
+    <p class="du">„Nein. Wie viele Zahlen sind jetzt noch übrig?“</p>
+    <p class="sie">„Oh. 1 bis 15. Das sind ja fast alle!“</p>
+    <p class="dann">Super Moment: Sie merkt selbst, dass die Frage kaum hilft. Frag: „Welche Frage wirft auf jeden Fall die Hälfte weg, egal ob ich Ja oder Nein sage?“ Mit Glück („Ja, dann ist es die 16!“) ist so eine Frage auch einmal schnell. Aber der Plan mit der Mitte klappt immer.</p>
+  </div>
+  <div class="sag">
+    <p class="du">(<a class="blattref" href="#blatt-10-2"></a>, Aufgabe 2) „8 Zahlen. Nach einer guten Frage sind noch wie viele übrig?“</p>
+    <p class="sie">„4. Dann 2. Dann 1. Drei Fragen!“</p>
+    <p class="du">„Und bei 16 Zahlen? Doppelt so viele Zahlen, wie viele Fragen mehr?“</p>
+    <p class="sie">„Nur eine mehr? Vier!“</p>
+    <p class="dann">Das ist die große Entdeckung der Halbier-Suche: Doppelt so viele Zahlen kosten nur eine Frage mehr. Deshalb reichen für 1 bis 100 schon 7 Fragen und für 1 bis 1000 nur 10.</p>
+  </div>
+
+  <h2>Spiele, Bewegung und Basteln</h2>
+
+  <div class="kasten bewegung darf-brechen e10-bricht" data-titel="Das Sortier-Netz im Hof">
+    <p class="spiel-meta">2 Personen · 5–10 Minuten · das Netz am Boden (Plan auf <a class="blattref" href="#blatt-10-3"></a>), 4 Kuscheltiere, die 8 Zahlenkärtchen, 4 Wäschekluppen, Muggelsteine</p>
+    <ol class="regeln">
+      <li><b>Vorbereitung:</b> Die Zahlenkärtchen liegen verdeckt gemischt. Jedes Kuscheltier zieht eins und bekommt es mit einer Kluppe ans Ohr (oder unter ein Gummiringerl am Bauch). Die anderen 4 Kärtchen bleiben für den nächsten Durchgang. Dann stellt ihr die Kuscheltiere an den Start, eins pro Bahn, so wie sie gezogen haben.</li>
+      <li><b>Ziel:</b> Am Ende sitzen alle Kuscheltiere sortiert am Ziel: die kleinste Zahl auf der kleinen Seite, die größte auf der großen.</li>
+      <li><b>Eine Vergleichs-Stelle:</b> Zwei Kuscheltiere laufen auf ihren Bahnen bis zu den beiden Kreisen einer Vergleichs-Stelle. Ihr schaut die Zahlen an. Das mit der kleineren Zahl gehört in den kleinen Kreis, das mit der größeren in den großen. Sitzen sie schon so: bleiben. Sonst tauschen sie: Ihr tragt sie aneinander vorbei, jedes in den anderen Kreis (die Kuscheltiere dürfen sich dabei zuwinken). Danach läuft jedes auf der Bahn weiter, auf der es jetzt sitzt.</li>
+      <li><b>Reihe für Reihe:</b> Das Netz hat 4 Reihen. In Reihe 1 und Reihe 3 gibt es zwei Vergleichs-Stellen nebeneinander: {{KIND}} macht die eine, du die andere, gleichzeitig. In Reihe 2 und Reihe 4 gibt es nur eine, in der Mitte: Die macht ihr gemeinsam, jede trägt ein Kuscheltier. Kuscheltiere ohne Vergleichs-Stelle in einer Reihe laufen einfach weiter.</li>
+      <li><b>Ende:</b> Wenn alle vier am Ziel sitzen, liest {{KIND}} die Zahlen vor, von der kleinen zur großen Seite. Sortiert? Dann ruft ihr gemeinsam „Sortiert!“ und klatscht ab.</li>
+    </ol>
+    <p><b>Spiel „Trick das Netz aus!“</b> (nach 2 Durchgängen): Abwechselnd stellt eine von euch die Kuscheltiere an den Start, so verkehrt wie möglich, und sagt vorher laut: „Diesmal schafft es das Netz nicht!“ Dann lauft ihr gemeinsam. Kommt alles sortiert an, bekommt das Netz einen Muggelstein. Kommt es nicht sortiert an, wird zuerst der Kobold gesucht: Hat jemand an einer Vergleichs-Stelle falsch getauscht? Nur wenn alle Vergleichs-Stellen richtig waren, bekommt die Austricks-Königin den Muggelstein. Nach 4 Starts wird gezählt. (Verraten wir es? Das Netz gewinnt immer, wenn richtig verglichen wird.)</p>
+    <p><b>Varianten:</b></p>
+    <ul>
+      <li><b>Wir sind die Zahlen:</b> Mit Oma, Opa oder Geschwistern (4 Personen) läuft jede selbst durchs Netz, mit einem Zahlenkärtchen in der Hand oder nach Größe: Wer kleiner ist, geht zum kleinen Kreis. Am Ziel steht die Familie der Größe nach. Schön auch bei der Urkunden-Feier.</li>
+      <li><b>Nur 3 Kuscheltiere</b> (leichter): Malt daneben das kleine Netz von <a class="blattref" href="#blatt-10-1"></a> (3 Bahnen, 3 Vergleichs-Stellen). Damit könnt ihr alle 6 Reihenfolgen ausprobieren, wirklich alle.</li>
+      <li><b>Nach Größe ohne Zahlen:</b> Die Kuscheltiere werden nach ihrer echten Größe verglichen. Was passiert bei zwei gleich großen? (Egal, wer in welchen Kreis kommt: Die Reihenfolge ist egal, wie in Einheit&nbsp;3.)</li>
+      <li><b>Kobold-Lauf:</b> Du tauschst einmal absichtlich falsch. Merkt {{KIND}} es spätestens am Ziel? Und findet sie die Vergleichs-Stelle?</li>
+    </ul>
+  </div>
+
+  <div class="kasten basteln darf-brechen e10-bricht" data-titel="Das Sortier-Netz malen oder kleben">
+    <ol>
+      <li><b>Plan:</b> <a class="blattref" href="#blatt-10-3"></a> zeigt das Netz von oben. Es hat 4 Bahnen und 6 Vergleichs-Stellen in 4 Reihen. Die Vergleichs-Stellen verbinden immer nur Nachbar-Bahnen: in Reihe 1 Bahn 1 mit 2 und Bahn 3 mit 4, in Reihe 2 Bahn 2 mit 3, Reihe 3 wie Reihe 1, Reihe 4 wie Reihe 2.</li>
+      <li><b>Im Hof:</b> Mit Straßenkreide eine Start-Linie, dann 4 Bahnen, je 50 cm auseinander und etwa 3 m lang. Alle 60 cm kommt eine Reihe mit Vergleichs-Stellen: ein Querstrich zwischen zwei Bahnen, am einen Ende ein <b>kleiner Kreis</b> (etwa 25 cm), am anderen ein <b>großer Kreis</b> (etwa 40 cm). Der kleine Kreis liegt immer auf der Seite, die im Plan links ist: Stell dich dafür an den Start und schau zum Ziel. Am Ende kommt eine Ziel-Linie mit einem kleinen Kreis auf der kleinen Seite und einem großen auf der großen.</li>
+      <li><b>Im Gang:</b> Bahnen mit Malerkrepp, 30 cm auseinander, die Reihen 50 cm hintereinander. Statt Kreisen klebt ihr Kreuze: ein kleines Kreuz (zwei kurze Stücke) und ein großes Kreuz (zwei lange Stücke).</li>
+      <li><b>Prüfen:</b> Stell dich an den Start und schau zum Ziel. Alle kleinen Kreise müssen auf deiner linken Seite ihrer Vergleichs-Stelle liegen. Ein vertauschter Kreis ist ein Kobold, der das Netz kaputt macht.</li>
+    </ol>
+  </div>
+
+  <div class="kasten spiel darf-brechen e10-bricht" data-titel="Halbier-Raten">
+    <p class="spiel-meta">2 Personen · 5–10 Minuten · Maßband, 2 Wäschekluppen, 10 Muggelsteine, ein Becher, Zettel und Bleistift</p>
+    <ol class="regeln">
+      <li><b>Vorbereitung:</b> Das Maßband liegt ausgerollt auf dem Tisch oder am Boden. Für die erste Runde kommt eine Kluppe auf die 1 und eine auf die 16, später auf die 1 und die 100. Die Kluppen zeigen immer, welche Zahlen noch gehen: alles von der linken bis zur rechten Kluppe.</li>
+      <li><b>Rollen:</b> Die <b>Hüterin</b> denkt sich eine Zahl und schreibt sie verdeckt auf den Zettel. Die <b>Sucherin</b> fragt. Nach jeder Runde tauscht ihr.</li>
+      <li><b>Ein Zug:</b> Die Sucherin fragt, und zwar nur so: „Ist deine Zahl größer als …?“ Die Hüterin antwortet ehrlich mit Ja oder Nein. Für jede Frage kommt ein Muggelstein in den Becher. Dann versetzt die Sucherin eine Kluppe: Bei <b>Ja</b> wandert die linke Kluppe auf die Zahl gleich danach („größer als 8? Ja“: auf die 9). Bei <b>Nein</b> wandert die rechte Kluppe auf die Zahl selbst („größer als 8? Nein“: auf die 8).</li>
+      <li><b>Ende:</b> Sitzen beide Kluppen auf derselben Zahl, sagt die Sucherin: „Deine Zahl ist …!“ Das ist keine Frage mehr und kostet keinen Muggelstein. Die Hüterin dreht den Zettel um. Dann werden die Muggelsteine im Becher gezählt.</li>
+      <li><b>Punkte:</b> Hat die Sucherin höchstens so viele Fragen gebraucht wie die Halbier-Suche (bis 16: 4 Fragen, bis 100: 7 Fragen), bekommt sie einen Punkt. Sonst bekommt die Hüterin den Punkt. Nach 4 Runden (jede ist 2-mal Sucherin) gewinnt, wer mehr Punkte hat. Unentschieden heißt: Ihr seid beide Halbier-Profis.</li>
+      <li><b>Ehrlich bleiben:</b> Stimmt eine Antwort nicht, landet die Zahl außerhalb der Kluppen. Das merkt man spätestens am Ende: „Hier hat der Kobold zugeschlagen!“ Die Runde wird wiederholt.</li>
+    </ol>
+    <p><b>Varianten:</b></p>
+    <ul>
+      <li><b>Kobold-Frage:</b> Wenn du Sucherin bist, stellst du einmal absichtlich eine schlechte Frage (eine, die nicht in der Mitte teilt, oder eine, deren Antwort man schon weiß). Ruft {{KIND}} „Kobold!“, bekommt sie einen Extra-Punkt.</li>
+      <li><b>Immer 1 mehr:</b> Du fragst „größer als 1? größer als 2? größer als 3? …“, {{KIND}} halbiert. Wer ist zuerst fertig? Bei 1 bis 100 kann „immer 1 mehr“ bis zu 99 Fragen brauchen, so viele Muggelsteine habt ihr gar nicht.</li>
+      <li><b>Im Auto, ohne Maßband:</b> nur 1 bis 16 oder 1 bis 32, die Zahlen im Kopf. Beim Antworten mit dem Daumen zeigen: Daumen hoch heißt Ja.</li>
+    </ul>
+  </div>
+
+  <div class="sag">
+    <p class="sie">(sucht bei 1 bis 100) „Ist sie größer als 50?“ – „Nein.“ – „Größer als 25?“ – „Ja.“ – „Hm … größer als 37?“</p>
+    <p class="du">„Nein. Wo kommen jetzt die Kluppen hin?“</p>
+    <p class="sie">„Links auf die 26, rechts auf die 37. Das sind noch ganz schön viele!“</p>
+    <p class="dann">Ungefähr in der Mitte reicht fast immer. Bei 26 bis 37 ist die Mitte zwischen 31 und 32 („größer als 31?“). Hilf mit zwei Fingern: von beiden Kluppen gleichzeitig eine Zahl nach innen, bis sich die Finger treffen. Mit so einem Plan braucht sie für jede Zahl von 1 bis 100 höchstens 7 Fragen.</p>
+  </div>
+
+  <div class="kasten spiel darf-brechen e10-bricht" data-titel="Zwei-Blick-Sortieren (für einen anderen Tag)">
+    <p class="spiel-meta">2 Personen · 10 Minuten · 5 Spielkarten Ass bis 5 einer Farbe (das Ass zählt 1), ein Becher, etwa 25 Muggelsteine</p>
+    <ol class="regeln">
+      <li><b>Vorbereitung:</b> Die Karten werden gemischt und verdeckt in eine Reihe gelegt. Links neben die Reihe kommt ein Muggelstein (die kleine Seite), rechts der Becher (die große Seite).</li>
+      <li><b>Ziel:</b> Die Karten sollen sortiert liegen, die kleinste beim Muggelstein. Aber man darf immer nur <b>zwei Nachbarkarten</b> gleichzeitig anschauen, wie ein Roboter.</li>
+      <li><b>Ein Blick:</b> Die Sortiererin dreht zwei Nachbarkarten um. Liegt die größere auf der kleinen Seite, tauscht sie die beiden. Dann dreht sie beide wieder um. Für jeden Blick kommt ein Muggelstein in den Becher.</li>
+      <li><b>Ende:</b> Glaubt sie, dass alles sortiert ist, sagt sie „Fertig!“ und deckt alle Karten auf. Sortiert: Die Muggelsteine im Becher sind ihre Blicke. Nicht sortiert: weitermachen, die Blicke zählen weiter.</li>
+      <li><b>Gewinner:</b> Dann ist die andere dran (neu mischen). Wer weniger Blicke gebraucht hat, gewinnt. Merken ist erlaubt, aber wer nachschaut, zahlt einen Muggelstein.</li>
+    </ol>
+    <p><b>Der Plan, der immer klappt:</b> Von der kleinen zur großen Seite alle Nachbarn der Reihe nach anschauen und tauschen, wenn nötig. Dann wieder von vorne. Wenn man einmal ganz durchkommt, ohne zu tauschen, ist alles sortiert. Mit 5 Karten sind das nie mehr als 20 Blicke. Das ist genau das, was das Sortier-Netz im Hof macht, nur nacheinander statt Reihe für Reihe.</p>
+  </div>
+
+  <h2>Wenn es hakt oder zu leicht ist</h2>
+
+  <div class="zwei">
+    <div class="kasten leichter">
+      <ul>
+        <li>Im Hof nur das kleine Netz mit 3 Bahnen (wie auf <a class="blattref" href="#blatt-10-1"></a>) und die Zahlen 1, 2, 3.</li>
+        <li>Statt Zahlen nach echter Größe: großer Bär, mittlerer Hase, kleine Maus.</li>
+        <li>Am Blatt zuerst die Zahlenkärtchen über das Netz schieben, erst dann schreiben.</li>
+        <li>Halbier-Raten nur bis 16, mit der Zahlen-Reihe von <a class="blattref" href="#blatt-10-2"></a> statt Maßband.</li>
+        <li>Die Mitte vorsagen: Sie übt nur das Kluppen-Versetzen.</li>
+      </ul>
+    </div>
+    <div class="kasten bonus" data-titel="Bonus-Knobelei">
+      <p class="klein"><i>Für zwischendurch: im Auto, beim Abendessen, beim Zähneputzen.</i></p>
+      <p><b>Fragen zählen:</b> „Ich denke an eine Zahl von 1 bis 8. Wie viele Fragen brauchst du höchstens?“</p>
+      <p><b>Doppelt so viele:</b> „Und bei 1 bis 32? Bei 1 bis 64?“</p>
+      <p><b>Kuscheltier-Reihe:</b> „Bär, Hase und Ente setzen sich in eine Reihe. Wie viele verschiedene Reihen gibt es?“</p>
+      <p><b>Für Profis:</b> „Mit 10 Fragen: Bis zu welcher Zahl findest du jede?“</p>
+      <p class="klein"><b>Kurz-Lösungen:</b> 3 Fragen (8, 4, 2, 1); 5 und 6 Fragen; 6 Reihen; bis 1024 (zehnmal verdoppeln), also sicher bis 1000. Mehr bei den Lösungen am Ende.</p>
+    </div>
+  </div>
+
+  <div class="kasten stolper darf-brechen e10-bricht">
+    <ul>
+      <li><b>Sie vergisst eine Vergleichs-Stelle</b> oder nimmt die falsche zuerst: Am Papier immer von oben nach unten, mit dem Finger, jede erledigte Vergleichs-Stelle bekommt einen kleinen Haken. Im Hof Reihe für Reihe, nie zwei Reihen auf einmal.</li>
+      <li><b>Die Zahl springt auf eine andere Bahn, ohne Vergleichs-Stelle:</b> Eine Zahl bleibt auf ihrer Bahn, bis eine Vergleichs-Stelle kommt. Lass sie mit dem Finger auf der Linie entlangfahren, das Kuscheltier im Hof auf der Kreide-Linie laufen.</li>
+      <li><b>Sie tauscht immer</b>, auch wenn es schon passt: „Kleine Zahl, kleiner Punkt. Passt es schon? Dann bleiben beide.“ Tauschen ist nur nötig, wenn die größere am kleinen Punkt steht.</li>
+      <li><b>Kleiner und großer Punkt verwechselt:</b> Das passiert, wenn man nach links und rechts denkt. Darum heißen sie „kleiner Punkt“ und „großer Punkt“. Den Satz „kleine Zahl, kleiner Punkt“ immer wieder sagen.</li>
+      <li><b>Sie fragt „Ist es die 7?“</b> statt „größer als“: freundlich umformulieren. „Diese Frage gibt es heute nicht. Frag: Ist sie größer als 6?“ Erklär später den Unterschied: Bei „Ist es die 7?“ fliegt meistens nur eine einzige Zahl raus.</li>
+      <li><b>„Größer als 8? Ja“, und die 8 bleibt stehen:</b> Bei Ja ist die Zahl selbst auch weg. Im Spiel hilft die Regel „Bei Ja kommt die linke Kluppe auf die Zahl danach“.</li>
+      <li><b>Die Mitte ist schwer zu finden</b> (bei 51 bis 75): Zwei Finger von beiden Kluppen gleichzeitig nach innen, bis sie sich treffen. Ungefähr in der Mitte reicht bei 1 bis 100 fast immer für 7 Fragen.</li>
+      <li><b>Sie zählt „Deine Zahl ist 11!“ als Frage:</b> Das ist eine Antwort, keine Frage. Darum kostet sie keinen Muggelstein.</li>
+      <li><b>Sie will lieber Glück haben:</b> „Größer als 15? Ja! Dann ist es die 16, nur eine Frage!“ Glück ist schön, aber man weiß vorher nie, ob es klappt. Der Plan mit der Mitte schafft jede Zahl von 1 bis 16 mit höchstens 4 Fragen.</li>
+    </ul>
+  </div>
+
+  <div class="kasten schwerer darf-brechen e10-bricht">
+    <p>Klappen Netz und Halbieren nach ein paar Minuten, wähle hier aus. Das ist kein Zusatz „für später“, sondern ein vollwertiger Hauptteil. Die Profi-Aufgaben auf den Blättern gehören dazu.</p>
+    <ol class="e10-ganz">
+      <li><b>Das große Netz am Papier:</b> Aufgabe 1 auf <a class="blattref" href="#blatt-10-3"></a>: 6, 9, 1, 4 laufen durch das Netz aus dem Hof. Wo wird getauscht, wo nicht? (An den ersten beiden Vergleichs-Stellen bleibt alles, wie es ist, an den anderen 4 wird getauscht. Am Ziel: 1, 4, 6, 9. Die letzte Vergleichs-Stelle tauscht noch 6 und 4: Ohne sie wäre es nicht sortiert.)</li>
+      <li><b>Alle Reihenfolgen ausprobieren:</b> Knobel-Ecke auf <a class="blattref" href="#blatt-10-3"></a>: Es gibt 6 Reihenfolgen für 1, 2, 3. Ein Trick, damit keine fehlt: zuerst alle mit der 1 vorne (123, 132), dann alle mit der 2 vorne, dann mit der 3. Danach lässt {{KIND}} alle 6 durch das Netz von <a class="blattref" href="#blatt-10-1"></a> laufen (mit Zahlenkärtchen oder am Papier). Alle kommen sortiert an. Damit hat sie <b>bewiesen</b>, dass das Netz immer sortiert, genauso wie Programmierer es beweisen. Für 4 Zahlen gibt es 24 Reihenfolgen (für jede Zahl vorne 6, also <span class="rechnung">4 · 6 = 24</span>): Das ist eine Aufgabe für mehrere Tage oder für das Programm.</li>
+      <li><b>Kaputtes Netz:</b> Der Kobold hat beim Netz mit 3 Bahnen die letzte Vergleichs-Stelle weggewischt. Es bleiben nur Bahn 1 mit 2 und dann Bahn 2 mit 3 (erstes Bild). Findet {{KIND}} eine Reihenfolge, die jetzt schiefgeht? (Genau 2 von 6 gehen schief: 2, 3, 1 und 3, 2, 1. Bei 3, 2, 1 kommt 2, 1, 3 heraus: Die 3 kommt richtig auf die große Seite, aber 2 und 1 treffen sich nie mehr.) Die anderen 4 kommen sortiert an. Darum reicht es nicht, ein paar auszuprobieren: Ein Netz ist erst gut, wenn <b>alle</b> klappen.
+        <div class="e10-bilder">
+          <figure><m-e10-netz raetsel="e10-x1" skala="0.3" ohne-text></m-e10-netz><figcaption>kaputt: nur 2 Vergleichs-Stellen</figcaption></figure>
+          <figure><m-e10-netz raetsel="e10-x4" skala="0.3" ohne-text></m-e10-netz><figcaption>Treppen-Netz: auch 6, sortiert alle 24</figcaption></figure>
+          <figure><m-e10-netz raetsel="e10-x2" skala="0.3" ohne-text></m-e10-netz><figcaption>nur 5, mit Brücken, sortiert alle 24</figcaption></figure>
+          <figure><m-e10-netz raetsel="e10-x3" skala="0.3" ohne-text></m-e10-netz><figcaption>5 Bahnen: 10, sortiert alle 120</figcaption></figure>
+        </div></li>
+      <li><b>Ein eigenes Netz erfinden:</b> Auf ein Blatt 4 Bahnen zeichnen, Vergleichs-Stellen (nur zwischen Nachbar-Bahnen) selbst setzen, dann mit verschiedenen Reihenfolgen testen. Gut zum Testen ist die verkehrteste: 4, 3, 2, 1. Ein Netz, das funktioniert, ist das <b>Treppen-Netz</b> (zweites Bild): zuerst Bahn 1 mit 2, 2 mit 3, 3 mit 4 (dann ist die größte Zahl sicher ganz auf der großen Seite), dann 1 mit 2, 2 mit 3, zuletzt 1 mit 2. Auch 6 Vergleichs-Stellen. Geht es mit Nachbar-Bahnen mit weniger als 6? (Nein: Bei 4, 3, 2, 1 stehen 6 Paare verkehrt, und jede Vergleichs-Stelle zwischen Nachbarn repariert höchstens eines davon.)</li>
+      <li><b>Mit Brücken nur 5:</b> Erlaubt man Vergleichs-Stellen, die über eine Bahn springen (eine Brücke), reichen 5: Bahn 1 mit 2 und 3 mit 4, dann 1 mit 3 und 2 mit 4, zuletzt 2 mit 3 (drittes Bild). Im Hof wird das ein Kreide-Bogen über die mittlere Bahn. Nach den ersten vier steht die kleinste Zahl schon sicher ganz auf der kleinen Seite und die größte ganz auf der großen.</li>
+      <li><b>5 Kuscheltiere:</b> Das Netz mit 5 Bahnen (viertes Bild) hat 10 Vergleichs-Stellen in 5 Reihen, abwechselnd wie im Hof, und sortiert alle 120 Reihenfolgen (geprüft). Für den Hof braucht ihr eine fünfte Bahn und eine fünfte Reihe.</li>
+      <li><b>Halbier-Suche bis 1000:</b> „Ich denke mir eine Zahl bis 1000. Wie viele Fragen brauchst du höchstens?“ Halbier-Leiter: <m-e10-wert raetsel="e10-l5" was="leiter"></m-e10-wert>, das sind <m-e10-wert raetsel="e10-l5" was="fragen"></m-e10-wert> Fragen. Spielt es wirklich (ohne Maßband, die Kluppen-Zahlen auf einen Zettel schreiben). „Immer 1 mehr“ bräuchte bis zu 999 Fragen.</li>
+      <li><b>Die schlechteste Strategie:</b> „Größer als 1? Größer als 2? …“ gegen Halbieren. Bei 1 bis 16 braucht „immer 1 mehr“ bis zu 15 Fragen, Halbieren immer genau 4. Frag: „Warum ist Halbieren so viel besser?“ (Weil jede Antwort die Hälfte wegwirft, egal ob Ja oder Nein. Bei „immer 1 mehr“ fliegt meistens nur eine Zahl raus.)</li>
+      <li><b>Kobold-Frage finden:</b> Erzähl: „Der Kobold sucht die Zahl der Fee von 1 bis 16. Er fragt <m-e10-fragen raetsel="e10-f1"></m-e10-fragen>. Dann weiß er: 11. Er hat <m-e10-wert raetsel="e10-f1" was="gebraucht"></m-e10-wert> Fragen gebraucht, mit Halbieren reichen 4. Welche Frage war schlecht?“ (Frage <m-e10-wert raetsel="e10-f1" was="schlecht"></m-e10-wert>: Bei 9 bis 12 fragt er „größer als 9?“ statt „größer als 10?“. Bei Ja bleiben 3 Zahlen statt 2.) Schreib die Fragen dazu auf einen Zettel, mit einer Zahlen-Reihe zum Durchstreichen.</li>
+      <li><b>Wörter im Wörterbuch suchen:</b> Ein Wörterbuch ist sortiert, nach dem Alphabet. {{KIND}} sucht „Drache“: in der Mitte aufschlagen, nachschauen, ob „D“ vorher oder nachher kommt, dann in der richtigen Hälfte wieder in der Mitte. Bei einem Buch mit 300 Seiten reicht höchstens <m-e10-wert raetsel="e10-l6" was="fragen"></m-e10-wert>-mal aufschlagen (<m-e10-wert raetsel="e10-l6" was="leiter"></m-e10-wert>). Und dann: Wie schwer wäre es, wenn die Wörter nicht sortiert wären? (Man müsste jede Seite anschauen.) Sortieren macht Suchen schnell.</li>
+      <li><b>Halbieren mit den Ja/Nein-Karten:</b> Mit den Ja/Nein-Karten aus Einheit&nbsp;9 (<a class="blattref" href="#blatt-9-1"></a>) und den Zahlen 0 bis 31: Die Halbier-Fragen sind genau „größer als 15?“ (das heißt: liegt die 16er-Karte?), dann „größer als 23?“ oder „größer als 7?“ (die 8er-Karte) und so weiter. 5 Fragen, 5 Karten. Jede Halbier-Antwort ist eine Ja/Nein-Karte!</li>
+    </ol>
+  </div>
+
+  <div class="kasten tipp" data-titel="Urkunde 1: Drachen-Programmiererin">
+    <p>Nach dieser Einheit hat {{KIND}} Block A und Block B geschafft: Befehle, Programme, den Fehler-Kobold, den Wiederhol-Zauber, Muster, Geheimschrift, Kästchenbilder, Ja/Nein-Zahlen, Sortieren und Suchen. Dafür gibt es die erste <b>Urkunde</b> (hinten im Heft und in den Kopiervorlagen, Seite „Urkunde 1“). So wird es feierlich:</p>
+    <ul>
+      <li><b>Wann:</b> nicht gleich nach der Einheit, sondern beim Abendessen oder am Wochenende, wenn die Familie da ist. Datum und Unterschrift sind schon drauf.</li>
+      <li><b>Wie:</b> Kurz ankündigen („Heute haben wir eine Drachen-Programmiererin am Tisch“), mit den Händen auf dem Tisch trommeln, die Urkunde überreichen und die fünf Sätze darauf gemeinsam vorlesen. Jeder Satz ist eine Sache, die sie wirklich kann.</li>
+      <li><b>Vorführung:</b> {{KIND}} zeigt der Familie ein Programm. Ideen: Oma oder Opa ist der Roboter und wird mit Befehlskarten durch die Wohnung programmiert (Einheit&nbsp;1). Oder die ganze Familie läuft durch das Sortier-Netz und steht am Ziel der Größe nach (Kasten „Bewegung“, Variante). Oder sie lässt jemanden eine Zahl bis 100 denken und findet sie mit höchstens 7 Fragen.</li>
+      <li><b>Danach:</b> Die Urkunde kommt an die Wand oder an den Kühlschrank. Im Sammelpass hat das Feld „Einheit&nbsp;10“ eine Medaille. Und für dich: Jetzt ist ein guter Moment für den Rückmeldebogen zu Block B (Einheiten 6 bis 10).</li>
+    </ul>
+  </div>
+
+  <h2>Hintergrund</h2>
+  <div class="kasten warum darf-brechen e10-bricht">
+    <p>Sortieren gehört zu den häufigsten Aufgaben eines Computers: Fotos nach Datum, Lieder nach Titel, Suchergebnisse nach Wichtigkeit. Ein Programm, das sortiert, heißt <span class="begriff">Sortieralgorithmus</span>. Fast alle arbeiten mit genau dem Schritt, den {{KIND}} heute gemacht hat: zwei Dinge vergleichen und, wenn nötig, tauschen. Der Computer „sieht“ nie alles auf einmal. Das Zwei-Blick-Sortieren (Nachbarn vergleichen, immer wieder von vorne) heißt bei Programmierern <span class="begriff">Bubblesort</span>: Die großen Zahlen steigen wie Blasen nach oben.</p>
+    <p>Das Sortier-Netz ist ein <span class="begriff">Sortiernetzwerk</span>. Seine Vergleichs-Stellen (Fachwort: Komparatoren) liegen fest, das Netz macht bei jeder Eingabe genau dieselben Vergleiche. Darum kann man es fest in Hardware bauen, und Vergleichs-Stellen in derselben Reihe arbeiten <b>gleichzeitig</b>, wie ihr beide im Hof. Das Netz im Hof vergleicht abwechselnd die Paare 1-2 und 3-4, dann 2-3 (Fachwort: Odd-Even-Transposition). Ob ein Netz immer sortiert, prüft man mit allen Reihenfolgen (bei 4 Bahnen 24, bei 6 Bahnen schon 720). Ein Trick für Profis: Es reicht, alle Folgen aus nur Nullen und Einsen zu prüfen (das 0-1-Prinzip), bei 4 Bahnen also nur 16.</p>
+    <p>Die Halbier-Suche heißt <span class="begriff">binäre Suche</span>. Sie geht nur, wenn die Dinge sortiert sind, wie die Zahlen am Maßband oder die Wörter im Wörterbuch. Darum sortieren Computer so gern: Sortiert findet man alles schnell. Jede Frage halbiert, also reichen für 1000 Dinge 10 Fragen und für eine Million Dinge 20. Mathematisch ist das der Logarithmus zur Basis 2. Schneller geht es mit Ja/Nein-Fragen nicht: Mit 7 Antworten gibt es nur <span class="rechnung">2 · 2 · 2 · 2 · 2 · 2 · 2 = 128</span> verschiedene Antwort-Folgen, mit 6 nur 64, und das ist weniger als 100. Das Programm, das diese Werkstatt prüft, hat das zusätzlich mit einem <span class="begriff">Spielbaum</span> über alle möglichen Frage-Pläne bestätigt. Jede Ja/Nein-Antwort ist ein <span class="begriff">Bit</span>, wie bei den Ja/Nein-Zahlen aus Einheit&nbsp;9. Später, bei den Ja-Nein-Bäumen (Einheit&nbsp;13), kommt die Halbier-Suche wieder: Dort ist die beste Frage die, die eine Gruppe in zwei gleich große Hälften teilt.</p>
+    <p><b>Zur Rechen-Werkstatt:</b> Dort ratet ihr in R8 Zahlen mit „größer“ und „kleiner“. Hier wird daraus ein <span class="begriff">Algorithmus</span>: eine feste Regel, die immer funktioniert, und eine Zahl, wie lange sie im schlimmsten Fall dauert.</p>
+  </div>
+
+  <h2>Bildschirm-Bonus</h2>
+  <div class="kasten bildschirm darf-brechen e10-bricht">
+    <p><b>Paket 10 „Sortieren und Suchen“.</b> Den QR-Code findest du auf <a class="blattref" href="#blatt-10-2"></a> unten rechts. Nur am Schluss, nach den Blättern, höchstens 15 Minuten. Die Einheit funktioniert auch ganz ohne Bildschirm.</p>
+    <p><b>8 Levels</b> in drei Sorten, gemischt:</p>
+    <ul>
+      <li><b>Nachbarn tauschen</b> (Level 1 und 2): Türme aus Steinen (Level 1) und Zahlenkarten (Level 2) stehen durcheinander. {{KIND}} tippt zwei Nachbarn an, dann tauschen sie den Platz. Geschafft ist es, wenn alles sortiert ist, das Kleinste auf der kleinen Seite. Wer nur tauscht, wenn das Größere auf der kleinen Seite steht, braucht die wenigsten Tausche.</li>
+      <li><b>Sortier-Netz</b> (Level 3 und 6): Eine Vergleichs-Stelle nach der anderen leuchtet auf, {{KIND}} entscheidet: tauschen oder bleiben. Die App lässt die Zahlen dann weiterlaufen. Geschafft ist es, wenn am Ziel alles sortiert ist. <b>Level 3 ist Aufgabe 1 von <a class="blattref" href="#blatt-10-1"></a>, Level 6 ist Aufgabe 1 von <a class="blattref" href="#blatt-10-3"></a>.</b></li>
+      <li><b>Halbier-Suche gegen den Computer</b> (Level 4, 5, 7, 8: bis 8, 16, 32 und 100): Die App denkt sich eine Zahl. {{KIND}} tippt eine Zahl an, das ist die Frage „Ist deine Zahl größer als …?“. Die App antwortet Ja oder Nein und streicht durch, was nicht mehr geht. Bleibt nur noch eine Zahl, ist sie gefunden. Den Stern gibt es, wenn es mit höchstens so vielen Fragen klappt wie mit Halbieren (bis 8: 3, bis 16: 4, bis 32: 5, bis 100: 7). Sonst zeigt die App „Fast geschafft!“ und wie viele Fragen mit Halbieren reichen. Level 5 ist das Spiel von <a class="blattref" href="#blatt-10-2"></a>, Aufgabe 1, nur denkt sich die App jedes Mal eine neue Zahl.</li>
+    </ul>
+    <p><b>Wann weglegen:</b> Nach Level 8 kommt „Super! Jetzt zurück zum Papier.“ Dann ist Schluss, auch wenn noch Zeit wäre. Lust auf mehr Halbier-Raten? Lieber noch eine Runde mit dem Maßband als ein weiteres Level.</p>
+  </div>
+
+  <h2>Lösungen</h2>
+  <div class="e10-loes">
+    <m-loesungen einheit="10" skala="0.39"></m-loesungen>
+    <div class="kasten loesung">
+      <p><b><a class="blattref" href="#blatt-10-1"></a>, Aufgabe 1:</b> Erste Vergleichs-Stelle: 7 und 2 tauschen (2, 7). Zweite: 7 und 5 tauschen (5, 7). Dritte: 2 und 5 bleiben. Am Ziel: <m-e10-wert raetsel="e10-n1" was="ende"></m-e10-wert>.</p>
+      <p><b>Aufgabe 2 (Kobold):</b> die zweite Vergleichs-Stelle (Bahn 2 und 3): Dort steht die 8 am kleinen Punkt und die 3 am großen. Richtig wäre 3 und 8, dann käme am Ziel <m-e10-wert raetsel="e10-k1" was="ende"></m-e10-wert> an statt 6, 8, 3.</p>
+      <p><b>Profi:</b> Start <m-e10-wert raetsel="e10-q1" was="antwort"></m-e10-wert>, also die größte Zahl auf der kleinen Seite. Das ist die einzige Reihenfolge, bei der alle 3 Vergleichs-Stellen tauschen (geprüft).</p>
+    </div>
+  </div>
+  <div class="kasten loesung darf-brechen e10-bricht e10-weiter">
+    <p><b><a class="blattref" href="#blatt-10-2"></a>, Aufgabe 1:</b> Die Fragen sind „größer als 8?“ (Ja, 1 bis 8 weg), „größer als 12?“ (Nein, 13 bis 16 weg), „größer als 10?“ (Ja, 9 und 10 weg), „größer als 11?“ (Nein, 12 weg). Die Zahl der Fee ist <m-e10-wert raetsel="e10-h1" was="gefunden"></m-e10-wert>. Bei jeder Frage gibt es genau eine Mitte, weil immer eine gerade Zahl an Zahlen übrig ist (16, 8, 4, 2).</p>
+    <p><b>Aufgabe 2:</b> 1 bis 8: 3 Fragen (Beispiel). 1 bis 16: <m-e10-wert raetsel="e10-l2" was="leiter"></m-e10-wert>, also <m-e10-wert raetsel="e10-l2" was="fragen"></m-e10-wert> Fragen. 1 bis 32: <m-e10-wert raetsel="e10-l3" was="leiter"></m-e10-wert>, also <m-e10-wert raetsel="e10-l3" was="fragen"></m-e10-wert> Fragen. Immer eine Frage mehr, wenn sich die Zahlen verdoppeln.</p>
+    <p><b>Profi:</b> <m-e10-wert raetsel="e10-l4" was="leiter"></m-e10-wert>: <m-e10-wert raetsel="e10-l4" was="fragen"></m-e10-wert> Fragen. Wer aus 25 die 12 macht statt 13, kommt auf 6: Das stimmt nur mit Glück (wenn die Antwort in die kleinere Hälfte führt). Höchstens heißt: auch im schlimmsten Fall.</p>
+    <p><b><a class="blattref" href="#blatt-10-3"></a>, Aufgabe 1:</b> Reihe 1: 6 und 9 bleiben, 1 und 4 bleiben. Reihe 2: 9 und 1 tauschen. Reihe 3: 6 und 1 tauschen, 9 und 4 tauschen. Reihe 4: 6 und 4 tauschen. Am Ziel: <m-e10-wert raetsel="e10-n2" was="ende"></m-e10-wert>.</p>
+    <p><b>Knobel-Ecke:</b> 6 Reihenfolgen: 123, 132, 213, 231, 312, 321 (die Reihenfolge der Zeilen ist egal). Alle 6 kommen im Netz von <a class="blattref" href="#blatt-10-1"></a> sortiert an.</p>
+    <p><b>Bonus-Knobelei:</b> Fragen zählen: 8, 4, 2, 1, also 3 Fragen. Doppelt so viele: bis 32 sind es 5 Fragen, bis 64 sind es 6. Kuscheltier-Reihe: 6 Reihen (wer vorne sitzt: 3 Möglichkeiten, dann noch 2 für den zweiten Platz, <span class="rechnung">3 · 2 = 6</span>). Für Profis: Zehnmal verdoppeln ergibt 1024, mit 10 Fragen findet man jede Zahl von 1 bis 1024.</p>
+    <p><b>Bildschirm-Levels (zum Nachschauen):</b> Die Halbier-Levels haben keine feste Lösung, die App denkt sich jedes Mal eine neue Zahl. Mit genauem Halbieren braucht man bei 8, 16 und 32 immer genau 3, 4 und 5 Fragen, bei 100 je nach Zahl 6 oder 7.</p>
+    <table class="tab e10-tab">
+      <tr><th>Level</th><th>Was ist es?</th><th>Lösung</th></tr>
+      <tr><td>1</td><td>Türme nach Größe: 3, 1, 4, 2 Steine</td><td>wenigstens <m-e10-wert raetsel="e10-w1" was="wenigsteTausche"></m-e10-wert> Tausche</td></tr>
+      <tr><td>2</td><td>Zahlen tauschen: 4, 1, 5, 2, 3</td><td>wenigstens <m-e10-wert raetsel="e10-w2" was="wenigsteTausche"></m-e10-wert> Tausche</td></tr>
+      <tr><td>3</td><td>Sortier-Netz mit 3 Zahlen (<a class="blattref" href="#blatt-10-1"></a>, Aufgabe 1)</td><td>tauschen, tauschen, bleiben</td></tr>
+      <tr><td>4</td><td>Zahl von 1 bis 8</td><td>höchstens <m-e10-wert raetsel="e10-w3" was="fragen"></m-e10-wert> Fragen</td></tr>
+      <tr><td>5</td><td>Zahl von 1 bis 16 (wie <a class="blattref" href="#blatt-10-2"></a>)</td><td>höchstens <m-e10-wert raetsel="e10-w4" was="fragen"></m-e10-wert> Fragen</td></tr>
+      <tr><td>6</td><td>Sortier-Netz mit 4 Zahlen (<a class="blattref" href="#blatt-10-3"></a>, Aufgabe 1)</td><td>bleiben, bleiben, tauschen, tauschen, tauschen, tauschen</td></tr>
+      <tr><td>7</td><td>Zahl von 1 bis 32</td><td>höchstens <m-e10-wert raetsel="e10-w5" was="fragen"></m-e10-wert> Fragen</td></tr>
+      <tr><td>8</td><td>Zahl von 1 bis 100</td><td>höchstens <m-e10-wert raetsel="e10-w6" was="fragen"></m-e10-wert> Fragen</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 10-1: Das Sortier-Netz (durchlaufen, Kobold, Profi)         -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="10" data-titel="Das Sortier-Netz" data-art="Arbeitsblatt" data-verteilt>
+  <p class="e10-regel">Die Zahlen laufen nach unten. An jeder Vergleichs-Stelle treffen sich zwei: Die <b>kleinere</b> Zahl geht zum kleinen Punkt <m-e10-punkt art="klein" gr="5"></m-e10-punkt>, die <b>größere</b> zum großen Punkt <m-e10-punkt art="gross" gr="5"></m-e10-punkt>.</p>
+
+  <div class="e10-paar">
+    <div class="aufg">
+      <p class="anw">{{KIND}}, lass die Zahlen durch das Netz laufen. Schreib sie in die Kästchen.</p>
+      <m-e10-netz raetsel="e10-n1"></m-e10-netz>
+    </div>
+    <div class="aufg">
+      <p class="anw">Hier hat der Fehler-Kobold einmal falsch getauscht. Kreis die Stelle ein!</p>
+      <m-e10-netz raetsel="e10-k1"></m-e10-netz>
+    </div>
+  </div>
+
+  <div class="profi" data-titel="Profi-Aufgabe: Immer tauschen">
+    <div class="e10-profi-reihe">
+      <p>Schreib die Zahlen 1, 2 und 3 so an den Start, dass an <b>jeder</b> Vergleichs-Stelle getauscht wird.</p>
+      <m-e10-netz raetsel="e10-q1" feld="11" abstand="24" zeile="20.5"></m-e10-netz>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 10-2: Die Halbier-Suche (Fee-Zahl, Halbier-Leiter, Profi) -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="10" data-titel="Die Halbier-Suche" data-art="Arbeitsblatt" data-verteilt>
+  <div class="aufg">
+    <p class="anw">{{KIND}}, die Fee denkt sich eine Zahl von 1 bis 16. Frag immer genau in der Mitte! Streich nach jeder Antwort durch, was nicht mehr geht.</p>
+    <div class="e10-fee">
+      <m-e10-halbier raetsel="e10-h1"></m-e10-halbier>
+      <m-bild name="fee" gr="24"></m-bild>
+      <m-qr paket="e10"></m-qr>
+    </div>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">Jede gute Frage halbiert. Halbiere, bis nur noch 1 Zahl übrig ist. Jeder Pfeil ist eine Frage. Wie viele Fragen brauchst du höchstens?</p>
+    <div class="e10-leitern">
+      <span></span><span></span><span class="e10-kopf">Fragen</span>
+      <span class="e10-bis">1 bis 8<span class="e10-bsp klein">So geht’s:</span></span><m-e10-leiter raetsel="e10-l1" beispiel zahl="nein" pfeil="10"></m-e10-leiter><m-e10-zahl raetsel="e10-l1" was="fragen" zeige></m-e10-zahl>
+      <span class="e10-bis">1 bis 16</span><m-e10-leiter raetsel="e10-l2" zahl="nein" pfeil="10"></m-e10-leiter><m-e10-zahl raetsel="e10-l2" was="fragen"></m-e10-zahl>
+      <span class="e10-bis">1 bis 32</span><m-e10-leiter raetsel="e10-l3" zahl="nein" pfeil="10"></m-e10-leiter><m-e10-zahl raetsel="e10-l3" was="fragen"></m-e10-zahl>
+    </div>
+  </div>
+
+  <div class="profi" data-titel="Profi-Aufgabe: 1 bis 100">
+    <p>Halbiere bis 1. Bei einer ungeraden Zahl nimmst du die größere Hälfte: Aus 25 wird 13.</p>
+    <m-e10-leiter raetsel="e10-l4" feld="11" pfeil="8" zahl="unten"></m-e10-leiter>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 10-3: Mein Sortier-Netz (Plan, alle Reihenfolgen, Kärtchen) -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="10" data-titel="Mein Sortier-Netz" data-art="Spielplan" data-verteilt>
+  <div class="aufg">
+    <p class="anw">{{KIND}}, das ist dein Sortier-Netz. Probier es am Papier aus!</p>
+    <div class="e10-plan-reihe">
+      <m-e10-netz raetsel="e10-n2" masse="50 cm, 60 cm" feld="12" zeile="21.5"></m-e10-netz>
+      <div class="e10-plan-info">
+        <p>4 Bahnen für 4 Kuscheltiere.</p>
+        <div class="e10-legende">
+          <span>Kleine Zahl: <m-e10-punkt art="klein" gr="5"></m-e10-punkt></span>
+          <span>Große Zahl: <m-e10-punkt art="gross" gr="5"></m-e10-punkt></span>
+        </div>
+        <p class="klein">Für Mama oder Papa: Im Hof sind die Bahnen 50 cm auseinander, die Reihen 60 cm. Im Gang 30 cm und 50 cm.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="knobel" data-titel="Knobel-Ecke: Alle Reihenfolgen">
+    <p>Wie kann man 1, 2 und 3 an den Start stellen? Schreib alle Reihenfolgen auf. Probier jede im Netz von <span class="e10-nw">Blatt 10-1</span> aus!</p>
+    <m-e10-alle n="3"></m-e10-alle>
+  </div>
+
+  <div>
+    <p class="e10-titel">Zahlenkärtchen für die Kuscheltiere</p>
+    <m-karten spalten="4" zeilen="2" hoehe="24" breite="176">
+      <div><span class="e10-kz">1</span></div>
+      <div><span class="e10-kz">2</span></div>
+      <div><span class="e10-kz">3</span></div>
+      <div><span class="e10-kz">4</span></div>
+      <div><span class="e10-kz">5</span></div>
+      <div><span class="e10-kz">6</span></div>
+      <div><span class="e10-kz">7</span></div>
+      <div><span class="e10-kz">8</span></div>
+    </m-karten>
+  </div>
+</section>
