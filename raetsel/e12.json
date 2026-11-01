@@ -1,0 +1,166 @@
+{
+  "paket": "e12",
+  "einheit": 12,
+  "titel": "Logikrätsel",
+  "web": {
+    "titel": "Logikrätsel",
+    "art": "logik",
+    "levels": ["e12-a1", "e12-w1", "e12-a2", "e12-w2", "e12-w3", "e12-k1", "e12-w4", "e12-p1"]
+  },
+  "raetsel": [
+    {
+      "id": "e12-a1", "art": "logik", "titel": "Wer mag was?",
+      "zeilen": ["drache", "einhorn"], "spalten": ["apfel", "eis"],
+      "hinweise": [
+        { "text": "Der {drache} mag kein {eis}.", "regel": "drache!=eis" }
+      ]
+    },
+    {
+      "id": "e12-a2", "art": "logik", "titel": "Wer mag was?",
+      "zeilen": ["katze", "hase", "eule"], "spalten": ["karotte", "kuchen", "fisch"],
+      "hinweise": [
+        { "text": "Der {hase} mag keine {karotte}.", "regel": "hase!=karotte" },
+        { "text": "Die {katze} mag keine {karotte}.", "regel": "katze!=karotte" },
+        { "text": "Die {katze} mag keinen {fisch}.", "regel": "katze!=fisch" }
+      ]
+    },
+    {
+      "id": "e12-wf", "art": "logik", "aufgabe": "wahrfalsch",
+      "szene": [
+        { "tier": "drache", "hat": ["muetze-rot", "apfel"] },
+        { "tier": "einhorn", "hat": ["muetze-blau", "eis"] },
+        { "tier": "katze", "hat": ["muetze-gelb", "fisch"] }
+      ],
+      "aussagen": [
+        { "text": "Der {drache} hat eine {muetze-rot}.", "regel": "drache=muetze-rot", "soll": "wahr" },
+        { "text": "Die {katze} hat ein {eis}.", "regel": "katze=eis", "soll": "falsch" },
+        { "text": "Der {drache} hat eine {muetze-gelb} und einen {apfel}.", "regel": "drache=muetze-gelb & drache=apfel", "soll": "falsch" },
+        { "text": "Das {einhorn} hat eine {muetze-blau} und ein {eis}.", "regel": "einhorn=muetze-blau & einhorn=eis", "soll": "wahr" },
+        { "text": "Die {katze} hat einen {apfel} oder einen {fisch}.", "regel": "katze=apfel | katze=fisch", "soll": "wahr" },
+        { "text": "Das {einhorn} hat keine {muetze-blau}.", "regel": "einhorn!=muetze-blau", "soll": "falsch" }
+      ]
+    },
+    {
+      "id": "e12-wf2", "art": "logik", "aufgabe": "wahrfalsch",
+      "szene": [
+        { "tier": "drache", "hat": ["muetze-rot", "apfel"] },
+        { "tier": "einhorn", "hat": ["muetze-blau", "eis"] },
+        { "tier": "katze", "hat": ["muetze-gelb", "fisch"] }
+      ],
+      "aussagen": [
+        { "text": "Die {katze} hat einen {apfel} und einen {fisch}.", "regel": "katze=apfel & katze=fisch", "soll": "falsch" },
+        { "text": "Das {einhorn} hat eine {muetze-blau}.", "regel": "einhorn=muetze-blau", "soll": "wahr" },
+        { "text": "Der {drache} hat eine {muetze-gelb} oder einen {apfel}.", "regel": "drache=muetze-gelb | drache=apfel", "soll": "wahr" },
+        { "text": "Die {katze} hat einen {apfel} oder ein {eis}.", "regel": "katze=apfel | katze=eis", "soll": "falsch" }
+      ]
+    },
+    {
+      "id": "e12-k1", "art": "logik", "titel": "Der Kobold war da!",
+      "zeilen": ["hase", "eule", "drache"], "spalten": ["muetze-rot", "muetze-blau", "muetze-gelb"],
+      "hinweise": [
+        { "text": "Der {drache} hat die {muetze-gelb}.", "regel": "drache=muetze-gelb" },
+        { "text": "Die {eule} hat keine {muetze-rot}.", "regel": "eule!=muetze-rot" }
+      ],
+      "vorgabe": { "ja": [["drache", "muetze-gelb"]], "nein": [["eule", "muetze-rot"], ["eule", "muetze-blau"]] },
+      "kobold": { "nein": ["eule", "muetze-blau"] }
+    },
+    {
+      "id": "e12-p1", "art": "logik", "titel": "Logik-Profi",
+      "zeilen": ["drache", "einhorn", "katze", "hase"], "spalten": ["apfel", "eis", "kuchen", "karotte"],
+      "hinweise": [
+        { "text": "Der {drache} und der {hase} mögen keinen {apfel}.", "regel": "drache!=apfel & hase!=apfel" },
+        { "text": "Der {hase} mag kein {eis}.", "regel": "hase!=eis" },
+        { "text": "Das {einhorn} mag das {eis} oder die {karotte}.", "regel": "einhorn=eis | einhorn=karotte" },
+        { "text": "Der {drache} mag keinen {kuchen} und keine {karotte}.", "regel": "drache!=kuchen & drache!=karotte" }
+      ],
+      "ueberfluessig": [2]
+    },
+    {
+      "id": "e12-w1", "art": "logik", "titel": "Wer mag was?",
+      "zeilen": ["eule", "hase"], "spalten": ["kuchen", "apfel"],
+      "hinweise": [
+        { "text": "Die {eule} mag den {apfel}.", "regel": "eule=apfel" }
+      ]
+    },
+    {
+      "id": "e12-w2", "art": "logik", "titel": "Wer hat welche Mütze?",
+      "zeilen": ["drache", "einhorn", "katze"], "spalten": ["muetze-rot", "muetze-blau", "muetze-gelb"],
+      "hinweise": [
+        { "text": "Das {einhorn} hat die {muetze-rot}.", "regel": "einhorn=muetze-rot" },
+        { "text": "Die {katze} hat keine {muetze-blau}.", "regel": "katze!=muetze-blau" }
+      ]
+    },
+    {
+      "id": "e12-w3", "art": "logik", "titel": "Mit oder",
+      "zeilen": ["einhorn", "hase", "eule"], "spalten": ["apfel", "eis", "karotte"],
+      "hinweise": [
+        { "text": "Das {einhorn} mag keinen {apfel}.", "regel": "einhorn!=apfel" },
+        { "text": "Die {eule} mag das {eis} oder die {karotte}.", "regel": "eule=eis | eule=karotte" },
+        { "text": "Das {einhorn} oder der {hase} mag das {eis}.", "regel": "einhorn=eis | hase=eis" }
+      ]
+    },
+    {
+      "id": "e12-w4", "art": "logik", "titel": "Mit und und oder",
+      "zeilen": ["drache", "katze", "hase"], "spalten": ["kuchen", "fisch", "karotte"],
+      "hinweise": [
+        { "text": "Der {drache} und die {katze} mögen keinen {kuchen}.", "regel": "drache!=kuchen & katze!=kuchen" },
+        { "text": "Die {katze} oder der {hase} mag die {karotte}.", "regel": "katze=karotte | hase=karotte" }
+      ]
+    },
+    {
+      "id": "e12-boden", "art": "logik", "titel": "Kuscheltier-Gitter",
+      "zeilen": ["teddy", "stoffhase", "stoffdrache"], "spalten": ["loeffel", "socke", "buch"],
+      "woerter": { "teddy": "Teddy", "stoffhase": "Hase", "stoffdrache": "Drache", "loeffel": "Löffel", "socke": "Socke", "buch": "Buch" },
+      "hinweise": [
+        { "text": "Der {teddy} mag keine {socke}.", "regel": "teddy!=socke" },
+        { "text": "Der {stoffhase} mag den {loeffel}.", "regel": "stoffhase=loeffel" }
+      ]
+    },
+    {
+      "id": "e12-s1", "art": "logik", "titel": "Ein Hinweis stimmt nicht",
+      "zeilen": ["drache", "einhorn", "eule"], "spalten": ["apfel", "eis", "kuchen"],
+      "hinweise": [
+        { "text": "Der {drache} mag den {kuchen}.", "regel": "drache=kuchen" },
+        { "text": "Der {drache} mag den {apfel}.", "regel": "drache=apfel" },
+        { "text": "Das {einhorn} mag den {apfel}.", "regel": "einhorn=apfel" }
+      ],
+      "falscherHinweis": 2
+    },
+    {
+      "id": "e12-s2", "art": "logik", "titel": "Familien-Rätsel: zu wenig Hinweise",
+      "zeilen": ["mama", "papa", "du"], "spalten": ["rot", "blau", "gruen"],
+      "woerter": { "mama": "Mama", "papa": "Papa", "du": "du", "rot": "Rot", "blau": "Blau", "gruen": "Grün" },
+      "hinweise": [
+        { "text": "{mama} mag kein {rot}.", "regel": "mama!=rot" }
+      ],
+      "erwarteteLoesungen": 4
+    },
+    {
+      "id": "e12-s3", "art": "logik", "titel": "Familien-Rätsel: genau eine Lösung",
+      "zeilen": ["mama", "papa", "du"], "spalten": ["rot", "blau", "gruen"],
+      "woerter": { "mama": "Mama", "papa": "Papa", "du": "du", "rot": "Rot", "blau": "Blau", "gruen": "Grün" },
+      "hinweise": [
+        { "text": "{mama} mag kein {rot}.", "regel": "mama!=rot" },
+        { "text": "{papa} mag {gruen}.", "regel": "papa=gruen" }
+      ]
+    },
+    {
+      "id": "e12-b1", "art": "logik", "titel": "Bonus: Eis-Rätsel",
+      "zeilen": ["papa", "oma", "du"], "spalten": ["schoko", "vanille", "erdbeer"],
+      "woerter": { "papa": "Papa", "oma": "Oma", "du": "du", "schoko": "Schoko", "vanille": "Vanille", "erdbeer": "Erdbeer" },
+      "hinweise": [
+        { "text": "{papa} mag kein {schoko}.", "regel": "papa!=schoko" },
+        { "text": "{du|Du} hast {erdbeer}.", "regel": "du=erdbeer" }
+      ]
+    },
+    {
+      "id": "e12-b2", "art": "logik", "aufgabe": "wahrfalsch", "ohneBilder": true,
+      "szene": [ { "tier": "du", "hat": ["kind"] } ],
+      "aussagen": [
+        { "text": "Du bist ein Kind oder ein Drache.", "regel": "du=kind | du=drache", "soll": "wahr" },
+        { "text": "Du bist ein Kind und ein Drache.", "regel": "du=kind & du=drache", "soll": "falsch" },
+        { "text": "Du bist kein Drache.", "regel": "du!=drache", "soll": "wahr" }
+      ]
+    }
+  ]
+}

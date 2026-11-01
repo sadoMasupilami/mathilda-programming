@@ -1,1 +1,510 @@
-<!-- Einheit 12: noch nicht geschrieben (Platzhalter, damit Buch und --nur 12 schon funktionieren) -->
+<!--
+  Einheit 12: Logikrätsel (Block C)
+  Wahr oder falsch, und, oder, nicht; kleine Logikgitter mit Bildern (zuerst 2 · 2, normal 3 · 3, 4 · 4 im Schwerer-Teil).
+  Rätsel: raetsel/e12.json (Web-Paket e12, Art logik)
+  Gemeinsame Logik und Bilder: web/kern/logik.js; Löser: werkzeuge/arten/logik.mjs
+  Eigene Bausteine: src/bausteine/e12-logik.js (Gitter, Hinweise, Szene, Wahr/falsch-Sätze)
+  Blätter: 12-1 Wer mag was? (mit QR-Code), 12-2 Wahr oder falsch? (mit Kobold-Jagd), 12-3 Logik-Profi
+-->
+<style>
+  .e12-ablauf > li { break-inside: avoid; }
+  .e12-ganz > li { break-inside: auto; orphans: 2; widows: 2; }
+  .kasten.e12-bricht { -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .kasten.e12-bricht > .kasten-titel { break-after: avoid; }
+  .kasten.e12-bricht > .kasten-titel + p, .kasten.e12-bricht > .kasten-titel + ul > li:first-child { break-before: avoid; break-inside: avoid; }
+  .e12-tab td:first-child { width: 9%; }
+  .e12-tab td:nth-child(2) { width: 34%; }
+  .e12-saetze td:nth-child(2) { width: 14%; white-space: nowrap; }
+  .e12-saetze td:first-child { width: 16%; white-space: nowrap; }
+  .e12-loes { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm 4mm; align-items: start; margin: 2mm 0 4mm 0; }
+  .e12-loes m-loesungen, .e12-loes .loesungen-raster { display: contents; }
+  .e12-loes > .kasten.loesung { margin: 5mm 0 0 0; font-size: 9.5pt; }
+  .e12-loes > .kasten.loesung p { margin-bottom: 1.6mm; }
+  .kasten.loesung.e12-weiter p { margin-bottom: 1.6mm; }
+  .e12-bsp { display: flex; gap: 6mm; align-items: flex-start; margin: 2mm 0 2.5mm 0; }
+  .e12-bsp > ul, .e12-bsp m-e12-hinweise { flex: 1; margin: 0; }
+  .e12-anl-gitter { flex: none; }
+  .anleitung .e12-hl { --abst: 1.5mm; }
+  .anleitung .e12-hl > li { padding-left: 6.5mm; line-height: 1.45; }
+  .anleitung .e12-hl > li::before { width: 4.6mm; height: 4.6mm; line-height: 3.8mm; font-size: 8pt; top: 0.2em; border-width: 0.35mm; }
+
+  /* Blätter */
+  .e12-neben { display: flex; gap: 7mm; align-items: flex-start; }
+  .e12-rechts { flex: 1; display: flex; flex-direction: column; gap: 3.5mm; min-width: 0; }
+  .e12-ht { font-family: var(--text); font-weight: 900; font-size: 14pt; color: var(--grau); margin: 0; }
+  .e12-mitte { display: flex; justify-content: center; margin-bottom: 3mm; }
+  .e12-frage { margin: 0; }
+  .e12-zaehl { display: grid; grid-template-columns: auto auto auto; justify-content: start; align-items: center; gap: 2.5mm 9mm; }
+  .e12-zaehl > span { white-space: nowrap; }
+  .e12-unten { display: flex; align-items: flex-end; gap: 6mm; }
+  .e12-unten > .knobel { flex: 1; }
+  .e12-nowrap { white-space: nowrap; }
+  .e12-schreib { display: flex; flex-direction: column; gap: 0; }
+  .e12-schreib > div { display: flex; align-items: flex-end; gap: 2mm; height: 12mm; }
+  .e12-schreib > div > b { font-family: var(--text); font-weight: 900; font-size: 14pt; color: var(--grau); width: 5mm; }
+  .e12-schreib > div > span { flex: 1; border-bottom: 0.35mm solid var(--linie); height: 100%; }
+</style>
+
+<!-- Spickzettel: Kurzfassung der Anleitung zum Mitnehmen, höchstens zwei Seiten. Ablauf als Drehbuch (Minuten wie in der Anleitung) -->
+<section class="spick nur-buch" data-einheit="12" data-titel="Logikrätsel">
+  <p class="spick-kern"><b>Darum geht’s:</b> Ein Satz ist <b>wahr</b> oder <b>falsch</b>, auch mit „und“, „oder“ und „nicht“. <b>Daumen-Regel:</b> pro Teil des Satzes ein Daumen, hoch heißt wahr. Bei „und“ müssen beide Daumen hoch sein, bei „oder“ reicht einer. Dann löst {{KIND}} <b>Logikgitter</b>: Jedes Tier mag genau ein Ding. Kreis heißt Ja, Kreuz heißt Nein. <b>Kreis-Regel:</b> In der Reihe und Spalte eines Kreises gibt es nur Kreuze. <b>Letztes-Feld-Regel:</b> Ist in einer Reihe oder Spalte nur noch ein Feld frei, kommt dort der Kreis hin.</p>
+
+  <div class="spick-zwei breit-links">
+    <div class="spick-block vorher">
+      <h2>Vorher, ohne {{KIND}} <small>· etwa 12 Min</small></h2>
+      <ul class="check">
+        <li><a class="blattref" href="#blatt-12-1"></a> und <a class="blattref" href="#blatt-12-2"></a> in Farbe drucken, <a class="blattref" href="#blatt-12-3"></a> für später. <span class="min">2 Min</span></li>
+        <li>Kuscheltier-Gitter: 3 · 3 Felder am Boden (Boden-Gitter aus Einheit 2 oder 9 Blätter Papier). Links 3 Kuscheltiere, oben Löffel, Socke, Buch. <span class="min">5 Min</span></li>
+        <li>6 bis 8 Kuscheltiere für „Wer bin ich?“ in ein Sackerl. <span class="min">2 Min</span></li>
+        <li>Die Satz-Ideen im Kasten „Steh auf, wenn’s wahr ist“ einmal lesen. <span class="min">3 Min</span></li>
+      </ul>
+    </div>
+    <div class="spick-block vorher">
+      <h2>Bereitlegen</h2>
+      <ul class="check">
+        <li>Bleistift, Radiergummi, roter Buntstift</li>
+        <li>etwa 10 Muggelsteine, 6 Wäschekluppen</li>
+        <li>ein Polster pro Person</li>
+        <li>Stempel oder Sticker</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Gemeinsam</h2>
+  <ol class="spick-ablauf">
+    <li data-min="5"><div><b>Steh auf, wenn’s wahr ist.</b> Erst einfache Sätze, dann mit „und“, dann mit „oder“. Bei „und“ und „oder“ zuerst die Daumen zeigen lassen.
+      <div class="spick-spiel"><h3>Steh auf, wenn’s wahr ist</h3>
+        <p class="meta">2 Polster, etwa 10 Muggelsteine</p>
+        <ul>
+          <li><b>Ein Zug:</b> Der Springer hockt vor seinem Polster. Der Sager sagt einen Satz. Wahr: hochspringen, Arme hoch. Falsch: auf den Polster plumpsen.</li>
+          <li><b>Punkte:</b> passende Bewegung: 1 Muggelstein für den Springer, sonst 1 für den Sager.</li>
+          <li><b>Ende:</b> Nach 5 Sätzen tauschen. Nach 2 Runden zählen, mehr Steine gewinnt.</li>
+        </ul>
+      </div>
+      <div class="sag">
+        <p class="du">„Ich habe Socken an und einen Hut auf. Zeig es mit den Daumen!“</p>
+        <p class="sie">„Socken: Daumen hoch. Hut: Daumen runter. Dann ist der Satz falsch!“</p>
+        <p class="dann">Dann derselbe Satz mit „oder“: Jetzt reicht ein Daumen, der Satz ist wahr.</p>
+      </div>
+    </div></li>
+    <li data-min="6"><div><b>Kuscheltier-Gitter.</b> „Jedes Kuscheltier mag genau ein Ding.“ Muggelstein heißt Ja, Kluppe heißt Nein. {{KIND}} hüpft in das Feld, um das es geht, und legt.
+      <div class="spick-spiel"><h3>Die zwei Hinweise</h3>
+        <ul>
+          <li>„Der Teddy (oben) mag keine Socke.“</li>
+          <li>„Der Hase (Mitte) mag den Löffel.“</li>
+          <li><b>Lösung:</b> Teddy Buch, Hase Löffel, Drache Socke.</li>
+        </ul>
+      </div>
+      <div class="sag">
+        <p class="du">„Der Hase hat den Löffel. Kann ihn noch jemand haben?“</p>
+        <p class="sie">„Nein! Da kommen Kluppen hin.“</p>
+        <p class="dann">Das ist die Kreis-Regel. Danach: „Wo ist nur noch ein Feld frei?“ (Letztes-Feld-Regel)</p>
+      </div>
+    </div></li>
+    <li data-min="7"><div><b>Blatt „Wer mag was?“</b> <a class="blattref" href="#blatt-12-1"></a>: genauso mit Bleistift, Kreis und Kreuz. Bei Aufgabe 2 zuerst die Kreuze. Für jeden Kreis fragen: „Woher weißt du das?“
+      <div class="sag">
+        <p class="du">„Bei der Karotte sind zwei Kreuze. Wer bleibt übrig?“</p>
+        <p class="sie">„Die Eule! Eine Eule, die Karotten mag!“</p>
+      </div>
+    </div></li>
+    <li data-min="4"><div><b>Wer bin ich?</b> Kuscheltiere aus dem Sackerl in eine Reihe.
+      <div class="spick-spiel"><h3>Wer bin ich?</h3>
+        <ul>
+          <li><b>Ein Zug:</b> Der Rätsel-Geber wählt heimlich ein Kuscheltier und sagt einen Satz mit „und“, „oder“ oder „nicht“: „Ich bin braun und weich.“ Der Rater legt alle weg, für die der Satz falsch ist. Höchstens 3 Sätze, dann raten.</li>
+          <li><b>Punkte:</b> richtig geraten: 1 für den Rater. Nur noch eins übrig nach höchstens 2 Sätzen: 1 für den Rätsel-Geber.</li>
+          <li><b>Kobold:</b> Liegt ein Tier weg, für das der Satz wahr ist, ruft der Rätsel-Geber „Kobold!“, und es kommt zurück.</li>
+        </ul>
+      </div>
+    </div></li>
+    <li data-min="6"><div><b>Blatt „Wahr oder falsch?“</b> <a class="blattref" href="#blatt-12-2"></a>: Sätze zum Bild, bei „und“ und „oder“ die Daumen. Dann die Kobold-Jagd: Ein lila Zeichen stimmt nicht.
+      <div class="sag">
+        <p class="du">„Welches lila Zeichen stimmt sicher? Welcher Hinweis sagt es?“</p>
+        <p class="sie">„Das Kreuz bei Rot, das steht im Hinweis. Dann hat der Kobold bei Blau zugeschlagen!“</p>
+      </div>
+    </div></li>
+    <li data-min="2"><div><b>Sammelpass.</b> Feld „Einheit&nbsp;12“, Sterne anmalen. <a class="blattref" href="#blatt-12-3"></a> liegt für das nächste Mal oder das Abendessen bereit.</div></li>
+  </ol>
+
+  <div class="spick-zwei">
+    <div class="spick-block stolper">
+      <h2>Wenn es hakt</h2>
+      <ul>
+        <li><b>Rät statt zu schließen:</b> „Welcher Hinweis sagt dir das?“</li>
+        <li><b>Vergisst die Kreuze nach einem Kreis:</b> Finger die Reihe entlang, dann die Spalte hinunter.</li>
+        <li><b>Überliest „kein“:</b> „kein“ und „nicht“ mit Bleistift unterstreichen.</li>
+        <li><b>„Hasen mögen doch Karotten!“</b> Im Rätsel gilt nur, was in den Hinweisen steht.</li>
+        <li><b>„Halb wahr“</b> gibt es nicht: Ein Daumen unten, und der Und-Satz ist falsch.</li>
+      </ul>
+    </div>
+    <div class="spick-block schwerer">
+      <h2>Zu leicht?</h2>
+      <ul>
+        <li><b>Logik-Profi</b> <a class="blattref" href="#blatt-12-3"></a>: 4 · 4 und ein überflüssiger Hinweis.</li>
+        <li><b>Ein Hinweis stimmt nicht:</b> Rätsel im Kasten „Schwerer machen“.</li>
+        <li><b>Oder mit zwei Daumen oben:</b> „Eine Katze hat Fell oder einen Schwanz.“ Wahr!</li>
+        <li><b>Eigenes Rätsel</b> für die Familie, mit genau einer Lösung.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="spick-block schluss">
+    <h2>Zum Schluss nicht vergessen</h2>
+    <ul class="check">
+      <li><b>Bildschirm-Bonus,</b> nur wenn ihr mögt (höchstens 15 Min, nach den Blättern): Paket 12, QR-Code unten rechts auf <a class="blattref" href="#blatt-12-1"></a>. Feld antippen: Kreuz, nochmal: Kreis, nochmal: leer. Dann „Los“. Nach dem Ende-Bild kommt das Gerät weg.</li>
+      <li>Beim Abendessen: <a class="blattref" href="#blatt-12-3"></a>, Profi-Aufgabe: ein Rätsel für die Familie.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="anleitung" data-einheit="12" data-titel="Logikrätsel">
+
+  <div class="kasten ziel">
+    <p>Heute geht es um Sätze, die stimmen oder nicht stimmen. {{KIND}} lernt die zwei Wörter dafür: Ein Satz ist <span class="begriff">wahr</span> oder <span class="begriff">falsch</span>. Spannend wird es, wenn zwei Teile zusammenkommen: Mit <span class="begriff">und</span> müssen beide Teile stimmen, mit <span class="begriff">oder</span> reicht einer. Und ein kleines „nicht“ dreht einen Satz ganz um. Das alles spielt ihr zuerst mit dem Körper: hochspringen bei wahr, auf den Polster plumpsen bei falsch.</p>
+    <p>Danach kommen die ersten <span class="begriff">Logikgitter</span>: links Tiere, oben Dinge, dazu ein paar kurze Hinweise. Jedes Tier mag genau ein Ding. {{KIND}} malt Kreuze (Nein) und Kreise (Ja), bis sie weiß, wer was mag, ohne zu raten. Zuerst ein 2 · 2-Gitter, dann 3 · 3. Im Schwerer-Teil warten ein 4 · 4-Gitter, ein überflüssiger Hinweis, ein Hinweis, der nicht stimmt, und ein eigenes Rätsel für die Familie. Der Fehler-Kobold hat heute schon in einem Gitter herumgemalt.</p>
+  </div>
+
+  <div class="kasten tipp" data-titel="Die Daumen-Regel: wahr, falsch, und, oder (für euch beide gleich)">
+    <ul>
+      <li><b>Wahr oder falsch:</b> Ein Satz ist <b>wahr</b>, wenn er stimmt („Ein Fisch kann schwimmen“), und <b>falsch</b>, wenn er nicht stimmt („Ein Hund kann fliegen“). Sagt bei Sätzen immer „wahr“ und „falsch“, nicht „richtig“. „Richtig“ heben wir uns für Antworten und Rechnungen auf.</li>
+      <li><b>Daumen-Regel:</b> Für jeden Teil des Satzes ein Daumen. Stimmt der Teil, geht der Daumen hoch, sonst runter.</li>
+      <li><b>und:</b> Der Satz ist nur wahr, wenn <b>beide</b> Daumen oben sind. „Schnee ist weiß und kalt“: wahr. „Schnee ist weiß und heiß“: falsch, ein Daumen ist unten.</li>
+      <li><b>oder:</b> Der Satz ist wahr, wenn <b>mindestens ein</b> Daumen oben ist. „Gras ist grün oder rosa“: wahr. Nur wenn beide Daumen unten sind, ist ein Oder-Satz falsch: „Ein Apfel ist ein Tier oder ein Werkzeug.“</li>
+      <li><b>nicht (kein):</b> dreht den Satz um. „Ein Elefant ist klein“ ist falsch, „Ein Elefant ist nicht klein“ ist wahr.</li>
+      <li><b>Wenn beide Daumen oben sind,</b> ist ein Oder-Satz auch wahr („Eine Katze hat Fell oder einen Schwanz“). Im Alltag meinen wir mit „oder“ aber oft „entweder oder“ („Willst du Saft oder Wasser?“). Darum kommen solche Sätze auf den Blättern nicht vor (der Löser prüft das), sondern erst im Schwerer-Teil.</li>
+    </ul>
+  </div>
+
+  <div class="kasten material darf-brechen e12-bricht">
+    <p><b>Vorher, ohne {{KIND}} (etwa 12 Minuten):</b></p>
+    <ul>
+      <li><b>Drucken (2 Minuten):</b> <a class="blattref" href="#blatt-12-1"></a> und <a class="blattref" href="#blatt-12-2"></a> <b>in Farbe</b> (die Mützen und die lila Zeichen des Kobolds brauchen Farbe). <a class="blattref" href="#blatt-12-3"></a> gleich mitdrucken: Es ist für den Schwerer-Teil und für ein Familien-Rätsel beim Abendessen.</li>
+      <li><b>Kuscheltier-Gitter (5 Minuten):</b> ein Gitter mit 3 · 3 Feldern am Boden. Klebt das Boden-Gitter aus Einheit 2 noch, ist es perfekt. Sonst legt ihr 9 Blätter Papier in 3 Reihen auf den Boden oder klebt mit Malerkrepp ein Gitter auf den Tisch. Links neben jede Reihe kommt ein Kuscheltier, über jede Spalte ein Ding: ein Löffel, eine Socke, ein Buch. Im Beispiel heißen die Kuscheltiere von oben nach unten Teddy, Hase und Drache. Habt ihr andere, nehmt eure: Die Hinweise passen, wenn ihr für „Teddy“ den Namen des obersten Kuscheltiers sagt und so weiter.</li>
+      <li><b>Kuscheltiere für „Wer bin ich?“ (2 Minuten):</b> 6 bis 8 Kuscheltiere oder Spielfiguren, die sich gut unterscheiden (groß und klein, braun und bunt, mit und ohne Flügel …), in ein Sackerl.</li>
+      <li><b>Satz-Ideen lesen (3 Minuten):</b> Lies die Satz-Ideen im Kasten „Spiel: Steh auf, wenn’s wahr ist“ einmal durch. Dann fallen dir während des Spiels leicht eigene Sätze über das Zimmer ein.</li>
+    </ul>
+    <p><b>Material in der Einheit:</b> Bleistift, Radiergummi und ein roter Buntstift, etwa 10 Muggelsteine (Ja) und 6 Wäschekluppen (Nein) für das Kuscheltier-Gitter, ein Polster pro Person, Stempel oder Sticker für den Sammelpass.</p>
+    <p><b>Extra, außerhalb der Einheit:</b> ein Familien-Rätsel mit der Profi-Aufgabe von <a class="blattref" href="#blatt-12-3"></a> (Kasten „Basteln: Rätsel für die Familie erfinden“), am besten beim Abendessen, etwa 15 Minuten.</p>
+  </div>
+
+  <div class="kasten tipp" data-titel="So geht ein Logikgitter">
+    <div class="e12-bsp">
+      <m-e12-gitter class="e12-anl-gitter" raetsel="e12-a1" feld="11" bild="7" zeige></m-e12-gitter>
+      <ul>
+        <li><b>Links die Tiere, oben die Dinge.</b> Jedes Feld fragt: Mag dieses Tier dieses Ding? Jedes Tier mag genau ein Ding, und jedes Ding mag genau ein Tier. Also gibt es in jeder Reihe und in jeder Spalte genau einen Kreis.</li>
+        <li><b>Kreis heißt Ja, Kreuz heißt Nein.</b> Im Bild ist das Gitter von <a class="blattref" href="#blatt-12-1"></a>, Aufgabe 1 fertig gelöst. Der Hinweis dazu: „Der Drache mag kein Eis.“</li>
+        <li><b>Kreis-Regel:</b> Kommt ein Kreis in ein Feld, gibt es in seiner Reihe und in seiner Spalte nur noch Kreuze.</li>
+        <li><b>Letztes-Feld-Regel:</b> Sind in einer Reihe (oder Spalte) alle Felder bis auf eines angekreuzt, kommt in das letzte freie Feld ein Kreis.</li>
+        <li><b>Jedes Zeichen braucht einen Grund:</b> einen Hinweis oder eine der zwei Regeln. Raten gilt nicht.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Ablauf Schritt für Schritt</h2>
+  <ol class="ablauf e12-ablauf">
+    <li data-min="5"><span class="schritt-titel">Steh auf, wenn’s wahr ist</span>Das Bewegungsspiel zum Aufwärmen (Kasten „Spiel: Steh auf, wenn’s wahr ist“). Zuerst sagst du einfache Sätze, und {{KIND}} springt hoch (wahr) oder plumpst auf den Polster (falsch). Nach 3 oder 4 Sätzen kommt „und“: Jetzt zeigt sie vor dem Springen mit zwei Daumen, welcher Teil stimmt. Dann „oder“, mit demselben Satz (Beispielsätze). Zum Schluss sagt sie dir 5 Sätze.</li>
+    <li data-min="6"><span class="schritt-titel">Kuscheltier-Gitter</span>Das erste Logikgitter, so groß, dass man hineinhüpfen kann (Kasten „Bewegung: Kuscheltier-Gitter“). Erklär die Regel: „Jedes Kuscheltier mag genau ein Ding, und jedes Ding mag genau ein Kuscheltier.“ Ein Muggelstein im Feld heißt Ja, eine Wäschekluppe heißt Nein. Du sagst die zwei Hinweise, {{KIND}} hüpft in das passende Feld und legt. Hier entdeckt sie die Kreis-Regel und die Letztes-Feld-Regel mit dem ganzen Körper.</li>
+    <li data-min="7"><span class="schritt-titel">Blatt „Wer mag was?“</span><a class="blattref" href="#blatt-12-1"></a>. Dasselbe am Papier: Kreis statt Muggelstein, Kreuz statt Kluppe. Aufgabe 1 ist ein 2 · 2-Gitter mit einem Hinweis. Bei Aufgabe 2 malt sie zuerst alle Kreuze, die direkt in den Hinweisen stehen, dann sucht sie eine Reihe oder Spalte mit nur einem freien Feld. Lass sie für jeden Kreis sagen, welcher Hinweis oder welche Regel ihn verrät. Die Knobel-Ecke (Kreise und Kreuze zählen) geht schnell, wenn das Gitter fertig ist.</li>
+    <li data-min="4"><span class="schritt-titel">Wer bin ich?</span>Eine kurze Pause vom Papier (Kasten „Spiel: Wer bin ich?“). Die Kuscheltiere aus dem Sackerl liegen in einer Reihe. Du beginnst als Rätsel-Geber, dann tauscht ihr. Hier zahlt sich die Daumen-Regel aus: Nach einem Oder-Satz bleiben mehr Kuscheltiere liegen als nach einem Und-Satz.</li>
+    <li data-min="6"><span class="schritt-titel">Blatt „Wahr oder falsch?“</span><a class="blattref" href="#blatt-12-2"></a>. Bei Aufgabe 1 schaut sie das Bild an und kreist bei jedem Satz „wahr“ oder „falsch“ ein. Bei „und“ und „oder“ helfen wieder die Daumen. Dann die Kobold-Jagd in der Knobel-Ecke: Der Kobold hat mit Lila schon angefangen, ein Zeichen stimmt nicht. Sie malt es rot an und macht das Gitter fertig.</li>
+    <li data-min="2"><span class="schritt-titel">Sammelpass</span>Feld „Einheit&nbsp;12“ stempeln oder bekleben, Sterne anmalen. Frag: „Was war heute am lustigsten?“ <a class="blattref" href="#blatt-12-3"></a> kommt beim nächsten Mal dran, oder sie erfindet beim Abendessen ein Rätsel für die Familie.</li>
+  </ol>
+
+  <h3>Beispielsätze</h3>
+  <div class="sag">
+    <p class="du">„Ich sage gleich einen Satz. Ist er wahr, springst du hoch. Ist er falsch, plumpst du auf den Polster. Bereit? Ein Fisch kann schwimmen.“</p>
+    <p class="sie">(springt) „Wahr!“</p>
+    <p class="du">„Ein Hund kann fliegen.“</p>
+    <p class="sie">(plumpst) „Falsch! Außer im Zeichentrickfilm.“</p>
+    <p class="dann">Lach mit. Wichtig ist das Wort: Bei Sätzen sagen wir „wahr“ und „falsch“. Sagt sie „richtig“, wiederhol einfach: „Genau, wahr.“</p>
+  </div>
+  <div class="sag">
+    <p class="du">„Jetzt wird es kniffliger. Ich habe Socken an und einen Hut auf. Bevor du springst: Zeig mir mit den Daumen. Ein Daumen für die Socken, einer für den Hut.“</p>
+    <p class="sie">„Socken: Daumen hoch. Einen Hut hast du nicht. Daumen runter. Also … falsch?“</p>
+    <p class="du">„Genau. Bei ‚und‘ müssen beide Daumen oben sein. Und jetzt: Ich habe Socken an oder einen Hut auf.“</p>
+    <p class="sie">„Immer noch kein Hut! Falsch!“ … (schaut auf die Daumen) „Ah, bei ‚oder‘ reicht einer. Wahr!“</p>
+    <p class="dann">Das ist der wichtigste Moment der Einheit: gleicher Satz, nur ein Wort anders, und schon ist er wahr. Lass sie ein zweites Paar selbst erfinden: „Ich bin ein Kind und ein Drache. Ich bin ein Kind oder ein Drache.“</p>
+  </div>
+  <div class="sag">
+    <p class="du">(Kuscheltier-Gitter) „Der Hase mag den Löffel. Hüpf in das Feld, wo sich Hase und Löffel treffen.“</p>
+    <p class="sie">(hüpft, legt einen Muggelstein) „Da!“</p>
+    <p class="du">„Kann noch jemand den Löffel mögen?“</p>
+    <p class="sie">„Nein, den hat ja der Hase. Und der Hase mag nichts anderes.“</p>
+    <p class="dann">Das ist die Kreis-Regel. Lass sie die Kluppen selbst legen: die Reihe des Hasen entlang und die Spalte des Löffels hinunter.</p>
+  </div>
+  <div class="sag">
+    <p class="du">(<a class="blattref" href="#blatt-12-1"></a>, Aufgabe 2) „Schau die Spalte mit der Karotte an. Wie viele Felder sind noch frei?“</p>
+    <p class="sie">„Nur eins. Bei der Eule. Dann mag die Eule die Karotte! Eine Eule, die Karotten mag, haha.“</p>
+    <p class="du">„Und woher weißt du das?“</p>
+    <p class="sie">„Weil der Hase und die Katze keine Karotte mögen. Das steht in den Hinweisen.“</p>
+    <p class="dann">Diese Frage („Woher weißt du das?“) ist wichtiger als die Lösung. Wer den Grund sagen kann, rät nicht, sondern schließt. Das ist Logik.</p>
+  </div>
+  <div class="sag">
+    <p class="du">(<a class="blattref" href="#blatt-12-2"></a>, Kobold-Jagd) „Der Kobold hat schon gezeichnet. Ein lila Zeichen stimmt nicht. Schau dir die Reihe der Eule an.“</p>
+    <p class="sie">„Da sind zwei Kreuze. Und die gelbe Mütze hat schon der Drache. Dann hat die Eule gar keine Mütze! Das geht nicht.“</p>
+    <p class="du">„Welches Kreuz stimmt sicher?“</p>
+    <p class="sie">„Das bei Rot, das steht im Hinweis. Also hat der Kobold beim blauen Kreuz zugeschlagen!“</p>
+    <p class="dann">Super. So findet man Kobolde in Logikgittern: Irgendwo passt etwas nicht zusammen (eine Reihe ohne Platz für einen Kreis), dann sucht man das Zeichen ohne Grund.</p>
+  </div>
+
+  <h2>Spiele, Bewegung und Basteln</h2>
+
+  <div class="kasten spiel darf-brechen e12-bricht" data-titel="Steh auf, wenn’s wahr ist">
+    <p class="spiel-meta">2 Personen · 5–10 Minuten · ein Polster pro Person, etwa 10 Muggelsteine</p>
+    <ol class="regeln">
+      <li><b>Vorbereitung:</b> Jeder hat einen Polster am Boden. Die Muggelsteine liegen in der Mitte.</li>
+      <li><b>Rollen:</b> Eine Person ist der <b>Sager</b>, die andere der <b>Springer</b>. Nach 5 Sätzen tauscht ihr.</li>
+      <li><b>Ein Zug:</b> Der Springer hockt vor seinem Polster. Der Sager sagt einen Satz. Ist der Satz <b>wahr</b>, springt der Springer hoch und reißt die Arme in die Luft. Ist er <b>falsch</b>, plumpst er auf den Polster. Dann wieder in die Hocke. Bei Sätzen mit „und“ oder „oder“ darf der Springer zuerst die Daumen zeigen.</li>
+      <li><b>Punkte:</b> Passt die Bewegung, bekommt der Springer einen Muggelstein. Passt sie nicht, bekommt ihn der Sager, aber nur, wenn er mit den Daumen erklären kann, warum.</li>
+      <li><b>Ende:</b> wenn jeder zweimal Springer war (20 Sätze, oder 10, wenn die Zeit knapp ist). Wer mehr Steine hat, gewinnt. Bei Gleichstand sagt jeder noch einen Satz mit „oder“.</li>
+    </ol>
+    <p><b>Satz-Ideen in Stufen</b> (dazu Sätze über das Zimmer, eure Kleidung, das Wetter):</p>
+    <table class="tab e12-saetze">
+      <tr><th>Stufe</th><th>Lösung</th><th>Satz</th></tr>
+      <tr><td>einfach</td><td>wahr</td><td>Ein Fisch kann schwimmen. Eine Kuh hat vier Beine.</td></tr>
+      <tr><td>einfach</td><td>falsch</td><td>Ein Hund kann fliegen. Schnee ist grün.</td></tr>
+      <tr><td>mit „nicht“</td><td>wahr</td><td>Ein Elefant ist nicht klein. Eine Schnecke ist nicht schnell.</td></tr>
+      <tr><td>mit „nicht“</td><td>falsch</td><td>Ein Zuckerl ist nicht süß. Eine Katze hat keinen Schwanz.</td></tr>
+      <tr><td>mit „und“</td><td>wahr</td><td>Schnee ist weiß und kalt. Ein Vogel hat Federn und einen Schnabel.</td></tr>
+      <tr><td>mit „und“</td><td>falsch</td><td>Schnee ist weiß und heiß. Ein Fisch kann schwimmen und laufen.</td></tr>
+      <tr><td>mit „oder“</td><td>wahr</td><td>Gras ist grün oder rosa. Ein Hund kann bellen oder fliegen.</td></tr>
+      <tr><td>mit „oder“</td><td>falsch</td><td>Ein Apfel ist ein Tier oder ein Werkzeug. Eine Maus ist größer als ein Pferd oder als ein Elefant.</td></tr>
+      <tr><td>Profi</td><td>wahr</td><td>Eine Katze hat Fell oder einen Schwanz (beide Daumen oben). Es stimmt nicht, dass ein Hund nicht bellen kann.</td></tr>
+    </table>
+    <p><b>Varianten:</b></p>
+    <ul>
+      <li><b>Kobold-Springer:</b> Der Springer darf einmal pro Runde absichtlich verkehrt springen. Merkt es der Sager und ruft „Kobold!“, bekommt er 2 Steine.</li>
+      <li><b>Im Auto oder beim Essen:</b> statt Springen nur Daumen hoch (wahr) oder runter (falsch).</li>
+      <li><b>Sätze über euch beide:</b> „Du hast Zöpfe und ich habe eine Brille.“ So schauen die zwei Daumen auf zwei verschiedene Personen.</li>
+    </ul>
+  </div>
+
+  <div class="kasten bewegung darf-brechen e12-bricht" data-titel="Kuscheltier-Gitter">
+    <p>Das erste Logikgitter ist groß, liegt am Boden und hat echte Dinge. Links neben den Reihen sitzen die Kuscheltiere (von oben nach unten: Teddy, Hase, Drache), über den Spalten liegen Löffel, Socke und Buch. Die Regel: „Jedes Kuscheltier mag genau ein Ding, und jedes Ding mag genau ein Kuscheltier.“ Ein Muggelstein im Feld heißt Ja, eine Wäschekluppe heißt Nein. Die zwei Hinweise und das fertige Gitter:</p>
+    <div class="e12-bsp">
+      <m-e12-hinweise raetsel="e12-boden" ohne-bilder></m-e12-hinweise>
+      <m-e12-gitter class="e12-anl-gitter" raetsel="e12-boden" feld="10" bild="0" zeige></m-e12-gitter>
+    </div>
+    <ol class="e12-ganz">
+      <li>Du sagst Hinweis 2. {{KIND}} hüpft in das Feld von Hase und Löffel und legt einen Muggelstein. „Kann noch jemand den Löffel mögen? Mag der Hase noch etwas anderes?“ Sie legt Kluppen in die Reihe des Hasen und in die Spalte des Löffels (Kreis-Regel).</li>
+      <li>Du sagst Hinweis 1. Sie legt eine Kluppe in das Feld von Teddy und Socke.</li>
+      <li>„Schau die Reihe vom Teddy an. Wie viele Felder sind noch frei?“ Nur beim Buch: Muggelstein (Letztes-Feld-Regel). Dann bekommt der Drache die Socke.</li>
+      <li><b>Lösung:</b> <m-e12-loesung raetsel="e12-boden" l="teddy=buch stoffhase=loeffel stoffdrache=socke"></m-e12-loesung>. Ohne Hinweis 1 gäbe es <m-e12-anzahl raetsel="e12-boden" ohne="1" l="2"></m-e12-anzahl> Möglichkeiten, ohne Hinweis 2 sogar <m-e12-anzahl raetsel="e12-boden" ohne="2" l="4"></m-e12-anzahl>.</li>
+      <li><b>Rollentausch:</b> {{KIND}} denkt sich heimlich aus, wer was mag, und gibt dir Hinweise. Hilf ihr, wenn du am Ende noch raten müsstest: „Da fehlt noch ein Hinweis!“</li>
+    </ol>
+  </div>
+
+  <div class="kasten spiel darf-brechen e12-bricht" data-titel="Wer bin ich?">
+    <p class="spiel-meta">2 Personen · 4–10 Minuten · 6 bis 8 Kuscheltiere oder Spielfiguren, die sich gut unterscheiden</p>
+    <ol class="regeln">
+      <li><b>Vorbereitung:</b> Die Kuscheltiere liegen nebeneinander am Boden oder am Tisch.</li>
+      <li><b>Rollen:</b> Der <b>Rätsel-Geber</b> sucht sich heimlich ein Kuscheltier aus: „Das bin ich.“ Der <b>Rater</b> soll herausfinden, welches.</li>
+      <li><b>Ein Zug:</b> Der Rätsel-Geber sagt einen Satz über sein Kuscheltier, mit „und“, „oder“ oder „nicht“, zum Beispiel: „Ich bin braun und weich.“ „Ich habe Flügel oder lange Ohren.“ „Ich bin nicht rosa.“ Der Rater legt alle Kuscheltiere zur Seite, für die der Satz <b>falsch</b> ist. Höchstens 3 Sätze, dann muss der Rater raten: „Du bist der Teddy!“</li>
+      <li><b>Kobold:</b> Legt der Rater ein Kuscheltier weg, für das der Satz wahr ist, ruft der Rätsel-Geber „Kobold!“, und es kommt zurück. Das kostet nichts.</li>
+      <li><b>Punkte:</b> richtig geraten: 1 Punkt für den Rater. Liegt nach höchstens 2 Sätzen nur noch ein Kuscheltier da: 1 Punkt für den Rätsel-Geber (er hat besonders gute Sätze gefunden).</li>
+      <li><b>Ende:</b> nach 2 Runden für jeden (oder 4, wenn ihr mehr Zeit habt). Mehr Punkte gewinnt.</li>
+    </ol>
+    <p><b>Varianten:</b> nur Oder-Sätze (dann bleibt viel liegen, und man braucht kluge Sätze), nur Nicht-Sätze („Ich bin nicht groß. Ich bin nicht blau.“), 10 Kuscheltiere und 4 Sätze. Tipp für dich als Rätsel-Geber: Sag am Anfang einen Und-Satz, der wenig übrig lässt, damit {{KIND}} sieht, wie streng „und“ ist. Dann einen Oder-Satz, bei dem viele liegen bleiben.</p>
+  </div>
+
+  <div class="sag">
+    <p class="du">„Ich habe Flügel oder lange Ohren.“</p>
+    <p class="sie">(legt den Teddy und die Katze weg) „Der Drache bleibt, der hat Flügel. Der Hase bleibt, der hat lange Ohren. Und die Eule hat auch Flügel.“</p>
+    <p class="dann">Genau: Bei „oder“ bleibt jedes Kuscheltier liegen, bei dem ein Daumen oben ist. Hätte eines Flügel und lange Ohren, bliebe es natürlich auch liegen.</p>
+  </div>
+
+  <div class="kasten basteln darf-brechen e12-bricht" data-titel="Rätsel für die Familie erfinden">
+    <p>Die Profi-Aufgabe von <a class="blattref" href="#blatt-12-3"></a> ist eine Schreibvorlage. Am schönsten beim Abendessen, außerhalb der Einheit: {{KIND}} erfindet ein Logikgitter, und die Familie löst es.</p>
+    <ol class="e12-ganz">
+      <li><b>Wer und was:</b> Links in die drei gestrichelten Rahmen malt oder schreibt sie 3 Leute oder Tiere (Mama, Papa, Oma, das Lieblings-Kuscheltier …), oben 3 Dinge (Farben, Essen, Spielsachen …).</li>
+      <li><b>Zuerst die Lösung, heimlich:</b> Sie legt fest, wer was mag, und schreibt es auf einen Zettel, der umgedreht daneben liegt. Wichtig: Jedes Ding gehört genau einem.</li>
+      <li><b>Hinweise, einer nach dem anderen:</b> Nach jedem Hinweis fragt ihr: Kann man jetzt schon alles herausfinden? Ein Beispiel: Mama, Papa und {{KIND}} mögen Rot, Blau und Grün. Mit dem Hinweis „Mama mag kein Rot“ gibt es noch <m-e12-anzahl raetsel="e12-s2" l="4"></m-e12-anzahl> Lösungen. Kommt „Papa mag Grün“ dazu, gibt es genau <m-e12-anzahl raetsel="e12-s3" l="1"></m-e12-anzahl>: <m-e12-loesung raetsel="e12-s3" l="mama=blau papa=gruen du=rot"></m-e12-loesung>.</li>
+      <li><b>Prüfen:</b> Jemand löst das Rätsel nur mit den Hinweisen. Muss er irgendwo raten, fehlt ein Hinweis. Findet er eine andere Lösung als die auf dem Zettel, auch. Dann schreibt {{KIND}} noch einen Hinweis dazu. So wird aus „vielleicht“ genau eine Lösung.</li>
+      <li><b>Schreiben:</b> {{KIND}} schreibt die Hinweise selbst, so gut es geht. Lange Sätze darf sie dir diktieren. Kurze Sätze mit „mag“, „mag kein“ und „oder“ reichen völlig.</li>
+    </ol>
+  </div>
+
+  <h2>Wenn es hakt oder zu leicht ist</h2>
+
+  <div class="zwei">
+    <div class="kasten leichter">
+      <ul>
+        <li>Länger beim Kuscheltier-Gitter bleiben, auch mit nur 2 Kuscheltieren und 2 Dingen (wie Aufgabe 1).</li>
+        <li>Am Blatt Muggelsteine und kleine Papierstreifen statt Kreis und Kreuz legen: Dann kann man umlegen, ohne zu radieren.</li>
+        <li>Du liest die Hinweise vor, {{KIND}} zeigt das Feld.</li>
+        <li>Beim Springen nur einfache Sätze, „und“ und „oder“ erst beim nächsten Mal.</li>
+        <li>Kobold-Jagd: Zeig auf die Reihe der Eule. „Welche Mütze bleibt für die Eule noch übrig?“</li>
+      </ul>
+    </div>
+    <div class="kasten bonus" data-titel="Bonus-Knobelei">
+      <p class="klein"><i>Für zwischendurch: im Auto, beim Abendessen, beim Zähneputzen.</i></p>
+      <p><b>Eis-Rätsel:</b> „Papa, Oma und du bekommen je ein Eis: Schoko, Vanille und Erdbeer. Papa mag kein Schoko. Du hast Erdbeer. Wer hat welches?“</p>
+      <p><b>Du-Sätze:</b> „Wahr oder falsch? Du bist ein Kind oder ein Drache. Du bist ein Kind und ein Drache. Du bist kein Drache.“</p>
+      <p><b>Für Profis:</b> „Heute regnet es, oder heute regnet es nicht. Wahr oder falsch?“</p>
+      <p class="klein"><b>Kurz-Lösungen:</b> <m-e12-loesung raetsel="e12-b1" l="papa=vanille oma=schoko du=erdbeer"></m-e12-loesung>; <m-e12-loesung raetsel="e12-b2"></m-e12-loesung>; immer wahr, egal wie das Wetter ist. Mehr bei den Lösungen am Ende.</p>
+    </div>
+  </div>
+
+  <div class="kasten stolper darf-brechen e12-bricht">
+    <ul>
+      <li><b>Sie rät, statt zu schließen</b> („Ich glaub, die Katze mag den Kuchen“): Frag freundlich „Welcher Hinweis sagt dir das?“ Jedes Zeichen braucht einen Grund: einen Hinweis, die Kreis-Regel oder die Letztes-Feld-Regel. Geraten wird nicht, auch wenn es zufällig stimmt.</li>
+      <li><b>Sie vergisst die Kreuze nach einem Kreis:</b> Fahr mit dem Finger die Reihe entlang und dann die Spalte hinunter: „Ein Kreis schickt Kreuze in seine Reihe und in seine Spalte.“ Am Boden waren das die Kluppen.</li>
+      <li><b>Sie verwechselt Reihe und Spalte:</b> Ein Muggelstein liegt auf dem Tier, um das es gerade geht, ein zweiter auf dem Ding. Die Finger wandern aufeinander zu, bis sie sich im Feld treffen.</li>
+      <li><b>Sie überliest „kein“ oder „nicht“:</b> Satz laut lesen lassen und „kein“ und „nicht“ mit Bleistift unterstreichen. Ein Satz mit „kein“ gibt fast immer ein Kreuz.</li>
+      <li><b>„Hasen mögen doch Karotten!“</b> Lachen, und dann: „Dieser Hase ist ein besonderer. Im Rätsel zählt nur, was in den Hinweisen steht.“ Genau so arbeitet ein Roboter: Er glaubt nur, was dasteht. Die verrückten Lösungen (der Hase mag Fisch) sind Absicht, damit der Bauch nicht miträt.</li>
+      <li><b>„Der Satz ist halb wahr“:</b> Das gibt es nicht. Ein Und-Satz mit einem Daumen unten ist falsch. Ein Oder-Satz mit einem Daumen oben ist wahr.</li>
+      <li><b>Sie sagt bei einem Oder-Satz mit zwei wahren Teilen „falsch“</b> (weil sie „entweder oder“ meint): Auf den Blättern kommt das nicht vor. Passiert es beim Spiel, erklär die Daumen-Regel: „Mindestens ein Daumen oben, dann ist er wahr.“ Ein schöner Gesprächsstoff für den Schwerer-Teil.</li>
+      <li><b>Eine Reihe hat zwei Kreise oder keinen Platz mehr für einen Kreis:</b> Kein Problem, da hat der Kobold zugeschlagen. Zurück zum letzten Zeichen mit einem sicheren Grund, ab dort radieren. Darum zuerst mit Bleistift.</li>
+    </ul>
+  </div>
+
+  <div class="kasten schwerer darf-brechen e12-bricht">
+    <p>Löst {{KIND}} die 3 · 3-Gitter schnell und sicher, wähle hier aus. Das ist kein Zusatz „für später“, sondern ein vollwertiger Hauptteil. Die Stufen bauen aufeinander auf.</p>
+    <ol class="e12-ganz">
+      <li><b>Logik-Profi mit 4 · 4</b> (<a class="blattref" href="#blatt-12-3"></a>, Aufgabe 1): 4 Tiere, 4 Essen, Hinweise mit „und“, „oder“ und „kein“. Es gibt 4 · 3 · 2 · 1 = 24 Möglichkeiten, die Essen zu verteilen, aber nur eine passt zu allen Hinweisen. Tipp, falls sie hängt: „Bei welchem Tier wissen wir am meisten?“ (Beim Drachen: Hinweis 1 und Hinweis 4 streichen drei Essen.)</li>
+      <li><b>Der überflüssige Hinweis</b> (<a class="blattref" href="#blatt-12-3"></a>, Aufgabe 2): Ein Hinweis ist zu viel, das Rätsel geht auch ohne ihn. Die Spur: Welchen Hinweis hat sie beim Lösen nie gebraucht? (Hinweis 2. Dass der Hase kein Eis mag, ist sowieso klar, sobald der Drache das Eis hat.) Ohne einen der anderen Hinweise gäbe es dagegen mehrere Lösungen, ohne Hinweis 1 zum Beispiel <m-e12-anzahl raetsel="e12-p1" ohne="1" l="5"></m-e12-anzahl>. Frag auch bei Aufgabe 2 von <a class="blattref" href="#blatt-12-1"></a>: „Kann man da einen Hinweis weglassen?“ (Nein. Ohne Hinweis 1 gäbe es <m-e12-anzahl raetsel="e12-a2" ohne="1" l="2"></m-e12-anzahl> Lösungen, ohne Hinweis 2 sogar <m-e12-anzahl raetsel="e12-a2" ohne="2" l="3"></m-e12-anzahl>, ohne Hinweis 3 wieder <m-e12-anzahl raetsel="e12-a2" ohne="3" l="2"></m-e12-anzahl>.)</li>
+      <li><b>Ein Hinweis stimmt nicht:</b> Der Kobold hat einen Hinweis geschrieben, der nicht stimmt. Drache, Einhorn und Eule mögen Apfel, Eis und Kuchen, jedes Tier genau eins. Welcher Hinweis ist vom Kobold?
+        <div class="e12-bsp"><m-e12-hinweise raetsel="e12-s1" gr="5"></m-e12-hinweise></div>
+        (Hinweis <m-e12-zahl raetsel="e12-s1" was="falsch" l="2" text></m-e12-zahl>. Er passt nicht zu Hinweis 1, denn der Drache mag nur ein Essen, und nicht zu Hinweis 3, denn den Apfel mag nur ein Tier. Hinweis 1 und 3 passen zusammen: <m-e12-loesung raetsel="e12-s1" l="drache=kuchen einhorn=apfel eule=eis"></m-e12-loesung>.) Danach darf sie dir einen Kobold-Hinweis in ein Gitter schmuggeln.</li>
+      <li><b>Oder mit zwei Daumen oben:</b> „Eine Katze hat Fell oder einen Schwanz.“ Wahr oder falsch? In der Logik ist das wahr, denn mindestens ein Daumen ist oben. Im Alltag sagen wir oft „oder“ und meinen „entweder oder“: „Willst du Saft oder Wasser?“ „Beides!“ Sprecht darüber, wie ein Roboter das versteht: Er nimmt „oder“ immer als „mindestens eins“. Wer „genau eins“ meint, sagt „entweder … oder“.</li>
+      <li><b>Ein Wort ändern:</b> Zum Bild von <a class="blattref" href="#blatt-12-2"></a>: Aus dem wahren Satz 5 („Die Katze hat einen Apfel oder einen Fisch“) wird mit „und“ statt „oder“ ein falscher. Aus dem falschen Satz 6 („Das Einhorn hat keine blaue Mütze“) wird ohne „keine“ ein wahrer („… eine blaue Mütze“). Der falsche Satz 3 wird wahr, wenn „oder“ statt „und“ dasteht. Und „Die Katze hat einen Apfel oder ein Eis“? (Falsch, beide Daumen unten.) Der Löser hat diese vier Sätze nachgerechnet: <m-e12-loesung raetsel="e12-wf2"></m-e12-loesung>. Danach erfindet {{KIND}} selbst Paare: einmal wahr, einmal falsch, nur ein Wort anders.</li>
+      <li><b>Kuscheltier-Gitter 4 · 4:</b> Ein viertes Kuscheltier und ein viertes Ding (ein Zuckerl) kommen dazu. Das Boden-Gitter aus Einheit 2 hatte im Schwerer-Teil ja 4 · 4 Felder. Diesmal erfindest du die Hinweise, mit „nicht“ und „oder“. Tipp: Leg zuerst die Lösung fest und such Hinweise, die zu ihr passen. Dann prüft ihr gemeinsam, ob man irgendwo raten muss.</li>
+      <li><b>Eigenes Rätsel mit genau einer Lösung</b> (Profi-Aufgabe von <a class="blattref" href="#blatt-12-3"></a>, Kasten „Rätsel für die Familie erfinden“). Die Profi-Frage dazu: „Wie viele Hinweise brauchst du mindestens?“ Bei 3 · 3 reichen oft 2 Hinweise (ein „mag“ und ein „mag kein“), bei 2 · 2 reicht einer.</li>
+      <li><b>Doppel-Nicht:</b> „Es stimmt nicht, dass ein Hund nicht bellen kann.“ Wahr oder falsch? (Wahr: Zwei „nicht“ heben sich auf.) Für die ganz Schnellen ein Spaß zum Mitnehmen.</li>
+    </ol>
+  </div>
+
+  <h2>Hintergrund</h2>
+  <div class="kasten warum darf-brechen e12-bricht">
+    <p>Wahr und falsch sind für Computer das Wichtigste überhaupt. Jede Programmiersprache kennt genau diese zwei <span class="begriff">Wahrheitswerte</span> (englisch true und false, nach dem Mathematiker George Boole heißen sie auch boolesche Werte). Ein Computer prüft ständig Aussagen: „Ist der Name bekannt und das Passwort richtig?“ „Ist der Akku leer oder der Aus-Knopf gedrückt?“ Die Wenn-dann-Regeln der vorigen Einheit brauchen genau solche Aussagen.</p>
+    <p>„und“, „oder“ und „nicht“ heißen <span class="begriff">logische Operatoren</span> (AND, OR, NOT). Die Daumen-Regel ist eine kleine Wahrheitstafel: zwei Daumen, vier Möglichkeiten, und für jede steht fest, ob der ganze Satz wahr ist. Das „oder“ der Logik ist immer das einschließende „mindestens eins“. Das „entweder oder“ (genau eins) hat einen eigenen Namen: XOR. In jedem Computer-Chip stecken Millionen solcher Bausteine, gebaut aus Strom an und Strom aus.</p>
+    <p>Ein Logikgitter ist ein kleines <span class="begriff">Suchproblem mit Bedingungen</span>. Der Löser dieses Hefts löst jedes Gitter mit <span class="begriff">Backtracking</span>: Er gibt dem ersten Tier probeweise das erste Ding, dem zweiten Tier das nächste freie Ding und so weiter. Sobald ein Hinweis sicher nicht mehr stimmen kann, geht er einen Schritt zurück und probiert das nächste Ding. Bei 4 · 4 gibt es 4 · 3 · 2 · 1 = 24 Zuordnungen. So hat der Löser für jedes Gitter auf den Blättern und in der App bewiesen, dass es genau eine Lösung gibt, und nachgeprüft, welche Hinweise nötig sind und welcher überflüssig ist. {{KIND}} macht dasselbe klüger: Mit Kreis-Regel und Letztes-Feld-Regel muss sie fast nie zurück. Stundenpläne, Sitzordnungen und Fahrpläne werden mit denselben Ideen berechnet, nur mit viel größeren Gittern.</p>
+  </div>
+
+  <h2>Bildschirm-Bonus</h2>
+  <div class="kasten bildschirm darf-brechen e12-bricht">
+    <p><b>Paket 12 „Logikrätsel“.</b> Den QR-Code findest du auf <a class="blattref" href="#blatt-12-1"></a> unten rechts. Nur am Schluss, nach den Blättern, höchstens 15 Minuten. Die Einheit funktioniert auch ganz ohne Bildschirm.</p>
+    <p><b>8 Levels:</b> Logikgitter mit denselben Bildern wie am Papier, die Hinweise stehen als Bilder-Sätze beim Gitter. Level 1 und 2 sind 2 · 2-Gitter, Level 3 bis 7 sind 3 · 3-Gitter mit Essen oder Mützen (Level 5 mit „oder“, Level 7 mit „und“ und „oder“), Level 8 ist das 4 · 4-Gitter. <b>Level 1 ist Aufgabe 1 von <a class="blattref" href="#blatt-12-1"></a>, Level 3 ist Aufgabe 2 von diesem Blatt, Level 6 ist die Kobold-Jagd von <a class="blattref" href="#blatt-12-2"></a> (die lila Zeichen des Kobolds sind schon da, eines stimmt nicht) und Level 8 ist Aufgabe 1 von <a class="blattref" href="#blatt-12-3"></a>.</b> Am besten spielt {{KIND}} sie nach dem Blatt.</p>
+    <p><b>So geht es in der App:</b> Ein Feld antippen setzt ein Kreuz (Nein), nochmal antippen einen Kreis (Ja), ein drittes Mal macht das Feld wieder leer. Kein Ziehen nötig. Mit „Los“ prüft die App das fertige Gitter: Hat jedes Tier genau einen Kreis, und stimmt jeder Hinweis? Wenn nicht, sagt sie freundlich, wo es noch hakt, zum Beispiel welcher Hinweis noch nicht passt. „Nochmal“ macht das Gitter wieder leer. Einen Stern gibt es, sobald alle Kreise stimmen. Die Kreuze sind nur eine Hilfe zum Denken, wie am Papier.</p>
+    <p><b>Wann weglegen:</b> Nach Level 8 kommt „Super! Jetzt zurück zum Papier.“ Dann ist Schluss, auch wenn noch Zeit wäre. Wer noch Lust auf Rätsel hat: lieber ein Familien-Rätsel erfinden als ein weiteres Level.</p>
+  </div>
+
+  <h2>Lösungen</h2>
+  <div class="e12-loes">
+    <m-loesungen einheit="12" skala="0.39"></m-loesungen>
+    <div class="kasten loesung">
+      <p><b><a class="blattref" href="#blatt-12-1"></a>, Aufgabe 1:</b> Kreuz bei Drache und Eis (Hinweis). Dann ist beim Drachen nur noch der Apfel frei: Kreis (Letztes-Feld-Regel). Kreuz bei Einhorn und Apfel (Kreis-Regel), Kreis bei Einhorn und Eis. <m-e12-loesung raetsel="e12-a1" l="drache=apfel einhorn=eis"></m-e12-loesung>.</p>
+      <p><b>Aufgabe 2:</b> Kreuze bei Hase und Karotte, Katze und Karotte, Katze und Fisch (Hinweise). In der Spalte der Karotte ist nur noch die Eule frei: Kreis. In der Reihe der Katze ist nur noch der Kuchen frei: Kreis. Bleibt für den Hasen der Fisch. <m-e12-loesung raetsel="e12-a2" l="katze=kuchen hase=fisch eule=karotte"></m-e12-loesung>.</p>
+      <p><b>Knobel-Ecke:</b> Aufgabe 2: 3 Kreise und 6 Kreuze (9 Felder, 9 − 3 = 6). Bei 4 Tieren und 4 Essen: 4 Kreise und 12 Kreuze (16 Felder, 16 − 4 = 12).</p>
+    </div>
+  </div>
+  <div class="kasten loesung darf-brechen e12-bricht e12-weiter">
+    <p><b><a class="blattref" href="#blatt-12-2"></a>, Aufgabe 1:</b> <m-e12-loesung raetsel="e12-wf"></m-e12-loesung>. Satz 1: Der Drache hat die rote Mütze. Satz 2: Die Katze hat einen Fisch, kein Eis. Satz 3: Den Apfel hat er, aber die Mütze ist rot, nicht gelb: ein Daumen unten, der Und-Satz ist falsch. Satz 4: beide Daumen oben. Satz 5: Den Apfel hat sie nicht, den Fisch schon: Bei „oder“ reicht ein Daumen. Satz 6: Das Einhorn hat ja eine blaue Mütze, also ist „keine“ falsch.</p>
+    <p><b>Knobel-Ecke (Kobold-Jagd):</b> Das lila Kreuz bei <b>Eule und blauer Mütze</b> stimmt nicht. Grund: Die gelbe Mütze hat der Drache (Hinweis 1, der lila Kreis stimmt), also bekommt die Eule keine gelbe. Die rote hat sie nicht (Hinweis 2, das lila Kreuz stimmt). Mit dem Kreuz bei Blau hätte die Eule gar keine Mütze. Lösung: <m-e12-loesung raetsel="e12-k1" l="hase=muetze-rot eule=muetze-blau drache=muetze-gelb"></m-e12-loesung>.</p>
+    <p><b><a class="blattref" href="#blatt-12-3"></a>, Aufgabe 1:</b> Drache: Apfel, Kuchen und Karotte sind gestrichen (Hinweis 1 und 4), also Eis. Einhorn: Eis oder Karotte (Hinweis 3), das Eis hat schon der Drache, also Karotte. In der Spalte des Apfels sind Drache, Hase und Einhorn gestrichen: Kreis bei der Katze. Bleibt für den Hasen der Kuchen. <m-e12-loesung raetsel="e12-p1" l="drache=eis einhorn=karotte katze=apfel hase=kuchen"></m-e12-loesung>.</p>
+    <p><b>Aufgabe 2:</b> Hinweis 2 ist überflüssig („Der Hase mag kein Eis“), denn das Eis hat sowieso der Drache. Alle anderen Hinweise sind nötig (vom Löser geprüft).</p>
+    <p><b>Profi-Aufgabe (eigenes Rätsel):</b> Mehrere Lösungen möglich. Gut ist jedes Rätsel, bei dem man ohne Raten auf genau eine Lösung kommt (Kasten „Rätsel für die Familie erfinden“).</p>
+    <p><b>Bonus-Knobelei:</b> Eis-Rätsel: {{KIND}} hat Erdbeer (Hinweis), Papa mag kein Schoko, und Erdbeer ist weg, also Vanille. Bleibt für Oma Schoko. Du-Sätze: wahr (ein Daumen reicht), falsch (ein Daumen unten), wahr. Für Profis: Eines von beiden, „es regnet“ oder „es regnet nicht“, stimmt immer, also ist der Oder-Satz immer wahr. „Heute regnet es, und heute regnet es nicht“ wäre dagegen immer falsch.</p>
+    <p><b>Bildschirm-Levels (zum Nachschauen):</b> Jedes Level hat genau eine Lösung, und jeder Hinweis ist nötig, außer Hinweis 2 in Level 8 (vom Löser geprüft). Die App vergleicht nicht mit einer gespeicherten Lösung, sie prüft, ob alle Hinweise stimmen.</p>
+    <table class="tab e12-tab">
+      <tr><th>Level</th><th>Was ist neu?</th><th>Lösung</th></tr>
+      <tr><td>1</td><td><a class="blattref" href="#blatt-12-1"></a>, Aufgabe 1</td><td><m-e12-loesung raetsel="e12-a1"></m-e12-loesung></td></tr>
+      <tr><td>2</td><td>2 · 2 mit „mag“ statt „mag kein“</td><td><m-e12-loesung raetsel="e12-w1" l="eule=apfel hase=kuchen"></m-e12-loesung></td></tr>
+      <tr><td>3</td><td><a class="blattref" href="#blatt-12-1"></a>, Aufgabe 2</td><td><m-e12-loesung raetsel="e12-a2"></m-e12-loesung></td></tr>
+      <tr><td>4</td><td>Mützen statt Essen</td><td><m-e12-loesung raetsel="e12-w2" l="drache=muetze-blau einhorn=muetze-rot katze=muetze-gelb"></m-e12-loesung></td></tr>
+      <tr><td>5</td><td>Hinweise mit „oder“</td><td><m-e12-loesung raetsel="e12-w3" l="einhorn=eis hase=apfel eule=karotte"></m-e12-loesung></td></tr>
+      <tr><td>6</td><td><a class="blattref" href="#blatt-12-2"></a>, Kobold-Jagd</td><td><m-e12-loesung raetsel="e12-k1"></m-e12-loesung></td></tr>
+      <tr><td>7</td><td>„und“ und „oder“</td><td><m-e12-loesung raetsel="e12-w4" l="drache=fisch katze=karotte hase=kuchen"></m-e12-loesung></td></tr>
+      <tr><td>8</td><td><a class="blattref" href="#blatt-12-3"></a>, 4 · 4</td><td><m-e12-loesung raetsel="e12-p1"></m-e12-loesung></td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 12-1: Wer mag was? (2 · 2 und 3 · 3)                       -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="12" data-titel="Wer mag was?" data-art="Arbeitsblatt" data-verteilt>
+  <div class="aufg">
+    <p class="anw">{{KIND}}, jedes Tier mag genau ein Essen. Wer mag was?</p>
+    <div class="e12-neben">
+      <m-e12-gitter raetsel="e12-a1" feld="21"></m-e12-gitter>
+      <div class="e12-rechts">
+        <p class="e12-ht">Hinweis</p>
+        <m-e12-hinweise raetsel="e12-a1"></m-e12-hinweise>
+        <m-e12-legende></m-e12-legende>
+      </div>
+    </div>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">Mal zuerst die Kreuze. Wo ist dann nur noch ein Feld frei?</p>
+    <div class="e12-neben">
+      <m-e12-gitter raetsel="e12-a2" feld="20"></m-e12-gitter>
+      <div class="e12-rechts">
+        <p class="e12-ht">Hinweise</p>
+        <m-e12-hinweise raetsel="e12-a2" abstand="4"></m-e12-hinweise>
+      </div>
+    </div>
+  </div>
+
+  <div class="e12-unten">
+    <div class="knobel" data-titel="Knobel-Ecke: Kreise und Kreuze zählen">
+      <div class="e12-zaehl">
+        <span>Aufgabe 2</span><span>Kreise <m-e12-zahl raetsel="e12-a2" was="kreise" l="3"></m-e12-zahl></span><span>Kreuze <m-e12-zahl raetsel="e12-a2" was="kreuze" l="6"></m-e12-zahl></span>
+        <span>Mit 4 Tieren</span><span>Kreise <m-e12-zahl raetsel="e12-p1" was="kreise" l="4"></m-e12-zahl></span><span>Kreuze <m-e12-zahl raetsel="e12-p1" was="kreuze" l="12"></m-e12-zahl></span>
+      </div>
+    </div>
+    <m-qr paket="e12"></m-qr>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 12-2: Wahr oder falsch? (Bild-Sätze, Kobold-Jagd, QR)     -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="12" data-titel="Wahr oder falsch?" data-art="Arbeitsblatt" data-verteilt>
+  <div class="aufg">
+    <p class="anw">{{KIND}}, schau das Bild an. Ist der Satz wahr oder falsch? Kreis das passende Wort ein.</p>
+    <div class="e12-mitte"><m-e12-szene raetsel="e12-wf" gr="27" abstand="14"></m-e12-szene></div>
+    <m-e12-aussagen raetsel="e12-wf" gr="7" abstand="2.4"></m-e12-aussagen>
+  </div>
+
+  <div class="knobel" data-titel="Knobel-Ecke: Kobold-Jagd">
+    <div class="e12-neben">
+      <m-e12-gitter raetsel="e12-k1" feld="19" kopf="stapel" bild="11"></m-e12-gitter>
+      <div class="e12-rechts">
+        <p class="e12-frage">Der Kobold hat schon mit Lila angefangen. Ein lila Zeichen stimmt nicht! Mal es rot an. Dann mach das Gitter fertig.</p>
+        <m-e12-hinweise raetsel="e12-k1" gr="7"></m-e12-hinweise>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 12-3: Logik-Profi (4 · 4, überflüssiger Hinweis, eigenes Rätsel) -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="12" data-titel="Logik-Profi" data-art="Arbeitsblatt" data-verteilt>
+  <div class="aufg">
+    <p class="anw">{{KIND}}, jetzt sind es 4 Tiere und 4 Essen. Lös das Logikgitter!</p>
+    <div class="e12-neben">
+      <m-e12-gitter raetsel="e12-p1" feld="20" kopf="stapel" bild="11"></m-e12-gitter>
+      <div class="e12-rechts">
+        <m-e12-hinweise raetsel="e12-p1" gr="7" abstand="3"></m-e12-hinweise>
+      </div>
+    </div>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">Ein Hinweis ist überflüssig: Das Rätsel geht auch ohne ihn. Welcher? <span class="e12-nowrap">Hinweis <m-e12-zahl raetsel="e12-p1" was="ueberfluessig" l="2"></m-e12-zahl></span></p>
+  </div>
+
+  <div class="profi" data-titel="Profi-Aufgabe: Ein Rätsel für deine Familie">
+    <div class="e12-neben">
+      <m-e12-leer n="3" feld="18"></m-e12-leer>
+      <div class="e12-rechts">
+        <p class="e12-frage">Mal links 3 Leute oder Tiere, oben 3 Dinge. Denk dir aus, wer was mag. Schreib Hinweise.</p>
+        <div class="e12-schreib"><div><b>1</b><span></span></div><div><b>2</b><span></span></div><div><b>3</b><span></span></div></div>
+        <p class="e12-frage">Gibt es genau eine Lösung?</p>
+      </div>
+    </div>
+    <p class="lsg-nur">Mehrere Lösungen möglich: jedes Rätsel, das ohne Raten genau eine Lösung hat.</p>
+  </div>
+</section>
