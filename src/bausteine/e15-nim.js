@@ -119,7 +119,7 @@ table.e15-zt td { text-align: center; }
     if (l.haufen.length !== 1 || l.stand !== null) return H().fehler(el, 'm-e15-stellung: nur Steine-Spiel mit einem Haufen');
     const n = l.haufen[0];
     const gr = parseFloat(el.getAttribute('gr') || '7');
-    const dran = l.dran === 'du' ? '<span><b>Du</b> bist dran.</span>' : drache(8) + '<span><b>Drache</b> ist dran.</span>';
+    const dran = l.dran === 'du' ? '<span><b>Du</b> bist dran.</span>' : drache(8) + '<span><b>Der Drache</b> ist dran.</span>';
     let lsg = '';
     if (l.dran === 'du' && l.gewinner === 'du') lsg = l.zugText ? l.zugText.replace(/^nimm/, 'Nimm') + ', dann bleiben ' + l.nachher[0] + '.' : '';
     else if (l.dran === 'du') lsg = 'Der Drache nimmt dann den Rest.';
