@@ -1,1 +1,542 @@
-<!-- Einheit 11: noch nicht geschrieben (Platzhalter, damit Buch und --nur 11 schon funktionieren) -->
+<!--
+  Einheit 11: Wenn-dann-Regeln (Block C)
+  Bedingungen: Regel-Spiel mit dem Körper („Wenn ich klatsche, hüpfst du“), dann der Drache
+  mit dem türkisen Wenn-dann-Kasten (Wenn-Karten Stein und frei), der große Aha-Moment:
+  Wenn-dann-Kasten im Zauber-Kasten, dasselbe Programm in verschiedenen Gittern.
+  Im Schwerer-Teil „sonst“. Kobold: eine falsche Wenn-Karte.
+  Rätsel: raetsel/e11.json (Web-Paket e11, Art pfad mit "erlaubt": ["zauber", "wenn"])
+  Eigener Baustein: src/bausteine/e11-regeln.js (Antwortkästchen, Aufstellungen, geprüfte Aussagen)
+  Blätter: 11-1 Der Drache schaut, 11-2 Die Regel im Zauber-Kasten, 11-3 Meine Wenn-Karten (Bastelvorlage)
+-->
+<style>
+  section[data-einheit="11"] { --e11-wenn: #0b8a8f; --e11-wenn-hell: #e0f4f4; }
+  .e11-ablauf > li { break-inside: avoid; }
+  .e11-ganz > li { break-inside: auto; orphans: 2; widows: 2; }
+  .kasten.e11-bricht { -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .kasten.e11-bricht > .kasten-titel { break-after: avoid; }
+  .kasten.e11-bricht > .kasten-titel + p, .kasten.e11-bricht > .kasten-titel + ul > li:first-child { break-before: avoid; break-inside: avoid; }
+  /* kleine Programm-Reihen im Fließtext der Anleitung */
+  .e11-mini m-programm { vertical-align: middle; }
+  .e11-mini .prog { gap: 0.8mm; vertical-align: middle; align-items: center; }
+  .e11-mini .prog .platz .box { border-width: 0.35mm; border-radius: 1mm; }
+  .e11-mini .prog .kasten-z { border-width: 0.5mm; border-radius: 1.6mm; padding: 0.5mm 1mm 0.9mm 1mm; gap: 0.4mm; }
+  .e11-mini .prog .kasten-z .mal { font-size: 8.5pt; }
+  .e11-mini .prog .kasten-z .innen { gap: 0.8mm; }
+  .e11-sym m-symbol { vertical-align: middle; }
+  /* Aufstellungen am Boden-Gitter (Anleitung) */
+  .e11-auf { display: flex; flex-wrap: wrap; gap: 3mm 4mm; align-items: flex-start; margin: 1.5mm 0 2.5mm 0; break-inside: avoid; }
+  .e11-auf figure { margin: 0; display: flex; gap: 2.5mm; align-items: center; flex: 0 0 54mm; break-inside: avoid; }
+  .e11-auf figcaption { font-size: 9pt; line-height: 1.25; }
+  .e11-auf m-e11-aufstellung svg { display: block; }
+  .e11-prog-zeile { display: flex; align-items: center; gap: 3mm; margin: 1mm 0 1.5mm 0; }
+  .e11-prog-zeile .e11-bl { font-size: 9.5pt; font-weight: 700; color: var(--grau); }
+  .e11-loes { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm 4mm; align-items: start; margin: 2mm 0 4mm 0; }
+  .e11-loes m-loesungen, .e11-loes .loesungen-raster { display: contents; }
+  .e11-loes > .kasten.loesung { margin: 5mm 0 0 0; font-size: 9.5pt; }
+  .e11-loes > .kasten.loesung p { margin-bottom: 1.6mm; }
+  .kasten.loesung.e11-weiter p { margin-bottom: 1.6mm; }
+  .e11-tab td:first-child { width: 9%; }
+  .e11-tab td:nth-child(3) { width: 10%; }
+  /* Körper-Regel (Regel-Spiel) in der Anleitung und auf dem Blatt */
+  .e11-regel { display: inline-flex; align-items: center; gap: 1.6mm; border: 0.6mm solid var(--e11-wenn); background: var(--e11-wenn-hell); border-radius: 2.5mm; padding: 0.8mm 1.6mm; font-family: var(--kind); line-height: 1.1; vertical-align: middle; }
+  .e11-regel .w { color: var(--e11-wenn); font-weight: 700; }
+  .e11-regel .k { background: white; border: 0.4mm solid var(--tinte); border-radius: 1.4mm; padding: 0.5mm 1.5mm; }
+  .e11-regel .k.sig { border-color: var(--e11-wenn); }
+
+  /* Blätter */
+  .e11-kopfreihe { display: flex; align-items: flex-end; justify-content: space-between; gap: 6mm; }
+  .e11-legende { border: 0.6mm solid var(--e11-wenn); background: var(--e11-wenn-hell); border-radius: 3mm; padding: 1.5mm 3.5mm 2mm 3.5mm; }
+  .e11-leg-titel { font-size: 14pt; line-height: 1.1; margin: 0 0 0.8mm 0; }
+  .e11-leg-karte > span { white-space: nowrap; }
+  .e11-leg { display: flex; gap: 4mm; align-items: center; }
+  .e11-profi-reihe { display: flex; align-items: flex-end; gap: 6mm; }
+  .e11-profi-reihe > .profi { flex: 1; }
+  .e11-profi-reihe .profi p { margin: 0 0 2.5mm 0; }
+  .e11-leg-karte { display: flex; align-items: center; gap: 3mm; font-size: 15pt; line-height: 1.15; }
+  .e11-leg-karte m-symbol svg { display: block; border: 0.5mm solid var(--e11-wenn); border-radius: 2mm; }
+  .e11-gitterpaar { display: flex; gap: 10mm; align-items: flex-start; margin-top: 2mm; }
+  .e11-gnr { display: flex; align-items: flex-start; gap: 2mm; }
+  .e11-nr { font-family: var(--text); font-weight: 900; font-size: 14pt; color: var(--grau); }
+  .e11-neben { display: flex; align-items: center; gap: 7mm; flex-wrap: nowrap; }
+  .e11-spalte { display: flex; flex-direction: column; gap: 4mm; align-items: flex-start; }
+  .e11-frage { margin: 0; }
+  .e11-form { margin-top: 3mm; }
+
+  /* Bastelvorlage */
+  .e11-hinweis { margin: 0 0 1mm 0; }
+  .e11-titel { font-family: var(--text); font-weight: 900; font-size: 14pt; margin: 0 0 1.5mm 0; }
+  .karte .e11-wkarte { display: flex; flex-direction: column; align-items: center; gap: 1mm; }
+  .karte .e11-wkarte m-symbol svg { display: block; }
+  .karte .e11-kwort { font-family: var(--kind); font-weight: 700; font-size: 16pt; line-height: 1; color: var(--e11-wenn); }
+  .karte.e11-tuerkis { background: var(--e11-wenn-hell); }
+  .karte .e11-wort { font-family: var(--kind); font-weight: 700; font-size: 22pt; color: var(--e11-wenn); }
+  .karte .e11-rk { font-family: var(--kind); font-weight: 700; font-size: 17pt; line-height: 1.1; text-align: center; padding: 0 2mm; }
+  .karte .e11-rk-leer { font-family: var(--kind); font-size: 11pt; color: var(--grau); }
+  .e11-knobel-reihe { display: flex; align-items: center; justify-content: space-between; gap: 6mm; }
+  .e11-zeichen { display: flex; flex-wrap: wrap; gap: 2mm 3mm; margin: 2mm 0 2.5mm 0; }
+  .e11-zeichen > span { border: 0.5mm solid var(--e11-wenn); background: white; border-radius: 2mm; padding: 0.8mm 2.5mm; font-size: 15pt; }
+  .e11-zeichen b { color: var(--grau); font-family: var(--text); font-size: 14pt; margin-right: 1.5mm; }
+  .e11-fragen { display: flex; flex-wrap: wrap; gap: 2mm 10mm; }
+  .e11-fragen > span { white-space: nowrap; }
+  .blatt .e11-regel { font-size: 16pt; padding: 1.2mm 2.2mm; gap: 2mm; border-width: 0.8mm; }
+</style>
+
+<!-- Spickzettel: Kurzfassung der Anleitung zum Mitnehmen, höchstens zwei Seiten. Ablauf als Drehbuch (Minuten wie in der Anleitung) -->
+<section class="spick nur-buch" data-einheit="11" data-titel="Wenn-dann-Regeln">
+  <p class="spick-kern"><b>Darum geht’s:</b> Eine Wenn-dann-Regel sagt dem Roboter, was er tun soll, <b>wenn</b> etwas der Fall ist. Zuerst mit dem Körper („Wenn ich klatsche, hüpfst du“), dann am Boden-Gitter mit dem türkisen Wenn-dann-Kasten: wenn [Wenn-Karte] dann [Befehle]. Die Wenn-Karte sagt, was vor der Nase des Drachen ist: <b>Stein</b> (der Rand zählt auch als Stein) oder <b>frei</b>. Der Drache schaut nur, er bewegt sich dabei nicht. Aha-Moment: Im Zauber-Kasten schaut er in jeder Runde neu, darum klappt dasselbe Programm in verschiedenen Gittern. <b>Karten zählen:</b> Wenn-Karte plus Befehle, die Wörter wenn, dann, sonst zählen nicht. „sonst“ ist der Schwerer-Teil.</p>
+
+  <div class="spick-zwei breit-links">
+    <div class="spick-block vorher">
+      <h2>Vorher, ohne {{KIND}} <small>· etwa 20 Min</small></h2>
+      <ul class="check">
+        <li><a class="blattref" href="#blatt-11-1"></a>, <a class="blattref" href="#blatt-11-2"></a> und <a class="blattref" href="#blatt-11-3"></a> in Farbe drucken, Blatt 11-3 auf dickes Papier. <span class="min">2 Min</span></li>
+        <li>Von Blatt 11-3 ausschneiden: 4 Wenn-Karten, 8 türkise Wort-Karten, 8 Regel-Karten. Die Knobel-Ecke bleibt am Rest. <span class="min">8 Min</span></li>
+        <li>Boden-Gitter 3 · 3 aus Einheit 2 prüfen oder neu kleben (Felder 45 cm), Polster an die obere Kante. <span class="min">10 Min</span></li>
+      </ul>
+    </div>
+    <div class="spick-block vorher">
+      <h2>Bereitlegen</h2>
+      <ul class="check">
+        <li>Befehlskarten, Zauber-Kasten mit Zahlenkarten, Tanz-Karten, Drachen-Figur</li>
+        <li>ein Kuscheltier (der Stein), ein Zuckerl</li>
+        <li>10 Muggelsteine, Buntstifte, Bleistift</li>
+        <li>Stempel oder Sticker</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Gemeinsam</h2>
+  <ol class="spick-ablauf">
+    <li data-min="6"><div><b>Regel-Spiel „Wenn ich klatsche …“.</b> Erst ohne Karten: eine Regel ansagen, ein paar Mal klatschen, einmal stampfen (Falle!). Dann zwei Runden mit Karten, jede Person einmal Roboter. Zum Schluss die Knobel-Ecke auf <a class="blattref" href="#blatt-11-3"></a>: lesen, dann wirklich machen.
+      <div class="spick-spiel"><h3>Regel-Spiel</h3>
+        <p class="meta">Regel-Karten und Wort-Karten (11-3), Tanz-Karten (5-3), 10 Muggelsteine</p>
+        <ul>
+          <li><b>Regeln legen:</b> Die Regel-Macherin legt 2 Regeln, jede als Reihe: wenn, Regel-Karte, dann, Tanz-Karte. Der Roboter liest sie laut vor.</li>
+          <li><b>Eine Runde:</b> 6 Zeichen nacheinander, auch Fallen (Zeichen ohne Regel: Der Roboter macht nichts, Statue).</li>
+          <li><b>Punkte:</b> Richtig reagiert: 1 Muggelstein für den Roboter. Falsch oder bei einer Falle bewegt: 1 für die Regel-Macherin.</li>
+          <li><b>Ende:</b> nach 4 Runden (heute 2, Rest später), mehr Muggelsteine gewinnt.</li>
+        </ul>
+      </div>
+      <div class="sag">
+        <p class="du">„Heute bist du ein Roboter mit einer Regel. Wenn ich klatsche, dann hüpfst du.“ (stampft)</p>
+        <p class="sie">(hüpft) „Hihi … Moment, du hast ja gestampft!“</p>
+        <p class="dann">Genau: Für Stampfen gibt es keine Regel, also macht der Roboter nichts. Ein Roboter tut nur, was eine Regel sagt.</p>
+      </div>
+    </div></li>
+    <li data-min="5"><div><b>Der Drache schaut.</b> {{KIND}} steht als Drache im Startfeld links unten, Nase zum Polster. Wenn-Karten zeigen: „Was ist vor deiner Nase?“ Programm neben das Gitter: vor, wenn [Stein] dann [rechts drehen], vor. Mit dem Kuscheltier links oben landet sie in der Mitte, ohne Kuscheltier links oben. Vorher sagen lassen, wo sie landet.
+      <div class="sag">
+        <p class="du">„Der Drache kann jetzt schauen. Was ist vor deiner Nase?“</p>
+        <p class="sie">„Das Kuscheltier!“</p>
+        <p class="du">„Dann sagt die Regel …?“</p>
+        <p class="sie">„Rechts drehen!“</p>
+        <p class="dann">Ohne Kuscheltier: „Frei! Also gar nichts, gleich weiter.“ Schauen ist kein Befehl.</p>
+      </div>
+    </div></li>
+    <li data-min="5"><div><b>Die Regel im Zauber-Kasten.</b> Lila Kasten „4-mal“, darin der Wenn-dann-Kasten und eine vor-Karte. Zuckerl vorher hinlegen: A (Kuscheltier links oben) rechts unten, B (ohne) rechts oben, C (Kuscheltier rechts oben) Mitte. Vorher fragen: „Kommt der Drache zum Zuckerl?“ Runden laut zählen. Der Rand ist auch ein Stein.
+      <div class="sag">
+        <p class="du">„Jetzt stelle ich das Kuscheltier weg. Klappt dein Programm noch?“</p>
+        <p class="sie">„Nein … da ist ja kein Stein mehr!“ (probiert) „Doch! Der Rand ist der Stein!“</p>
+        <p class="dann">Das ist der Aha-Moment: Der Drache schaut in jeder Runde neu. Ein Programm, drei Aufstellungen.</p>
+      </div>
+    </div></li>
+    <li data-min="6"><div><b>Blatt „Der Drache schaut“.</b> <a class="blattref" href="#blatt-11-1"></a>: Drachen-Figur mitschieben, vor jeder Wenn-Karte mit dem Finger auf das Feld vor der Nase tippen. Aufgabe 2: das Programm in Gitter 1 <b>und</b> Gitter 2 prüfen. Profi (Karten und Befehle zählen) freiwillig.</div></li>
+    <li data-min="5"><div><b>Blatt „Die Regel im Zauber-Kasten“.</b> <a class="blattref" href="#blatt-11-2"></a>: Runden laut zählen, für jeden Befehl einen Strich. Aufgabe 2 hat nur 4 Karten. Profi: Der Kobold hat eine Wenn-Karte vertauscht. Passt das Blatt heute nicht mehr: nächstes Mal.
+      <div class="sag">
+        <p class="du">„Runde 2. Was ist jetzt vor der Nase?“</p>
+        <p class="dann">Schaut sie nur in der ersten Runde: „In jeder Runde neu schauen!“</p>
+      </div>
+    </div></li>
+    <li data-min="2"><div><b>Sammelpass.</b> Feld „Einheit&nbsp;11“, Sterne anmalen. Block C beginnt!
+      <div class="sag"><p class="du">„Welche Regel war heute am lustigsten?“</p></div>
+    </div></li>
+  </ol>
+
+  <div class="spick-zwei">
+    <div class="spick-block stolper">
+      <h2>Wenn es hakt</h2>
+      <ul>
+        <li><b>Schaut aufs falsche Feld:</b> Hand flach vor die Nase, wie eine Taschenlampe. Nur dieses Feld zählt.</li>
+        <li><b>Vergisst den Rand:</b> „Am Rand liegen unsichtbare Steine.“</li>
+        <li><b>Macht dann und sonst:</b> „Entweder oder, nie beides.“</li>
+        <li><b>Schaut nur in Runde 1:</b> In jeder Runde neu schauen.</li>
+        <li><b>Zählt die Wörter mit:</b> wenn, dann, sonst sind nur der Rahmen.</li>
+      </ul>
+    </div>
+    <div class="spick-block schwerer">
+      <h2>Zu leicht?</h2>
+      <ul>
+        <li><b>sonst:</b> „4-mal: wenn Stein: rechts drehen, sonst vor“ am Boden-Gitter.</li>
+        <li><b>Kobold mit sonst:</b> dann und sonst vertauscht, eine Karte repariert alles.</li>
+        <li><b>Vorsichtiger Drache:</b> „5-mal: wenn frei: vor“.</li>
+        <li><b>Eigene Aufstellung,</b> bei der der Kobold zuschlägt.</li>
+        <li><b>Alltagsregeln:</b> Ampel, Regenschirm.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="spick-block schluss">
+    <h2>Zum Schluss nicht vergessen</h2>
+    <ul class="check">
+      <li><b>Bildschirm-Bonus,</b> nur wenn ihr mögt (höchstens 15 Min, nach den Blättern): Paket 11, QR-Code unten rechts auf <a class="blattref" href="#blatt-11-1"></a>. Wenn-dann-Taste (Drache schaut), Wenn-Karte wählen, Befehle für „dann“, „fertig“. Nach dem Ende-Bild kommt das Gerät weg.</li>
+      <li>Wenn-Karten und Wort-Karten ins Kuvert zu den Befehlskarten. Das Boden-Gitter darf kleben bleiben.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="anleitung" data-einheit="11" data-titel="Wenn-dann-Regeln">
+
+  <div class="kasten ziel">
+    <p>{{KIND}} lernt die <span class="begriff">Wenn-dann-Regel</span>: Bevor der Roboter etwas tut, schaut er nach. Und je nachdem, was er sieht, macht er etwas anderes. Zuerst erlebt sie das mit dem ganzen Körper: „Wenn ich klatsche, hüpfst du. Wenn ich stampfe, machst du einen Kreisel.“ Dann bekommt der Drache am Boden-Gitter und am Papier einen türkisen <span class="begriff">Wenn-dann-Kasten</span>: wenn [Wenn-Karte] dann [Befehle]. Die <span class="begriff">Wenn-Karte</span> sagt, wohin der Drache schaut und was er dort erwartet: einen Stein vor seiner Nase oder ein freies Feld.</p>
+    <p>Der große Aha-Moment kommt, wenn der Wenn-dann-Kasten im Zauber-Kasten liegt: „4-mal: wenn Stein: rechts drehen, dann vor.“ In jeder Runde schaut der Drache neu. Darum funktioniert <b>dasselbe Programm in verschiedenen Gittern</b>, egal wo die Steine liegen. Im Schwerer-Teil kommt <span class="begriff">sonst</span> dazu: „Wenn Stein, dann rechts drehen, sonst vor.“ Und der Fehler-Kobold versteckt sich diesmal in einer falschen Regel.</p>
+  </div>
+
+  <div class="kasten tipp e11-mini e11-sym" data-titel="Die Spielregeln des Wenn-dann-Kastens (für euch beide gleich)">
+    <ul>
+      <li><b>So sieht er aus:</b> ein türkiser Kasten in einer Zeile: „wenn“, die Wenn-Karte, „dann“ und 1 bis 3 Befehle. Mit sonst kommen dahinter „sonst“ und noch einmal 1 bis 3 Befehle. So steht er auch auf den Blättern und in der Web-App: <m-programm befehle="wenn[stein: rechts sonst vor]" gr="7" nummern="nein"></m-programm></li>
+      <li><b>Zwei Wenn-Karten:</b> <m-symbol name="wenn-stein" gr="7"></m-symbol> <b>Stein vor der Nase:</b> Im Feld direkt vor der Nase liegt ein Stein, oder dort ist der Rand. „Am Rand liegen unsichtbare Steine.“ <m-symbol name="wenn-frei" gr="7"></m-symbol> <b>frei vor der Nase:</b> Das Feld davor ist frei (auch wenn dort der Schatz liegt). Was neben oder hinter dem Drachen liegt, zählt nicht. Im Bild schaut der Drache immer nach oben, das Feld liegt über ihm.</li>
+      <li><b>So läuft er ab:</b> Der Drache schaut auf das Feld vor seiner Nase. Stimmt die Wenn-Karte, macht er die Befehle nach „dann“. Stimmt sie nicht, macht er die Befehle nach „sonst“, und gibt es kein „sonst“, macht er gar nichts. Nie beides. Schauen ist kein Befehl: Der Drache bewegt sich dabei nicht und stößt beim Schauen nie an.</li>
+      <li><b>Im Zauber-Kasten:</b> In jeder Runde schaut der Drache neu. Der Wenn-dann-Kasten ist ein Teil im Zauber-Kasten, höchstens 3 Teile passen hinein, z. B. <m-programm befehle="4[wenn[stein: rechts] vor]" gr="7" nummern="nein"></m-programm>. Nach „dann“ und „sonst“ stehen nur Befehle, kein Kasten im Wenn-dann-Kasten.</li>
+      <li><b>Karten zählen:</b> Die Wenn-Karte ist 1 Karte, dazu kommen die Befehle nach „dann“ und nach „sonst“. Die Wörter wenn, dann und sonst zählen nicht, sie sind nur der Rahmen (wie die lila Streifen beim Zauber-Kasten). Das Programm oben sind also 1 + 1 + 1 + 1 = 4 Karten: Zahlenkarte, Wenn-Karte, rechts drehen, vor. Bei Fragen wie „nach Befehl 5“ zählen nur die Befehle, die der Drache wirklich macht.</li>
+    </ul>
+  </div>
+
+  <div class="kasten material darf-brechen e11-bricht">
+    <p><b>Vorher, ohne {{KIND}} (etwa 20 Minuten):</b></p>
+    <ul>
+      <li><b>Drucken (2 Minuten):</b> <a class="blattref" href="#blatt-11-1"></a> und <a class="blattref" href="#blatt-11-2"></a> (Arbeitsblätter) und <a class="blattref" href="#blatt-11-3"></a> (Bastelvorlage) <b>in Farbe</b>, die Bastelvorlage am besten auf dickerem Papier (160&nbsp;g).</li>
+      <li><b>Ausschneiden (8 Minuten):</b> Von <a class="blattref" href="#blatt-11-3"></a> die 4 Wenn-Karten (2-mal Stein, 2-mal frei, so groß wie die Befehlskarten), die 8 türkisen Wort-Karten (wenn, dann je 3-mal, sonst 2-mal) und die 8 Regel-Karten für das Regel-Spiel (2 davon sind leer zum Selbermalen). Zuerst die langen geraden Linien schneiden. Die Knobel-Ecke bleibt am Rest des Blatts, sie kommt in Schritt 1 dran. Alles zu den Befehlskarten ins Kuvert.</li>
+      <li><b>Boden-Gitter (10 Minuten):</b> Klebt das 3 · 3-Gitter aus Einheit 2 noch, nur nachschauen, ob alle Streifen halten. Sonst neu kleben: Felder 45 cm, 4 und 4 Streifen Malerkrepp zu je 1,35 m, das Startfeld ist links unten. Ein Polster liegt an der oberen Kante, er ist „oben“.</li>
+      <li><b>Aus früheren Einheiten bereitlegen:</b> die Befehlskarten (<a class="blattref" href="#blatt-1-1"></a>), den Zauber-Kasten mit den lila Streifen, den Zahlenkarten und den Tanz-Karten (<a class="blattref" href="#blatt-5-3"></a>) und die Drachen-Figur (<a class="blattref" href="#blatt-2-3"></a>).</li>
+    </ul>
+    <p><b>Material in der Einheit:</b> ein Kuscheltier (es ist am Boden-Gitter der Stein), ein Zuckerl, 10 Muggelsteine für die Punkte, Buntstifte und Bleistift, Stempel oder Sticker für den Sammelpass. Fehlen die Tanz-Karten, sagt ihr die Bewegungen einfach an.</p>
+    <p><b>Extra, außerhalb der Einheit:</b> Die Wenn-Karten auf Karton kleben (sie werden in Einheit 16 und 19 wieder gebraucht) und die zwei leeren Regel-Karten mit eigenen Zeichen bemalen. Wer mag, schreibt mit {{KIND}} ein Familien-Regel-Plakat: „Wenn jemand niest, sagen alle Gesundheit.“</p>
+  </div>
+
+  <h2>Ablauf Schritt für Schritt</h2>
+  <ol class="ablauf e11-ablauf">
+    <li data-min="6"><span class="schritt-titel">Regel-Spiel „Wenn ich klatsche …“</span>Fang ohne Vorrede an: „Heute bist du ein Roboter mit einer Regel. Wenn ich klatsche, dann hüpfst du.“ Klatsch ein paar Mal, zwischendurch stampfst du einmal: eine Falle, denn für Stampfen gibt es keine Regel, also bleibt der Roboter stehen. Dann kommt eine zweite Regel dazu („Wenn ich stampfe, dann machst du einen Kreisel“). Danach das Spiel mit Karten (Kasten „Spiel: Regel-Spiel“): zwei Runden, zuerst ist {{KIND}} der Roboter, dann du. Zum Abschluss die Knobel-Ecke auf <a class="blattref" href="#blatt-11-3"></a>: erst lesen und zählen, dann wirklich hüpfen und stampfen. Hier hört sie das erste Mal das Wort „sonst“, ganz nebenbei.</li>
+    <li data-min="5"><span class="schritt-titel">Der Drache schaut</span>{{KIND}} steht als Drache am Boden-Gitter im Startfeld links unten, die Nase zum Polster. Zeig ihr die zwei Wenn-Karten: „Der Drache kann jetzt schauen. Bevor er etwas tut, schaut er auf das Feld vor seiner Nase.“ Leg das Programm neben das Gitter: vor, dann ein Wenn-dann-Kasten aus Wort-Karten (wenn, Stein, dann, rechts drehen), dann noch einmal vor. Zuerst liegt das Kuscheltier im Feld links oben (Aufstellung 1, Bild unter dem Ablauf). Sie sagt vorher, wo sie landet, dann geht sie: vor, schauen, Kuscheltier vor der Nase, also rechts drehen, vor. Sie landet in der Mitte. Dann nimmst du das Kuscheltier weg (Aufstellung 2): vor, schauen, frei, also nichts, vor. Jetzt landet sie links oben. „Gleiches Programm, anderes Ende!“</li>
+    <li data-min="5"><span class="schritt-titel">Die Regel im Zauber-Kasten</span>Jetzt kommt der Wenn-dann-Kasten in einen lila Zauber-Kasten „4-mal“, dazu eine vor-Karte: <span class="e11-mini"><m-programm befehle="4[wenn[stein: rechts] vor]" gr="6" nummern="nein"></m-programm></span>. Leg das Zuckerl vorher ins Zielfeld und frag: „Kommt der Drache mit diesem Programm zum Zuckerl?“ Aufstellung A: Kuscheltier links oben, Zuckerl rechts unten. Sie zählt die Runden laut: „Runde 1: schauen, frei, vor.“ Landet sie auf dem Zuckerl, gehört es ihr (oder es bleibt für die nächste Aufstellung liegen). Dann B: kein Kuscheltier, Zuckerl rechts oben, hier ist der Rand oben der Stein. Zum Schluss C: Kuscheltier rechts oben, Zuckerl in der Mitte. Das ist der Aha-Moment: ein Programm, drei Aufstellungen, und der Drache findet jedes Mal den Weg.</li>
+    <li data-min="6"><span class="schritt-titel">Blatt „Der Drache schaut“</span><a class="blattref" href="#blatt-11-1"></a>. Bei Aufgabe 1 läuft die Drachen-Figur mit, und vor dem Wenn-dann-Kasten tippt sie mit dem Finger auf das Feld vor der Nase. Neben dem Programm erklärt ein kleiner Kasten die zwei Wenn-Karten. Bei Aufgabe 2 sucht sie ein Programm für beide Gitter: Am besten probiert sie es zuerst in Gitter 1 mit der Figur und prüft es dann in Gitter 2. Die Profi-Aufgabe ist freiwillig: Dort zählt sie Karten und Befehle und merkt, dass ein Programm mit 6 Karten im einen Gitter 5 Befehle macht und im anderen nur 2.</li>
+    <li data-min="5"><span class="schritt-titel">Blatt „Die Regel im Zauber-Kasten“</span><a class="blattref" href="#blatt-11-2"></a>. Bei Aufgabe 1 tippt sie mit dem Muggelstein mit und zählt die Runden laut, für jeden Befehl macht sie einen Strich neben das Gitter. Aufgabe 2 hat eine <b>Kartengrenze</b>: nur 4 Karten, und das Programm muss in beiden Gittern ankommen. Die Profi-Aufgabe ist die Kobold-Jagd dieser Einheit: Eine Wenn-Karte ist falsch. Passt das Blatt heute nicht mehr hinein, kommt es beim nächsten Mal dran.</li>
+    <li data-min="2"><span class="schritt-titel">Sammelpass</span>Feld „Einheit&nbsp;11“ stempeln oder bekleben, Sterne anmalen. Frag: „Welche Regel war heute am lustigsten?“ Mit dieser Einheit beginnt Block C, Wenn-dann und Logik.</li>
+  </ol>
+
+  <div class="kasten tipp e11-mini darf-brechen e11-bricht" data-titel="Die Aufstellungen am Boden-Gitter (Schritt 2 und 3)">
+    <p>Das Boden-Gitter von oben gesehen, der Polster ist oben. Grau ist das Kuscheltier (der Stein), rot der Weg, der blasse Drache steht am Ende. Startfeld immer links unten, Nase zum Polster.</p>
+    <div class="e11-prog-zeile"><span class="e11-bl">Schritt 2:</span><m-programm raetsel="e11-b1" gr="6" nummern="nein"></m-programm></div>
+    <div class="e11-auf">
+      <figure><m-e11-aufstellung raetsel="e11-b1"></m-e11-aufstellung><figcaption><b>1:</b> Kuscheltier links oben. <m-e11-ende raetsel="e11-b1" ende="1,1,rechts" befehle="3">Der Drache landet in der Mitte, Blick nach rechts.</m-e11-ende></figcaption></figure>
+      <figure><m-e11-aufstellung raetsel="e11-b2"></m-e11-aufstellung><figcaption><b>2:</b> kein Kuscheltier. <m-e11-ende raetsel="e11-b2" ende="0,0,oben" befehle="2">Er landet links oben, Blick zum Polster.</m-e11-ende></figcaption></figure>
+    </div>
+    <div class="e11-prog-zeile"><span class="e11-bl">Schritt 3:</span><m-programm raetsel="e11-b3" gr="6" nummern="nein"></m-programm></div>
+    <div class="e11-auf">
+      <figure><m-e11-aufstellung raetsel="e11-b3"></m-e11-aufstellung><figcaption><b>A:</b> Kuscheltier links oben. <m-e11-ende raetsel="e11-b3" ende="2,2,unten" befehle="6">Zuckerl rechts unten. 6 Befehle, Blick nach unten.</m-e11-ende></figcaption></figure>
+      <figure><m-e11-aufstellung raetsel="e11-b4"></m-e11-aufstellung><figcaption><b>B:</b> kein Kuscheltier. <m-e11-ende raetsel="e11-b4" ende="2,0,rechts" befehle="5">Zuckerl rechts oben. 5 Befehle, der Rand oben ist der Stein.</m-e11-ende></figcaption></figure>
+      <figure><m-e11-aufstellung raetsel="e11-b5"></m-e11-aufstellung><figcaption><b>C:</b> Kuscheltier rechts oben. <m-e11-ende raetsel="e11-b5" ende="1,1,unten" befehle="6">Zuckerl in der Mitte. 6 Befehle, Blick nach unten.</m-e11-ende></figcaption></figure>
+    </div>
+    <p>Wer will, legt danach selbst eine Aufstellung und sagt vorher, wo der Drache landet. Achtung, Kobold: Liegt das Kuscheltier im Feld <b>Mitte links</b>, dreht sich der Drache gleich am Anfang, läuft die untere Reihe entlang, dreht sich am Rand nach unten und <m-e11-ende raetsel="e11-b11" stoss="5">stößt beim 5. Befehl an</m-e11-ende>. Nach dem Drehen schaut er nicht noch einmal, bevor er vor geht.</p>
+  </div>
+
+  <h3>Beispielsätze</h3>
+  <div class="sag">
+    <p class="du">„Heute bist du ein Roboter mit einer Regel. Die Regel heißt: Wenn ich klatsche, dann hüpfst du. Bereit?“ (klatscht)</p>
+    <p class="sie">(hüpft) „Piep!“</p>
+    <p class="du">(stampft)</p>
+    <p class="sie">(hüpft) „Hihi … Moment. Du hast ja gestampft!“</p>
+    <p class="dann">Genau. Für Stampfen gibt es keine Regel. Sag: „Ein Roboter macht nur, was eine Regel sagt. Für Stampfen hast du keine, also bleibst du stehen wie eine Statue.“ Das ist die wichtigste Entdeckung des Tages: Die Regel gilt nur, <b>wenn</b> das Zeichen kommt.</p>
+  </div>
+  <div class="sag">
+    <p class="du">(am Boden-Gitter, nach dem ersten vor) „Halt! Bevor du weitergehst: Der Drache kann jetzt schauen. Was ist vor deiner Nase?“</p>
+    <p class="sie">„Das Kuscheltier!“</p>
+    <p class="du">„Und was sagt die Regel, wenn ein Stein vor der Nase ist?“</p>
+    <p class="sie">„Rechts drehen! … Und dann vor.“</p>
+    <p class="dann">Das letzte vor steht nicht im Wenn-dann-Kasten, es kommt immer dran. Ohne Kuscheltier sagt sie vielleicht: „Frei! Dann muss ich … nichts?“ Richtig: Ohne „sonst“ macht der Drache gar nichts und geht zum nächsten Befehl.</p>
+  </div>
+  <div class="sag">
+    <p class="du">(nach Aufstellung A) „Jetzt nehme ich das Kuscheltier weg und lege das Zuckerl nach rechts oben. Klappt dein Programm noch?“</p>
+    <p class="sie">„Nein … da ist ja kein Stein mehr!“</p>
+    <p class="du">„Probier’s aus. Runde 1?“</p>
+    <p class="sie">„Frei, vor. Runde 2: frei, vor. Runde 3: Oh, der Rand! Das ist auch ein Stein. Rechts drehen, vor. Runde 4: frei, vor. Das Zuckerl!“</p>
+    <p class="dann">Das ist der Aha-Moment. Sag: „Dein Programm schaut selbst nach, wo die Steine liegen. Darum klappt es in verschiedenen Gittern.“ So arbeiten auch Roboter-Staubsauger (Kasten „Was hat das mit echtem Programmieren zu tun?“).</p>
+  </div>
+  <div class="sag">
+    <p class="du">(<a class="blattref" href="#blatt-11-2"></a>, Aufgabe 1) „Wie viele Karten hat dieses Programm? Und wie viele Befehle macht der Drache?“</p>
+    <p class="sie">„Vier Karten … und der Drache macht viel mehr, acht!“</p>
+    <p class="dann">Super beobachtet: 4 Karten, aber 5-mal vor und 3-mal rechts drehen. Zählt sie die Wörter wenn und dann mit: „Liegen die beim Zauber-Kasten auch als Karte da? Nein, die Wörter sind nur der Rahmen, wie die lila Streifen.“</p>
+  </div>
+
+  <h2>Spiele, Bewegung und Basteln</h2>
+
+  <div class="kasten spiel darf-brechen e11-bricht" data-titel="Regel-Spiel „Wenn ich klatsche …“">
+    <p class="spiel-meta">2 Personen · 5–10 Minuten · die 8 Regel-Karten und die türkisen Wort-Karten von <a class="blattref" href="#blatt-11-3"></a>, die Tanz-Karten von <a class="blattref" href="#blatt-5-3"></a>, 10 Muggelsteine, Platz zum Hüpfen</p>
+    <ol class="regeln">
+      <li><b>Vorbereitung:</b> Regel-Karten, Wort-Karten und Tanz-Karten offen auf den Tisch, die Muggelsteine in eine Schüssel. Die Regel-Karten sind die Zeichen („Ich klatsche“, „Ich stampfe“, „Ich winke“, „Ich rufe: Drache!“, „Ich klopfe aufs Knie“, „Ich setze mich hin“ und zwei leere für eigene Zeichen). Die Tanz-Karten sind die Bewegungen: klatschen, hüpfen, stampfen, Kreisel, Arme hoch, verbeugen.</li>
+      <li><b>Rollen:</b> Eine Person ist die <b>Regel-Macherin</b>, die andere der <b>Roboter</b>. Ihr tauscht nach jeder Runde.</li>
+      <li><b>Regeln legen:</b> Die Regel-Macherin legt 2 Regeln, jede als eigene Reihe mit den Wort-Karten: <span class="e11-regel"><span class="w">wenn</span><span class="k sig">Ich klatsche.</span><span class="w">dann</span><span class="k">hüpfen</span></span> und <span class="e11-regel"><span class="w">wenn</span><span class="k sig">Ich stampfe.</span><span class="w">dann</span><span class="k">Kreisel</span></span>. Der Roboter liest beide Regeln laut vor.</li>
+      <li><b>Eine Runde:</b> Die Regel-Macherin gibt <b>6 Zeichen</b>, eines nach dem anderen, mit einer kleinen Pause dazwischen. Sie darf auch <b>Fallen</b> stellen: Zeichen, für die keine Regel liegt (z. B. winken). Dann macht der Roboter nichts und bleibt stehen wie eine Statue. Kein Zeitdruck, Hauptsache genau.</li>
+      <li><b>Punkte:</b> Für jede richtige Reaktion (auch Statue bei einer Falle) bekommt der Roboter 1 Muggelstein. Macht er die falsche Bewegung oder bewegt er sich bei einer Falle, bekommt die Regel-Macherin 1 Muggelstein.</li>
+      <li><b>Ende:</b> Nach 4 Runden (jede Person 2-mal Roboter) gewinnt, wer mehr Muggelsteine hat. Gleichstand: Ihr erfindet zusammen eine verrückte Regel und macht sie beide. In Schritt 1 spielt ihr nur 2 Runden, die anderen beim nächsten Mal oder am Abend. Tipp für dich als Regel-Macher: mal schnell, mal mit Falle, mal mit drei gleichen Zeichen hintereinander, damit {{KIND}} oft punktet.</li>
+    </ol>
+    <p><b>Varianten:</b></p>
+    <ul>
+      <li><b>Mit sonst:</b> Eine Regel bekommt ein „sonst“: <span class="e11-regel"><span class="w">wenn</span><span class="k sig">Ich klatsche.</span><span class="w">dann</span><span class="k">hüpfen</span><span class="w">sonst</span><span class="k">stampfen</span></span>. Jetzt gibt es keine Statue mehr: Bei jedem anderen Zeichen stampft der Roboter. Das ist die Knobel-Ecke auf <a class="blattref" href="#blatt-11-3"></a> als Spiel.</li>
+      <li><b>Drei Regeln:</b> Mit 3 Regeln auf einmal wird es richtig knifflig. Es gibt genug Wort-Karten dafür.</li>
+      <li><b>Kobold-Roboter:</b> Du bist der Roboter und folgst absichtlich einer falschen Regel: Du verwechselst dann und sonst, oder du hüpfst beim falschen Zeichen. {{KIND}} ruft „Kobold!“ und sagt, was falsch war. Dafür bekommt sie den Muggelstein.</li>
+      <li><b>Regel-Detektivin:</b> Du denkst dir heimlich eine Regel aus, ohne Karten (z. B. „Wenn du winkst, setze ich mich hin“). {{KIND}} gibt Zeichen und beobachtet, was du machst. Findet sie die Regel mit höchstens 6 Zeichen, bekommt sie 3 Muggelsteine. Dann tauscht ihr.</li>
+      <li><b>Gegenteil-Regel:</b> „Wenn ich mich hinsetze, dann stehst du auf. Wenn ich aufstehe, dann setzt du dich hin.“ Sehr lustig, sehr schwer.</li>
+    </ul>
+  </div>
+
+  <div class="sag">
+    <p class="sie">(als Regel-Macherin, mit verschmitztem Blick) „Ich klatsche … ich klatsche … ich WINKE!“</p>
+    <p class="du">(hüpft absichtlich) „Piep!“</p>
+    <p class="sie">„Falle! Für Winken gibt es keine Regel! Der Muggelstein gehört mir!“</p>
+    <p class="dann">Lass dich ruhig ab und zu erwischen. {{KIND}} lernt dabei genau das, worum es geht: Eine Regel gilt nur, wenn ihr „wenn“ stimmt.</p>
+  </div>
+
+  <div class="kasten bewegung darf-brechen e11-bricht" data-titel="Drache mit Regel am Boden-Gitter">
+    <p>Das ist der Kern von Schritt 2 und 3 (Bilder im Kasten unter dem Ablauf). {{KIND}} ist der Drache, ein Kuscheltier ist der Stein, das Programm liegt aus Karten neben dem Gitter. Weitere Ideen, wenn noch Zeit und Lust da sind:</p>
+    <ul>
+      <li><b>Wer legt den Stein?</b> {{KIND}} legt das Kuscheltier, du legst das Zuckerl dorthin, wo der Drache deiner Meinung nach landet. Stimmt es, bekommst du einen Muggelstein, sonst sie. Dann tauscht ihr.</li>
+      <li><b>Zwei Kuscheltiere:</b> Mit 2 Steinen gibt es noch mehr Aufstellungen. Klappt das Programm „4-mal: wenn Stein: rechts drehen, vor“ immer? (Nein, siehe Kobold im Kasten unter dem Ablauf: Wenn nach dem Drehen schon wieder ein Stein vor der Nase ist, stößt der Drache an.)</li>
+      <li><b>Rand-Lava:</b> Hinter dem Malerkrepp ist Lava. Am Rand liegen unsichtbare Steine. Das hilft, den Rand als Stein zu sehen.</li>
+    </ul>
+  </div>
+
+  <div class="kasten basteln" data-titel="Wenn-dann-Kasten legen">
+    <ol>
+      <li>Ein Wenn-dann-Kasten liegt in einer Reihe: die türkise Wort-Karte <b>wenn</b>, eine Wenn-Karte (Stein oder frei), die Wort-Karte <b>dann</b>, 1 bis 3 Befehlskarten. Mit sonst: die Wort-Karte <b>sonst</b> und noch 1 bis 3 Befehlskarten. Die Wenn-Karten sind so groß wie die Befehlskarten aus Einheit 1.</li>
+      <li>Gezählt werden nur die Wenn-Karte und die Befehlskarten. Die Wort-Karten sind der Rahmen, wie die lila Streifen.</li>
+      <li>Im Zauber-Kasten: Der Wenn-dann-Kasten ist breiter als die lila Streifen. Legt den Kopf-Streifen mit der Zahlenkarte oben hin und den langen Streifen unten, rechts darf der Kasten offen bleiben. Oder ihr legt eine lila Wollschnur als Rahmen.</li>
+      <li>Für das Regel-Spiel kommen statt der Wenn-Karte eine Regel-Karte und statt der Befehlskarte eine Tanz-Karte in die Reihe.</li>
+    </ol>
+  </div>
+
+  <h2>Wenn es hakt oder zu leicht ist</h2>
+
+  <div class="zwei">
+    <div class="kasten leichter">
+      <ul>
+        <li>Länger beim Körper bleiben: Regel-Spiel mit nur einer Regel, ohne Fallen.</li>
+        <li>Am Boden-Gitter zuerst nur einen Wenn-dann-Kasten ohne Zauber-Kasten, das Kuscheltier immer wieder hin und weg.</li>
+        <li>Vor jeder Wenn-Karte fragen: „Was ist vor deiner Nase?“ Sie zeigt mit der flachen Hand auf das Feld.</li>
+        <li>Am Papier läuft die Drachen-Figur mit, das Feld vor der Nase antippen, erst dann entscheiden.</li>
+        <li><a class="blattref" href="#blatt-11-2"></a> an einem anderen Tag.</li>
+      </ul>
+    </div>
+    <div class="kasten bonus" data-titel="Bonus-Knobelei">
+      <p class="klein"><i>Für zwischendurch: im Auto, beim Abendessen, beim Zähneputzen.</i></p>
+      <p><b>Regenschirm:</b> „Wenn es regnet, nehme ich den Schirm mit, sonst die Kappe. Heute scheint die Sonne. Was nehme ich mit?“</p>
+      <p><b>Drachen-Wort:</b> „Wenn ich ‚Drache‘ sage, brüllst du. Sonst flüsterst du. Katze, Drache, Hund. Was machst du?“</p>
+      <p><b>Ampel:</b> „Wenn die Ampel grün ist, gehen wir. Sonst warten wir. Die Ampel ist rot. Was machen wir?“</p>
+      <p><b>Für Profis:</b> „Wenn ich klatsche, hüpfst du. Sonst hüpfst du auch. Wann hüpfst du?“</p>
+      <p class="klein"><b>Kurz-Lösungen:</b> die Kappe; flüstern, brüllen, flüstern; warten; immer (die Regel ist überflüssig). Mehr bei den Lösungen am Ende.</p>
+    </div>
+  </div>
+
+  <div class="kasten stolper darf-brechen e11-bricht">
+    <ul>
+      <li><b>Sie schaut auf das falsche Feld</b> (neben den Drachen, schräg davor oder dorthin, wo sie gerne hin möchte): Die Hand flach vor die Nase halten, wie eine Taschenlampe. Nur das Feld, auf das die Hand zeigt, zählt. Am Papier tippt sie mit dem Finger genau auf dieses Feld.</li>
+      <li><b>Sie vergisst den Rand:</b> „Am Rand liegen unsichtbare Steine.“ Am Boden hilft die Rand-Lava. Auf den Blättern ist das wichtig: Bei Aufgabe 1 auf <a class="blattref" href="#blatt-11-2"></a> dreht sich der Drache zweimal am Rand und nur einmal an einem Stein.</li>
+      <li><b>Sie glaubt, der Drache geht beim Schauen:</b> Schauen ist kein Befehl. Die Wenn-Karte ist eine Frage, keine Bewegung. Lass sie beim Schauen am Boden die Füße fest stehen lassen.</li>
+      <li><b>Sie macht dann und sonst:</b> „Entweder oder, nie beides.“ Zwei Hände: Die eine Hand ist dann, die andere sonst. Nur eine darf hoch.</li>
+      <li><b>Sie schaut im Zauber-Kasten nur in der ersten Runde:</b> In jeder Runde neu schauen. Am Boden hilft es, bei jeder Runde laut „schauen!“ zu sagen.</li>
+      <li><b>Sie zählt die Wörter mit</b> (wenn, dann, sonst) oder vergisst die Wenn-Karte: Die Regel lautet: Wenn-Karte plus Befehle. Lass sie die Karten wirklich in die Hand nehmen und zählen.</li>
+      <li><b>„Warum brauche ich überhaupt eine Regel? Ich sehe doch, wo der Stein ist!“</b> Eine sehr kluge Frage. Bei einem einzigen Gitter stimmt das: Da reicht ein Programm ohne Regel. Die Regel lohnt sich, wenn dasselbe Programm in mehreren Gittern klappen soll oder wenn der Drache im Zauber-Kasten immer wieder schauen muss.</li>
+      <li><b>Der Drache stößt an:</b> Wie immer: „Hier hat der Kobold zugeschlagen!“ Meistens ist die Wenn-Karte falsch oder die Zahl im Zauber-Kasten zu groß.</li>
+    </ul>
+  </div>
+
+  <m-linksrechts></m-linksrechts>
+
+  <div class="kasten schwerer darf-brechen e11-bricht e11-mini">
+    <p>Sitzt die Regel nach wenigen Minuten, wähle hier aus. Das ist kein Zusatz „für später“, sondern ein vollwertiger Hauptteil. Alles geht am Boden-Gitter (Startfeld links unten, Nase zum Polster) oder am Papier mit der Drachen-Figur.</p>
+    <ol class="e11-ganz">
+      <li><b>sonst am Boden-Gitter:</b> <m-programm raetsel="e11-b6" gr="6" nummern="nein"></m-programm>. Jetzt macht der Drache in jeder Runde genau eins: drehen <b>oder</b> vor. Aufstellung A (Kuscheltier links oben): <m-e11-ende raetsel="e11-b6" ende="2,1,rechts" befehle="4">Er landet Mitte rechts, Blick nach rechts.</m-e11-ende> Aufstellung B (kein Kuscheltier): <m-e11-ende raetsel="e11-b7" ende="1,0,rechts" befehle="4">Er landet Mitte oben, Blick nach rechts.</m-e11-ende> Frag: „Warum kommt er nicht so weit wie in Schritt 3?“ (Weil eine Runde mit Drehen kein vor hat. 4 Runden sind 4 Befehle.) Profi-Frage: Was ist hier besser? (Mit sonst schaut der Drache nach dem Drehen noch einmal, bevor er geht. Darum stößt er nicht an, wenn schon wieder ein Stein vor der Nase ist.)</li>
+      <li><b>Kobold mit sonst:</b> Du legst <m-programm raetsel="e11-k2" gr="6" nummern="nein"></m-programm> mit dem Kuscheltier links oben, das Zuckerl liegt Mitte rechts. {{KIND}} geht es durch: Runde 1 und 2 ist vor der Nase frei, also zweimal rechts drehen. In Runde 3 ist der Rand vor der Nase, also vor, und <m-e11-ende raetsel="e11-k2" prog="kaputt" stoss="3">der Kobold schlägt beim 3. Befehl zu</m-e11-ende>. Der Kobold hat dann und sonst vertauscht. Reparieren geht auf zwei Arten: die zwei Befehlskarten tauschen (2 Karten bewegen) oder nur die Wenn-Karte tauschen, frei statt Stein (1 Karte). „wenn Stein: rechts drehen, sonst vor“ macht genau dasselbe wie „wenn frei: vor, sonst rechts drehen“. <m-e11-ende raetsel="e11-k2" ende="2,1,rechts">Repariert landet der Drache auf dem Zuckerl.</m-e11-ende></li>
+      <li><b>Der vorsichtige Drache:</b> <m-programm raetsel="e11-b8" gr="6" nummern="nein"></m-programm>. Er geht nur, wenn frei ist, und stößt darum nie an. Wo bleibt er stehen? Mit dem Kuscheltier links oben <m-e11-ende raetsel="e11-b8" ende="0,1,oben" befehle="1">bleibt er Mitte links stehen (nur 1 Befehl, dann schaut er 4-mal auf das Kuscheltier)</m-e11-ende>, ohne Kuscheltier <m-e11-ende raetsel="e11-b9" ende="0,0,oben" befehle="2">links oben</m-e11-ende>. Lustige Frage: „Wie viele Befehle macht der Drache, obwohl im Kasten 5-mal steht?“</li>
+      <li><b>Der eingeklemmte Drache</b> (Bildschirm-Level 7): Kuscheltiere direkt vor der Nase und rechts daneben, hinter dem Drachen ist der Rand. Mit „4-mal: wenn Stein: rechts drehen, sonst vor“ dreht er sich 3-mal nach rechts und schaut dann nach links. Entdeckung: 3-mal rechts drehen ist dasselbe wie 1-mal links drehen.</li>
+      <li><b>Ein Programm für drei Aufstellungen:</b> Bildschirm-Level 5 sind genau die Aufstellungen A, B und C aus Schritt 3. Am Boden: Drei Zuckerl gleichzeitig hinlegen (rechts unten, rechts oben, Mitte) und das Kuscheltier zwischen den Durchgängen umsetzen. Die Profis machen dasselbe mit sonst: Bildschirm-Level 8.</li>
+      <li><b>Kartengrenze nur mit Wenn-dann:</b> Zeichne auf Kästchenpapier einen Gang mit zwei Ecken, die verschieden weit auseinander liegen (wie Bildschirm-Level 3: 1 Feld hinauf, 3 Felder nach rechts, 1 Feld hinunter). Ohne Regel braucht man 6 Karten oder mehr, mit Regel nur 4: <m-programm raetsel="e11-w2" teil="beispiel" gr="6" nummern="nein"></m-programm>. Sind alle Gangstücke gleich lang, geht es auch ohne Regel kurz: Das ist eine schöne Profi-Frage („Warum braucht dieser Gang keine Regel?“).</li>
+      <li><b>Blick nach unten:</b> {{KIND}} startet im Feld rechts oben und schaut vom Polster weg nach unten. Programm: „4-mal: wenn Stein: rechts drehen, vor“, kein Kuscheltier. <m-e11-ende raetsel="e11-b10" ende="0,2,links" befehle="5">Sie landet links unten, Blick nach links.</m-e11-ende> Dabei ist ihr Rechts von dir aus gesehen links (Hilfen für links und rechts).</li>
+      <li><b>Alltagsregeln als Programm:</b> {{KIND}} schreibt oder malt Regeln aus dem Alltag als Wenn-dann-Regel: „Wenn die Ampel rot ist, dann warten, sonst gehen.“ „Wenn es regnet, dann Gummistiefel, sonst Turnschuhe.“ „Wenn ich Hunger habe, dann Jause.“ Dann baust du Kobold-Regeln, die sie findet: „Wenn es regnet, dann Sonnenbrille.“ „Wenn die Ampel grün ist, dann warten.“</li>
+      <li><b>Eigene Regel-Rätsel erfinden:</b> {{KIND}} legt ein oder zwei Kuscheltiere ins Gitter und ein Zuckerl. Du musst eine Regel im Zauber-Kasten finden, mit der der Drache hinkommt. Dann tauscht ihr. Schwerste Stufe: Sie erfindet zwei Aufstellungen und ein Programm, das in beiden klappt, und zeichnet beide auf Kästchenpapier.</li>
+      <li><b>Regel-Detektivin</b> (Variante des Regel-Spiels): Du bist ein Roboter mit einer geheimen Regel, {{KIND}} findet sie durch Ausprobieren heraus. Für Profis mit sonst: „Wenn du klatschst, setze ich mich, sonst stehe ich auf.“</li>
+    </ol>
+  </div>
+
+  <h2>Hintergrund</h2>
+  <div class="kasten warum darf-brechen e11-bricht">
+    <p>Die Wenn-dann-Regel ist eine <span class="begriff">Bedingung</span>, auf Englisch „if“, und „sonst“ heißt „else“. Mit Bedingungen trifft ein Programm Entscheidungen: Es tut nicht immer dasselbe, sondern schaut nach und reagiert. In echten Programmiersprachen sieht der Wenn-dann-Kasten etwa so aus: „wenn Stein vor mir { rechts drehen } sonst { vor }“. Kinder-Programmiersprachen zeigen ihn genau wie hier als farbigen Kasten mit einem Loch für die Frage.</p>
+    <p>Die Wenn-Karte ist ein kleiner <span class="begriff">Sensor</span>: Der Drache schaut, ob vor ihm ein Stein liegt. Echte Roboter machen das mit Sensoren für Abstand, Licht oder Berührung. Ein Roboter-Staubsauger hat ein Programm, das unserem sehr ähnlich ist: „wiederhole: wenn Wand vor mir, dann drehen, sonst vor“. Darum funktioniert derselbe Roboter in jeder Wohnung, obwohl der Programmierer die Wohnung nie gesehen hat. Genau das hat {{KIND}} heute am Boden-Gitter erlebt: ein Programm, drei Aufstellungen.</p>
+    <p><span class="begriff">Schleife</span> (Zauber-Kasten) und Bedingung (Wenn-dann-Kasten) zusammen sind das Herz fast jedes <span class="begriff">Algorithmus</span>. Darauf bauen die nächsten Einheiten auf: In Einheit 15 wird eine Gewinn-Strategie als Wenn-dann-Regel aufgeschrieben, in Einheit 16 kommt der Wiederhol-Zauber „bis zum Schatz“ dazu (dann muss man nicht einmal mehr die Runden zählen), und in Einheit 19 laufen alle Werkzeuge im großen Parcours zusammen.</p>
+  </div>
+
+  <h2>Bildschirm-Bonus</h2>
+  <div class="kasten bildschirm darf-brechen e11-bricht">
+    <p><b>Paket 11 „Wenn-dann-Regeln“.</b> Den QR-Code findest du unten rechts auf <a class="blattref" href="#blatt-11-1"></a>. Nur am Schluss, nach den Blättern, höchstens 15 Minuten. Die Einheit funktioniert auch ganz ohne Bildschirm.</p>
+    <p><b>8 Levels:</b> Drachen-Pfade mit Wenn-dann-Kasten und Zauber-Kasten, oft mit mehreren Gittern: Dann steht oben „Ein Programm für beide Gitter!“ (oder „für alle 3 Gitter“), und dasselbe Programm muss in jedem Gitter beim Schatz ankommen. Die App zeigt, wie viele Karten erlaubt sind, und zählt genau wie am Papier (die Wenn-Karte zählt, die Wörter nicht). Level 1 und 2 gehen mit einem Wenn-dann-Kasten allein, ab Level 3 liegt die Regel im Zauber-Kasten. Level 7 und 8 brauchen „sonst“, sie sind für den Schwerer-Teil. <b>Level 1 ist Aufgabe 2 von <a class="blattref" href="#blatt-11-1"></a>, Level 4 ist Aufgabe 2 von <a class="blattref" href="#blatt-11-2"></a>,</b> Level 5 sind die Aufstellungen A, B und C vom Boden-Gitter.</p>
+    <p><b>So geht der Wenn-dann-Kasten in der App:</b> Die Taste mit dem schauenden Drachen antippen. Die App fragt „Welche Wenn-Karte?“: Stein oder frei antippen. Dann die Befehle für „dann“ antippen (1 bis 3). Wer „sonst“ braucht, tippt auf „sonst“ und dann die Befehle dafür. Zum Schluss „fertig“. <b>Zauber-Kasten:</b> Die Taste „?-mal“ antippen, bei „Wie oft?“ eine Zahl von 2 bis 5 wählen, dann den Inhalt antippen (Befehle oder die Wenn-dann-Taste, höchstens 3 Teile) und „fertig“. Liegt der Wenn-dann-Kasten im Zauber-Kasten, kommt also zweimal „fertig“: das erste schließt den Wenn-dann-Kasten, das zweite den Zauber-Kasten. Die Taste mit der Karte und dem roten X löscht Schritt für Schritt zurück. „Nochmal“ stellt den Drachen zurück an den Start, das Programm bleibt.</p>
+    <p><b>Beim Laufen</b> schaut der Drache sichtbar: Die Wenn-Karte leuchtet, und das Feld vor seiner Nase ist türkis umrandet (am Rand leuchtet die Kante). Danach leuchtet „dann“ oder „sonst“, der andere Teil wird blass. Im Zauber-Kasten zeigt die App die Runde. Bei mehreren Gittern läuft der Drache erst im Gitter 1, dann im Gitter 2. Kommt er in einem Gitter nicht an, steht dort zum Beispiel „Im Gitter 2 ist der Drache noch nicht beim Schatz.“ Stößt er an: „Hier hat der Kobold zugeschlagen!“ Einen Stern gibt es, sobald der Drache in allen Gittern beim Schatz ist.</p>
+    <p><b>Wann weglegen:</b> Nach Level 8 kommt „Super! Jetzt zurück zum Papier.“ Dann ist Schluss, auch wenn noch Zeit wäre. Wer noch Energie hat: lieber eine Runde Regel-Detektivin als ein weiteres Level.</p>
+  </div>
+
+  <h2>Lösungen</h2>
+  <div class="e11-loes">
+    <m-loesungen einheit="11" skala="0.39"></m-loesungen>
+    <div class="kasten loesung e11-mini">
+      <p><b><a class="blattref" href="#blatt-11-1"></a>, Aufgabe 1:</b> <m-e11-ende raetsel="e11-l1" ende="2,1,rechts">Gitter 1: Der Stein liegt vor der Nase, also rechts drehen und vor. Der Drache landet rechts unten.</m-e11-ende> <m-e11-ende raetsel="e11-l2" ende="1,0,oben">Gitter 2: Der Stein liegt schräg rechts, nicht vor der Nase. Also nichts, nur vor: Mitte oben.</m-e11-ende></p>
+      <p><b>Aufgabe 2:</b> <m-programm raetsel="e11-p1" teil="beispiel" gr="6" nummern="nein"></m-programm>, 6 Karten. <m-e11-ende raetsel="e11-p1" welt="1" ende="2,0">In Gitter 1 geht der Drache um den Stein herum</m-e11-ende>, <m-e11-ende raetsel="e11-p1" welt="2" ende="1,0">in Gitter 2 ist frei, er geht nur vor, vor.</m-e11-ende> Mit diesen Kästchen ist das die einzige Lösung. Mit Zauber-Kasten (nicht verlangt, aber auch 6 Karten): „2-mal: vor“ statt vor, vor, oder „2-mal: Wenn-dann-Kasten, vor“.</p>
+      <p><b>Profi:</b> 6 Karten: die Wenn-Karte, 3 Befehle nach „dann“ und 2-mal vor. <m-e11-ende raetsel="e11-p1" welt="1" befehle="5">Im Gitter 1 macht der Drache 5 Befehle (rechts drehen, vor, links drehen, vor, vor)</m-e11-ende>, <m-e11-ende raetsel="e11-p1" welt="2" befehle="2">im Gitter 2 nur 2 (vor, vor).</m-e11-ende></p>
+    </div>
+  </div>
+  <div class="kasten loesung darf-brechen e11-bricht e11-weiter e11-mini">
+    <p><b><a class="blattref" href="#blatt-11-2"></a>, Aufgabe 1:</b> <m-e11-ende raetsel="e11-l4" ende="1,1,links" befehle="8" drehungen="3">Runde 1: frei, vor. Runde 2: der Rand, also rechts drehen, vor. Runde 3: frei, vor. Runde 4: der Stein rechts oben, also rechts drehen (jetzt schaut er nach unten), vor. Runde 5: der Rand, also rechts drehen, vor. Der Drache landet in der unteren Reihe im zweiten Feld, Blick nach links. Er macht 8 Befehle: 5-mal vor und 3-mal rechts drehen.</m-e11-ende> Der Stein rechts unten liegt nie vor seiner Nase.</p>
+    <p><b>Aufgabe 2:</b> <m-programm raetsel="e11-p2" teil="beispiel" gr="6" nummern="nein"></m-programm>, 4 Karten. <m-e11-ende raetsel="e11-p2" welt="1" ende="0,2">In Gitter 1 dreht der Drache zuerst am Stein und dann am Rand</m-e11-ende>, <m-e11-ende raetsel="e11-p2" welt="2" ende="0,0">in Gitter 2 nur am oberen Rand.</m-e11-ende> Auch richtig (vom Löser gezählt, 4 Programme mit 4 Karten): „3-mal: vor, wenn Stein: links drehen“ (erst vor, dann schauen) und mit sonst „5-mal: wenn Stein: links drehen, sonst vor“ bzw. die gespiegelte Form „5-mal: wenn frei: vor, sonst links drehen“. Ohne Wenn-dann-Kasten geht es mit 4 Karten nicht.</p>
+    <p><b>Kobold-Profi:</b> Die Wenn-Karte „frei“ ist falsch, richtig ist „Stein“. <m-e11-ende raetsel="e11-k1" prog="kaputt" stoss="4">Mit „frei“ dreht sich der Drache gleich in Runde 1, geht in die Mitte unten, dreht sich in Runde 2 nach unten und stößt an den Rand.</m-e11-ende> <m-e11-ende raetsel="e11-k1" ende="2,0">Mit „Stein“: vor, am Rand rechts drehen und vor, noch einmal vor zum Schatz.</m-e11-ende> Eine andere Reparatur mit einer Karte gibt es nicht (vom Löser geprüft).</p>
+    <p><b><a class="blattref" href="#blatt-11-3"></a>, Knobel-Ecke:</b> klatschen: hüpfen, winken: stampfen, klatschen: hüpfen, klatschen: hüpfen, „Drache!“: stampfen. Also 3-mal hüpfen und 2-mal stampfen.</p>
+    <p><b>Bonus-Knobelei:</b> Regenschirm: Es regnet nicht, also sonst: die Kappe. Drachen-Wort: flüstern, brüllen, flüstern. Ampel: Sie ist nicht grün, also sonst: warten. Für Profis: immer. Ob geklatscht wird oder nicht, das Ergebnis ist dasselbe. So eine Regel kann man weglassen, sie entscheidet nichts.</p>
+    <p><b>Bildschirm-Levels (zum Nachschauen):</b> Alle Levels sind „Bring den Drachen zum Schatz“ mit Kartengrenze, die App prüft nur, ob der Drache in allen Gittern ankommt. Ohne Wenn-dann-Kasten geht keines mit der erlaubten Kartenzahl (vom Löser geprüft). Bei Level 3 bis 6 geht auch die Form „vor, dann wenn Stein …“ im Kasten, bei Level 7 auch 5-mal statt 4-mal, und überall mit sonst die gespiegelte Wenn-Karte (frei statt Stein, dann und sonst getauscht). Bei Level 8 klappt nur 4-mal.</p>
+    <table class="tab e11-tab">
+      <tr><th>Level</th><th>Was ist neu?</th><th>Karten</th><th>Lösung</th></tr>
+      <tr><td>1</td><td><a class="blattref" href="#blatt-11-1"></a>, Aufgabe 2: 2 Gitter</td><td>6</td><td><m-programm raetsel="e11-p1" teil="beispiel" gr="6" nummern="nein"></m-programm></td></tr>
+      <tr><td>2</td><td>die Wenn-Karte frei, 2 Gitter</td><td>3</td><td><m-programm raetsel="e11-w1" teil="beispiel" gr="6" nummern="nein"></m-programm> (oder „2-mal: wenn frei: vor“)</td></tr>
+      <tr><td>3</td><td>Regel im Zauber-Kasten, Gang mit 2 Ecken</td><td>4</td><td><m-programm raetsel="e11-w2" teil="beispiel" gr="6" nummern="nein"></m-programm></td></tr>
+      <tr><td>4</td><td><a class="blattref" href="#blatt-11-2"></a>, Aufgabe 2</td><td>4</td><td><m-programm raetsel="e11-p2" teil="beispiel" gr="6" nummern="nein"></m-programm></td></tr>
+      <tr><td>5</td><td>3 Gitter: Aufstellungen A, B, C</td><td>4</td><td><m-programm raetsel="e11-w3" teil="beispiel" gr="6" nummern="nein"></m-programm></td></tr>
+      <tr><td>6</td><td>Blick nach rechts, Steine mitten im Weg</td><td>4</td><td><m-programm raetsel="e11-w4" teil="beispiel" gr="6" nummern="nein"></m-programm></td></tr>
+      <tr><td>7</td><td>sonst: der eingeklemmte Drache</td><td>4</td><td><m-programm raetsel="e11-w5" teil="beispiel" gr="6" nummern="nein"></m-programm></td></tr>
+      <tr><td>8</td><td>sonst, 3 Gitter</td><td>4</td><td><m-programm raetsel="e11-w6" teil="beispiel" gr="6" nummern="nein"></m-programm></td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 11-1: Der Drache schaut (Wenn-dann-Kasten allein)          -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="11" data-titel="Der Drache schaut" data-art="Arbeitsblatt" data-verteilt>
+  <div class="aufg">
+    <p class="anw">{{KIND}}, das Programm ist in beiden Gittern gleich. Wo landet der Drache? Mal ein Kreuz.</p>
+    <div class="e11-kopfreihe">
+      <m-programm raetsel="e11-l1" gr="11"></m-programm>
+      <div class="e11-legende">
+        <p class="e11-leg-titel">Vor der Nase:</p>
+        <div class="e11-leg">
+          <span class="e11-leg-karte"><m-symbol name="wenn-stein" gr="12"></m-symbol><span>Stein oder Rand</span></span>
+          <span class="e11-leg-karte"><m-symbol name="wenn-frei" gr="12"></m-symbol><span>frei</span></span>
+        </div>
+      </div>
+    </div>
+    <div class="e11-gitterpaar">
+      <div class="e11-gnr"><span class="e11-nr">1</span><m-gitter raetsel="e11-l1" feld="20" loesung="ende"></m-gitter></div>
+      <div class="e11-gnr"><span class="e11-nr">2</span><m-gitter raetsel="e11-l2" feld="20" loesung="ende"></m-gitter></div>
+    </div>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">Ein Programm für beide Gitter! Fülle die Karten aus.</p>
+    <div class="e11-gitterpaar">
+      <div class="e11-gnr"><span class="e11-nr">1</span><m-gitter raetsel="e11-p1" welt="1" feld="20"></m-gitter></div>
+      <div class="e11-gnr"><span class="e11-nr">2</span><m-gitter raetsel="e11-p1" welt="2" feld="20"></m-gitter></div>
+    </div>
+    <div class="e11-form"><m-programm raetsel="e11-p1" teil="form" gr="12"></m-programm></div>
+  </div>
+
+  <div class="e11-profi-reihe">
+    <div class="profi" data-titel="Profi-Aufgabe: Dein Programm von Aufgabe 2">
+      <p>Wie viele Karten hat es? <m-e11-karten raetsel="e11-p1" l="6"></m-e11-karten></p>
+      <p>Wie viele Befehle macht der Drache?<br>Gitter 1: <m-e11-zahl raetsel="e11-p1" welt="1" was="befehle" l="5"></m-e11-zahl> &nbsp; Gitter 2: <m-e11-zahl raetsel="e11-p1" welt="2" was="befehle" l="2"></m-e11-zahl></p>
+    </div>
+    <m-qr paket="e11"></m-qr>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 11-2: Die Regel im Zauber-Kasten (lesen, 2 Gitter, Kobold) -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="11" data-titel="Die Regel im Zauber-Kasten" data-art="Arbeitsblatt" data-verteilt>
+  <div class="aufg">
+    <p class="anw">{{KIND}}, wo landet der Drache? Mal ein Kreuz.</p>
+    <div class="e11-neben">
+      <m-gitter raetsel="e11-l4" feld="20" loesung="weg"></m-gitter>
+      <div class="e11-spalte">
+        <m-programm raetsel="e11-l4" gr="12" nummern="nein"></m-programm>
+        <p class="e11-frage">Wie viele Befehle? <m-e11-zahl raetsel="e11-l4" was="befehle" l="8"></m-e11-zahl></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">Ein Programm für beide Gitter. Du hast nur 4 Karten!</p>
+    <div class="e11-gitterpaar">
+      <div class="e11-gnr"><span class="e11-nr">1</span><m-gitter raetsel="e11-p2" welt="1" feld="20"></m-gitter></div>
+      <div class="e11-gnr"><span class="e11-nr">2</span><m-gitter raetsel="e11-p2" welt="2" feld="20"></m-gitter></div>
+    </div>
+    <div class="e11-form"><m-programm raetsel="e11-p2" teil="form" gr="12" nummern="nein"></m-programm></div>
+  </div>
+
+  <div class="profi" data-titel="Kobold-Profi: Eine falsche Regel">
+    <p>Der Kobold hat eine Karte vertauscht. Kreise sie ein!</p>
+    <div class="e11-neben">
+      <m-gitter raetsel="e11-k1" feld="20"></m-gitter>
+      <m-programm raetsel="e11-k1" gr="12" nummern="nein"></m-programm>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 11-3: Bastelvorlage Wenn-Karten, Wort-Karten, Regel-Karten -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="11" data-titel="Meine Wenn-Karten" data-art="Bastelvorlage">
+  <p class="e11-hinweis">{{KIND}}, heb die Karten bei den Befehlskarten auf!</p>
+
+  <div>
+    <p class="e11-titel">Wenn-Karten für den Drachen</p>
+    <m-karten spalten="4" zeilen="1" hoehe="42" breite="176">
+      <div class="e11-tuerkis"><span class="e11-wkarte"><m-symbol name="wenn-stein" gr="25"></m-symbol><span class="e11-kwort">Stein</span></span></div>
+      <div class="e11-tuerkis"><span class="e11-wkarte"><m-symbol name="wenn-stein" gr="25"></m-symbol><span class="e11-kwort">Stein</span></span></div>
+      <div class="e11-tuerkis"><span class="e11-wkarte"><m-symbol name="wenn-frei" gr="25"></m-symbol><span class="e11-kwort">frei</span></span></div>
+      <div class="e11-tuerkis"><span class="e11-wkarte"><m-symbol name="wenn-frei" gr="25"></m-symbol><span class="e11-kwort">frei</span></span></div>
+    </m-karten>
+  </div>
+
+  <div>
+    <p class="e11-titel">Wort-Karten</p>
+    <m-karten spalten="4" zeilen="2" hoehe="15" breite="176">
+      <div class="e11-tuerkis"><span class="e11-wort">wenn</span></div>
+      <div class="e11-tuerkis"><span class="e11-wort">wenn</span></div>
+      <div class="e11-tuerkis"><span class="e11-wort">wenn</span></div>
+      <div class="e11-tuerkis"><span class="e11-wort">sonst</span></div>
+      <div class="e11-tuerkis"><span class="e11-wort">dann</span></div>
+      <div class="e11-tuerkis"><span class="e11-wort">dann</span></div>
+      <div class="e11-tuerkis"><span class="e11-wort">dann</span></div>
+      <div class="e11-tuerkis"><span class="e11-wort">sonst</span></div>
+    </m-karten>
+  </div>
+
+  <div>
+    <p class="e11-titel">Regel-Karten für das Regel-Spiel</p>
+    <m-karten spalten="4" zeilen="2" hoehe="18" breite="176">
+      <div><span class="e11-rk">Ich klatsche.</span></div>
+      <div><span class="e11-rk">Ich stampfe.</span></div>
+      <div><span class="e11-rk">Ich winke.</span></div>
+      <div><span class="e11-rk">Ich rufe: Drache!</span></div>
+      <div><span class="e11-rk">Ich klopfe aufs Knie.</span></div>
+      <div><span class="e11-rk">Ich setze mich hin.</span></div>
+      <div><span class="e11-rk-leer">eigene Karte</span></div>
+      <div><span class="e11-rk-leer">eigene Karte</span></div>
+    </m-karten>
+  </div>
+
+  <div class="knobel" data-titel="Knobel-Ecke: Die Hüpf-Regel">
+    <p>{{KIND}}, das ist die Regel:</p>
+    <p><span class="e11-regel"><span class="w">wenn</span><span class="k sig">Ich klatsche.</span><span class="w">dann</span><span class="k">hüpfen</span><span class="w">sonst</span><span class="k">stampfen</span></span></p>
+    <p>Mama oder Papa macht:</p>
+    <div class="e11-zeichen"><span><b>1</b>klatschen</span><span><b>2</b>winken</span><span><b>3</b>klatschen</span><span><b>4</b>klatschen</span><span><b>5</b>„Drache!“</span></div>
+    <div class="e11-fragen">
+      <span>Wie oft hüpfst du? <m-feld l="3" art="k"></m-feld></span>
+      <span>Wie oft stampfst du? <m-feld l="2" art="k"></m-feld></span>
+    </div>
+  </div>
+</section>
