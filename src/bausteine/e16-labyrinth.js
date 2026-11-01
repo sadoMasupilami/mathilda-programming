@@ -20,8 +20,7 @@
      <m-e16-form raetsel="e16-b1">
          Nur für die Lösung: Alle Programme in der Form des Beispiels (gleiche Kästen,
          jede Wenn-Karte aus "bedingungen", jeder Befehl vor/links/rechts), die in allen
-         Gittern ankommen, als Liste von <m-programm> (läuft vor programmieren.js,
-         darum werden die <m-programm> danach noch gezeichnet).
+         Gittern ankommen, als Liste von <m-programm> (der Baustein zeichnet sie gleich selbst).
      <m-e16-kuerzeste raetsel="e16-b1" [karten="5"] [max="2"] [programm="…"]>
          Nur für die Lösung: die Programme mit der kleinsten Kartenzahl, die der Löser
          gefunden hat (r.loesung.erweitert.kuerzeste), als <m-programm>. karten prüft die
@@ -261,6 +260,9 @@
   }
   function liste(el, programme, gr) {
     el.innerHTML = '<span class="e16-progliste">' + programme.map((p) => '<span class="e16-progzeile"><m-programm befehle="' + H().esc(p) + '" gr="' + gr + '" nummern="nein"></m-programm></span>').join('') + '</span>';
+    // gleich zeichnen (unabhängig davon, ob programmieren.js vor oder nach dieser Datei an der Reihe ist;
+    // ein zweites Zeichnen im Durchgang für <m-programm> ergibt dasselbe)
+    if (B['m-programm']) el.querySelectorAll('m-programm').forEach((p) => B['m-programm'](p));
   }
   B['m-e16-form'] = function (el) {
     const r = raetsel(el, ['pfad']);
