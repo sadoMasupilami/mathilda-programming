@@ -1,0 +1,952 @@
+{
+ "paket": "e20",
+ "einheit": 20,
+ "titel": "Das große Code-Fest",
+ "web": {
+  "titel": "Code-Fest",
+  "art": "gemischt",
+  "levels": [
+   "e20-muster",
+   "e20-w-lampen",
+   "e20-kobold",
+   "e20-w-krone",
+   "e20-drache",
+   "e20-formen",
+   "e20-w-wimpel",
+   "e20-steine",
+   "e20-w-parcours"
+  ]
+ },
+ "raetsel": [
+  {
+   "id": "e20-drache",
+   "art": "pfad",
+   "aufgabe": "ankommen",
+   "b": 4,
+   "h": 2,
+   "start": {
+    "x": 0,
+    "y": 1,
+    "blick": "rechts"
+   },
+   "ziel": {
+    "x": 3,
+    "y": 0
+   },
+   "hindernisse": [
+    [
+     2,
+     0
+    ]
+   ],
+   "zauber": true,
+   "maxKarten": 4
+  },
+  {
+   "id": "e20-kobold",
+   "art": "kobold",
+   "b": 4,
+   "h": 2,
+   "start": {
+    "x": 3,
+    "y": 1,
+    "blick": "links"
+   },
+   "ziel": {
+    "x": 0,
+    "y": 0
+   },
+   "hindernisse": [
+    [
+     1,
+     1
+    ]
+   ],
+   "programm": "vor links vor links vor vor",
+   "reparatur": {
+    "art": "tauschen",
+    "stelle": 2,
+    "befehl": "rechts"
+   }
+  },
+  {
+   "id": "e20-muster",
+   "art": "muster",
+   "aufgabe": "fortsetzen",
+   "folge": "klatschen klatschen stampfen schnipsen klatschen klatschen stampfen schnipsen",
+   "weiter": 2
+  },
+  {
+   "id": "e20-finger",
+   "art": "janein",
+   "aufgabe": "legen",
+   "aussehen": "finger",
+   "zahl": 13
+  },
+  {
+   "id": "e20-formen",
+   "art": "formen",
+   "titel": "Fest-Quadrat",
+   "n": 3,
+   "logik": 2,
+   "vorgabe": [
+    "D..",
+    ".K.",
+    "..Q"
+   ]
+  },
+  {
+   "id": "e20-steine",
+   "art": "nim",
+   "aufgabe": "spiel",
+   "spiel": "steine 1-2",
+   "haufen": [
+    8
+   ],
+   "dran": "du",
+   "titel": "Steine-Duell",
+   "tippGz": [
+    6,
+    3
+   ],
+   "tipp": "Nimm zuerst 2. Dann lass immer 6 oder 3 Steine liegen."
+  },
+  {
+   "id": "e20-steine9",
+   "art": "nim",
+   "aufgabe": "gewinnzahlen",
+   "spiel": "steine 1-2",
+   "bis": 9,
+   "gewinnzahlen": [
+    3,
+    6,
+    9
+   ],
+   "start": 9,
+   "anfangen": "zweiter"
+  },
+  {
+   "id": "e20-schluessel",
+   "art": "janein",
+   "aufgabe": "lesen",
+   "ja": [
+    4,
+    1
+   ],
+   "zahl": 5
+  },
+  {
+   "id": "e20-verstecke",
+   "art": "geheim",
+   "aufgabe": "liste",
+   "schluessel": 5,
+   "woerter": [
+    "KASTEN",
+    "SESSEL",
+    "KOFFER",
+    "POLSTER",
+    "VORHANG",
+    "SACKERL",
+    "STOCKERL",
+    "BROTKORB",
+    "BETT",
+    "SOFA",
+    "LADE",
+    "KORB"
+   ]
+  },
+  {
+   "id": "e20-fee",
+   "art": "geheim",
+   "aufgabe": "knacken",
+   "klartext": "DU KANNST ALLES",
+   "geheimtext": "GX NDQQVW DOOHV",
+   "schluessel": 3,
+   "bereich": [
+    1,
+    4
+   ]
+  },
+  {
+   "id": "e20-w-lampen",
+   "art": "janein",
+   "aufgabe": "legen",
+   "aussehen": "lampen",
+   "zahl": 20
+  },
+  {
+   "id": "e20-w-krone",
+   "art": "geheim",
+   "aufgabe": "lesen",
+   "klartext": "KRONE",
+   "geheimtext": "MTQPG",
+   "schluessel": 2,
+   "bilder": [
+    "stern",
+    "krone",
+    "herz"
+   ]
+  },
+  {
+   "id": "e20-w-wimpel",
+   "art": "kaestchen",
+   "aufgabe": "malen",
+   "titel": "Krone",
+   "artikel": "eine",
+   "b": 7,
+   "h": 5,
+   "farben": [
+    "w",
+    "e",
+    "r"
+   ],
+   "code": [
+    "1e 2w 1e 2w 1e",
+    "2e 1w 1e 1w 2e",
+    "7e",
+    "2e 1r 1e 1r 2e",
+    "7e"
+   ],
+   "bild": [
+    "e..e..e",
+    "ee.e.ee",
+    "eeeeeee",
+    "eereree",
+    "eeeeeee"
+   ]
+  },
+  {
+   "id": "e20-w-parcours",
+   "art": "pfad",
+   "aufgabe": "ankommen",
+   "b": 4,
+   "h": 4,
+   "start": {
+    "x": 0,
+    "y": 3,
+    "blick": "oben"
+   },
+   "ziel": {
+    "x": 3,
+    "y": 1
+   },
+   "hindernisse": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     3
+    ],
+    [
+     2,
+     3
+    ]
+   ],
+   "erlaubt": [
+    "zauber",
+    "wenn"
+   ],
+   "maxKarten": 4,
+   "beispiel": "5[vor wenn[stein: rechts]]"
+  },
+  {
+   "id": "e20-drache2",
+   "art": "pfad",
+   "aufgabe": "ankommen",
+   "b": 4,
+   "h": 2,
+   "start": {
+    "x": 0,
+    "y": 1,
+    "blick": "oben"
+   },
+   "ziel": {
+    "x": 3,
+    "y": 0
+   },
+   "hindernisse": [
+    [
+     2,
+     0
+    ]
+   ],
+   "zauber": true,
+   "maxKarten": 5
+  },
+  {
+   "id": "e20-muster2",
+   "art": "muster",
+   "aufgabe": "fortsetzen",
+   "folge": "klatschen klatschen stampfen stampfen schnipsen klatschen klatschen stampfen stampfen schnipsen klatschen",
+   "weiter": 2
+  },
+  {
+   "id": "e20-finger2",
+   "art": "janein",
+   "aufgabe": "legen",
+   "aussehen": "finger",
+   "zahl": 25
+  },
+  {
+   "id": "e20-formen2",
+   "art": "formen",
+   "titel": "Fest-Quadrat mit Stern",
+   "n": 4,
+   "logik": 2,
+   "vorgabe": [
+    "K.D.",
+    "..S.",
+    ".Q..",
+    "...K"
+   ]
+  },
+  {
+   "id": "e20-steine2",
+   "art": "nim",
+   "aufgabe": "spiel",
+   "spiel": "steine 1-3",
+   "haufen": [
+    10
+   ],
+   "dran": "du",
+   "titel": "1, 2 oder 3",
+   "tippGz": [
+    8,
+    4
+   ],
+   "tipp": "Nimm zuerst 2. Dann lass immer 8 oder 4 Steine liegen."
+  },
+  {
+   "id": "e20-x-roboter",
+   "art": "lesen",
+   "b": 3,
+   "h": 3,
+   "start": {
+    "x": 1,
+    "y": 1,
+    "blick": "oben"
+   },
+   "programm": "rechts rechts rechts"
+  },
+  {
+   "id": "e20-x-pfad",
+   "art": "pfad",
+   "aufgabe": "kuerzestes",
+   "b": 4,
+   "h": 3,
+   "start": {
+    "x": 0,
+    "y": 2,
+    "blick": "rechts"
+   },
+   "ziel": {
+    "x": 2,
+    "y": 2
+   },
+   "hindernisse": [
+    [
+     1,
+     2
+    ],
+    [
+     3,
+     1
+    ]
+   ],
+   "maxBefehle": 8
+  },
+  {
+   "id": "e20-x-pfad2",
+   "art": "pfad",
+   "aufgabe": "ankommen",
+   "b": 4,
+   "h": 3,
+   "start": {
+    "x": 0,
+    "y": 2,
+    "blick": "unten"
+   },
+   "ziel": {
+    "x": 2,
+    "y": 2
+   },
+   "hindernisse": [
+    [
+     1,
+     2
+    ],
+    [
+     3,
+     1
+    ]
+   ],
+   "maxBefehle": 10
+  },
+  {
+   "id": "e20-x-kuchen",
+   "art": "ablauf",
+   "titel": "Geburtstags-Kuchen",
+   "karten": [
+    {
+     "id": "teig",
+     "text": "Teig rühren"
+    },
+    {
+     "id": "form",
+     "text": "Teig in die Form"
+    },
+    {
+     "id": "backen",
+     "text": "Kuchen backen"
+    },
+    {
+     "id": "kerzen",
+     "text": "Kerzen draufstecken"
+    },
+    {
+     "id": "ausblasen",
+     "text": "Kerzen ausblasen"
+    }
+   ],
+   "regeln": [
+    [
+     "teig",
+     "form"
+    ],
+    [
+     "form",
+     "backen"
+    ],
+    [
+     "backen",
+     "kerzen"
+    ],
+    [
+     "kerzen",
+     "ausblasen"
+    ]
+   ]
+  },
+  {
+   "id": "e20-x-kuchen2",
+   "art": "ablauf",
+   "titel": "Geburtstags-Kuchen mit Gästen",
+   "mehrereLoesungen": true,
+   "karten": [
+    {
+     "id": "teig",
+     "text": "Teig rühren"
+    },
+    {
+     "id": "form",
+     "text": "Teig in die Form"
+    },
+    {
+     "id": "backen",
+     "text": "Kuchen backen"
+    },
+    {
+     "id": "kerzen",
+     "text": "Kerzen draufstecken"
+    },
+    {
+     "id": "lied",
+     "text": "Lied singen"
+    },
+    {
+     "id": "ausblasen",
+     "text": "Kerzen ausblasen"
+    },
+    {
+     "id": "einladen",
+     "text": "Gäste einladen"
+    }
+   ],
+   "regeln": [
+    [
+     "teig",
+     "form"
+    ],
+    [
+     "form",
+     "backen"
+    ],
+    [
+     "backen",
+     "kerzen"
+    ],
+    [
+     "kerzen",
+     "lied"
+    ],
+    [
+     "lied",
+     "ausblasen"
+    ],
+    [
+     "einladen",
+     "lied"
+    ]
+   ]
+  },
+  {
+   "id": "e20-x-geheim2",
+   "art": "geheim",
+   "aufgabe": "schreiben",
+   "klartext": "KUCHEN",
+   "geheimtext": "MWEJGP",
+   "schluessel": 2
+  },
+  {
+   "id": "e20-x-halbier",
+   "art": "suche",
+   "aufgabe": "hoechstens",
+   "bis": 32
+  },
+  {
+   "id": "e20-x-halbier2",
+   "art": "suche",
+   "aufgabe": "hoechstens",
+   "bis": 64
+  },
+  {
+   "id": "e20-x-wenn",
+   "art": "pfad",
+   "aufgabe": "ankommen",
+   "b": 3,
+   "h": 3,
+   "start": {
+    "x": 0,
+    "y": 2,
+    "blick": "oben"
+   },
+   "welten": [
+    {
+     "ziel": {
+      "x": 2,
+      "y": 0
+     },
+     "hindernisse": [
+      [
+       2,
+       2
+      ]
+     ]
+    },
+    {
+     "ziel": {
+      "x": 2,
+      "y": 1
+     },
+     "hindernisse": [
+      [
+       0,
+       0
+      ]
+     ]
+    }
+   ],
+   "erlaubt": [
+    "wenn"
+   ],
+   "maxKarten": 6,
+   "beispiel": "vor wenn[frei: vor] rechts vor vor"
+  },
+  {
+   "id": "e20-x-logik",
+   "art": "logik",
+   "titel": "Fest-Jause",
+   "zeilen": [
+    "oma",
+    "opa",
+    "du"
+   ],
+   "spalten": [
+    "kuchen",
+    "eis",
+    "apfel"
+   ],
+   "woerter": {
+    "oma": "Oma",
+    "opa": "Opa",
+    "du": "du"
+   },
+   "hinweise": [
+    {
+     "text": "{opa} mag den {kuchen}.",
+     "regel": "opa=kuchen"
+    },
+    {
+     "text": "{oma} mag kein {eis}.",
+     "regel": "oma!=eis"
+    }
+   ]
+  },
+  {
+   "id": "e20-x-logik2",
+   "art": "logik",
+   "titel": "Fest-Hüte",
+   "zeilen": [
+    "drache",
+    "einhorn",
+    "katze"
+   ],
+   "spalten": [
+    "muetze-rot",
+    "muetze-blau",
+    "muetze-gelb"
+   ],
+   "hinweise": [
+    {
+     "text": "Das {einhorn} hat keine {muetze-rot} und keine {muetze-gelb}.",
+     "regel": "einhorn!=muetze-rot & einhorn!=muetze-gelb"
+    },
+    {
+     "text": "Die {katze} hat keine {muetze-gelb}.",
+     "regel": "katze!=muetze-gelb"
+    }
+   ]
+  },
+  {
+   "id": "e20-x-baum",
+   "art": "baum",
+   "titel": "Der Fest-Gäste-Baum",
+   "aufgabe": "folgen",
+   "wer": "fee",
+   "fragen": {
+    "fluegel": {
+     "text": "Hat es Flügel?",
+     "kurz": "Flügel?"
+    },
+    "feuer": {
+     "text": "Kann es Feuer speien?",
+     "kurz": "Feuer?"
+    },
+    "wasser": {
+     "text": "Lebt es im Wasser?",
+     "kurz": "Wasser?"
+    }
+   },
+   "dinge": [
+    {
+     "id": "drache",
+     "name": "Drache",
+     "bild": "drache",
+     "ja": [
+      "fluegel",
+      "feuer"
+     ]
+    },
+    {
+     "id": "fee",
+     "name": "Fee",
+     "bild": "fee",
+     "ja": [
+      "fluegel"
+     ]
+    },
+    {
+     "id": "fisch",
+     "name": "Fisch",
+     "bild": "fisch",
+     "ja": [
+      "wasser"
+     ]
+    },
+    {
+     "id": "einhorn",
+     "name": "Einhorn",
+     "bild": "einhorn",
+     "ja": []
+    }
+   ],
+   "baum": {
+    "f": "fluegel",
+    "ja": {
+     "f": "feuer",
+     "ja": "drache",
+     "nein": "fee"
+    },
+    "nein": {
+     "f": "wasser",
+     "ja": "fisch",
+     "nein": "einhorn"
+    }
+   }
+  },
+  {
+   "id": "e20-x-baum2",
+   "art": "baum",
+   "titel": "Das Flügelpferd kommt zum Fest",
+   "aufgabe": "neu",
+   "neu": "fluegelpferd",
+   "fragen": {
+    "fluegel": {
+     "text": "Hat es Flügel?",
+     "kurz": "Flügel?"
+    },
+    "feuer": {
+     "text": "Kann es Feuer speien?",
+     "kurz": "Feuer?"
+    },
+    "wasser": {
+     "text": "Lebt es im Wasser?",
+     "kurz": "Wasser?"
+    },
+    "pferd": {
+     "text": "Ist es ein Pferd?",
+     "kurz": "Pferd?"
+    }
+   },
+   "dinge": [
+    {
+     "id": "drache",
+     "name": "Drache",
+     "bild": "drache",
+     "ja": [
+      "fluegel",
+      "feuer"
+     ]
+    },
+    {
+     "id": "fee",
+     "name": "Fee",
+     "bild": "fee",
+     "ja": [
+      "fluegel"
+     ]
+    },
+    {
+     "id": "fisch",
+     "name": "Fisch",
+     "bild": "fisch",
+     "ja": [
+      "wasser"
+     ]
+    },
+    {
+     "id": "einhorn",
+     "name": "Einhorn",
+     "bild": "einhorn",
+     "ja": [
+      "pferd"
+     ]
+    },
+    {
+     "id": "fluegelpferd",
+     "name": "Flügelpferd",
+     "bild": "fluegelpferd",
+     "ja": [
+      "fluegel",
+      "pferd"
+     ]
+    }
+   ],
+   "baum": {
+    "f": "fluegel",
+    "ja": {
+     "f": "feuer",
+     "ja": "drache",
+     "nein": "fee"
+    },
+    "nein": {
+     "f": "wasser",
+     "ja": "fisch",
+     "nein": "einhorn"
+    }
+   }
+  },
+  {
+   "id": "e20-x-labyrinth",
+   "art": "pfad",
+   "aufgabe": "kuerzestes",
+   "b": 5,
+   "h": 5,
+   "start": {
+    "x": 0,
+    "y": 4,
+    "blick": "oben"
+   },
+   "ziel": {
+    "x": 4,
+    "y": 0
+   },
+   "hindernisse": [
+    [
+     3,
+     3
+    ],
+    [
+     4,
+     3
+    ],
+    [
+     4,
+     1
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     2,
+     1
+    ],
+    [
+     3,
+     4
+    ],
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ]
+   ],
+   "maxBefehle": 12
+  },
+  {
+   "id": "e20-x-labyrinth2",
+   "art": "pfad",
+   "aufgabe": "ankommen",
+   "b": 4,
+   "h": 4,
+   "start": {
+    "x": 0,
+    "y": 3,
+    "blick": "oben"
+   },
+   "ziel": {
+    "x": 3,
+    "y": 0
+   },
+   "hindernisse": [
+    [
+     2,
+     3
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     0
+    ]
+   ],
+   "erlaubt": [
+    "wenn",
+    "bis"
+   ],
+   "maxKarten": 4,
+   "beispiel": "bis[wenn[stein: rechts sonst vor]]"
+  },
+  {
+   "id": "e20-x-spruch",
+   "art": "pfad",
+   "aufgabe": "ankommen",
+   "b": 4,
+   "h": 4,
+   "start": {
+    "x": 0,
+    "y": 3,
+    "blick": "oben"
+   },
+   "ziel": {
+    "x": 3,
+    "y": 0
+   },
+   "hindernisse": [
+    [
+     1,
+     3
+    ],
+    [
+     2,
+     2
+    ],
+    [
+     3,
+     1
+    ]
+   ],
+   "erlaubt": [
+    "spruch"
+   ],
+   "sprueche": {
+    "stern": "vor rechts vor links"
+   },
+   "maxKarten": 3,
+   "beispiel": "@stern @stern @stern"
+  },
+  {
+   "id": "e20-x-spruch-l",
+   "art": "lesen",
+   "b": 4,
+   "h": 4,
+   "start": {
+    "x": 0,
+    "y": 3,
+    "blick": "oben"
+   },
+   "ziel": {
+    "x": 3,
+    "y": 0
+   },
+   "hindernisse": [
+    [
+     1,
+     3
+    ],
+    [
+     2,
+     2
+    ],
+    [
+     3,
+     1
+    ]
+   ],
+   "sprueche": {
+    "stern": "vor rechts vor links"
+   },
+   "programm": "@stern @stern @stern"
+  },
+  {
+   "id": "e20-x-parcours-z",
+   "art": "pfad",
+   "aufgabe": "ankommen",
+   "b": 4,
+   "h": 4,
+   "start": {
+    "x": 0,
+    "y": 3,
+    "blick": "oben"
+   },
+   "ziel": {
+    "x": 3,
+    "y": 1
+   },
+   "hindernisse": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     3
+    ],
+    [
+     2,
+     3
+    ]
+   ],
+   "zauber": true,
+   "maxKarten": 5
+  }
+ ]
+}
