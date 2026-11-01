@@ -1,1 +1,582 @@
-<!-- Einheit 18: noch nicht geschrieben (Platzhalter, damit Buch und --nur 18 schon funktionieren) -->
+<!--
+  Einheit 18: Ich erfinde ein Spiel (Block D)
+  Spielregeln sind ein Programm: Reihenfolge (ein Zug), Wenn-dann (besondere Felder),
+  Wiederholen bis jemand gewinnt. Kobolde in Regeln finden (unklar, hört nie auf, unfair),
+  ein eigenes Spiel erfinden, testen (zu zweit, dann mit der Familie), verbessern.
+  Bewusst ohne Bildschirm: kein Web-Paket, kein QR-Code, keine Rätsel-Datei.
+  Eigener Baustein: src/bausteine/e18-spiel.js (Spielplan, Wettflug ausgerechnet:
+  Wahrscheinlichkeiten, längste Dauer, Züge; jede Zahl im Text wird beim Bauen geprüft)
+  Blätter: 18-1 Der Regel-Kobold, 18-2 Mein Spielplan (Bastelvorlage), 18-3 Meine Regel-Karte (mit Testbogen)
+-->
+<style>
+  .e18-ablauf > li { break-inside: avoid; }
+  .e18-ganz > li { break-inside: auto; orphans: 2; widows: 2; }
+  .kasten.e18-bricht { -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .kasten.e18-bricht > .kasten-titel { break-after: avoid; }
+  .kasten.e18-bricht > .kasten-titel + p, .kasten.e18-bricht > .kasten-titel + ul > li:first-child, .kasten.e18-bricht > .kasten-titel + ol > li:first-child { break-before: avoid; break-inside: avoid; }
+  .e18-loes { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm 4mm; align-items: start; margin: 2mm 0 4mm 0; }
+  .e18-loes m-loesungen, .e18-loes .loesungen-raster { display: contents; }
+  .e18-loes > .kasten.loesung { margin: 5mm 0 0 0; font-size: 9.5pt; }
+  .e18-loes > .kasten.loesung p, .kasten.loesung.e18-weiter p { margin-bottom: 1.6mm; }
+
+  /* Bausteine aus src/bausteine/e18-spiel.js */
+  m-e18-plan, m-e18-strecke, m-e18-schnecken, m-e18-bild { display: inline-block; vertical-align: middle; line-height: 0; }
+  m-e18-plan svg, m-e18-strecke svg, m-e18-schnecken svg, m-e18-bild svg { display: block; }
+  m-e18-test { display: inline-block; vertical-align: middle; }
+  m-e18-test[nur-zahl] { display: inline; vertical-align: baseline; }
+  m-e18-zahl[feld] { display: inline-block; vertical-align: middle; }
+  m-e18-kobold { display: contents; }
+  m-e18-sieger { display: inline-flex; gap: 6mm; vertical-align: middle; }
+  m-e18-pruefe { display: none; }
+  .e18-kreuz { width: 11mm; height: 11mm; border: 0.6mm solid var(--tinte); border-radius: 2mm; background: white; display: inline-flex; align-items: center; justify-content: center; justify-self: center; flex: none; }
+  .e18-x { visibility: hidden; width: 8mm; height: 8mm; line-height: 0; }
+  .e18-x svg { display: block; width: 100%; height: 100%; }
+  .loesungsmodus .e18-x { visibility: visible; }
+  .e18-wahl { display: inline-flex; align-items: center; gap: 2mm; }
+
+  /* Anleitung: die Regel-Karte des Wettflugs */
+  .e18-rk { border: 0.5mm solid var(--akzent); border-radius: 3mm; padding: 2.5mm 4mm 1.5mm 4mm; margin: 0 0 2.5mm 0; background: white; break-inside: avoid; }
+  .kasten.e18-bricht > .spiel-meta { break-after: avoid; }
+  .e18-rk-titel { font-weight: 900; font-size: 12pt; margin: 0 0 1.5mm 0; }
+  .e18-rk-z { display: grid; grid-template-columns: 27mm 1fr; gap: 0 3mm; margin: 0 0 1.4mm 0; }
+  .e18-rk-z > b:first-child { color: var(--akzent); }
+  .e18-rk-zk { border: 0.6mm solid var(--zauber); background: var(--zauber-hell); border-radius: 3mm; padding: 1.4mm 3mm 0.6mm 3mm; margin: 1.5mm 0 2mm 0; }
+  .e18-rk-zk .e18-bis { font-weight: 900; color: var(--zauber); margin: 0 0 0.8mm 0; }
+  .e18-rk-zk ol { margin: 0 0 1mm 0; }
+  .e18-rk-zk .e18-rk-zug { margin: 0 0 0.6mm 0; }
+  .e18-weg { break-inside: avoid; }
+  .e18-strecke-a { margin: 1.5mm 0 2.5mm 0; }
+
+  /* Blatt 18-1: Regel-Kobold */
+  .e18-kt { display: grid; grid-template-columns: 13mm 1fr 21mm 27mm 21mm; align-items: center; column-gap: 2.5mm; row-gap: 0; }
+  .e18-kt > * { padding: 1.1mm 0; }
+  .e18-kt .e18-kopf { display: flex; flex-direction: column; align-items: center; gap: 0.6mm; font-size: 14pt; line-height: 1.02; text-align: center; padding: 0 0 1mm 0; white-space: nowrap; }
+  .e18-kt .e18-regel { line-height: 1.2; }
+  .e18-kt .e18-b { line-height: 0; display: flex; justify-content: center; }
+  .e18-kt .e18-linie-t { grid-column: 1 / -1; border-top: 0.35mm dashed var(--linie); padding: 0; }
+  .e18-tests { display: grid; grid-template-columns: 1fr 1.25fr; gap: 4mm; margin-top: 2.5mm; align-items: stretch; }
+  .e18-tfall { border: 0.5mm solid var(--linie); border-radius: 3mm; padding: 1.8mm 3mm 2mm 3mm; display: flex; flex-direction: column; justify-content: space-between; gap: 1.5mm; }
+  .e18-tfall p { margin: 0; line-height: 1.32; }
+  .e18-tfall m-wuerfel { vertical-align: -1.8mm; }
+  .e18-antw { display: flex; flex-wrap: nowrap; gap: 1.5mm 4mm; align-items: center; }
+  .e18-antw > span { white-space: nowrap; }
+  .e18-profi-reihe { display: flex; align-items: center; justify-content: space-between; gap: 5mm; }
+  .e18-fragen { display: flex; flex-direction: column; gap: 3mm; }
+  .e18-fragen > div { display: flex; flex-direction: column; align-items: flex-start; gap: 1mm; }
+  .e18-fair { display: flex; align-items: center; gap: 5mm; margin-top: 2.5mm; }
+
+  /* Blatt 18-2: Spielplan, Ereignis-Karten, Figuren */
+  .e18-hinweis { margin: 0; }
+  .e18-titel { font-family: var(--text); font-weight: 900; font-size: 14pt; margin: 0 0 2.5mm 0; }
+  .karte.e18-ek { justify-content: flex-start; align-items: stretch; gap: 1mm; padding: 1.8mm 3mm 1.5mm 3mm; }
+  .e18-ek-kopf { display: flex; align-items: center; gap: 2mm; font-family: var(--text); font-weight: 800; font-size: 9pt; color: var(--grau); line-height: 1; }
+  .e18-ek-text { font-size: 13pt; line-height: 1.15; text-align: left; }
+  .e18-ek-l { border-bottom: 0.35mm solid var(--linie); height: 7.5mm; flex: none; }
+  .karte.e18-fig { flex-direction: row; gap: 2mm; }
+  .e18-fig-kreis { width: 20mm; height: 20mm; border: 0.6mm solid var(--tinte); border-radius: 50%; display: flex; align-items: center; justify-content: center; background: white; flex: none; }
+  .e18-fig-name { font-size: 11pt; line-height: 1.05; text-align: left; }
+
+  /* Blatt 18-3: Regel-Karte und Testbogen */
+  .e18-karte { border: 0.8mm solid var(--akzent); border-radius: 4mm; padding: 2mm 5mm 3mm 5mm; }
+  .e18-z { display: flex; align-items: flex-end; gap: 2.5mm; min-height: 10.4mm; }
+  .e18-z > span:not(.e18-l):not(.e18-feldchen) { white-space: nowrap; padding-bottom: 0.8mm; }
+  .e18-l { flex: 1; border-bottom: 0.4mm solid var(--tinte); height: 10mm; position: relative; min-width: 20mm; }
+  .e18-l > .lsg { position: absolute; left: 1.5mm; bottom: 0.8mm; font-size: 13pt; line-height: 1; white-space: nowrap; }
+  .e18-zk { border: 0.8mm solid var(--zauber); background: var(--zauber-hell); border-radius: 3.5mm; padding: 0 4mm 2.5mm 4mm; margin: 2mm 0 1mm 0; }
+  .e18-zk .e18-bis > span:first-child { color: var(--zauber); font-weight: 700; font-size: 18pt; }
+  .e18-z:has(> .e18-feldchen) { margin-top: 1mm; }
+  .e18-feldchen { width: 11.5mm; height: 11.5mm; border: 0.55mm solid var(--tinte); border-radius: 2mm; background: white; flex: none; position: relative; }
+  .e18-feldchen > .lsg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; line-height: 0; }
+  .e18-zk .e18-fest { padding-top: 2mm; }
+  .e18-tb { border-collapse: collapse; width: 100%; margin-top: 1mm; }
+  .e18-tb th { font-family: var(--kind); font-size: 14pt; font-weight: 700; line-height: 1.05; padding: 1.2mm 1.5mm; border: 0.4mm solid var(--tinte); background: var(--akzent-hell); text-align: center; }
+  .e18-tb td { height: 10.5mm; border: 0.4mm solid var(--tinte); padding: 0 1.5mm; text-align: center; font-size: 14pt; }
+  .e18-tb td:first-child { width: 13mm; font-weight: 700; }
+  .e18-tb .e18-jn { font-size: 14pt; color: var(--grau); }
+  .e18-tb .e18-sterne { display: inline-flex; gap: 1mm; vertical-align: middle; }
+  .e18-profi-zeile { display: flex; align-items: center; gap: 2.5mm; flex-wrap: wrap; }
+  .e18-fair2 { gap: 5mm; margin-top: 2.5mm; }
+  .loesungsmodus .lsg-nur.e18-inline { display: inline; }
+  .e18-leer { display: inline-block; width: 14mm; height: 11mm; border: 0.55mm solid var(--tinte); border-radius: 1.5mm; background: white; vertical-align: middle; }
+</style>
+
+<!-- Spickzettel: Kurzfassung der Anleitung zum Mitnehmen, höchstens zwei Seiten. Ablauf als Drehbuch (Minuten wie in der Anleitung) -->
+<section class="spick nur-buch" data-einheit="18" data-titel="Ich erfinde ein Spiel">
+  <p class="spick-kern"><b>Darum geht’s:</b> Spielregeln sind ein Programm für Menschen: ein Zug in der richtigen Reihenfolge, Wenn-dann-Regeln für besondere Felder, und alles wiederholt sich, bis jemand gewinnt. {{KIND}} spielt das Beispiel-Spiel „Wettflug zum Wolkenschloss“, findet Kobolde in Regeln (<b>unklar</b>, <b>hört nie auf</b>, <b>unfair</b>), erfindet ein eigenes Spiel und testet es. Neue Wörter: <b>Spielregel</b>, <b>testen</b>. Heute ganz ohne Bildschirm.</p>
+
+  <div class="spick-zwei breit-links">
+    <div class="spick-block vorher">
+      <h2>Vorher, ohne {{KIND}} <small>· etwa 15 Min</small></h2>
+      <ul class="check">
+        <li><a class="blattref" href="#blatt-18-1"></a> und <a class="blattref" href="#blatt-18-3"></a> einmal drucken, <a class="blattref" href="#blatt-18-2"></a> <b>zweimal</b> (einmal für den Wettflug, einmal für {{KIND}}s Spiel). <span class="min">2 Min</span></li>
+        <li>Von einem Blatt 18-2 die 4 Ereignis-Karten und 4 Figuren ausschneiden (gestrichelte Linien). <span class="min">5 Min</span></li>
+        <li>Start-Kreuz aus Malerkrepp im Gang, davor 6 Querstreifen, je einen großen Kinderschritt auseinander. Kuscheltier hinter den 6. Streifen. Ein Schritt im Spiel: bis zum nächsten Streifen. <span class="min">3 Min</span></li>
+        <li>Die Regel-Karte des Wettflugs (Anleitung) lesen und im Kopf einen Zug spielen. <span class="min">5 Min</span></li>
+      </ul>
+    </div>
+    <div class="spick-block vorher">
+      <h2>Bereitlegen</h2>
+      <ul class="check">
+        <li>ein Würfel, 2 Figuren (Drachen-Figuren von <a class="blattref" href="#blatt-2-3"></a> oder Muggelsteine in zwei Farben)</li>
+        <li>Buntstifte, Bleistift, Radiergummi</li>
+        <li>4 Wäschekluppen als Ständer (nach Wunsch)</li>
+        <li>Stempel oder Sticker</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Gemeinsam</h2>
+  <ol class="spick-ablauf">
+    <li data-min="4"><div><b>Das Kobold-Wettrennen.</b> Im Gang, beide am Kreuz. Du liest zwei Kobold-Regeln vor, ihr spielt sie wirklich. {{KIND}} sagt, was kaputt ist, und repariert.
+      <div class="spick-spiel"><h3>Kobold-Regeln</h3>
+        <ul>
+          <li><b>Regel 1:</b> „Wir sind abwechselnd dran. Wer dran ist, macht einen Schritt. Wer zuerst beim Kuscheltier ist, gewinnt. Ich beginne.“ Du gewinnst, zweimal hintereinander: <b>unfair</b>.</li>
+          <li><b>Regel 2:</b> „Wer dran ist, würfelt. Bei einer 7 machst du 3 Schritte, sonst bleibst du stehen.“ Niemand kommt an: <b>hört nie auf</b>.</li>
+          <li><b>Repariert, z. B.:</b> „Wenn du 4, 5 oder 6 würfelst, dann mach 2 Schritte, sonst 1 Schritt. {{KIND}} beginnt.“ Einmal spielen. Ganz fair ist das noch nicht (wer beginnt, gewinnt etwa <m-e18-zahl spiel="rennen" was="starter" l="71"></m-e18-zahl> von 100).</li>
+        </ul>
+      </div>
+      <div class="sag">
+        <p class="sie">„Du gewinnst ja immer! Das ist unfair!“</p>
+        <p class="du">„Stimmt, da hat der Kobold zugeschlagen. Was genau ist kaputt?“</p>
+        <p class="dann">Zum Schluss: „Spielregeln sind wie ein Programm. Wir machen genau, was dasteht, auch wenn es Unsinn ist.“</p>
+      </div>
+    </div></li>
+    <li data-min="8"><div><b>Der Wettflug.</b> Regel-Karte zusammen lesen (Anleitung, Kasten „Spiel: Wettflug zum Wolkenschloss“). {{KIND}} bereitet den ersten Spielplan genau nach der Karte vor: Stern auf Feld <m-e18-felder art="stern"></m-e18-felder>, Wirbelwind auf <m-e18-felder art="wirbel"></m-e18-felder> (jedes dritte Feld, abwechselnd; schnell gemalt reicht). Dann ein Wettflug, meist <m-e18-zahl was="zuegeVon" l="6"></m-e18-zahl> bis <m-e18-zahl was="zuegeBis" l="12"></m-e18-zahl> Züge.
+      <div class="spick-spiel"><h3>Wettflug zum Wolkenschloss</h3>
+        <p class="meta">Spielplan, 2 Figuren, 1 Würfel · die jüngere Person beginnt</p>
+        <ul>
+          <li><b>Ein Zug:</b> Würfeln, so viele Felder vor. <b>Wenn Stern, dann</b> noch einmal würfeln und weiter, auch mehrmals hintereinander. <b>Wenn Wirbelwind, dann</b> tauschen die beiden Figuren die Plätze. Dann ist die andere Person dran.</li>
+          <li><b>Bis:</b> eine Figur im Schloss ist. Wer zuerst dort ist, gewinnt. Genau treffen ist nicht nötig.</li>
+          <li><b>Gegen den Kobold:</b> Ein Feld wirkt nur für die Figur, die mit dem Würfel darauf landet. Wer durch Tauschen hinkommt, macht nichts.</li>
+        </ul>
+      </div>
+      <div class="sag">
+        <p class="sie">„Jetzt bin ich auf dem Wirbelwind. Muss ich auch tauschen?“</p>
+        <p class="du">„Schauen wir auf die Regel-Karte. Was steht da?“</p>
+      </div>
+    </div></li>
+    <li data-min="5"><div><b>Blatt „Der Regel-Kobold“.</b> <a class="blattref" href="#blatt-18-1"></a>: Aufgabe 1 vorlesen lassen, zu jeder Regel ankreuzen, was kaputt ist. Aufgabe 2 mit einem Muggelstein auf der Reihe mitziehen und jedes Feld anschauen. Profi: die Schnecken mit zwei Muggelsteinen nachspielen.</div></li>
+    <li data-min="8"><div><b>Mein eigenes Spiel.</b> Zweiter Spielplan. Leichter Einstieg: eine Sache am Wettflug ändern. {{KIND}} wählt höchstens 2 oder 3 Arten von besonderen Feldern, malt sie auf und füllt <a class="blattref" href="#blatt-18-3"></a> aus. Sie diktiert, du schreibst, wenn sie mag.
+      <div class="sag">
+        <p class="du">„Was passiert, wenn man auf dein Einhorn-Feld kommt?“</p>
+        <p class="sie">„Dann darf man so weit fliegen, wie man will!“</p>
+        <p class="du">„Ich bin ein Spiel-Roboter. Wie weit ist ‚so weit man will‘? Ich fliege bis ins Schloss.“</p>
+      </div>
+    </div></li>
+    <li data-min="4"><div><b>Testen.</b> Ihr spielt {{KIND}}s Spiel. Du bist der Spiel-Roboter: Du machst nur, was auf der Regel-Karte steht, und fragst bei jeder Lücke. Jede Frage ist ein Kobold, die Regel wird mit Bleistift ergänzt. Erste Zeile im Testbogen. Wird es knapp: beim nächsten Treffen weitertesten.
+      <div class="spick-spiel"><h3>Fragen des Spiel-Roboters</h3>
+        <ul>
+          <li>Wer beginnt? Wo stehen die Figuren am Anfang?</li>
+          <li>Was ist, wenn ich über das Ziel hinaus würfle? Dürfen zwei Figuren auf einem Feld stehen?</li>
+          <li>Gilt ein Feld, wenn ich nur darüber fliege? Was passiert mit einer Ereignis-Karte danach?</li>
+          <li>Wann ist das Spiel aus? Und bei Gleichstand?</li>
+        </ul>
+      </div>
+      <div class="sag">
+        <p class="du">„Piep. Ich habe eine 6 und bin über das Schloss hinaus. Was mache ich jetzt?“</p>
+        <p class="dann">Freu dich über jede Frage, die sie beantwortet und aufschreibt: „Kobold gefunden!“</p>
+      </div>
+    </div></li>
+    <li data-min="1"><div><b>Sammelpass.</b> Feld „Einheit&nbsp;18“, Sterne anmalen. Familien-Test verabreden: „Wer soll dein Spiel testen?“</div></li>
+  </ol>
+
+  <div class="spick-zwei">
+    <div class="spick-block stolper">
+      <h2>Wenn es hakt</h2>
+      <ul>
+        <li><b>Zählt beim Ziehen das eigene Feld mit:</b> „Das erste Feld ist das nächste.“ Mit dem Finger hüpfen, die Zahl erst beim Landen sagen.</li>
+        <li><b>Zu viele Ideen:</b> höchstens 3 Arten von Feldern, der Rest kommt in Version 2.</li>
+        <li><b>„Ich darf immer zweimal würfeln“:</b> einmal testen, dann fragen: „Würde Opa so mit dir spielen?“</li>
+        <li><b>Regeln ändern sich mitten im Spiel:</b> neue Regeln nur zwischen zwei Spielen, dann auf die Karte.</li>
+        <li><b>Schreiben dauert:</b> Du bist der Schreib-Roboter, Bilder statt Wörter sind erlaubt.</li>
+      </ul>
+    </div>
+    <div class="spick-block schwerer">
+      <h2>Zu leicht?</h2>
+      <ul>
+        <li><b>Roboter-Regeln:</b> so lange verbessern, bis der Spiel-Roboter keine Frage mehr hat.</li>
+        <li><b>Fair?</b> Würfel-Rennen ohne besondere Felder 10-mal spielen und zählen: Wer beginnt, gewinnt öfter (etwa <m-e18-zahl spiel="leer" was="starter" l="62"></m-e18-zahl> von 100).</li>
+        <li><b>Pech-Würfel:</b> Wettflug mit lauter 1ern: Wie viele Züge? (<m-e18-zahl was="einsenZuege" l="35"></m-e18-zahl>)</li>
+        <li><b>Ereignis-Karten mit Wenn-dann</b> und „sonst“.</li>
+        <li><b>Mit Entscheidung:</b> Würfelzahl oder nur 1 Feld fliegen.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="spick-block">
+    <h2>Lösungen auf einen Blick</h2>
+    <ul>
+      <li><b>18-1, Aufgabe 1:</b> 7er-Regel hört nie auf, „ein paar Felder“ unklar, Schnecken unfair, „Die Jüngste … Wer die größte Zahl …“ unklar (zwei Regeln streiten). <b>Aufgabe 2:</b> Fee auf Feld <m-e18-test pos="1,8" wuerfe="2,3" l="8" nur-zahl></m-e18-test> (Stern, dann Wirbelwind); Drache auf Feld <m-e18-test pos="2,10" wuerfe="4" l="10" nur-zahl></m-e18-test>, Fee auf Feld <m-e18-test pos="2,10" wuerfe="4" zeige="b" l="6" nur-zahl></m-e18-test>. <b>Profi:</b> Blau gewinnt immer, also nicht fair.</li>
+      <li><b>18-2, Knobel-Ecke:</b> mindestens <m-e18-zahl spiel="leer" was="minWuerfe" l="4"></m-e18-zahl>-mal würfeln. <b>18-3:</b> keine feste Lösung, Roboter-Test machen.</li>
+    </ul>
+  </div>
+
+  <div class="spick-block schluss">
+    <h2>Zum Schluss nicht vergessen</h2>
+    <ul class="check">
+      <li><b>Heute kein Bildschirm.</b> Statt Bildschirm: der Familien-Test.</li>
+      <li><b>Familien-Test</b> (später, z. B. am Wochenende): {{KIND}} liest die Regel-Karte vor, die anderen spielen genau danach, nach jedem Spiel eine Zeile im Testbogen.</li>
+      <li>Spielplan, Regel-Karte, Figuren und Ereignis-Karten in ein Kuvert oder eine Schachtel: Das ist jetzt {{KIND}}s Spiel.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="anleitung" data-einheit="18" data-titel="Ich erfinde ein Spiel">
+
+  <div class="kasten ziel">
+    <p>Heute wird {{KIND}} Spiele-Erfinderin. Dabei entdeckt sie: Eine <span class="begriff">Spielregel</span> ist ein Programm für Menschen. Sie sagt in der richtigen <b>Reihenfolge</b>, was in einem Zug passiert. Sie hat <b>Wenn-dann-Regeln</b> („Wenn du auf einem Stern landest, dann würfelst du noch einmal“). Und alles <b>wiederholt sich, bis jemand gewinnt</b>, wie in einem Wiederhol-Zauber, auf dem statt einer Zahl „bis jemand gewinnt“ steht. Wie beim Roboter gilt: Was nicht dasteht, weiß niemand.</p>
+    <p>Zuerst spielt ihr ein Beispiel-Spiel, den „Wettflug zum Wolkenschloss“. Dann jagt {{KIND}} den Kobold in Spielregeln: Eine Regel ist <b>unklar</b>, ein Spiel <b>hört nie auf</b>, oder einer gewinnt immer, es ist <b>unfair</b>. Danach erfindet sie auf einem leeren Spielplan ihr eigenes Spiel und <span class="begriff">testet</span> es: zuerst ihr zwei, später die Familie mit dem Testbogen. Was beim Testen hakt, wird verbessert. Heute ganz ohne Bildschirm.</p>
+  </div>
+
+  <div class="kasten tipp" data-titel="Was eine gute Spielregel braucht (für euch beide gleich)">
+    <ul>
+      <li><b>Das braucht ihr:</b> Material und Vorbereitung (Wo stehen die Figuren am Anfang?).</li>
+      <li><b>Wer beginnt?</b> Eine klare Regel, keine zwei, die sich streiten.</li>
+      <li><b>Ein Zug, Schritt für Schritt:</b> in der richtigen Reihenfolge, wie die Befehle eines Programms. Erst würfeln, dann ziehen, dann das Feld anschauen.</li>
+      <li><b>Wenn-dann-Regeln</b> für besondere Felder: „Wenn du auf … landest, dann …“. Jede sagt genau, was passiert (nicht „ein paar Felder“, sondern „2 Felder“).</li>
+      <li><b>Wiederholen bis:</b> Die Züge wiederholen sich, bis jemand gewinnt. Auf der Regel-Karte steht das wie ein lila Zauber-Kasten mit „bis …“ oben. Habt ihr die lila Streifen aus Einheit 5 noch (<a class="blattref" href="#blatt-5-3"></a>), legt sie beim Vorlesen um den Teil „Ein Zug“.</li>
+      <li><b>Wer gewinnt?</b> Und was ist, wenn zwei gleichzeitig fertig sind?</li>
+      <li><b>Die drei Regel-Kobolde:</b> <b>unklar</b> (Was soll ich jetzt tun? Auch: zwei Regeln streiten sich), <b>hört nie auf</b> (niemand kann je gewinnen), <b>unfair</b> (einer gewinnt immer oder viel öfter).</li>
+      <li><b>Testen</b> heißt: das Spiel wirklich spielen und genau hinschauen, ob alles klappt. Jede Frage beim Spielen zeigt einen Kobold, und jeder gefundene Kobold macht das Spiel besser.</li>
+    </ul>
+  </div>
+
+  <div class="kasten material darf-brechen e18-bricht">
+    <p><b>Vorher, ohne {{KIND}} (etwa 15 Minuten):</b></p>
+    <ul>
+      <li><b>Drucken (2 Minuten):</b> <a class="blattref" href="#blatt-18-1"></a> (Arbeitsblatt) und <a class="blattref" href="#blatt-18-3"></a> (Regel-Karte mit Testbogen) einmal, <a class="blattref" href="#blatt-18-2"></a> (Spielplan) <b>zweimal</b>: ein Plan für den Wettflug, einer für {{KIND}}s eigenes Spiel. Farbe ist schön, aber nicht nötig. Den Spielplan gern auf dickeres Papier (160&nbsp;g).</li>
+      <li><b>Ausschneiden (5 Minuten):</b> Von <b>einem</b> Blatt 18-2 die 4 Ereignis-Karten und die 4 Figuren unter dem Spielplan ausschneiden (entlang der gestrichelten Linien). Das zweite Blatt behält seine Karten, falls später mehr gebraucht werden. Die Figuren kann man in eine Wäschekluppe klemmen, dann stehen sie.</li>
+      <li><b>Figuren:</b> Für den Wettflug reichen die Drachen-Figuren aus Einheit 2 (<a class="blattref" href="#blatt-2-3"></a>), zwei Muggelsteine in verschiedenen Farben oder die neuen Figuren von Blatt 18-2.</li>
+      <li><b>Kobold-Wettrennen (3 Minuten):</b> Klebe im Gang wieder ein Start-Kreuz aus Malerkrepp auf (wie in Einheit 1) und davor <b>6 Querstreifen</b>, je einen großen Kinderschritt auseinander (etwa 40&nbsp;cm), so lang, dass ihr nebeneinander darauf stehen könnt. Hinter den 6. Streifen kommt ein Kuscheltier. Ein Schritt heißt im Spiel: bis zum nächsten Streifen. So sind deine Schritte genau so lang wie {{KIND}}s. Die zwei Kobold-Regeln stehen im Kasten „Bewegung: Das Kobold-Wettrennen“. Wer mag, schreibt sie auf einen Zettel und malt einen Kobold dazu.</li>
+      <li><b>Wettflug lesen (5 Minuten):</b> Lies die Regel-Karte im Kasten „Spiel: Wettflug zum Wolkenschloss“ einmal ganz und spiel im Kopf einen Zug. Wichtig ist die Regel gegen den Kobold: Ein Feld wirkt nur für die Figur, die mit dem Würfel darauf landet.</li>
+    </ul>
+    <p><b>Material in der Einheit:</b> ein Würfel, Buntstifte (gelb für Sterne, blau für Wirbelwinde, dazu nach Wunsch), Bleistift und <b>Radiergummi</b> (Regeln werden verbessert!), einige Muggelsteine zum Mitziehen, Stempel oder Sticker für den Sammelpass.</p>
+    <p><b>Extra, außerhalb der Einheit:</b> {{KIND}}s Spielplan verzieren und auf Karton kleben (eine aufgeschnittene Müslischachtel), eigene Figuren auf Karton malen und in Wäschekluppen klemmen, eine Schachtel für das Spiel mit Titelbild bemalen (etwa 20 Minuten). Dazu der <b>Familien-Test</b> an einem anderen Tag (Kasten „Der Familien-Test“).</p>
+  </div>
+
+  <h2>Ablauf Schritt für Schritt</h2>
+  <ol class="ablauf e18-ablauf">
+    <li data-min="4"><span class="schritt-titel">Das Kobold-Wettrennen</span>Im Gang. Ihr steht beide am Kreuz, das Kuscheltier wartet hinter dem 6. Streifen. Du hast ein Spiel „vom Kobold“ bekommen und liest die erste Regel vor (Kasten „Bewegung: Das Kobold-Wettrennen“). Spielt sie wirklich, zweimal: Du gewinnst beide Male, denn wer beginnt, ist immer zuerst da. Dann die zweite Regel mit der 7, die es am Würfel nicht gibt. Lass {{KIND}} jedes Mal sagen, was kaputt ist, und eine bessere Regel erfinden. Die reparierte Regel spielt ihr einmal bis zum Kuscheltier. Dein Satz zum Schluss: „Spielregeln sind wie ein Programm für Menschen.“</li>
+    <li data-min="8"><span class="schritt-titel">Der Wettflug</span>Am Tisch. Lest die Regel-Karte des Wettflugs zusammen, {{KIND}} liest so viel vor, wie sie mag. Dann bereitet sie den ersten Spielplan <b>genau nach der Karte</b> vor: einen Stern auf Feld <m-e18-felder art="stern"></m-e18-felder>, einen Wirbelwind auf Feld <m-e18-felder art="wirbel"></m-e18-felder>. Das ist jedes dritte Feld, abwechselnd Stern und Wirbelwind. Schnell gemalt reicht: ein gelber Stern, ein blauer Wirbel. Figuren auf Start, und los. Sag bei jedem besonderen Feld laut die Wenn-dann-Regel dazu. Ein Wettflug dauert meist <m-e18-zahl was="zuegeVon" l="6"></m-e18-zahl> bis <m-e18-zahl was="zuegeBis" l="12"></m-e18-zahl> Züge, also etwa 5 Minuten. Ein Spiel reicht heute.</li>
+    <li data-min="5"><span class="schritt-titel">Blatt „Der Regel-Kobold“</span><a class="blattref" href="#blatt-18-1"></a>. Bei Aufgabe 1 liest {{KIND}} jede Regel vor und kreuzt an, welcher Kobold drinsteckt. Bei Aufgabe 2 testet sie den Wettflug wie ein Roboter: Ein Muggelstein zieht auf der Feld-Reihe mit, auf jedem Feld wird geschaut, ob es besonders ist. Die Profi-Aufgabe ist freiwillig. Mit zwei Muggelsteinen (rot und blau) kann sie die Schnecken nachspielen.</li>
+    <li data-min="8"><span class="schritt-titel">Mein eigenes Spiel</span>Jetzt der zweite, leere Spielplan. Der leichteste Einstieg: „Was möchtest du am Wettflug ändern?“ (ein neues Feld, neue Figuren, ein anderes Ziel). Oder ein ganz neues Spiel. {{KIND}} entscheidet, wer wohin fliegt oder läuft und welche besonderen Felder es gibt, <b>höchstens 2 oder 3 Arten</b>. Sie malt sie auf den Plan und füllt die Regel-Karte aus (<a class="blattref" href="#blatt-18-3"></a>). Mag sie nicht so viel schreiben, diktiert sie und du schreibst. Ereignis-Karten sind ein Extra (Kasten „Basteln: So erfindet {{KIND}} ihr Spiel“).</li>
+    <li data-min="4"><span class="schritt-titel">Testen</span>Ihr spielt {{KIND}}s Spiel. Du bist dabei ein <b>Spiel-Roboter</b>: Du machst nur, was auf der Regel-Karte steht, und fragst bei jeder Lücke nach („Was mache ich jetzt?“). Jede Frage ist ein gefundener Kobold, {{KIND}} ergänzt die Regel mit Bleistift. Danach füllt sie die erste Zeile im Testbogen aus. Ist das Spiel noch nicht fertig, ist das ganz normal: Echte Spiele werden viele Male getestet. Erfinden und Testen brauchen oft länger als 12 Minuten. Wird es knapp, hört ihr nach dem ersten gefundenen Kobold auf und testet beim nächsten Treffen weiter.</li>
+    <li data-min="1"><span class="schritt-titel">Sammelpass</span>Feld „Einheit&nbsp;18“ stempeln oder bekleben, Sterne anmalen. Frag: „Wer soll dein Spiel als Nächstes testen?“ und verabredet den Familien-Test.</li>
+  </ol>
+
+  <h3>Beispielsätze</h3>
+  <div class="sag">
+    <p class="du">„Ich habe ein Spiel vom Kobold bekommen. Hör zu: Wir sind abwechselnd dran. Wer dran ist, macht einen Schritt. Wer zuerst beim Kuscheltier ist, gewinnt. Ich beginne.“</p>
+    <p class="sie">(nach zwei Rennen) „Du gewinnst ja immer! Das ist unfair!“</p>
+    <p class="du">„Stimmt. Da hat der Kobold zugeschlagen. Was genau ist kaputt?“</p>
+    <p class="sie">„Wer anfängt, gewinnt. Immer.“</p>
+    <p class="dann">Genau das ist der Kobold „unfair“. Lob sie: „Du hast den Kobold in der Spielregel gefunden!“ Dann: „Spielregeln sind wie ein Programm. Wir machen genau, was dasteht, auch wenn es Unsinn ist. Wie würdest du die Regel reparieren?“ Jede Idee darf sie ausprobieren, auch wenn sie nicht klappt.</p>
+  </div>
+  <div class="sag">
+    <p class="du">„Zweite Regel vom Kobold: Wer dran ist, würfelt. Bei einer 7 machst du 3 Schritte. Sonst bleibst du stehen.“</p>
+    <p class="sie">(nach ein paar Würfen) „Es gibt doch gar keine 7 am Würfel! Da kommen wir nie an.“</p>
+    <p class="dann">Lass ruhig noch zwei oder drei Mal würfeln, bis es ganz klar ist. „Dieses Spiel hört nie auf. Auch das ist ein Kobold.“ Fällt ihr keine Reparatur ein, schlag vor: „Wenn du 4, 5 oder 6 würfelst, dann mach 2 Schritte, sonst 1 Schritt.“ Das „sonst“ kennt sie von den Wenn-dann-Regeln aus Einheit 11.</p>
+  </div>
+  <div class="sag">
+    <p class="du">(würfelt eine 6 und landet auf dem Wirbelwind) „Oh, Wirbelwind! Wenn ich auf einem Wirbelwind lande, dann tauschen wir die Plätze.“</p>
+    <p class="sie">„Und jetzt bin ich auf dem Wirbelwind. Muss ich auch tauschen?“</p>
+    <p class="du">„Gute Frage! Schauen wir auf die Regel-Karte. Was steht da?“</p>
+    <p class="dann">Unter „Gegen den Kobold“ steht: Ein Feld wirkt nur für die Figur, die mit dem Würfel darauf landet. Ohne diese Regel würden die zwei immer weiter hin und her tauschen. Erzähl ihr: „So eine Frage fehlt beim Erfinden oft. Beim Testen fällt sie auf, und dann kommt eine Regel dazu.“ So sieht sie, dass auch fertige Spiele durch Testen entstehen.</p>
+  </div>
+  <div class="sag">
+    <p class="du">(<a class="blattref" href="#blatt-18-1"></a>, Aufgabe 1) „Und was ist bei der Schnecken-Regel kaputt?“</p>
+    <p class="sie">„Nichts! Beide kriechen gleich schnell. Das ist fair.“</p>
+    <p class="du">„Probieren wir es aus. Zwei Muggelsteine auf Start, Rot beginnt, jede kriecht immer 1 Feld.“</p>
+    <p class="dann">Auf der Reihe der Profi-Aufgabe (der Salat kommt nach Feld 4) ist Rot nach dem 5. Zug beim Salat, Blau ist noch ein Feld davor. „Gleich schnell heißt nicht fair: Wer beginnt, ist immer einen Zug voraus.“ Das ist genau der Gedanke der Profi-Aufgabe. Lass sie dort zuerst raten, dann mit den Muggelsteinen nachspielen.</p>
+  </div>
+  <div class="sag">
+    <p class="du">„Was passiert in deinem Spiel, wenn man auf das Einhorn-Feld kommt?“</p>
+    <p class="sie">„Dann darf man so weit fliegen, wie man will!“</p>
+    <p class="du">„Ich bin ein Spiel-Roboter. Wie weit ist ‚so weit man will‘? Piep. Ich fliege bis ins Schloss. Gewonnen!“</p>
+    <p class="sie">„Neeein! … Dann 3 Felder.“</p>
+    <p class="dann">Das ist der Roboter-Test: Jede Frage des Roboters macht die Regel genauer. Lob die verbesserte Regel, nicht nur das Spiel: „Jetzt weiß jeder genau, was er tun muss.“</p>
+  </div>
+  <div class="sag">
+    <p class="du">„Dein Spiel ist zu Ende. Hat es gut aufgehört? Wer hat begonnen, wer hat gewonnen? Das schreiben wir in den Testbogen.“</p>
+    <p class="sie">„Ich hab begonnen und gewonnen. Und beim Pilz-Feld wussten wir nicht, was man machen muss.“</p>
+    <p class="dann">Super, das ist ein echter Testbericht! Der Kobold kommt in die Zeile „Kobold gefunden“, die Reparatur mit Bleistift auf die Regel-Karte. Gewinnt in ihrem Spiel immer sie, ist das kein Problem, sondern der nächste Kobold, den die Familie finden kann.</p>
+  </div>
+
+  <h2>Spiele, Bewegung und Basteln</h2>
+
+  <div class="kasten bewegung darf-brechen e18-bricht" data-titel="Das Kobold-Wettrennen">
+    <p>Im Gang, beide stehen nebeneinander am Malerkrepp-Kreuz, davor liegen 6 Querstreifen, das Kuscheltier sitzt hinter dem 6. Streifen. Ein Schritt heißt: bis zum nächsten Streifen, so sind eure Schritte gleich lang. Du liest jede Regel vor, dann wird sie <b>genau so</b> gespielt.</p>
+    <ol>
+      <li><b>Kobold-Regel 1:</b> „Wir sind abwechselnd dran. Wer dran ist, macht einen Schritt. Wer zuerst beim Kuscheltier ist, gewinnt. Ich beginne.“ Du bist immer einen Schritt voraus und gewinnst. Noch einmal („Vielleicht hatte ich nur Glück“): wieder du. <b>Kobold: unfair</b>, denn wer beginnt, gewinnt immer. Lass {{KIND}} reparieren. Typische Ideen: „Ich beginne“ (dann gewinnt immer sie, auch unfair, aber lustig, das zu merken) oder „Wir würfeln“ (sehr gut).</li>
+      <li><b>Kobold-Regel 2:</b> „Wer dran ist, würfelt. Bei einer 7 machst du 3 Schritte. Sonst bleibst du stehen.“ Ein Würfel hat nur 1 bis 6. <b>Kobold: hört nie auf.</b></li>
+      <li><b>Die reparierte Regel:</b> zum Beispiel „Wer dran ist, würfelt. Wenn du 4, 5 oder 6 würfelst, dann mach 2 Schritte, sonst 1 Schritt. {{KIND}} beginnt. Wer zuerst beim Kuscheltier ist, gewinnt.“ Jetzt kann jede gewinnen, und das Spiel hört sicher auf, denn jeder Zug bringt mindestens einen Schritt. Einmal spielen. Ganz fair ist es noch nicht: Wer beginnt, gewinnt etwa <m-e18-zahl spiel="rennen" was="starter" l="71"></m-e18-zahl> von 100 Rennen (ausgerechnet). Darum beginnt {{KIND}}.</li>
+    </ol>
+    <p><b>Varianten:</b> Hüpfer statt Schritte (wenig Platz), {{KIND}} denkt sich eine eigene Kobold-Regel aus und du findest den Kobold.</p>
+  </div>
+
+  <div class="kasten spiel darf-brechen e18-bricht" data-titel="Wettflug zum Wolkenschloss">
+    <p class="spiel-meta">2 Personen · etwa 5 Minuten pro Spiel · Spielplan (<a class="blattref" href="#blatt-18-2"></a>), 2 Figuren, 1 Würfel, Buntstifte. Ein eigenes Spiel, kein Nachbau. Vorlesen oder {{KIND}} lesen lassen.</p>
+    <div class="e18-rk">
+      <p class="e18-rk-titel">Regel-Karte: Wettflug zum Wolkenschloss</p>
+      <div class="e18-rk-z"><b>Darum geht’s</b><span>Der Drache und die Fee fliegen um die Wette zum Wolkenschloss.</span></div>
+      <div class="e18-rk-z"><b>Das braucht ihr</b><span>den Spielplan, 2 Figuren, 1 Würfel.</span></div>
+      <div class="e18-rk-z"><b>Vorbereitung</b><span>Mal einen Stern auf Feld <m-e18-felder art="stern"></m-e18-felder> und einen Wirbelwind (einen kleinen Wind-Trichter) auf Feld <m-e18-felder art="wirbel"></m-e18-felder>. Beide Figuren stehen auf Start.</span></div>
+      <div class="e18-rk-z"><b>Wer beginnt?</b><span>Die jüngere Person.</span></div>
+      <div class="e18-rk-zk">
+        <p class="e18-bis">bis eine Figur im Schloss ist</p>
+        <p class="e18-rk-zug"><b>Ein Zug</b> (abwechselnd, immer wieder):</p>
+        <ol>
+          <li>Würfle.</li>
+          <li>Flieg so viele Felder vor, wie der Würfel zeigt. Das erste Feld ist das nächste.</li>
+          <li><b>Wenn</b> du auf einem Stern landest, <b>dann</b> würfle noch einmal: zurück zu 1.</li>
+          <li><b>Wenn</b> du auf einem Wirbelwind landest, <b>dann</b> tauschen die beiden Figuren die Plätze.</li>
+          <li>Dann ist die andere Person dran.</li>
+        </ol>
+      </div>
+      <div class="e18-rk-z"><b>Wer gewinnt?</b><span>Wer zuerst im Schloss ist. Genau treffen ist nicht nötig: Mehr Augen als nötig sind auch gut.</span></div>
+      <div class="e18-rk-z"><b>Gegen den Kobold</b><span>Ein Stern oder Wirbelwind wirkt nur für die Figur, die mit dem Würfel darauf landet. Wer durch Tauschen auf ein Feld kommt, macht dort nichts. Zwei Figuren dürfen auf demselben Feld stehen. Fällt der Würfel vom Tisch, würfelt man noch einmal.</span></div>
+    </div>
+    <div class="e18-weg">
+      <p><b>So sieht der Weg aus</b> (Start bis Feld 20, danach kommt das Schloss):</p>
+      <div class="e18-strecke-a"><m-e18-strecke bis="20" gr="8"></m-e18-strecke></div>
+    </div>
+    <p><b>So kann ein Wettflug anfangen:</b> {{KIND}} würfelt eine 3 und landet auf dem Stern. Sie würfelt noch einmal, eine 5, und steht auf Feld 8. Du würfelst eine 6: Wirbelwind! Ihr tauscht, jetzt stehst du auf Feld 8 und sie auf Feld 6. Auf dem Wirbelwind macht sie nichts, sie ist ja nicht mit dem Würfel hingekommen. {{KIND}} würfelt eine 3: Feld 9, wieder ein Stern. Noch einmal, eine 3: Feld 12, ein Wirbelwind! Ihr tauscht schon wieder, sie fliegt zurück auf Feld 8, du auf Feld 12. Gelächter garantiert.<m-e18-pruefe pos="0,0" wuerfe="3,5,6,3,3" erwartet="8,12" zuege="3"></m-e18-pruefe></p>
+    <p><b>Gut zu wissen</b> (mit einem kleinen Programm genau ausgerechnet, alle möglichen Würfe durchgezählt):</p>
+    <ul>
+      <li><b>Der Wettflug endet sicher.</b> Jeder Wurf bringt eine Figur weiter, Tauschen nimmt nichts weg. Selbst mit lauter 1ern ist er nach <m-e18-zahl was="einsenZuege" l="35"></m-e18-zahl> Zügen vorbei, länger geht es nicht (<m-e18-zahl was="maxZuege" l="35"></m-e18-zahl> Züge sind das Höchste). In fast <m-e18-zahl was="zehntelVonBis" l="9"></m-e18-zahl> von 10 Spielen dauert er <m-e18-zahl was="zuegeVon" l="6"></m-e18-zahl> bis <m-e18-zahl was="zuegeBis" l="12"></m-e18-zahl> Züge, im Schnitt etwa <m-e18-zahl was="schnitt" l="9"></m-e18-zahl>.</li>
+      <li><b>Der Wettflug ist fair.</b> Wer beginnt, gewinnt etwa <m-e18-zahl was="starter" l="50"></m-e18-zahl> von 100 Spielen. Das liegt an den Wirbelwinden: Wer vorne liegt, kann auf einem Wirbelwind die Führung verlieren. Ohne Wirbelwinde gewinnt, wer beginnt, etwa <m-e18-zahl spiel="sterne" was="starter" l="61"></m-e18-zahl> von 100 Spielen (mehr dazu im Kasten „Schwerer machen“).</li>
+      <li><b>Mit viel Glück dauert er nur einen einzigen Zug:</b> 3 (Stern), 6 (Stern auf Feld 9), 6 (Stern auf Feld 15), 6 (Schloss). Das sind 3 + 6 + 6 + 6 = 21 Felder.<m-e18-pruefe pos="0,0" wuerfe="3,6,6,6" erwartet="sieg:a" zuege="1"></m-e18-pruefe></li>
+    </ul>
+    <p><b>Varianten:</b></p>
+    <ul>
+      <li><b>Riesen-Wettflug im Gang (Bewegung):</b> 12 Felder aus Malerkrepp am Boden (oder mit Straßenkreide im Hof), Stern auf Feld 3 und 9, Wirbelwind auf Feld 6 und 12, danach das Kuscheltier als Schloss. Ihr seid selbst die Figuren. Sterne und Wirbelwinde malst du mit Filzstift auf das Malerkrepp des Feldes. Wer auf einem Stern landet, hüpft 3-mal und würfelt noch einmal. Wer auf einem Wirbelwind landet, dreht sich einmal im Kreis, dann tauscht ihr die Plätze. Kein Papier auf den Boden legen, darauf rutscht man aus.</li>
+      <li><b>Edelstein-Wettflug:</b> Wer auf einem Stern landet, nimmt einen Muggelstein. Wer zuerst im Schloss ist, bekommt 2 Muggelsteine, dann ist das Spiel aus. Gewonnen hat, wer mehr Muggelsteine hat. Bei Gleichstand gewinnen beide.</li>
+      <li><b>Mehr Mitspieler:</b> Für 3 oder 4 Personen geht der Wettflug auch. Der Wirbelwind tauscht dann mit der Figur der Person, die als Nächste dran ist.</li>
+    </ul>
+  </div>
+
+  <div class="kasten basteln darf-brechen e18-bricht" data-titel="So erfindet {{KIND}} ihr Spiel">
+    <ol>
+      <li><b>Wer und wohin?</b> Wer sind die Figuren (Drache, Fee, Einhorn, Kuscheltier …), und wohin wollen sie? Der Plan hat Start, 20 Felder und ein Schloss. Das Schloss darf auch eine Höhle, ein Schatz oder ein Feen-Baum sein. Es gilt nur: Am Ende ist ein Ziel.</li>
+      <li><b>Besondere Felder:</b> Höchstens 2 oder 3 Arten, jede mit einem Bild, das man schnell malt: Stern, Wirbelwind, Pilz, Herz, Regenwolke, „?“ für eine Ereignis-Karte. Ideen für das „dann“: noch einmal würfeln, 2 Felder vor, Plätze tauschen, die andere Figur fliegt 1 Feld vor, eine Ereignis-Karte ziehen, einen Muggelstein nehmen.</li>
+      <li><b>Regel-Karte:</b> von oben nach unten ausfüllen (<a class="blattref" href="#blatt-18-3"></a>). Ins kleine Feld neben „Wenn du auf“ kommt das Bild des Feldes. Oben im lila Kasten steht, bis wann gespielt wird, z. B. „bis eine Figur im Schloss ist“.</li>
+      <li><b>Ereignis-Karten (Extra):</b> Auf den 4 Karten von Blatt 18-2 steht oben ein Fragezeichen. Die erste ist ein Beispiel, was auf den anderen steht, bestimmt {{KIND}}. Wichtig für die Regel-Karte: Was passiert mit der Karte danach? (Am einfachsten: unter den Stapel.)</li>
+      <li><b>Name und Figuren:</b> Das Spiel bekommt einen Namen, die Figuren werden angemalt und in Wäschekluppen geklemmt.</li>
+      <li><b>Testen:</b> Spielen, Testbogen ausfüllen, Kobold suchen, verbessern. Version 2 darf ganz anders aussehen als Version 1.</li>
+    </ol>
+  </div>
+
+  <div class="kasten tipp darf-brechen e18-bricht" data-titel="Der Familien-Test (später, außerhalb der Einheit)">
+    <p>Beim nächsten Familienessen, am Wochenende oder bei Oma und Opa: {{KIND}} ist die Spiele-Erfinderin, die anderen sind die Tester. So geht es:</p>
+    <ul>
+      <li>{{KIND}} liest die Regel-Karte vor (oder gibt sie zum Lesen). Sie erklärt <b>nichts</b> dazu, was nicht auf der Karte steht. Die Tester spielen genau nach der Karte, wie Roboter.</li>
+      <li>Jede Frage der Tester merkt sie sich oder du schreibst sie auf: Das sind die Kobolde. Nach dem Spiel bessert sie die Regel-Karte mit Bleistift aus.</li>
+      <li>Nach jedem Spiel eine Zeile im Testbogen: Wer hat mitgespielt, wer hat begonnen, wer hat gewonnen, hat es aufgehört, wie hat es gefallen.</li>
+      <li>Mit 3 oder 4 Personen braucht ihr vielleicht eine neue Regel (Wer beginnt? Wer ist danach dran?). Auch das ist ein echter Test: Hält das Spiel mehr Mitspieler aus?</li>
+      <li>Die Tester loben zuerst etwas, dann sagen sie, was gehakt hat. Gewinnt die Erfinderin nicht, ist das kein schlechtes Zeichen: In einem fairen Spiel kann jeder gewinnen. Ob es wirklich fair ist, zeigt erst das Zählen über viele Spiele (Kasten „Schwerer machen“).</li>
+    </ul>
+  </div>
+
+  <h2>Wenn es hakt oder zu leicht ist</h2>
+
+  <div class="zwei">
+    <div class="kasten leichter">
+      <ul>
+        <li>Eigenes Spiel: nur <b>eine</b> Sache am Wettflug ändern, z. B. eine neue Feld-Art oder andere Figuren. Der Rest der Regel-Karte bleibt.</li>
+        <li>Nur eine Art besonderer Felder.</li>
+        <li>Du bist der Schreib-Roboter, {{KIND}} diktiert. Statt Wörtern darf sie Bilder malen (ein Würfel statt „würfle“).</li>
+        <li>Kurzer Weg: Das Schloss ist schon nach Feld 10, die anderen Felder werden durchgestrichen.</li>
+        <li><a class="blattref" href="#blatt-18-1"></a>: jede Kobold-Regel zuerst wirklich nachspielen, dann ankreuzen.</li>
+      </ul>
+    </div>
+    <div class="kasten bonus" data-titel="Bonus-Knobelei">
+      <p class="klein"><i>Für zwischendurch: im Auto, beim Abendessen, beim Zähneputzen.</i></p>
+      <p><b>Kobold-Regel:</b> „Wer zuerst eine 0 würfelt, gewinnt. Was ist kaputt?“</p>
+      <p><b>Erster Stern:</b> „Du stehst beim Wettflug am Start. Welche Zahl brauchst du für den ersten Stern? Und für den ersten Wirbelwind?“</p>
+      <p><b>Blitz-Flug:</b> „Kann man den Wettflug in einem einzigen Zug gewinnen?“</p>
+      <p><b>Für Profis:</b> „Wir würfeln beim Wettflug immer nur 6er. Wer gewinnt?“</p>
+      <p class="klein"><b>Kurz-Lösungen:</b> hört nie auf (keine 0 am Würfel); 3 und 6; ja, mit 3, 6, 6, 6; die Person, die als Zweite dran ist. Mehr bei den Lösungen am Ende.</p>
+    </div>
+  </div>
+
+  <div class="kasten stolper darf-brechen e18-bricht">
+    <ul>
+      <li><b>Sie zählt beim Ziehen das eigene Feld mit</b> (bei einer 3 sagt sie „eins“ auf dem Feld, auf dem sie steht): Das passiert fast allen Kindern. „Das erste Feld ist das nächste.“ Lass sie mit dem Finger hüpfen und die Zahl erst beim Landen sagen. Darum steht es auch auf der Regel-Karte.</li>
+      <li><b>Sie will, dass sie in ihrem Spiel immer gewinnt</b> („{{KIND}} darf zweimal würfeln“): Kein Drama, das ist einen Test wert. Spielt es einmal, dann frag: „Würde Opa so mit dir spielen wollen?“ Den Kobold „unfair“ findet sie dann selbst.</li>
+      <li><b>Zu viele Ideen</b> (zehn verschiedene Felder, drei Würfel, Geheimgänge): Wunderbar, aber für Version 1 höchstens 3 Arten von Feldern. Die anderen Ideen kommen auf die Rückseite der Regel-Karte, für Version 2.</li>
+      <li><b>Regeln ändern sich mitten im Spiel</b> („Ab jetzt darf man zurückfliegen!“): Neue Regeln gibt es nur zwischen zwei Spielen, dann kommen sie auf die Regel-Karte. Das ist wie beim Programmieren: Man ändert das Programm, nicht den Roboter, während er läuft.</li>
+      <li><b>Sie ist enttäuscht, wenn sie ihr eigenes Spiel verliert:</b> Erzähl, dass Spiele-Erfinder ihre Spiele oft verlieren, weil sie fair sind. Lob die Regeln, nicht den Sieg: „Dein Spiel ist so gut, dass jeder gewinnen kann.“</li>
+      <li><b>Der Wirbelwind ärgert</b>, wenn man vorne liegt: Genau das macht den Wettflug fair (Kasten „Schwerer machen“).</li>
+      <li><b>Ihr Spiel hört nicht auf</b> (z. B. mit „Geh 3 Felder zurück“): Nach 10 Minuten abbrechen und freuen, das war ein echter Testerfolg, der Kobold „hört nie auf“ ist gefunden. Gemeinsam überlegen, welche Regel schuld ist.</li>
+      <li><b>Schreiben dauert lange:</b> Kurze Wörter, Bilder sind erlaubt, du schreibst mit. Das Denken ist die Arbeit, nicht das Schreiben.</li>
+    </ul>
+  </div>
+
+  <div class="kasten schwerer darf-brechen e18-bricht">
+    <p>Klappt das eigene Spiel schnell, wähle hier aus. Das ist kein Zusatz „für später“, sondern ein vollwertiger Hauptteil. Der Kern: Eine Spielregel kann man genauso prüfen wie ein Programm. Ist sie vollständig? Endet das Spiel sicher? Ist es fair? Die Zahlen hier hat ein kleines Programm genau ausgerechnet.</p>
+    <ol class="e18-ganz">
+      <li><b>Roboter-Regeln:</b> Du bist ein Spiel-Roboter, der nichts weiß und nur macht, was auf der Regel-Karte steht. Bei jeder Lücke fragst du. Ziel: eine Regel-Karte, bei der der Roboter keine einzige Frage mehr hat. Fragen, die ein Roboter gern stellt: Wer beginnt? Wo stehen die Figuren am Anfang? Was ist, wenn ich über das Ziel hinaus würfle? Dürfen zwei Figuren auf demselben Feld stehen? Gilt ein Feld, wenn ich nur darüber fliege? Und wenn mich eine Ereignis-Karte hinschickt? Was passiert mit der Karte, nachdem ich sie gelesen habe? Was ist bei Gleichstand? Zum Üben zuerst beim Wettflug: Findet {{KIND}} eine Frage, die die Regel-Karte nicht beantwortet? (Zum Beispiel: „Die jüngere Person beginnt“, und wenn beide gleich alt sind, wie Zwillinge? Eine Reparatur: „Sonst beginnt, wer die größere Zahl würfelt.“ Mit dem „sonst“ streiten sich die zwei Regeln nicht.) Auch die Regel-Karte des Wettflugs hatte beim Testen einen Kobold: Zuerst stand bei Schritt 3 nur „würfle noch einmal und flieg weiter“. Ein Roboter liest die Schritte der Reihe nach. Landet er nach dem zweiten Wurf wieder auf einem Stern, ist Schritt 3 schon vorbei, und er würfelt nicht mehr. Erst „zurück zu 1.“ sagt ihm genau, was zu tun ist. Frag {{KIND}}: „Was macht der Roboter mit 3, 6, 6, 6, wenn bei Schritt 3 nur ‚würfle noch einmal und flieg weiter‘ steht?“ (Er bleibt auf Feld 9 stehen.)</li>
+      <li><b>Wer beginnt, gewinnt öfter? (Fair machen in drei Stufen)</b>
+        <ul>
+          <li><b>Stufe 1, ohne Würfel:</b> Das Schnecken-Rennen von <a class="blattref" href="#blatt-18-1"></a>. Wenn jede Schnecke immer 1 Feld kriecht, steht der Sieger schon vor dem Start fest. Auch mit Vorsprung für Blau wird es nicht fair, dann gewinnt eben immer Blau (Profi-Aufgabe). Fair wird ein Spiel ohne Würfel nur, wenn ihr abwechselnd beginnt.</li>
+          <li><b>Stufe 2, zählen:</b> Spielt ein Würfel-Rennen <b>ohne</b> besondere Felder, auf einem frisch gedruckten Spielplan oder auf dem Wettflug-Plan, ohne Sterne und Wirbelwinde zu beachten. Jedes Rennen dauert nur 2 bis 3 Minuten, verteilt die Spiele ruhig auf mehrere Tage. Abwechselnd beginnen, und nach jedem Spiel einen Strich in eine von zwei Spalten: „Wer begonnen hat, hat gewonnen“ oder „… hat verloren“. Ausgerechnet: Wer beginnt, gewinnt etwa <m-e18-zahl spiel="leer" was="starter" l="62"></m-e18-zahl> von 100 Spielen. Nach 10 Spielen sieht man das oft, aber nicht immer (etwa 6 zu 4). Das ist eine wichtige Erfahrung: Ein paar Spiele sind ein Test, aber noch kein Beweis.</li>
+          <li><b>Stufe 3, fair machen:</b> Wie bekommt die Zweite einen Ausgleich? Idee: Wer als Zweite dran ist, startet auf Feld 2. Beim Würfel-Rennen gewinnt dann, wer beginnt, nur noch etwa <m-e18-zahl spiel="leer" was="starter" zweiter="2" l="48"></m-e18-zahl> von 100 Spielen, beim Wettflug ohne Wirbelwinde etwa <m-e18-zahl spiel="sterne" was="starter" zweiter="2" l="50"></m-e18-zahl> von 100: fast genau fair. Startet die Zweite schon auf Feld 3, ist es beim Würfel-Rennen zu viel des Guten (dann gewinnt, wer beginnt, nur noch etwa <m-e18-zahl spiel="leer" was="starter" zweiter="3" l="42"></m-e18-zahl> von 100). Der Wettflug mit Wirbelwinden ist von selbst fast genau fair. Eine Erklärung: Wer beginnt, liegt öfter vorne und verliert darum öfter auf einem Wirbelwind die Führung.</li>
+        </ul></li>
+      <li><b>Hört es sicher auf? Der Pech-Würfel:</b> Legt den Würfel immer mit der 1 nach oben und spielt den Wettflug, jeder Zug ein Strich. Wie viele Züge sind es? (<m-e18-zahl was="einsenZuege" l="35"></m-e18-zahl> Züge, und wer begonnen hat, gewinnt. Zusammen sind es <m-e18-zahl was="einsenWuerfe" l="41"></m-e18-zahl> Würfe, weil man auf den Sternen noch einmal würfelt.) Länger kann ein Wettflug nicht dauern. Warum nicht? Zählt die Feldnummern beider Figuren zusammen: Jeder Wurf macht die Summe größer, Tauschen lässt sie gleich. Bevor eine Figur im Schloss ist, stehen beide höchstens auf Feld 20, die Summe ist also höchstens 40. Darum ist nach spätestens 41 Würfen Schluss. Gefährlich sind Regeln wie „Geh 3 Felder zurück“: Damit kann ein Spiel im Kreis laufen. Auch „Ins Schloss nur mit genau der richtigen Zahl“ macht ein Spiel länger, und niemand kann sagen, wie lange es höchstens dauert. Auftrag: {{KIND}} erfindet absichtlich eine Regel, mit der ein Spiel nie aufhört, und du musst den Kobold finden. Dann umgekehrt.</li>
+      <li><b>Varianten-Regeln:</b> Eine Regel ändern und testen, was passiert. Der Edelstein-Wettflug (Kasten „Spiel“) ändert, wer gewinnt: Wer zuerst im Schloss ist, kann trotzdem verlieren. Weitere Ideen: Zwei Würfel, und man darf sich einen aussuchen. Rückenwind: Wer hinten ist, fliegt bei einer 1 gleich 3 Felder. Für jede Variante gilt: zuerst der Roboter-Test (Ist sie klar?), dann spielen (Hört es auf? Ist es fair?).</li>
+      <li><b>Ereignis-Karten mit Wenn-dann:</b> Auf den Karten stehen Regeln mit Bedingung, wie die Wenn-dann-Regeln aus Einheit 11, auch mit „sonst“. Beispiele: „Wenn du hinten bist, dann flieg 3 Felder vor. Sonst flieg 1 Feld vor.“ „Wenn die andere Figur auf einem Stern steht, dann tauscht die Plätze.“ „Wenn du eine 6 gewürfelt hast, dann darfst du dir die nächste Karte aussuchen.“ Roboter-Frage zur ersten Karte: Was ist, wenn beide auf demselben Feld stehen? Bin ich dann hinten? (Mit „sonst“ ist es klar: Gleich weit ist nicht hinten, also 1 Feld.)</li>
+      <li><b>Ein Spiel mit Entscheidung:</b> Neue Regel für den Wettflug: „Du darfst wählen: so viele Felder, wie der Würfel zeigt, oder nur 1 Feld.“ Jetzt kann man planen, wie bei den Gewinn-Strategien aus Einheit 15. Frag: „Du stehst auf Feld 14, die andere Figur auf Feld 10, und du würfelst eine 4. Was wählst du?“ (Mit 4 kommst du auf Feld 18, einen Wirbelwind: 14 + 4 = 18, und du müsstest mit der Figur hinter dir tauschen. Mit 1 kommst du auf Feld 15, einen Stern: 14 + 1 = 15, und du darfst noch einmal würfeln. Also lieber 1.)</li>
+      <li><b>Spiele-Erfinderin für andere:</b> {{KIND}} erfindet ein Spiel für jemand Bestimmten, z. B. für ein kleineres Kind (ganz einfache Regeln, kurzer Weg) oder für Opa (mit Edelsteinen und Entscheidung). Die Regel-Karte muss dann so klar sein, dass es ohne {{KIND}}s Erklärung funktioniert.</li>
+    </ol>
+  </div>
+
+  <h2>Hintergrund</h2>
+  <div class="kasten warum darf-brechen e18-bricht">
+    <p>Eine Spielregel ist ein <span class="begriff">Algorithmus</span>, den Menschen ausführen. Ein Zug ist eine <span class="begriff">Sequenz</span> von Schritten in fester Reihenfolge, die besonderen Felder sind <span class="begriff">Bedingungen</span> („wenn … dann …“), und „Das wiederholt ihr, bis eine Figur im Schloss ist“ ist eine <span class="begriff">Schleife</span> mit Abbruchbedingung, wie ein Wiederhol-Zauber „bis zum Schatz“. Programmierer nennen die genaue Beschreibung dessen, was ein Programm tun soll, eine <span class="begriff">Spezifikation</span>. Unklare oder widersprüchliche Spezifikationen gehören zu den häufigsten Ursachen für <span class="begriff">Bugs</span>: Ein Computer fragt nicht nach, er macht irgendetwas, und oft nicht das Gewollte.</p>
+    <p>Ein Spiel, das nie aufhört, ist eine <span class="begriff">Endlosschleife</span>. Dass eine Schleife sicher endet, beweisen Informatiker oft genau so wie beim Pech-Würfel: Man sucht eine Zahl, die bei jedem Durchlauf wächst und nicht beliebig groß werden kann (hier die Summe der beiden Feldnummern). Ein Spiel, das einer immer gewinnt, ist nicht kaputt, aber unfair. Spiele-Entwickler nennen das Ausgleichen von Vorteilen <i>Balancing</i>.</p>
+    <p><span class="begriff">Testen</span> ist beim Programmieren mindestens so wichtig wie das Schreiben. Ein <span class="begriff">Testfall</span> ist eine bestimmte Situation, die man ausprobiert (Aufgabe 2 auf <a class="blattref" href="#blatt-18-1"></a>). Der Pech-Würfel ist ein <span class="begriff">Randfall</span>: der extremste Fall, den es gibt. Der Familien-Test ist ein Beta-Test mit echten Benutzern, der Testbogen ein Fehlerbericht. Die Zahlen in dieser Anleitung hat ein kleines Programm ausgerechnet, das alle möglichen Würfe durchzählt, so wie Spiele-Firmen am Computer prüfen, ob ein Spiel fair ist. Für {{KIND}} reicht der Strich im Testbogen.</p>
+  </div>
+
+  <h2>Bildschirm-Bonus</h2>
+  <div class="kasten bildschirm">
+    <p><b>Heute gibt es bewusst keinen Bildschirm</b> und kein Level-Paket. Das Handy bleibt weg.</p>
+    <p><b>Warum:</b> Ein Spiel zu erfinden heißt gestalten, mit Kopf und Händen. Am Tisch kann {{KIND}} eine Regel sofort ändern, ausradieren und neu schreiben, und ihr seht beim nächsten Wurf, ob es besser geworden ist. In einer App wären die Regeln schon fest eingebaut, hier bestimmt sie selbst. Und Testen heißt heute: mit echten Menschen spielen, reden, lachen und gemeinsam überlegen, ob eine Regel klar ist. Das kann kein Bildschirm ersetzen.</p>
+    <p><b>Statt Bildschirm:</b> der Familien-Test. <b>Ausblick:</b> In Einheit 19 (Großer Roboter-Parcours) gibt es wieder ein Level-Paket.</p>
+  </div>
+
+  <h2>Lösungen</h2>
+  <div class="e18-loes">
+    <m-loesungen einheit="18" skala="0.39"></m-loesungen>
+    <div class="kasten loesung">
+      <p><b><a class="blattref" href="#blatt-18-1"></a>, Aufgabe 1:</b> „Wer eine 7 würfelt, gewinnt“: <b>hört nie auf</b>, ein Würfel hat nur 1 bis 6. „Ein paar Felder“: <b>unklar</b>, wie viele sind ein paar? „Schnecken“: <b>unfair</b>, Rot beginnt und ist immer einen Zug voraus. „Die Jüngste beginnt. Wer die größte Zahl würfelt, beginnt.“: <b>unklar</b>, zwei Regeln streiten sich, welche gilt?</p>
+      <p><b>Aufgabe 2:</b> Die Fee steht am Ende auf Feld <b>8</b>: 1 + 2 = 3 ist ein Stern, sie würfelt noch einmal, 3 + 3 = 6 ist ein Wirbelwind. Sie tauscht mit dem Drachen: Fee auf Feld 8, Drache auf Feld 6. Wer nur zusammenzählt, kommt auf Feld 6 und hat den Wirbelwind übersehen. Im zweiten Test landet der Drache mit 2 + 4 = 6 auf einem Wirbelwind und tauscht mit der Fee: Drache auf Feld <b>10</b>, Fee auf Feld <b>6</b>. Die Fee macht auf dem Wirbelwind nichts, sie ist nicht mit dem Würfel hingekommen.</p>
+    </div>
+  </div>
+  <div class="kasten loesung darf-brechen e18-bricht e18-weiter">
+    <p><b><a class="blattref" href="#blatt-18-1"></a>, Profi:</b> <b>Blau</b> gewinnt, immer: Blau braucht nur 4 Züge bis zum Salat, Rot 5. Nach Blaus 4. Zug ist Rot erst auf Feld 4. Fair ist es <b>nicht</b>: Ohne Würfel gewinnt bei denselben Regeln immer dieselbe Schnecke. Fair wird es mit einem Würfel oder wenn ihr abwechselnd beginnt (Kasten „Schwerer machen“, Stufe 1).</p>
+    <p><b><a class="blattref" href="#blatt-18-2"></a>:</b> In der Lösungsansicht ist der Plan für den Wettflug eingezeichnet (Stern auf Feld <m-e18-felder art="stern"></m-e18-felder>, Wirbelwind auf <m-e18-felder art="wirbel"></m-e18-felder>). {{KIND}}s eigener Plan hat keine feste Lösung. <b>Knobel-Ecke:</b> mindestens <b>4-mal</b>. Vom Start bis ins Schloss sind es 21 Felder, mit 3 Würfen kommt man höchstens 6 + 6 + 6 = 18 Felder weit. Mit 4 Würfen geht es, z. B. 6 + 6 + 6 + 3 = 21.</p>
+    <p><b><a class="blattref" href="#blatt-18-3"></a>:</b> keine feste Lösung. In der Lösungsansicht steht als Beispiel der Wettflug. Prüft die Regel-Karte mit dem Roboter-Test (Kasten „Schwerer machen“): Ist jede Frage beantwortet? Steht oben im lila Kasten, bis wann gespielt wird? <b>Profi:</b> Beim Wettflug gewinnt, wer beginnt, etwa <m-e18-zahl was="starter" l="50"></m-e18-zahl> von 100 Spielen. Bei {{KIND}}s Spiel zeigt erst das Zählen, ob es fair ist. Zählt lange genug: Nach 6 Spielen ist „4 von 6“ noch kein Beweis für unfair.</p>
+    <p><b>Bonus-Knobelei:</b> Kobold-Regel: hört nie auf, ein Würfel hat keine 0. Erster Stern: eine 3, erster Wirbelwind: eine 6 (mit einer 3 landest du auf dem Stern und würfelst noch einmal, mit einer weiteren 3 kommst du auch auf den Wirbelwind). Blitz-Flug: Ja, mit 3 (Stern), 6 (Stern auf Feld 9), 6 (Stern auf Feld 15), 6 (Schloss), das sind 3 + 6 + 6 + 6 = 21 Felder in einem einzigen Zug. Für Profis: Mit lauter 6ern gewinnt die Person, die als <b>Zweite</b> dran ist, im <m-e18-zahl was="sechsenZuege" l="4"></m-e18-zahl>. Zug. Die Erste landet auf Feld 6 (Wirbelwind) und tauscht zurück auf Start, die Zweite landet auf Feld 12 (Wirbelwind) und tauscht zurück auf Start, die Erste kommt auf Feld 18 (Wirbelwind) und tauscht wieder, und die Zweite fliegt von Feld 18 ins Schloss.<m-e18-pruefe pos="0,0" wuerfe="6,6,6,6" erwartet="sieg:b" zuege="4"></m-e18-pruefe></p>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 18-1: Der Regel-Kobold (Kobold finden, wie ein Roboter testen) -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="18" data-titel="Der Regel-Kobold" data-art="Arbeitsblatt" data-verteilt>
+  <div class="aufg">
+    <p class="anw">{{KIND}}, in jeder Spielregel steckt ein Kobold. Kreuz an!</p>
+    <div class="e18-kt">
+      <span></span><span></span>
+      <span class="e18-kopf"><m-e18-bild name="unklar" gr="11"></m-e18-bild>unklar</span>
+      <span class="e18-kopf"><m-e18-bild name="nie" gr="11"></m-e18-bild>hört nie auf</span>
+      <span class="e18-kopf"><m-e18-bild name="unfair" gr="11"></m-e18-bild>unfair</span>
+      <span class="e18-linie-t"></span>
+      <span class="e18-b"><m-wuerfel n="5" gr="11"></m-wuerfel></span>
+      <span class="e18-regel">Würfelt abwechselnd. Wer eine 7 würfelt, gewinnt.</span>
+      <m-e18-kobold l="nie"></m-e18-kobold>
+      <span class="e18-linie-t"></span>
+      <span class="e18-b"><m-e18-bild name="stern-farbig" gr="12"></m-e18-bild></span>
+      <span class="e18-regel">Wenn du auf einem Stern landest, dann flieg ein paar Felder vor.</span>
+      <m-e18-kobold l="unklar"></m-e18-kobold>
+      <span class="e18-linie-t"></span>
+      <span class="e18-b"><m-e18-bild name="schnecke-rot" gr="13"></m-e18-bild></span>
+      <span class="e18-regel">Jede Schnecke kriecht immer 1 Feld. Rot beginnt. Wer zuerst beim Salat ist, gewinnt.</span>
+      <m-e18-kobold l="unfair"></m-e18-kobold>
+      <span class="e18-linie-t"></span>
+      <span class="e18-b"><m-e18-bild name="zettel" gr="12"></m-e18-bild></span>
+      <span class="e18-regel">Die Jüngste beginnt. Wer die größte Zahl würfelt, beginnt.</span>
+      <m-e18-kobold l="unklar"></m-e18-kobold>
+    </div>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">Teste den Wettflug wie ein Roboter. Schau auf jedes Feld!</p>
+    <m-e18-strecke bis="12" gr="13.5"></m-e18-strecke>
+    <div class="e18-tests">
+      <div class="e18-tfall">
+        <p>Die Fee steht auf Feld 1, der Drache auf Feld 8. Sie würfelt <m-wuerfel n="2" gr="8.5"></m-wuerfel>, dann <m-wuerfel n="3" gr="8.5"></m-wuerfel>.</p>
+        <p class="e18-antw"><span>Fee: Feld <m-e18-test pos="1,8" wuerfe="2,3" l="8"></m-e18-test></span></p>
+      </div>
+      <div class="e18-tfall">
+        <p>Der Drache steht auf Feld 2, die Fee auf Feld 10. Der Drache würfelt <m-wuerfel n="4" gr="8.5"></m-wuerfel>.</p>
+        <p class="e18-antw"><span>Drache: Feld <m-e18-test pos="2,10" wuerfe="4" l="10"></m-e18-test></span><span>Fee: Feld <m-e18-test pos="2,10" wuerfe="4" zeige="b" l="6"></m-e18-test></span></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="profi" data-titel="Profi-Aufgabe: Der Kobold repariert">
+    <p>Wie oben, aber Blau startet 1 Feld weiter vorne.</p>
+    <div class="e18-profi-reihe">
+      <m-e18-schnecken rot="0" blau="1" ziel="5" gr="15"></m-e18-schnecken>
+      <div class="e18-fragen">
+        <div><span>Wer gewinnt?</span><m-e18-sieger rot="0" blau="1" ziel="5" beginnt="rot" frage="wer" l="blau"></m-e18-sieger></div>
+      </div>
+    </div>
+    <div class="e18-fair"><span>Ist es jetzt fair?</span><m-e18-sieger rot="0" blau="1" ziel="5" beginnt="rot" frage="fair" l="nein"></m-e18-sieger></div>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 18-2: Mein Spielplan (Bastelvorlage: Plan, Ereignis-Karten, Figuren) -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="18" data-titel="Mein Spielplan" data-art="Bastelvorlage">
+  <p class="e18-hinweis">{{KIND}}, mal auf einige Felder etwas Besonderes!</p>
+  <div class="zentriert"><m-e18-plan gr="24"></m-e18-plan></div>
+  <p class="lsg-nur">So sieht der Plan für den Wettflug aus.</p>
+
+  <div>
+    <p class="e18-titel">Ereignis-Karten und Figuren (ausschneiden)</p>
+    <m-karten spalten="4" zeilen="2" hoehe="29" breite="180">
+      <div class="e18-ek"><span class="e18-ek-kopf"><m-e18-bild name="frage" gr="7"></m-e18-bild>Ereignis</span><span class="e18-ek-text">Rückenwind! Flieg 2 Felder vor.</span></div>
+      <div class="e18-ek"><span class="e18-ek-kopf"><m-e18-bild name="frage" gr="7"></m-e18-bild>Ereignis</span><span class="e18-ek-l"></span><span class="e18-ek-l"></span></div>
+      <div class="e18-ek"><span class="e18-ek-kopf"><m-e18-bild name="frage" gr="7"></m-e18-bild>Ereignis</span><span class="e18-ek-l"></span><span class="e18-ek-l"></span></div>
+      <div class="e18-ek"><span class="e18-ek-kopf"><m-e18-bild name="frage" gr="7"></m-e18-bild>Ereignis</span><span class="e18-ek-l"></span><span class="e18-ek-l"></span></div>
+      <div class="e18-fig"><span class="e18-fig-kreis"><m-bild name="drache" gr="16"></m-bild></span><span class="e18-fig-name">Drache</span></div>
+      <div class="e18-fig"><span class="e18-fig-kreis"><m-bild name="fee" gr="16"></m-bild></span><span class="e18-fig-name">Fee</span></div>
+      <div class="e18-fig"><span class="e18-fig-kreis"><m-bild name="einhorn" gr="16"></m-bild></span><span class="e18-fig-name">Einhorn</span></div>
+      <div class="e18-fig"><span class="e18-fig-kreis"></span><span class="e18-fig-name">deine<br>Figur</span></div>
+    </m-karten>
+  </div>
+
+  <div class="knobel" data-titel="Knobel-Ecke: Schnell ins Schloss">
+    <p>Ohne besondere Felder: Wie oft musst du mindestens würfeln, bis du vom Start im Schloss bist? <m-e18-zahl spiel="leer" was="minWuerfe" feld l="4"></m-e18-zahl></p>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 18-3: Meine Regel-Karte (zum Ausfüllen) und Testbogen      -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="18" data-titel="Meine Regel-Karte" data-art="Arbeitsblatt">
+  <div class="e18-karte">
+    <div class="e18-z"><span>Mein Spiel heißt:</span><span class="e18-l"><span class="lsg">Wettflug zum Wolkenschloss</span></span></div>
+    <div class="e18-z"><span>Das braucht ihr:</span><span class="e18-l"><span class="lsg">Spielplan, 2 Figuren, 1 Würfel</span></span></div>
+    <div class="e18-z"><span>Wer beginnt?</span><span class="e18-l"><span class="lsg">die jüngere Person</span></span></div>
+    <div class="e18-zk">
+      <div class="e18-z e18-bis"><span>bis</span><span class="e18-l"><span class="lsg">eine Figur im Schloss ist</span></span></div>
+      <div class="e18-z"><span><b>Ein Zug:</b> 1.</span><span class="e18-l"><span class="lsg">Würfle.</span></span></div>
+      <div class="e18-z"><span>2.</span><span class="e18-l"><span class="lsg">Flieg so viele Felder vor.</span></span></div>
+      <div class="e18-z"><span>Wenn du auf</span><span class="e18-feldchen"><span class="lsg"><m-e18-bild name="stern-farbig" gr="9"></m-e18-bild></span></span><span>landest, dann</span><span class="e18-l"><span class="lsg">würfle noch einmal: zurück zu 1.</span></span></div>
+      <div class="e18-z"><span>Wenn du auf</span><span class="e18-feldchen"><span class="lsg"><m-e18-bild name="wirbel-farbig" gr="9"></m-e18-bild></span></span><span>landest, dann</span><span class="e18-l"><span class="lsg">tauscht die Plätze.</span></span></div>
+      <div class="e18-z"><span>Wenn du auf</span><span class="e18-feldchen"></span><span>landest, dann</span><span class="e18-l"></span></div>
+      <div class="e18-z e18-fest"><span>Dann ist die oder der Nächste dran.</span></div>
+    </div>
+    <div class="e18-z"><span>Wer gewinnt?</span><span class="e18-l"><span class="lsg">wer zuerst im Schloss ist</span></span></div>
+  </div>
+
+  <div class="aufg ohne-nr">
+    <p class="anw"><b>Testbogen:</b> {{KIND}}, testet dein Spiel! Nach jedem Spiel eine Zeile.</p>
+    <table class="e18-tb">
+      <tr><th></th><th>Wer spielt mit?</th><th>Wer beginnt?</th><th>Wer gewinnt?</th><th>Fertig?</th><th>Spaß?</th></tr>
+      <tr><td>1</td><td></td><td></td><td></td><td class="e18-jn">ja nein</td><td><span class="e18-sterne"><m-symbol name="sternLeer" gr="6"></m-symbol><m-symbol name="sternLeer" gr="6"></m-symbol><m-symbol name="sternLeer" gr="6"></m-symbol></span></td></tr>
+      <tr><td>2</td><td></td><td></td><td></td><td class="e18-jn">ja nein</td><td><span class="e18-sterne"><m-symbol name="sternLeer" gr="6"></m-symbol><m-symbol name="sternLeer" gr="6"></m-symbol><m-symbol name="sternLeer" gr="6"></m-symbol></span></td></tr>
+      <tr><td>3</td><td></td><td></td><td></td><td class="e18-jn">ja nein</td><td><span class="e18-sterne"><m-symbol name="sternLeer" gr="6"></m-symbol><m-symbol name="sternLeer" gr="6"></m-symbol><m-symbol name="sternLeer" gr="6"></m-symbol></span></td></tr>
+    </table>
+    <div class="e18-z"><span>Kobold gefunden:</span><span class="e18-l"></span></div>
+  </div>
+
+  <div class="profi" data-titel="Profi-Aufgabe: Ist dein Spiel fair?">
+    <div class="e18-profi-zeile"><span>Wer begonnen hat, hat gewonnen:</span><span><span class="e18-leer"></span> von <span class="e18-leer"></span> Spielen.</span></div>
+    <div class="e18-profi-zeile e18-fair2"><span>Ist dein Spiel fair?</span><span class="e18-wahl"><span class="e18-kreuz"></span><span>ja</span></span><span class="e18-wahl"><span class="e18-kreuz"></span><span>nein</span></span><span class="lsg-nur e18-inline">Selbst zählen!</span></div>
+  </div>
+</section>

@@ -1,0 +1,108 @@
+/* =====================================================================
+   Spiel-Plugin „geheim“ (Einheit 7): Geheimschrift-Rad, Wort-Karten, Bilder, Buchstaben
+   Hoch: Rad oben, Wort und Tasten unten. Quer: Rad links, Wort und Tasten rechts.
+   Die Größe des Rads rechnet web/spiele/geheim.js aus dem Platz im Feld (Dreh-Tasten in den Ecken).
+   ===================================================================== */
+.art-geheim { --kt: var(--t); --bt: calc(var(--t) * 1.3); }
+.art-geheim .programm { min-height: 0; }
+
+/* ----- Feld: Rad mit Dreh-Tasten, oder die Feen-Zeichen-Tabelle ----- */
+.geheim-feld { position: absolute; inset: 0; }
+.geheim-rad { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+.geheim-rad > svg { width: 100%; height: 100%; overflow: visible; }
+.geheim-rad text, .geheim-tabelle text, .geheim-icon text, .geheim-mini text { font-family: "Andika", "Comic Sans MS", sans-serif; }
+.taste.geheim-drehen { position: absolute; bottom: 0; border-color: var(--akzent); color: var(--akzent); background: #fff; }
+.taste.geheim-drehen svg { width: 84%; height: 84%; }
+.taste.geheim-links { left: 0; }
+.taste.geheim-rechts { right: 0; }
+
+/* Die innere Scheibe dreht sich sanft; jeder Buchstabe dreht sich gleich schnell zurück und bleibt aufrecht */
+.geheim-dreh, .geheim-auf { transition: transform var(--tempo) ease-in-out; transform-origin: 0 0; transform-box: view-box; }
+.geheim-sofort .geheim-dreh, .geheim-sofort .geheim-auf { transition: none; }
+@media (prefers-reduced-motion: reduce) { .geheim-dreh, .geheim-auf { transition: none; } }
+
+/* Such-Hilfe: angetippter Buchstabe golden umkreist */
+.geheim-lupe { fill: none; stroke: none; }
+.geheim-mark .geheim-lupe { fill: #ffd23f; stroke: #c79500; stroke-width: 1.6; }
+/* Die Zahl beim Stern: dunkel und fett auf Gold */
+.geheim-n-hg { fill: none; }
+.geheim-n.geheim-oben .geheim-n-hg { fill: #ffd23f; stroke: #c79500; stroke-width: 1; }
+.geheim-n.geheim-oben text { fill: #1f2340; font-size: 9.5px; }
+
+/* Feen-Zeichen-Tabelle: eine Reihe pro Form, angetippte Form golden */
+.geheim-feld-tabelle { display: flex; align-items: center; justify-content: center; }
+.geheim-tabelle { width: 100%; height: 100%; }
+.geheim-zeile { fill: #f7f4ec; stroke: none; }
+.geheim-zeile.geheim-an { fill: #fff4cc; stroke: #f2b705; stroke-width: 5; }
+
+/* ----- Wort: Karten (oben), Plätze bzw. Probe darunter ----- */
+.geheim-wort { display: flex; flex-direction: column; align-items: center; gap: 6px; max-width: 100%; }
+.geheim-reihe { display: flex; align-items: flex-end; justify-content: center; gap: 8px; max-width: 100%; }
+.geheim-spalte { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.geheim-luecke { width: 14px; flex: none; }
+.geheim-karte, .geheim-platz, .geheim-probe-feld {
+  width: var(--kt); height: var(--kt); flex: none; padding: 0; margin: 0;
+  display: flex; align-items: center; justify-content: center;
+  border: 3px solid var(--tinte); border-radius: 12px; background: #fff;
+  font: inherit; font-weight: 700; font-size: calc(var(--kt) * 0.56); line-height: 1; color: var(--tinte);
+}
+button.geheim-karte, button.geheim-platz { cursor: pointer; box-shadow: 0 3px 0 rgba(31, 35, 64, 0.18); }
+button.geheim-karte:active, button.geheim-platz:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(31, 35, 64, 0.18); }
+.geheim-karte:focus-visible, .geheim-platz:focus-visible { outline: 4px solid var(--gold); outline-offset: 2px; }
+/* Geheim-Buchstaben grün-blau wie innen am Rad, normale Buchstaben dunkel wie außen */
+.geheim-karte.geheim-gk { border-color: #0f8f87; color: #0b6b65; background: #e3f6f4; }
+.geheim-karte.geheim-kk { color: var(--tinte); }
+.geheim-karte.geheim-feen { border-color: #9a9db0; }
+.geheim-karte.geheim-feen svg { width: 84%; height: 84%; }
+.geheim-karte.geheim-an { border-color: #c79500; background: #ffd23f; color: var(--tinte); box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--gold); }
+.geheim-wortbild { width: var(--kt); height: var(--kt); flex: none; align-self: flex-start; margin-right: 4px; }
+.geheim-wortbild svg { width: 100%; height: 100%; }
+
+/* Plätze (schreiben): leer gestrichelt, der Platz, der dran ist, golden, ein Platz zum Nachschauen rot */
+.geheim-platz { color: #0b6b65; }
+.geheim-platz.geheim-leer { border: 3px dashed #7d8299; }
+.geheim-platz.geheim-voll { border-color: #0f8f87; background: #e3f6f4; }
+.geheim-platz.geheim-dran { border: 4px solid var(--gold); background: var(--gold-hell); box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--gold); }
+.geheim-platz.geheim-falsch { border: 4px solid var(--rot); background: #fde7ec; }
+.geheim-platz:disabled { opacity: 1; cursor: default; }
+
+/* Probe (knacken): so heißt es mit der Zahl beim Stern (normale Buchstaben, darum dunkel) */
+.geheim-probe-feld { height: calc(var(--kt) * 0.82); border: 3px dashed #b7b1a6; box-shadow: none; font-size: calc(var(--kt) * 0.5); }
+.geheim-probe-feld.geheim-voll { border: 3px solid var(--tinte); background: #fff; }
+.geheim-probiert { font-size: 0.9rem; color: var(--grau); line-height: 1.2; }
+
+/* ----- Tasten: Bilder, Probe, Buchstaben ----- */
+.geheim-bilder, .geheim-abc { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: var(--abst); max-width: 100%; }
+.taste.geheim-bildtaste { width: var(--bt); height: var(--bt); padding: 0; border-radius: 16px; }
+.taste.geheim-bildtaste svg { width: 80%; height: 80%; }
+.taste.geheim-bildtaste.geheim-passt-nicht { opacity: 0.4; box-shadow: none; }
+.taste.geheim-bildtaste.geheim-gewaehlt { border-color: #c79500; background: var(--gold-hell); box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--gold); }
+.taste.geheim-probe {
+  width: var(--bt); height: var(--bt); padding: 0; border-radius: 16px;
+  flex-direction: column; gap: 0;
+  background: var(--akzent); border-color: #0b6b65; color: #fff;
+}
+.taste.geheim-probe svg { width: 56%; height: 56%; }
+.taste.geheim-probe span { font-size: 0.8rem; line-height: 1; }
+.geheim-mit-probe .taste.geheim-probe { margin-right: 6px; }
+.taste.geheim-buchstabe { font-size: 1.6rem; color: #0b6b65; border-color: #0f8f87; background: #e3f6f4; }
+/* 7 oder 8 Buchstaben und Löschen: zwei Reihen zu 4 bzw. 5 */
+.geheim-abc[data-n="8"] { display: grid; grid-template-columns: repeat(4, auto); justify-content: center; }
+.geheim-abc[data-n="9"] { display: grid; grid-template-columns: repeat(5, auto); justify-content: center; }
+
+/* Quer: Wort und Tasten rechts */
+@media (orientation: landscape) {
+  .art-geheim .programm { flex: 0 0 auto; }
+  .art-geheim .spalte-rechts { justify-content: center; }
+  .geheim-mit-probe .taste.geheim-probe { margin-right: 0; }
+}
+/* Kleine Handys quer: etwas kleinere Karten und Bilder */
+@media (orientation: landscape) and (max-height: 500px) {
+  .art-geheim { --kt: 50px; --bt: 64px; }
+  .geheim-wort { gap: 4px; }
+  .geheim-spalte { gap: 8px; }
+}
+/* Schmale Handys hoch: 5 Karten und Bilder passen nebeneinander */
+@media (orientation: portrait) and (max-width: 400px) {
+  .art-geheim { --bt: 66px; }
+}

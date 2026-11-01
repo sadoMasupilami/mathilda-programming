@@ -1,0 +1,115 @@
+/* =====================================================================
+   Spiel-Plugin „muster“ (Einheit 6): Perlen-Reihen, Auswahl, Zauber-Kasten
+   Hoch: Perlen oben, Auswahl und Tasten unten. Quer: Perlen links, Tasten rechts.
+   Die Größe der Perlen (--s) rechnet web/spiele/muster.js aus dem Platz im Feld.
+   ===================================================================== */
+.art-muster .programm { min-height: 0; }
+.art-muster .programm:empty { display: none; }
+.art-muster { --kz: 44px; }
+@media (min-width: 700px) and (min-height: 700px) {
+  .art-muster { --kz: 58px; }
+}
+
+/* ----- Feld: Perlen auf der Schnur, in Reihen ----- */
+.muster-feld {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.muster-block { display: flex; flex-direction: column; align-items: flex-start; gap: var(--zg); }
+.muster-paar { display: flex; flex-direction: column; gap: var(--pg); }
+.muster-zeile { position: relative; display: flex; align-items: center; gap: var(--g); }
+.muster-schnur::before {
+  content: ""; position: absolute; z-index: 0;
+  left: calc(var(--g) * -1); right: calc(var(--g) * -1); top: 50%;
+  border-top: 3px solid #9a9db0; transform: translateY(-50%);
+}
+.muster-p {
+  position: relative; z-index: 1; flex: none;
+  width: var(--s); height: var(--s); padding: 0; margin: 0;
+  display: flex; align-items: center; justify-content: center;
+  border: 3px solid transparent; border-radius: 12px; background: transparent;
+  color: inherit; font: inherit;
+}
+.muster-p > svg { width: 84%; height: 84%; flex: none; }
+button.muster-p { cursor: pointer; }
+button.muster-p:disabled { opacity: 1; cursor: default; }
+button.muster-p:focus-visible { outline: 4px solid var(--gold); outline-offset: 2px; }
+
+/* Fortsetzen: leere Plätze gestrichelt, eigene Perlen mit Rand, der Platz, der dran ist, golden */
+.muster-platz.muster-leer { border: 3px dashed #7d8299; background: #fff; }
+.muster-platz.muster-voll { border-color: var(--akzent); background: #fff; }
+.muster-platz.muster-dran { border: 4px solid var(--gold); background: var(--gold-hell); box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--gold); }
+.muster-p.muster-falsch { border: 4px solid var(--rot); background: #fde7ec; }
+.muster-platz.muster-dran.muster-falsch { border-color: var(--rot); background: #fde7ec; box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--gold); }
+
+/* Kobold: angetippte Perle und die getauschte */
+.muster-perle.muster-wahl { border-color: var(--akzent); background: var(--akzent-hell); box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--akzent); }
+.muster-perle.muster-getauscht { border-color: var(--akzent); background: #fff; }
+.muster-tausch {
+  position: absolute; top: -9px; right: -9px; width: 24px; height: 24px;
+  background: #fff; border-radius: 50%; box-shadow: 0 0 0 2px var(--akzent);
+  display: flex; align-items: center; justify-content: center;
+}
+.muster-tausch svg { width: 20px; height: 20px; }
+
+/* Zauber-Kasten: darunter malt der Kasten das Armband (lila Streifen wie der Kasten) */
+.muster-zeile.muster-unten { background: var(--zauber-hell); border-radius: 12px; box-shadow: 0 0 0 4px var(--zauber-hell); }
+.muster-erg.muster-frei { background: #fff; border-color: #fff; }
+.muster-erg.muster-jetzt { border-color: #c79500; background: var(--gold-hell); }
+.muster-zauber .muster-fest.muster-falsch { border-color: var(--rot); background: #fff; }
+
+/* Geschafft: unter jedem Muster-Kern ein Strich, abwechselnd lila und gold (so sieht man, wie oft er sich wiederholt) */
+.muster-p.muster-band::after {
+  content: ""; position: absolute; z-index: 0;
+  left: calc(var(--g) / -2 - 3px); right: calc(var(--g) / -2 - 3px);
+  bottom: -14px; height: 7px; background: var(--zauber);
+}
+.muster-p.muster-band-b::after { background: var(--gold); }
+.muster-p.muster-band-start::after { left: 1px; border-top-left-radius: 4px; border-bottom-left-radius: 4px; }
+.muster-p.muster-band-ende::after { right: 1px; border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
+
+/* ----- Programm: der Zauber-Kasten (wie am Papier: Zahl, „-mal“, bis zu 3 Plätze) ----- */
+.muster-prog { display: flex; align-items: center; justify-content: center; gap: var(--abst); }
+.muster-kasten {
+  display: inline-flex; flex-direction: column; gap: 4px;
+  border: 3px solid var(--zauber); background: var(--zauber-hell); border-radius: 12px;
+  padding: 3px 8px 8px;
+}
+.muster-mal { display: flex; align-items: baseline; gap: 0; font-weight: 700; color: var(--zauber); font-size: 1.05rem; line-height: 1.15; border-radius: 6px; padding: 0 2px; }
+.muster-zahl-anz { font-size: 1.3rem; }
+.muster-zahl-leer { border: 2px dashed var(--zauber); border-radius: 6px; padding: 0 4px; margin-right: 2px; font-size: 1.05rem; }
+.muster-runde { font-weight: 400; font-size: 0.8rem; color: #4b2a9a; margin-left: 10px; }
+.muster-mal.muster-warn { background: #fde7ec; box-shadow: 0 0 0 3px var(--rot); }
+.muster-innen { display: flex; gap: 6px; }
+.muster-k {
+  width: var(--kz, 44px); height: var(--kz, 44px); flex: none;
+  border: 2.5px dashed #a99bd6; border-radius: 9px; background: #fff;
+  display: flex; align-items: center; justify-content: center;
+}
+.muster-k-voll { border-style: solid; border-color: var(--zauber); }
+.muster-k-aktiv { background: var(--gold-hell); border-color: #c79500; box-shadow: 0 0 0 3px var(--gold); }
+.muster-k > svg { width: 82%; height: 82%; }
+
+/* ----- Tasten: Auswahl (Palette), Zahlen, Nochmal und Los ----- */
+.muster-palette, .muster-zahlen { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--abst); }
+.taste.muster-el { background: #fff; border-color: var(--tinte); }
+.taste.muster-el svg { width: 80%; height: 80%; }
+.taste.muster-zahl.muster-gewaehlt { background: var(--zauber); color: #fff; border-color: #5a34a8; }
+/* Sechs Perlen nebeneinander passen auf ein schmales Handy nur etwas kleiner */
+@media (orientation: portrait) and (max-width: 420px) {
+  .muster-palette[data-n="6"] { gap: 8px; }
+  .muster-palette[data-n="6"] .taste { --t: 50px; }
+}
+
+/* Quer: rechte Spalte schmaler (die Perlen brauchen den Platz), Auswahl in Reihen zu 3 */
+@media (orientation: landscape) {
+  .art-muster .spalte-rechts { flex: 0 0 clamp(280px, 40%, 460px); }
+  .art-muster .programm { flex: 0 0 auto; }
+  /* Das Geschafft-Fenster liegt nur über den Tasten, die Perlen bleiben zu sehen */
+  .art-muster .dialog { width: min(100%, max(280px, 38vw), 440px); }
+  .muster-palette[data-n="5"], .muster-palette[data-n="6"] { display: grid; grid-template-columns: repeat(3, auto); justify-content: center; }
+}
+@media (orientation: landscape) and (max-height: 500px) {
+  .art-muster { --kz: 40px; }
+  .muster-kasten { padding: 2px 7px 6px; gap: 3px; }
+}
