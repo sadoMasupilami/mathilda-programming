@@ -56,7 +56,9 @@ for (const p of daten.pakete) {
   if (p.levels.length < 5 || p.levels.length > 9) warnungen.push('Paket ' + p.paket + ' hat ' + p.levels.length + ' Levels (geplant 5–9)');
   for (const l of p.levels) {
     if (!SPIELBAR.includes(l.art)) fehler.push('Level ' + l.id + ': art „' + l.art + '“ ist in der App nicht spielbar (' + SPIELBAR.join(', ') + ')');
-    if ((l.art === 'pfad' || l.art === 'kobold') && !l.ziel) fehler.push('Level ' + l.id + ': ohne Ziel nicht spielbar');
+    // mehrere Gitter ("welten"): jedes braucht ein Ziel (eigenes oder das gemeinsame des Levels)
+    const ohneZiel = Array.isArray(l.welten) && l.welten.length ? l.welten.some((w) => !(w && w.ziel) && !l.ziel) : !l.ziel;
+    if ((l.art === 'pfad' || l.art === 'kobold') && ohneZiel) fehler.push('Level ' + l.id + ': ohne Ziel nicht spielbar');
     if (l.art === 'pfad' && l.maxKarten && l.maxKarten > 12) fehler.push('Level ' + l.id + ': maxKarten höchstens 12');
   }
 }
