@@ -192,7 +192,7 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
 }
 .kachel-bild { width: min(92px, 40%); aspect-ratio: 1; display: flex; align-items: center; justify-content: center; flex: 0 1 auto; min-height: 0; }
 .kachel-bild > svg { width: 100%; height: 100%; }
-.kachel-titel { font-weight: 700; font-size: 1rem; text-align: center; line-height: 1.15; }
+.kachel-titel { font-weight: 700; font-size: 1rem; text-align: center; line-height: 1.15; -webkit-hyphens: auto; hyphens: auto; }
 .kachel-stand { display: flex; align-items: center; gap: 6px; color: var(--grau); font-size: 0.9rem; }
 .mini-stern { width: 24px; height: 24px; display: inline-block; flex: none; }
 .mini-stern svg { width: 100%; height: 100%; }
@@ -218,10 +218,14 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
 
 @media (orientation: landscape) {
   .kacheln { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .kacheln[data-n="5"] { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  /* 5 Pakete: auf kleinen Handys quer 3 + 2 (lange Wörter wie „Geheimschrift“ passen), ab 740 px fünf nebeneinander */
+  .kacheln[data-n="5"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .kacheln[data-n="1"], .kacheln[data-n="2"], .kacheln[data-n="3"] { grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); }
   .start-drache { width: 52px; height: 52px; }
   .start h1 { font-size: 1.4rem; }
+}
+@media (orientation: landscape) and (min-width: 740px) {
+  .kacheln[data-n="5"] { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 }
 
 /* ---------------------------------------------------------------------
