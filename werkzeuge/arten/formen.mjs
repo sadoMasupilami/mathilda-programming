@@ -34,11 +34,16 @@
 //   Backtracking zählt alle (z. B. 3 · 3 mit Schrägen-Regel: keines; Farben und Formen 3 · 3: 72).
 //
 // aufgabe "duell": das Spiel Formen-Duell (abwechselnd legen, wer nicht legen kann, verliert)
-//   { n: 3, gewinnt: "erste" } bzw. { n: 4, gewinnt: "zweite" }
-//   Spielbaum: Der Löser zeigt, dass der Trick aus der Anleitung gegen jeden Zug funktioniert:
-//   n = 4: Die Zweite legt immer dieselbe Form genau gegenüber (durch die Mitte gespiegelt).
-//   n = 3: Die Erste legt in die Mitte, dann immer gegenüber, die Mitte-Form bleibt gleich,
-//          die anderen zwei Formen werden getauscht. Für n = 3 auch der ganze Spielbaum.
+//   n = 4: { n: 4, gewinnt: "zweite" }  Spielbaum: Der Spiegel-Trick der Anleitung (die Zweite legt
+//          immer dieselbe Form genau gegenüber) funktioniert gegen jeden Zug.
+//   n = 3 ohne Stein: { n: 3, gewinnt: "erste", immer: true }  Ganzer Spielbaum: Jedes Spiel endet
+//          nach einer ungeraden Zahl von Karten (5, 7 oder 9), also gewinnt immer die Erste, egal wie
+//          beide spielen. Darum braucht das normale Duell den Stein.
+//   n = 3 mit Stein: { n: 3, stein: true, gewinnt: "zweite", zufallErste: 44 }  Ein Feld ist gesperrt.
+//          Für jedes der 9 Steinfelder der ganze Spielbaum: Wer bei bestem Spiel gewinnt (gewinnt),
+//          die genaue Gewinnchance der Ersten in Prozent, wenn beide zufällig legen (zufallErste,
+//          gerundet), und dass das Spiel offen ist (Endstellungen mit gerader und ungerader
+//          Kartenzahl, Gewinnchance zwischen 30 und 70 Prozent). Alle 9 Steinfelder gleich.
 
 import '../../web/kern/formen.js';
 
@@ -212,9 +217,11 @@ function pruefeMindestens(r, F) {
 }
 
 // Formen-Duell: Spielbaum und Trick
+//   Brett als Zahlen: 0 leer, 1 … n Formen, -1 Stein (dort darf keine Karte hin)
 function pruefeDuell(r, F) {
   const n = r.n;
   if (n !== 3 && n !== 4) return F('Formen-Duell nur 3 · 3 oder 4 · 4');
+  if (r.stein && n !== 3) return F('Formen-Duell mit Stein nur 3 · 3');
   const N = n * n;
   const erlaubt = (b, i, f) => {
     const x = i % n, y = (i / n) | 0;
@@ -226,11 +233,11 @@ function pruefeDuell(r, F) {
     for (let i = 0; i < N; i++) if (!b[i]) for (let f = 1; f <= n; f++) if (erlaubt(b, i, f)) z.push([i, f]);
     return z;
   };
-  const gegenueber = (i) => N - 1 - i;
-  let trickOk = true, zustaende = 0;
-  const gesehen = new Set();
   if (n === 4) {
     // Die Zweite spiegelt: dieselbe Form genau gegenüber
+    const gegenueber = (i) => N - 1 - i;
+    let trickOk = true, zustaende = 0;
+    const gesehen = new Set();
     (function spiel(b) {
       const key = b.join('');
       if (gesehen.has(key)) return;
@@ -245,44 +252,62 @@ function pruefeDuell(r, F) {
         if (!trickOk) return;
       }
     })(new Array(N).fill(0));
-  } else {
-    // Die Erste legt in die Mitte (Form 1), dann gegenüber: Form 1 bleibt, 2 und 3 tauschen
-    const tausch = [0, 1, 3, 2];
-    const start = new Array(N).fill(0);
-    start[4] = 1;
-    (function spiel(b) {
-      const key = b.join('');
-      if (gesehen.has(key)) return;
-      gesehen.add(key);
-      zustaende++;
-      for (const [i, f] of zuege(b)) {
+    if (!trickOk) F('Der Spiegel-Trick funktioniert nicht gegen jeden Zug');
+    if (r.gewinnt !== undefined && r.gewinnt !== 'zweite') F('Mit dem Spiegel-Trick gewinnt die zweite, nicht die ' + r.gewinnt);
+    return { n, gewinnt: 'zweite', trickOk, zustaende };
+  }
+  // n = 3: der ganze Spielbaum (für jedes Steinfeld bzw. ohne Stein)
+  function baum(start) {
+    const sieg = new Map();     // Gewinnt, wer am Zug ist (bei bestem Spiel)?
+    const chance = new Map();   // Gewinnchance dessen, der am Zug ist, wenn beide zufällig legen
+    const enden = new Set();    // Kartenzahl in den Endstellungen
+    const karten = (b) => b.filter((v) => v > 0).length;
+    (function gehe(b) {
+      const key = b.join(',');
+      if (sieg.has(key)) return;
+      const z = zuege(b);
+      if (!z.length) { sieg.set(key, false); chance.set(key, 0); enden.add(karten(b)); return; }
+      let w = false, c = 0;
+      for (const [i, f] of z) {
         b[i] = f;
-        const j = gegenueber(i);
-        if (!erlaubt(b, j, tausch[f])) trickOk = false;
-        else { b[j] = tausch[f]; spiel(b); b[j] = 0; }
+        gehe(b);
+        const k = b.join(',');
+        if (!sieg.get(k)) w = true;
+        c += 1 - chance.get(k);
         b[i] = 0;
-        if (!trickOk) return;
       }
-    })(start);
+      sieg.set(key, w);
+      chance.set(key, c / z.length);
+    })(start.slice());
+    const key = start.join(',');
+    return { ersteGewinnt: sieg.get(key), zufallErste: chance.get(key), enden: [...enden].sort((a, b) => a - b), stellungen: sieg.size };
   }
-  if (!trickOk) F('Der Trick funktioniert nicht gegen jeden Zug');
-  const gewinnt = n === 4 ? 'zweite' : 'erste';
-  let baum = null;
-  if (n === 3) {
-    const memo = new Map();
-    const amZugGewinnt = (b) => {
-      const key = b.join('');
-      if (memo.has(key)) return memo.get(key);
-      let w = false;
-      for (const [i, f] of zuege(b)) { b[i] = f; const g = amZugGewinnt(b); b[i] = 0; if (!g) { w = true; break; } }
-      memo.set(key, w);
-      return w;
-    };
-    baum = { ersteGewinnt: amZugGewinnt(new Array(N).fill(0)), zustaende: memo.size };
-    if (!baum.ersteGewinnt) F('Spielbaum: Die Erste kann nicht immer gewinnen');
+  if (!r.stein) {
+    const b = baum(new Array(N).fill(0));
+    if (!b.ersteGewinnt) F('Spielbaum ohne Stein: Die Erste gewinnt nicht');
+    const immer = b.enden.every((k) => k % 2 === 1);
+    if (r.immer && !immer) F('Ohne Stein endet nicht jedes Spiel mit einer ungeraden Kartenzahl: ' + b.enden.join(', '));
+    if (r.gewinnt !== undefined && r.gewinnt !== 'erste') F('Ohne Stein gewinnt die erste, nicht die ' + r.gewinnt);
+    return { n, gewinnt: 'erste', immer, enden: b.enden, stellungen: b.stellungen };
   }
-  if (r.gewinnt !== undefined && r.gewinnt !== gewinnt) F('Mit dem Trick gewinnt die ' + gewinnt + ', nicht die ' + r.gewinnt);
-  return { n, gewinnt, trickOk, zustaende, baum };
+  const proFeld = [];
+  for (let s = 0; s < N; s++) {
+    const start = new Array(N).fill(0);
+    start[s] = -1;
+    proFeld.push(baum(start));
+  }
+  const b0 = proFeld[0];
+  for (let s = 1; s < N; s++) {
+    const b = proFeld[s];
+    if (b.ersteGewinnt !== b0.ersteGewinnt || Math.abs(b.zufallErste - b0.zufallErste) > 1e-9) F('Mit Stein: Steinfeld ' + s + ' gibt ein anderes Ergebnis als Feld 0');
+  }
+  const gewinnt = b0.ersteGewinnt ? 'erste' : 'zweite';
+  const prozent = Math.round(b0.zufallErste * 100);
+  const offen = b0.enden.some((k) => k % 2 === 0) && b0.enden.some((k) => k % 2 === 1) && b0.zufallErste > 0.3 && b0.zufallErste < 0.7;
+  if (!offen) F('Mit Stein ist das Spiel nicht offen (Endstellungen ' + b0.enden.join(', ') + ', Erste gewinnt zufällig ' + prozent + ' %)');
+  if (r.gewinnt !== undefined && r.gewinnt !== gewinnt) F('Mit Stein gewinnt bei bestem Spiel die ' + gewinnt + ', nicht die ' + r.gewinnt);
+  if (r.zufallErste !== undefined && r.zufallErste !== prozent) F('Mit Stein gewinnt die Erste bei zufälligem Legen in ' + prozent + ' von 100 Spielen, nicht ' + r.zufallErste);
+  return { n, stein: true, gewinnt, zufallErste: prozent, enden: b0.enden, stellungen: b0.stellungen, steinfelder: N };
 }
 
 // Wie viele Formen-Quadrate gibt es (mit Schrägen-Regel, mit Farben)? Für Sätze wie „Ohne Anfang gibt es 72“.
@@ -313,7 +338,11 @@ function bericht(r) {
   if (a === 'kobold') return 'Kobold bei [' + l.feld + ']: ' + l.falsch + ' statt ' + l.richtig;
   if (a === 'mindestens') return 'mindestens ' + l.mindestens + ' Formen (' + l.quadrate + ' Quadrate), z. B. ' + (l.beispiel || []).join(' ') + (l.regelZweiFormen ? ', Regel für 2 Formen stimmt' : '');
   if (a === 'zaehlen') return l.anzahl + ' Formen-Quadrate ' + l.n + '·' + l.n + (l.diagonale ? ' mit Schrägen' : '') + (l.farben ? ' mit Farben' : '');
-  if (a === 'duell') return 'gewinnt: ' + l.gewinnt + ' (Trick geprüft, ' + l.zustaende + ' Stellungen)' + (l.baum ? ', Spielbaum ' + l.baum.zustaende + ' Stellungen' : '');
+  if (a === 'duell') {
+    if (l.n === 4) return 'gewinnt: zweite (Spiegel-Trick gegen jeden Zug geprüft, ' + l.zustaende + ' Stellungen)';
+    if (l.stein) return 'mit Stein (alle ' + l.steinfelder + ' Felder gleich): bei bestem Spiel gewinnt die ' + l.gewinnt + ', zufällig die Erste in ' + l.zufallErste + ' %, Spiele enden nach ' + l.enden.join('/') + ' Karten (' + l.stellungen + ' Stellungen)';
+    return 'ohne Stein: gewinnt ' + (l.immer ? 'immer' : 'bei bestem Spiel') + ' die ' + l.gewinnt + ', Spiele enden nach ' + l.enden.join('/') + ' Karten (' + l.stellungen + ' Stellungen)';
+  }
   return '';
 }
 

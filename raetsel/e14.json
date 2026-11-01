@@ -24,6 +24,13 @@
     { "id": "e14-e3", "art": "formen", "titel": "Beispiel: zwei Formen reichen", "n": 3, "logik": 2,
       "vorgabe": ["K..", "..D", "..."] },
 
+    { "id": "e14-kq3", "art": "formen", "titel": "Karten-Quadrat am Boden, 3 Karten weg (Herz = Kreis, Pik = Dreieck, Karo = Quadrat)", "n": 3, "logik": 1,
+      "vorgabe": ["KD.", "DQ.", "QK."] },
+    { "id": "e14-kq6", "art": "formen", "titel": "Karten-Quadrat am Boden, 6 Karten weg", "n": 3, "logik": 2,
+      "vorgabe": ["KD.", "...", "Q.."] },
+    { "id": "e14-kqk", "art": "formen", "aufgabe": "kobold", "titel": "Karten-Quadrat am Boden, Kobold: Herz statt Karo in der Mitte", "n": 3,
+      "vorgabe": ["KDQ", "DKK", "QKD"], "kobold": [1, 1], "richtig": "Q" },
+
     { "id": "e14-c1", "art": "formen", "titel": "Mit Schrägen", "n": 4, "diagonale": true, "logik": 2,
       "vorgabe": ["QK..", "....", "K.D.", "...."] },
     { "id": "e14-c2", "art": "formen", "titel": "Farben und Formen", "n": 3, "farben": ["rot", "blau", "gelb"], "logik": 2, "getrennt": true,
@@ -50,7 +57,8 @@
     { "id": "e14-z4s", "art": "formen", "aufgabe": "zaehlen", "n": 4, "diagonale": true, "erwartet": 48 },
     { "id": "e14-z9", "art": "formen", "aufgabe": "zaehlen", "n": 3, "farben": ["rot", "blau", "gelb"], "erwartet": 72 },
     { "id": "e14-z16", "art": "formen", "aufgabe": "zaehlen", "n": 4, "farben": ["rot", "blau", "gelb", "gruen"], "erwartet": 6912 },
-    { "id": "e14-d3", "art": "formen", "aufgabe": "duell", "n": 3, "gewinnt": "erste" },
+    { "id": "e14-d3", "art": "formen", "aufgabe": "duell", "n": 3, "gewinnt": "erste", "immer": true },
+    { "id": "e14-d3s", "art": "formen", "aufgabe": "duell", "n": 3, "stein": true, "gewinnt": "zweite", "zufallErste": 44 },
     { "id": "e14-d4", "art": "formen", "aufgabe": "duell", "n": 4, "gewinnt": "zweite" }
   ]
 }
