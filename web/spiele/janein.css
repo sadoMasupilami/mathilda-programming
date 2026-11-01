@@ -130,7 +130,7 @@ button.janein-ding:focus-visible, .janein-finger:focus-visible { outline: 4px so
    So bekommen die Karten (und die Hand) die ganze Höhe, auch am kleinen Handy quer. ----- */
 @media (orientation: landscape) {
   .spiel.art-janein {
-    --rechts: clamp(276px, 34vw, 440px);
+    --rechts: clamp(290px, 34vw, 440px);
     display: grid;
     grid-template-columns: minmax(0, 1fr) var(--rechts);
     grid-template-rows: auto minmax(0, 1fr) auto auto;

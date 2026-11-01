@@ -93,13 +93,13 @@
   const HAND_ICON = '<svg viewBox="0 0 140 140" aria-hidden="true"><g transform="translate(0 2)">' + ohneKopf(J.hand([false, false, false, true, true])) + '</g></svg>';
   const ICONS = { karten: KARTE_ICON, lampen: LAMPE_ICON, finger: HAND_ICON, ziffern: KARTE_ICON };
 
-  // Paket-Bild: drei Karten wie in der Hand, die mittlere umgedreht (4 · Nein · 1 ist 5)
+  // Paket-Bild: drei Karten, hinten eine umgedrehte (Nein), vorne zwei mit Punkten (Ja)
   function paketBild() {
     const k = (svg, x, y, w) => svg.replace('<svg ', '<svg x="' + x + '" y="' + y + '" width="' + w + '" height="' + r1(w * 1.4) + '" ');
     return '<svg class="janein-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-hidden="true">' +
-      '<g transform="rotate(-15 26 74)">' + k(J.karte(4, { nummer: false }), 2, 20, 44) + '</g>' +
-      '<g transform="rotate(15 74 74)">' + k(J.karte(1, { nummer: false }), 54, 20, 44) + '</g>' +
-      '<g>' + k(J.karte(2, { ja: false }), 28, 8, 44) + '</g></svg>';
+      '<g>' + k(J.karte(2, { ja: false }), 29, 4, 42) + '</g>' +
+      '<g transform="rotate(-10 25 60)">' + k(J.karte(4, { nummer: false }), 4, 31, 42) + '</g>' +
+      '<g transform="rotate(10 75 60)">' + k(J.karte(1, { nummer: false }), 54, 31, 42) + '</g></svg>';
   }
 
   // ---------------------------------------------------------------------
@@ -203,7 +203,7 @@
   function neu(api) {
     const lv = api.lv;
     const z = api.zustand;
-    for (const k of Object.keys(z)) if (k !== 'beob' && k !== 'masse') delete z[k];
+    for (const k of Object.keys(z)) if (!['beob', 'masse', 'groesse'].includes(k)) delete z[k];
     z.aufgabe = lv.aufgabe;
     z.aussehen = lv.aussehen || 'karten';
     z.n = J.anzahl(lv.anzahl);
@@ -455,7 +455,7 @@
         z.fertig = true;
         z.ergebnis = 'geschafft';
         zeichne(api);
-        api.geschafft({ zusatz: J.rechnung(z.ja, z.n) });
+        api.geschafft({ zusatz: rechnungText(z) });
       });
     }
     z.ergebnis = 'nicht';
@@ -463,6 +463,9 @@
     zeichne(api);
     api.meldung(x + ' ist ' + (b.art === 'zuviel' ? 'zu viel' : 'zu wenig') + '. ' + z.w.nochmalSchauen, 'hinweis', icon(api));
   }
+
+  // Die Rechnung für das Geschafft-Fenster, ohne Zeilenumbruch mitten in der Rechnung (geschützte Leerzeichen)
+  function rechnungText(z) { return J.rechnung(z.ja, z.n).replace(/ /g, '\u00a0'); }
 
   // ---------------------------------------------------------------------
   // Los: die Punkte der Ja-Karten langsam zusammenzählen, dann bewerten
@@ -506,7 +509,7 @@
         z.fertig = true;
         z.ergebnis = 'geschafft';
         zeichne(api);
-        const r = J.rechnung(z.ja, z.n);
+        const r = rechnungText(z);
         const zus = z.aussehen === 'ziffern' ? J.ziffern(z.ja) + ' ist ' + r : r;
         return api.geschafft({ zusatz: z.aufgabe === 'kobold' ? 'Kobold erwischt! ' + zus : zus });
       }
@@ -527,28 +530,29 @@
     if (sp) sp.classList.add('janein-' + api.lv.aufgabe, 'janein-aussehen-' + (api.lv.aussehen || 'karten'));
     geruest(api);
     zeichne(api);
-    // Neu zeichnen, wenn sich der Platz ändert (Drehen, längere Rechnung): Größe der Karten anpassen
+    // Neu zeichnen, wenn sich der Platz ändert (Drehen, längere Rechnung): Größe der Karten anpassen.
+    // Gleich im ResizeObserver (nicht erst im nächsten Bild): Die Bühne selbst ändert sich dabei nicht.
+    // Dazu das resize-Ereignis des Fensters, falls ein Browser den ResizeObserver spät meldet.
     const z = api.zustand;
     const buehne = api.feld && api.feld.querySelector('.janein-buehne');
-    if (z.beob) { z.beob.disconnect(); z.beob = null; }
-    if (window.ResizeObserver && buehne) {
-      let geplant = false;
-      z.beob = new ResizeObserver(() => {
-        if (geplant) return;
-        geplant = true;
-        requestAnimationFrame(() => {
-          geplant = false;
-          if (!buehne.isConnected) return;
-          const m = z.masse;
-          if (!m || Math.abs(buehne.clientWidth - m.W) > 1 || Math.abs(buehne.clientHeight - m.H) > 1) zeichneDinge(api);
-        });
-      });
+    stopp(api);
+    if (!buehne) return;
+    z.groesse = () => {
+      if (!buehne.isConnected) return;
+      const m = z.masse;
+      if (!m || Math.abs(buehne.clientWidth - m.W) > 1 || Math.abs(buehne.clientHeight - m.H) > 1) zeichneDinge(api);
+    };
+    if (window.ResizeObserver) {
+      z.beob = new ResizeObserver(z.groesse);
       z.beob.observe(buehne);
     }
+    window.addEventListener('resize', z.groesse);
   }
   function stopp(api) {
     const z = api.zustand;
-    if (z && z.beob) { z.beob.disconnect(); z.beob = null; }
+    if (!z) return;
+    if (z.beob) { z.beob.disconnect(); z.beob = null; }
+    if (z.groesse) { window.removeEventListener('resize', z.groesse); z.groesse = null; }
   }
 
   SPIELE.janein = {
