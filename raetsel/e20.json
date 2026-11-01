@@ -846,6 +846,36 @@
    "beispiel": "bis[wenn[stein: rechts sonst vor]]"
   },
   {
+   "id": "e20-x-labyrinth2-l",
+   "art": "lesen",
+   "b": 4,
+   "h": 4,
+   "start": {
+    "x": 0,
+    "y": 3,
+    "blick": "oben"
+   },
+   "ziel": {
+    "x": 3,
+    "y": 0
+   },
+   "hindernisse": [
+    [
+     2,
+     3
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     0
+    ]
+   ],
+   "programm": "bis[wenn[frei: vor sonst rechts]]"
+  },
+  {
    "id": "e20-x-spruch",
    "art": "pfad",
    "aufgabe": "ankommen",

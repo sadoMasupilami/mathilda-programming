@@ -124,7 +124,7 @@
       <tr><td>3 Kobold</td><td>Befehl 2: rechts drehen statt links drehen</td></tr>
       <tr><td>4 Ja/Nein</td><td>13 = 8 + 4 + 1: Ringfinger, Mittelfinger, Daumen</td></tr>
       <tr><td>5 Formen</td><td>oben: Dreieck, Quadrat, Kreis; Mitte: Quadrat, Kreis, Dreieck; unten: Kreis, Dreieck, Quadrat</td></tr>
-      <tr><td>6 Steine</td><td>zuerst 2 nehmen, dann 6 und 3 liegen lassen</td></tr>
+      <tr><td>6 Steine</td><td>zuerst 2 nehmen (6 bleiben), dann 3 liegen lassen</td></tr>
       <tr><td>Fest-Rätsel</td><td>Schlüssel-Zahl 4 + 1 = 5</td></tr>
     </table>
   </div>
@@ -160,7 +160,7 @@
         <ul>
           <li><b>Ein Zug:</b> 1 oder 2 Steine nehmen. Abwechselnd, {{KIND}} fängt an.</li>
           <li><b>Ende:</b> Wer den letzten Stein nimmt, gewinnt.</li>
-          <li><b>Plan:</b> zuerst 2 nehmen, dann immer 6, dann 3 Steine liegen lassen.</li>
+          <li><b>Plan:</b> zuerst 2 nehmen, dann liegen 6. Danach immer so nehmen, dass 3 liegen bleiben.</li>
         </ul>
       </div>
     </div></li>
@@ -290,7 +290,7 @@
     <tbody>
     <tr><td><b class="e20-stname">1 Muster-Tanz</b> <span class="e20-einh">(Einheit 6)</span><br>Das Muster mitmachen und weitermachen, dann die nächsten 2 Bewegungen auf die Karte malen. Platz zum Tanzen.</td>
       <td><m-e6-folge raetsel="e20-muster" teil="voll" gr="4.5"></m-e6-folge><br>Weiter geht es mit klatschen, klatschen. Der Muster-Kern hat <m-e6-wert raetsel="e20-muster" wert="laenge" l="4"></m-e6-wert> Bewegungen.</td>
-      <td>Du klatschst ein Muster mit 5 im Kern vor, ohne Karte: <m-e6-folge raetsel="e20-muster2" gr="4"></m-e6-folge>. Weiter geht es mit klatschen, stampfen.</td></tr>
+      <td>Du klatschst ein Muster mit 5 im Kern vor, ohne Karte: <m-e6-folge raetsel="e20-muster2" gr="4"></m-e6-folge> Weiter geht es mit klatschen, stampfen.</td></tr>
     <tr><td><b class="e20-stname">2 Drachen-Station</b> <span class="e20-einh">(Einheit 2 und 5)</span><br>Programm mit höchstens 4 Karten legen, mit der Drachen-Figur prüfen. Befehlskarten, Zauber-Kasten, Drachen-Figur.</td>
       <td><m-e20-prog raetsel="e20-drache"></m-e20-prog>: 4 Karten, das einzige Programm mit 4 Karten. Ohne Kasten sind es <m-e20-wert raetsel="e20-drache" pfad="laenge" l="5"></m-e20-wert> Karten.</td>
       <td>Drachen-Figur am Start nach oben drehen, jetzt sind 5 Karten erlaubt. Zwei Lösungen: <m-e20-prog raetsel="e20-drache2" alle anzahl="2" gr="4.5"></m-e20-prog>.</td></tr>
@@ -298,14 +298,14 @@
       <td>Befehl 2 ist falsch: rechts drehen statt links drehen. Richtig: <m-e20-prog raetsel="e20-kobold"></m-e20-prog>. Mit dem Kobold-Befehl stößt der Drache bei Befehl 3 an den Rand.</td>
       <td>Gibt es noch eine andere Reparatur? Nein, der Löser hat alle probiert. Dann legt {{KIND}} dir ein Kobold-Programm mit den Befehlskarten.</td></tr>
     <tr><td><b class="e20-stname">4 Ja/Nein-Station</b> <span class="e20-einh">(Einheit 9)</span><br>Die 13 mit den Fingern einer Hand zeigen. Nichts, nur die Hand.</td>
-      <td><m-e9-loesung raetsel="e20-finger" gr="4.5"></m-e9-loesung>: Ringfinger, Mittelfinger und Daumen.</td>
-      <td>Zeig 25 und 31. <m-e9-loesung raetsel="e20-finger2" gr="4.5"></m-e9-loesung>: kleiner Finger, Ringfinger und Daumen. 31 sind alle fünf Finger, mehr geht mit einer Hand nicht.</td></tr>
+      <td><m-e9-loesung raetsel="e20-finger" gr="4.5"></m-e9-loesung><br>Hoch sind Ringfinger, Mittelfinger und Daumen.</td>
+      <td>Zeig 25 und 31.<br><m-e9-loesung raetsel="e20-finger2" gr="4.5"></m-e9-loesung><br>25: kleiner Finger, Ringfinger und Daumen. 31: alle fünf Finger, 16 + 8 + 4 + 2 + 1 = 31. Mehr geht mit einer Hand nicht.</td></tr>
     <tr><td><b class="e20-stname">5 Formen-Station</b> <span class="e20-einh">(Einheit 14)</span><br>Die 6 fehlenden Formen einmalen. Bleistift oder Buntstifte.</td>
       <td><m-e14-quadrat raetsel="e20-formen" feld="6" zeige mit-loesung></m-e14-quadrat> Tipp: Zuerst das Feld oben in der Mitte. In seiner Reihe ist schon ein Dreieck, in seiner Spalte ein Kreis, also kommt ein Quadrat hinein.</td>
       <td>Du zeichnest ein 4 · 4-Quadrat mit Stern auf einen Zettel (Vorgabe links), Lösung rechts: <m-e14-quadrat raetsel="e20-formen2" feld="6"></m-e14-quadrat> <m-e14-quadrat raetsel="e20-formen2" feld="6" zeige mit-loesung></m-e14-quadrat></td></tr>
     <tr><td><b class="e20-stname">6 Steine-Duell</b> <span class="e20-einh">(Einheit 15)</span><br>Gegen dich spielen, bis {{KIND}} gewinnt. 8 Muggelsteine.</td>
-      <td>Wer anfängt, gewinnt mit dem Plan: zuerst <m-e15-text raetsel="e20-steine" was="zug"></m-e15-text>, dann immer 6, dann 3 Steine liegen lassen. Gewinnzahlen: <m-e15-text raetsel="e20-steine" was="gz"></m-e15-text>.</td>
-      <td>10 Steine, jetzt darf man 1, 2 oder 3 nehmen. Plan: zuerst <m-e15-text raetsel="e20-steine2" was="zug"></m-e15-text>, dann 8, dann 4 liegen lassen.</td></tr>
+      <td>Wer anfängt, gewinnt mit dem Plan: <m-e15-stimmt spiel="steine 1-2" haufen="8" dran="du" gewinner="du" nimm="2">zuerst 2 nehmen, dann liegen 6</m-e15-stimmt>. Danach immer so nehmen, dass <m-e15-stimmt spiel="steine 1-2" gz="teil">3</m-e15-stimmt> Steine liegen bleiben. Gewinnzahlen: <m-e15-text raetsel="e20-steine" was="gz"></m-e15-text>.</td>
+      <td>10 Steine, jetzt darf man 1, 2 oder 3 nehmen. Plan: <m-e15-stimmt spiel="steine 1-3" haufen="10" dran="du" gewinner="du" nimm="2">zuerst 2 nehmen, dann liegen 8</m-e15-stimmt>. Danach immer so nehmen, dass <m-e15-stimmt spiel="steine 1-3" gz="teil">4</m-e15-stimmt> Steine liegen bleiben.</td></tr>
   </tbody>
   </table>
 
@@ -315,7 +315,7 @@
     <thead><tr><th>Station: Aufgabe (3–4 Minuten)</th><th>Lösung</th><th>Profi-Variante (mit Lösung)</th></tr></thead>
     <tbody>
     <tr><td><b class="e20-stname">Roboter-Spiel</b> <span class="e20-einh">(Einheit 1)</span><br>{{KIND}} programmiert Oma, Opa oder dich mit den Befehlskarten vom Sessel zum Kühlschrank. Dann ein Rätsel im Kopf: „Der Roboter macht rechts drehen, rechts drehen, rechts drehen. Wohin schaut er?“</td>
-      <td>Jedes Programm, das ankommt. Im Kopf: Er schaut nach links (drei Vierteldrehungen nach rechts sind eine nach links).</td>
+      <td>Jedes Programm, das ankommt. Im Kopf: Er schaut nach <m-e20-wert raetsel="e20-x-roboter" pfad="ende.blick" l="links"></m-e20-wert> (drei Vierteldrehungen nach rechts sind eine nach links).</td>
       <td>Der Roboter schaut {{KIND}} an, bevor es losgeht. Sie muss aus seiner Sicht denken (Hilfen für links und rechts).</td></tr>
     <tr><td><b class="e20-stname">Drachen-Pfad</b> <span class="e20-einh">(Einheit 2)</span><br>Finde das kürzeste Programm! Am Boden-Gitter oder Muggelstein-Brett (4 · 3 Felder):<br><m-e20-gitter raetsel="e20-x-pfad"></m-e20-gitter></td>
       <td><m-e20-prog raetsel="e20-x-pfad" gr="4.5"></m-e20-prog>, <m-e20-wert raetsel="e20-x-pfad" pfad="laenge" l="7"></m-e20-wert> Befehle, das einzige kürzeste. Der Stein liegt direkt vor der Nase.</td>
@@ -333,25 +333,25 @@
       <td>Mit Fragen genau in der Mitte reichen immer <m-e20-wert raetsel="e20-x-halbier" pfad="fragen" l="5"></m-e20-wert> Fragen (32, 16, 8, 4, 2, 1). Erste Frage: größer als 16?</td>
       <td>Von 1 bis 64: <m-e20-wert raetsel="e20-x-halbier2" pfad="fragen" l="6"></m-e20-wert> Fragen. Eine Frage mehr für doppelt so viele Zahlen.</td></tr>
     <tr><td><b class="e20-stname">Wenn-dann-Regel</b> <span class="e20-einh">(wie in Einheit 11)</span><br>Ein Programm für beide Gitter! Erst links aufbauen und laufen, dann Stein und Schatz umlegen wie rechts und dasselbe Programm noch einmal. Den Wenn-dann-Kasten zeichnet ihr auf einen Zettel, wie in Einheit 11.<br><m-e20-gitter raetsel="e20-x-wenn" welt="1"></m-e20-gitter> <m-e20-gitter raetsel="e20-x-wenn" welt="2"></m-e20-gitter></td>
-      <td><m-e20-prog raetsel="e20-x-wenn" gr="4.5"></m-e20-prog> (6 Karten, das einzige mit 6 Karten). Links ist vorne frei, der Drache geht noch einmal vor, rechts liegt dort ein Stein.</td>
+      <td><m-e20-prog raetsel="e20-x-wenn" gr="5.5"></m-e20-prog><br>(6 Karten, das einzige mit 6 Karten). Links ist vorne frei, der Drache geht noch einmal vor, rechts liegt dort ein Stein.</td>
       <td>Regel-Spiel ohne Papier: „Wenn ich klatsche, hüpfst du. Sonst stehst du still.“ Dann erfindet {{KIND}} eine Regel für dich, mit sonst.</td></tr>
     <tr><td><b class="e20-stname">Logikgitter</b> <span class="e20-einh">(Einheit 12)</span><br>Fest-Jause: Oma, Opa und du. Kuchen, Eis und Apfel, jeder mag genau eines. Hinweise: <m-e12-hinweise raetsel="e20-x-logik" gr="4.5"></m-e12-hinweise> Ein 3 · 3-Gitter auf einen Zettel zeichnen.</td>
       <td><m-e12-loesung raetsel="e20-x-logik"></m-e12-loesung>.</td>
-      <td>Fest-Hüte (rot, blau, gelb) für Drache, Einhorn und Katze: <m-e12-hinweise raetsel="e20-x-logik2" gr="4.5"></m-e12-hinweise> Lösung: <m-e12-loesung raetsel="e20-x-logik2"></m-e12-loesung>.</td></tr>
+      <td>Fest-Mützen (rot, blau, gelb) für Drache, Einhorn und Katze: <m-e12-hinweise raetsel="e20-x-logik2" gr="4.5"></m-e12-hinweise> Lösung: <m-e12-loesung raetsel="e20-x-logik2"></m-e12-loesung>.</td></tr>
     <tr><td><b class="e20-stname">Ja-Nein-Baum</b> <span class="e20-einh">(Einheit 13)</span><br>Du denkst an einen der vier Fest-Gäste: Drache, Fee, Fisch, Einhorn. {{KIND}} fragt sich durch den Baum (vorher abzeichnen oder hier zeigen): <m-e13-baum raetsel="e20-x-baum" modus="voll" kurz namen blatt-b="13" blatt-h="14" frage-b="19" frage-h="8" bild="8.5" ebene="12" luft="1.5" schrift="3.4" name-schrift="3" pille="3.4"></m-e13-baum></td>
       <td>Immer genau 2 Fragen. Die Fee: Flügel? ja, Feuer? nein, Platz <m-e20-wert raetsel="e20-x-baum" pfad="plaetze.fee" l="2"></m-e20-wert>.</td>
       <td>Das Flügelpferd kommt dazu. Wo landet es? Bei der Fee (Flügel ja, Feuer nein). Welche Frage trennt die beiden? „Ist es ein Pferd?“</td></tr>
     <tr><td><b class="e20-stname">Labyrinth</b> <span class="e20-einh">(wie in Einheit 16)</span><br>Muggelsteine als Mauern auf das Muggelstein-Brett (davon 5 · 5 Felder), Drachen-Figur unten links. Finde den kürzesten Weg!<br><m-e20-gitter raetsel="e20-x-labyrinth"></m-e20-gitter></td>
       <td><m-e20-prog raetsel="e20-x-labyrinth" gr="4"></m-e20-prog>, <m-e20-wert raetsel="e20-x-labyrinth" pfad="laenge" l="11"></m-e20-wert> Befehle, der einzige kürzeste Weg.</td>
-      <td>Anderes Labyrinth (4 · 4), nur 4 Karten: „bis zum Schatz“ mit einem Wenn-dann-Kasten.<br><m-e20-gitter raetsel="e20-x-labyrinth2"></m-e20-gitter><br>Lösung: <m-e20-prog raetsel="e20-x-labyrinth2" gr="4"></m-e20-prog>. Der Drache läuft einmal rund durch die Ecke unten rechts, das ist erlaubt.</td></tr>
+      <td>Anderes Labyrinth (4 · 4), nur 4 Karten: „bis zum Schatz“ mit einem Wenn-dann-Kasten.<br><m-e20-gitter raetsel="e20-x-labyrinth2"></m-e20-gitter><br>Lösung:<br><m-e20-prog raetsel="e20-x-labyrinth2" gr="5"></m-e20-prog><br>oder mit der Wenn-Karte andersherum:<br><m-e20-prog raetsel="e20-x-labyrinth2-l" gr="5"></m-e20-prog><br> Mit 4 Karten gibt es genau diese <m-e20-wert raetsel="e20-x-labyrinth2" pfad="erweitert.anzahlMin" l="2"></m-e20-wert>. Der Drache läuft einmal rund durch die Ecke unten rechts, das ist erlaubt.</td></tr>
     <tr><td><b class="e20-stname">Zauberspruch</b> <span class="e20-einh">(wie in Einheit 17)</span><br>Der Stern-Spruch ist die Stiege: <br><m-spruch name="stern" befehle="vor rechts vor links" gr="5.5"></m-spruch><br>Wie oft braucht der Drache ihn bis zum Schatz? Höchstens 3 Karten.<br><m-e20-gitter raetsel="e20-x-spruch"></m-e20-gitter></td>
       <td><m-e20-prog raetsel="e20-x-spruch"></m-e20-prog>: 3-mal. Der vorgegebene Spruch zählt nicht als Karte.</td>
-      <td>Wie viele Befehle macht der Drache dabei wirklich? <m-e20-wert raetsel="e20-x-spruch-l" pfad="befehle" l="12"></m-e20-wert>, denn 3 · 4 = 12. Drei Karten statt zwölf.</td></tr>
+      <td>Wie viele Befehle macht der Drache dabei wirklich? <m-e20-wert raetsel="e20-x-spruch-l" pfad="befehle" l="12"></m-e20-wert>, denn 4 + 4 + 4 = 12. Drei Karten statt zwölf.</td></tr>
     <tr><td><b class="e20-stname">Regel-Kobold</b> <span class="e20-einh">(Einheit 18)</span><br>Du liest eine Spielregel vor: „Wir würfeln abwechselnd. Wer eine 6 würfelt, bekommt einen Stern.“ Wo steckt der Kobold?</td>
       <td>Das Spiel hört nie auf: Es steht nicht da, wer gewinnt. Repariert: „Wer zuerst 3 Sterne hat, gewinnt.“</td>
       <td>„Wer jünger ist, darf zweimal würfeln.“ Kobold: unfair. {{KIND}} macht die Regel fair (zum Beispiel: beide würfeln einmal).</td></tr>
     <tr><td><b class="e20-stname">Parcours mit allem</b> <span class="e20-einh">(wie in Einheit 19)</span><br>Boden-Gitter 4 · 4, Kuscheltiere als Steine. Nur 4 Karten, mit Zauber-Kasten und Wenn-dann-Kasten!<br><m-e20-gitter raetsel="e20-w-parcours"></m-e20-gitter></td>
-      <td><m-e20-prog raetsel="e20-w-parcours" alle anzahl="2" gr="4.5"></m-e20-prog>: je 4 Karten. Der Wenn-dann-Kasten darf vor oder nach dem vor stehen.</td>
+      <td><m-e20-prog raetsel="e20-w-parcours" alle anzahl="2" gr="6"></m-e20-prog>: je 4 Karten. Der Wenn-dann-Kasten darf vor oder nach dem vor stehen.</td>
       <td>Geht es ohne Wenn-dann? Ja, aber mit <m-e20-wert raetsel="e20-x-parcours-z" pfad="zauber.minKarten" l="5"></m-e20-wert> Karten: <m-e20-prog raetsel="e20-x-parcours-z" alle anzahl="2" gr="4.5"></m-e20-prog>.</td></tr>
   </tbody>
   </table>
@@ -365,7 +365,7 @@
       <li><b>Ziel:</b> den letzten Stein nehmen.</li>
       <li><b>Ein Zug:</b> Wer dran ist, nimmt 1 oder 2 Steine. Nicht nehmen gilt nicht. Dann ist die andere Person dran. {{KIND}} fängt an.</li>
       <li><b>Ende:</b> Wer den letzten Stein nimmt, hat gewonnen. Gleich noch eine Runde, bis {{KIND}} einmal gewonnen hat (dann gibt es den Stempel).</li>
-      <li><b>Der Plan (aus Einheit 15):</b> Wer anfängt, nimmt zuerst 2. Dann liegen 6 Steine. Nimmt die andere Person 1, nimmt man 2, nimmt sie 2, nimmt man 1: Dann liegen 3. Und von 3 Steinen aus kann die andere Person nicht gewinnen. 6 und 3 sind die Gewinnzahlen. Du spielst ehrlich, aber nicht perfekt: Kennt {{KIND}} den Plan, gewinnt sie immer.</li>
+      <li><b>Der Plan (wie beim „letzten Edelstein“ aus Einheit 15):</b> Wer anfängt, nimmt zuerst 2. Dann liegen 6 Steine. Nimmt die andere Person 1, nimmt man 2, nimmt sie 2, nimmt man 1: Dann liegen 3. Und von 3 Steinen aus kann die andere Person nicht gewinnen. 6 und 3 sind die Gewinnzahlen. Du spielst ehrlich, aber nicht perfekt: Kennt {{KIND}} den Plan, gewinnt sie immer.</li>
     </ol>
     <p><b>Varianten:</b> mit 10 Steinen und „1, 2 oder 3 nehmen“ (Profi-Variante, Gewinnzahlen 8 und 4); mit 9 Steinen (wer anfängt, verliert bei gutem Spiel: Knobel-Ecke); mit Oma oder Opa als Gegner, {{KIND}} erklärt ihnen vorher die Regeln (aber nicht den Plan).</p>
   </div>
@@ -464,9 +464,9 @@
       <tr><td>3</td><td>Kobold-Station (wie Station 3)</td><td>Den falschen Befehl antippen, unten den richtigen wählen, „Los“. Der Drache läuft.</td><td>wenn der Drache beim Schatz ankommt</td></tr>
       <tr><td>4</td><td>Geheimschrift (Extra-Station): MTQPG mit Schlüssel-Zahl 2</td><td>Das digitale Geheimschrift-Rad wie in Einheit 7: Die runden Pfeil-Tasten drehen die innere Scheibe auf 2. Ein angetippter Buchstabe leuchtet innen am Rad, außen daneben steht der echte. Dann das passende Bild antippen.</td><td>wenn das richtige Bild angetippt ist (die Krone)</td></tr>
       <tr><td>5</td><td>Drachen-Station (wie Station 2)</td><td>Zauber-Kasten antippen, Zahl wählen, Befehle hinein, „fertig“, dann „Los“. Höchstens 4 Karten, die App zählt wie am Papier.</td><td>wenn der Drache mit höchstens 4 Karten ankommt</td></tr>
-      <tr><td>6</td><td>Formen-Station (wie Station 5)</td><td>Leeres Feld antippen, dann eine Form, „Los“. Ist eine Form doppelt, bekommt die Reihe oder Spalte einen rosa Rahmen, und ein Satz sagt, welche Form zweimal da ist.</td><td>wenn das Quadrat voll und richtig ist</td></tr>
+      <tr><td>6</td><td>Formen-Station (wie Station 5)</td><td>Am Anfang steht ein Denk-Tipp („Nur 3 Formen!“). Leeres Feld antippen, dann eine Form, „Los“. Tippt {{KIND}} gleich „Los“, erklärt die App das Antippen. Ist eine Form doppelt, bekommt die Reihe oder Spalte einen rosa Rahmen, und ein Satz sagt, welche Form zweimal da ist.</td><td>wenn das Quadrat voll und richtig ist</td></tr>
       <tr><td>7</td><td>Kästchen-Wimpel (Extra-Station): die Krone</td><td>Am Anfang ist Rot gewählt: also zuerst Gelb antippen, dann die Kästchen Zeile für Zeile nach dem Code, später Rot für die zwei roten Kästchen in Zeile 4. Dann „Fertig“. Erst jetzt verrät die App, was es ist.</td><td>wenn das Bild stimmt</td></tr>
-      <tr><td>8</td><td>Steine-Duell (wie Station 6) gegen den Roboter</td><td>Steine antippen (oder „1“, „2“), dann „Nehmen“. Der Roboter spielt gut: Wer eine Gewinnzahl verpasst, verliert. Gewinnt der Roboter, steht ein Tipp da (zuerst 2 nehmen, dann immer 6 oder 3 liegen lassen), und „Nochmal“ startet neu.</td><td>wenn {{KIND}} den letzten Stein nimmt</td></tr>
+      <tr><td>8</td><td>Steine-Duell (wie Station 6) gegen den Roboter</td><td>Steine antippen (oder „1“, „2“), dann „Nehmen“. Der Roboter spielt gut: Wer eine Gewinnzahl verpasst, verliert. Gewinnt der Roboter, steht ein Tipp da („Nimm zuerst 2. Dann lass immer 6 oder 3 Steine liegen.“), und „Nochmal“ startet neu.</td><td>wenn {{KIND}} den letzten Stein nimmt</td></tr>
       <tr><td>9</td><td>Parcours mit allem (Extra-Station)</td><td>Höchstens 4 Karten, zum Beispiel so: Zauber-Kasten antippen, bei „Wie oft?“ die 5 wählen, vor hinein, dann die Taste mit dem schauenden Drachen (Wenn-dann-Kasten): die Wenn-Karte mit dem Stein wählen, rechts drehen, „fertig“, und noch einmal „fertig“ für den Zauber-Kasten. Beim Laufen zeigt der Kasten die Runde.</td><td>wenn der Drache beim Schatz ankommt</td></tr>
     </tbody>
   </table>
@@ -480,7 +480,7 @@
     <p><b><a class="blattref" href="#blatt-20-1"></a>:</b> Stempel und Code-Buchstaben hängen vom Versteck ab (Tabelle oben), zum Beispiel für den Kasten P, F, X, Y, J, S in den Feldern 1 bis 6. Lieblings-Station, Sterne und die eigene Station sind frei.</p>
     <p><b><a class="blattref" href="#blatt-20-2"></a>:</b> Die Lösungen der sechs Stationen stehen in der Tabelle „Die Fest-Runde“. <b>Knobel-Ecke:</b> nein. Mit 9 Steinen verliert, wer anfängt, wenn die andere Person den Plan kennt. Die Gewinnzahlen sind <m-e15-text raetsel="e20-steine9" was="gz"></m-e15-text>, und wer bei 9 Steinen dran ist, kann keine Gewinnzahl liegen lassen. Also lässt {{KIND}} dich anfangen und lässt dann immer 6 und 3 Steine liegen.</p>
     <p><b><a class="blattref" href="#blatt-20-3"></a>, Aufgabe 1:</b> 4 + 1 = 5. <b>Aufgabe 2:</b> je nach Versteck, zum Beispiel P F X Y J S wird mit Schlüssel-Zahl 5 zu KASTEN. <b>Profi:</b> „DU KANNST ALLES“ mit Schlüssel-Zahl 3. Nur diese Zahl ergibt echte Wörter (vom Löser mit allen Zahlen von 1 bis 25 geprüft).</p>
-    <p><b>Bildschirm-Levels (zum Nachschauen):</b> Level 2: Lampen 16 und 4 an. Level 4: KRONE. Level 7: die Krone der Extra-Station Kästchen-Wimpel. Level 9: <m-e20-prog raetsel="e20-w-parcours" alle anzahl="2" gr="4.5"></m-e20-prog> (beide mit 4 Karten). Die anderen wie die Stationen.</p>
+    <p><b>Bildschirm-Levels (zum Nachschauen):</b> Level 2: Lampen 16 und 4 an. Level 4: KRONE. Level 7: die Krone der Extra-Station Kästchen-Wimpel. Level 9: <m-e20-prog raetsel="e20-w-parcours" alle anzahl="2" gr="6"></m-e20-prog> (beide mit 4 Karten). Die anderen wie die Stationen.</p>
   </div>
 </section>
 
@@ -558,7 +558,7 @@
       <div class="e20-kkopf"><span class="e20-knr">6</span><m-symbol name="edelstein" gr="8"></m-symbol><span class="e20-kname">Steine-Duell</span></div>
       <m-e15-steine n="8" gr="7.5" pro="8"></m-e15-steine>
       <p class="e20-kaufg e20-ohne-lsg">Nimm 1 oder 2. Wer den letzten nimmt, gewinnt. Du fängst an!</p>
-      <p class="lsg-nur e20-lsg-klein">Erst 2 nehmen, dann 6 und 3 liegen lassen.</p>
+      <p class="lsg-nur e20-lsg-klein">Erst 2 nehmen (6 bleiben), dann 3 liegen lassen.</p>
     </div>
     <div class="e20-zelle-knobel u r">
       <div class="knobel" data-titel="Knobel-Ecke">
