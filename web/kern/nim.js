@@ -314,7 +314,8 @@
 
   // Zahlen-Weg für „Wer sagt …?“: Felder 0 … bis als Schlange (Reihe 1 nach rechts, Reihe 2 zurück …)
   //   o: { feld (mm, 22), proReihe (7), luecke (mm zwischen Reihen, 7), markiert: [Zahlen mit rotem Ring],
-  //        gold: [Zahlen gelb hinterlegt], drache: Feld mit Drache (0), schatz: true, masse }
+  //        gold: [Zahlen gelb hinterlegt], drache: Feld mit dem Drachen (Zahl, Standard 0 = Start; false = keiner),
+  //        schatz: true, masse }
   function wegFelder(bis, pro) {
     const f = [];
     for (let z = 0; z <= bis; z++) {
@@ -347,17 +348,27 @@
     for (const f of felder) {
       const [x, y] = xy(f);
       const istStart = f.zahl === 0, istZiel = f.zahl === bis;
+      const drachePos = o.drache === false ? -1 : (typeof o.drache === 'number' ? o.drache : 0);
       const fill = istStart ? FARBE.start : gold.has(f.zahl) ? FARBE.goldHell : FARBE.weg;
       s += '<rect x="' + r2(x + 0.6) + '" y="' + r2(y + 0.6) + '" width="' + r2(F - 1.2) + '" height="' + r2(F - 1.2) + '" rx="' + r2(F * 0.16) + '" fill="' + fill + '" stroke="' + FARBE.wegRand + '" stroke-width="0.7"/>';
       const zahlGr = F * 0.4;
       if (istStart) {
-        if (S && o.drache !== false) s += '<g transform="translate(' + r2(x + F * 0.16) + ' ' + r2(y + F * 0.04) + ') scale(' + r2(F * 0.68 / 100) + ') rotate(90 50 50)">' + S.inhalt('drache') + '</g>';
-        s += '<text x="' + r2(x + F / 2) + '" y="' + r2(y + F * 0.9) + '" font-family="Andika, sans-serif" font-size="' + r2(F * 0.2) + '" font-weight="700" text-anchor="middle" fill="' + FARBE.tinte + '">Start</text>';
+        s += '<text x="' + r2(x + F / 2) + '" y="' + r2(y + (drachePos === 0 ? F * 0.9 : F / 2 + F * 0.08)) + '" font-family="Andika, sans-serif" font-size="' + r2(F * 0.2) + '" font-weight="700" text-anchor="middle" fill="' + FARBE.tinte + '">Start</text>';
       } else if (istZiel && o.schatz !== false && S) {
         s += '<g transform="translate(' + r2(x + F * 0.2) + ' ' + r2(y + F * 0.04) + ') scale(' + r2(F * 0.6 / 100) + ')">' + S.inhalt('schatz') + '</g>';
         s += '<text x="' + r2(x + F / 2) + '" y="' + r2(y + F * 0.9) + '" font-family="Andika, sans-serif" font-size="' + r2(F * 0.3) + '" font-weight="700" text-anchor="middle" fill="' + FARBE.tinte + '">' + f.zahl + '</text>';
+      } else if (f.zahl === drachePos) {
+        // Drache steht auf dem Feld: Zahl klein unten (wie bei Start und Schatz)
+        s += '<text x="' + r2(x + F / 2) + '" y="' + r2(y + F * 0.9) + '" font-family="Andika, sans-serif" font-size="' + r2(F * 0.3) + '" font-weight="700" text-anchor="middle" fill="' + FARBE.tinte + '">' + f.zahl + '</text>';
       } else {
         s += '<text x="' + r2(x + F / 2) + '" y="' + r2(y + F / 2 + zahlGr * 0.36) + '" font-family="Andika, sans-serif" font-size="' + r2(zahlGr) + '" font-weight="700" text-anchor="middle" fill="' + FARBE.tinte + '">' + f.zahl + '</text>';
+      }
+      if (S && f.zahl === drachePos) {
+        // Drache schaut in Laufrichtung (Reihe 1, 3 … nach rechts, Reihe 2, 4 … nach links)
+        const rechts = f.ze % 2 === 0;
+        const gr = f.zahl === 0 ? 0.68 : 0.6;
+        const dx = f.zahl === 0 ? F * 0.16 : F * 0.2, dy = f.zahl === 0 ? F * 0.04 : F * 0.02;
+        s += '<g transform="translate(' + r2(x + dx) + ' ' + r2(y + dy) + ') scale(' + r2(F * gr / 100) + ') rotate(' + (rechts ? 90 : 270) + ' 50 50)">' + S.inhalt('drache') + '</g>';
       }
       if (markiert.has(f.zahl)) s += '<circle cx="' + r2(x + F / 2) + '" cy="' + r2(y + F / 2) + '" r="' + r2(F * 0.4) + '" fill="none" stroke="' + FARBE.rot + '" stroke-width="' + r2(F * 0.07) + '"/>';
     }
