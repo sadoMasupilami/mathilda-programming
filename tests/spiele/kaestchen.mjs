@@ -205,7 +205,11 @@ export function tests({ test, expect: erwarte, DATEN, h }) {
     const f = h.suche('kaestchen', (l) => l.aufgabe === 'malen' && (l.farben || []).filter((x) => x !== 'w').length >= 2);
     test.skip(!f, 'kein Mal-Level mit zwei Farben');
     await h.oeffneLevel(page, f, info);
-    const [a, b] = f.lv.farben.filter((x) => x !== 'w');
+    // Vorgewählt ist die Farbe mit den meisten Kästchen (bei Gleichstand die erste)
+    const zahl = (x) => sollMalen(f.lv).flat().filter((y) => y === x).length;
+    const zwei = f.lv.farben.filter((x) => x !== 'w');
+    const a = zwei.reduce((best, x) => (zahl(x) > zahl(best) ? x : best), zwei[0]);
+    const b = zwei.find((x) => x !== a);
     const stift = (x) => '.tasten [data-aktion="kaestchen-stift"][data-f="' + x + '"]';
     await erwarte(page.locator(stift(a))).toHaveAttribute('aria-pressed', 'true');
     await erwarte(meldung(page)).toContainText('Farbe');

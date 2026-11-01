@@ -278,15 +278,17 @@
   // ---------------------------------------------------------------------
   function zeigeEnde(p) {
     const n = sterneVon(p);
+    // Fest-Paket (web.art "gemischt", Einheit 20): Abschluss der Werkstatt, mit Stern zwischen Drache und Schatz
+    const fest = p.art === 'gemischt';
     let sterne = '';
     p.levels.forEach((l) => { sterne += '<span class="ende-stern">' + sym(speicher.sterne[l.id] ? 'stern' : 'sternLeer') + '</span>'; });
     ansicht('ende',
-      '<section class="ansicht ende">' +
-      '<div class="ende-bild"><span>' + sym('drache') + '</span><span>' + sym('schatz') + '</span></div>' +
+      '<section class="ansicht ende' + (fest ? ' fest' : '') + '">' +
+      '<div class="ende-bild"><span>' + sym('drache') + '</span>' + (fest ? '<span>' + sym('stern') + '</span>' : '') + '<span>' + sym('schatz') + '</span></div>' +
       '<div class="ende-text">' +
       '<h1>Super! Jetzt zurück zum Papier.</h1>' +
       '<div class="ende-sterne" aria-label="' + n + ' von ' + p.levels.length + ' Sternen">' + sterne + '</div>' +
-      '<p>Das Paket ist fertig. Leg das Gerät jetzt weg.</p>' +
+      '<p>' + (fest ? 'Hurra, das ' + esc(p.titel) + ' ist geschafft! Leg das Gerät jetzt weg.' : 'Das Paket ist fertig. Leg das Gerät jetzt weg.') + '</p>' +
       '<button class="taste" data-aktion="heim">' + ICON.heim + '<span>Startseite</span></button>' +
       '</div></section>');
   }

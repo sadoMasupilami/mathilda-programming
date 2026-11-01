@@ -97,7 +97,9 @@
       z.h = z.soll.length;
       z.b = z.soll[0].length;
       z.bild = z.soll.map((r) => r.map(() => 'w'));
-      z.stift = z.stifte[0];
+      // Zuerst die Farbe mit den meisten Kästchen (bei Gleichstand die erste)
+      const zahl = (f) => z.soll.reduce((n, r) => n + r.filter((x) => x === f).length, 0);
+      z.stift = z.stifte.reduce((best, f) => (zahl(f) > zahl(best) ? f : best), z.stifte[0]);
       z.linie = null;      // Zeile (oder Spalte), in der zuletzt gemalt wurde
     } else if (z.aufgabe === 'schreiben') {
       z.soll = KK.liesBild(lv.bild);
