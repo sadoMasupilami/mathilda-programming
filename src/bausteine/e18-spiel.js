@@ -11,8 +11,9 @@
          in der Lösungsansicht zeigt der leere Plan die Felder des Wettflugs rot.
      <m-e18-strecke spiel="wettflug" bis="12" [gr="13"]>
          Ausschnitt des Plans als eine Reihe (Start bis Feld 12) mit Stern und Wirbelwind.
-     <m-e18-test spiel="wettflug" pos="2,10" wuerfe="4" zeige="a|b" [l="10"]>
+     <m-e18-test spiel="wettflug" pos="2,10" wuerfe="4" zeige="a|b" [l="10"] [nur-zahl]>
          Antwortkästchen: Wo steht Figur a (die würfelt) bzw. b nach diesen Würfen?
+         nur-zahl: nur die Zahl als Text (für die Lösungen in der Anleitung).
      <m-e18-pruefe spiel="wettflug" pos="0,0" wuerfe="3,5,6" erwartet="6,8|sieg:a|offen">
          Unsichtbar: prüft einen Spielverlauf, der in der Anleitung in Worten steht.
      <m-e18-zahl spiel="wettflug" was="…" [zweiter="2"] [l="50"] [feld]>
@@ -332,7 +333,7 @@
         o += '<rect x="' + (x + 0.3) + '" y="0.3" width="' + (f - 0.6) + '" height="' + (f - 0.6) + '" rx="2" fill="' + (n === 0 ? '#eaf6e6' : 'white') + '" stroke="' + T + '" stroke-width="0.5"/>';
         if (n === 0) o += '<text x="' + (x + f / 2) + '" y="' + (f / 2 + 0.2) + '" font-family="Andika, sans-serif" font-weight="700" font-size="' + (f * 0.27).toFixed(2) + '" text-anchor="middle" dominant-baseline="central" fill="' + T + '">Start</text>';
         else {
-          o += '<text x="' + (x + f / 2) + '" y="' + (f + 4.2) + '" font-family="Andika, sans-serif" font-weight="700" font-size="4.6" text-anchor="middle" fill="' + T + '">' + n + '</text>';
+          o += '<text x="' + (x + f / 2) + '" y="' + (f + 4.2) + '" font-family="Andika, sans-serif" font-weight="700" font-size="' + Math.min(4.6, f * 0.42).toFixed(2) + '" text-anchor="middle" fill="' + T + '">' + n + '</text>';
           if (s._art[n]) o += gruppe(BILD[s._art[n]](true), x + f * 0.12, f * 0.1, f * 0.76);
         }
       }
@@ -358,7 +359,9 @@
       const wer = el.getAttribute('zeige') === 'b' ? 1 : 0;
       const n = e.pos[wer];
       if (el.hasAttribute('l') && +el.getAttribute('l') !== n) return h.fehler(el, 'Ergebnis ist Feld ' + n + ', nicht ' + el.getAttribute('l'));
-      el.innerHTML = h.feldHTML(String(n), n >= 10 ? '' : 'k');
+      // nur-zahl: die Zahl als Text (Lösungen in der Anleitung), sonst ein Antwortkästchen
+      if (el.hasAttribute('nur-zahl')) el.textContent = String(n);
+      else el.innerHTML = h.feldHTML(String(n), n >= 10 ? '' : 'k');
       el.dataset.loesung = String(n);
     } catch (e) { return h.fehler(el, e.message); }
     el.classList.add('komp', 'geprueft');
