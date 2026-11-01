@@ -1,0 +1,341 @@
+{
+ "paket": "e13",
+ "einheit": 13,
+ "titel": "Ja-Nein-Bäume",
+ "_hinweis": "Rätselart baum (web/kern/baum.js, werkzeuge/arten/baum.mjs). Ja-Ast links, Nein-Ast rechts. dinge[].ja = Fragen, die das Ding mit Ja beantwortet (alle anderen: Nein). Ein Blatt des Baums ist die id eines Dings.",
+ "web": {
+  "titel": "Ja-Nein-Bäume",
+  "art": "baum",
+  "levels": ["e13-w-einhorn", "e13-w-fee", "e13-wesen", "e13-w-drachen4", "e13-frage", "e13-w-frosch", "e13-w-wurzel", "e13-w-drachen8"]
+ },
+ "raetsel": [
+  {
+   "id": "e13-wesen",
+   "art": "baum",
+   "titel": "Wo wohnen die Wesen?",
+   "aufgabe": "einsortieren",
+   "fragen": {
+    "fluegel": { "text": "Hat es Flügel?", "kurz": "Flügel?" },
+    "feuer": { "text": "Kann es Feuer speien?", "kurz": "Feuer?" },
+    "pferd": { "text": "Ist es ein Pferd?", "kurz": "Pferd?" },
+    "wasser": { "text": "Lebt es im Wasser?", "kurz": "Wasser?" },
+    "horn": { "text": "Hat es ein Horn?", "kurz": "Horn?" }
+   },
+   "dinge": [
+    { "id": "einhorn", "name": "Einhorn", "bild": "einhorn", "ja": ["pferd", "horn"] },
+    { "id": "fee", "name": "Fee", "bild": "fee", "ja": ["fluegel"] },
+    { "id": "drache", "name": "Drache", "bild": "drache", "ja": ["fluegel", "feuer"] },
+    { "id": "meerjungfrau", "name": "Meerjungfrau", "bild": "meerjungfrau", "ja": ["wasser"] },
+    { "id": "fluegelpferd", "name": "Flügelpferd", "bild": "fluegelpferd", "ja": ["fluegel", "pferd"] }
+   ],
+   "baum": { "f": "fluegel",
+     "ja": { "f": "feuer", "ja": "drache", "nein": { "f": "pferd", "ja": "fluegelpferd", "nein": "fee" } },
+     "nein": { "f": "wasser", "ja": "meerjungfrau", "nein": "einhorn" } },
+   "wege": [["ja", "nein", "nein"], ["nein", "ja"]]
+  },
+  {
+   "id": "e13-w-einhorn",
+   "art": "baum",
+   "titel": "Wo landet das Einhorn?",
+   "aufgabe": "folgen",
+   "wer": "einhorn",
+   "fragen": {
+    "fluegel": { "text": "Hat es Flügel?", "kurz": "Flügel?" },
+    "feuer": { "text": "Kann es Feuer speien?", "kurz": "Feuer?" },
+    "pferd": { "text": "Ist es ein Pferd?", "kurz": "Pferd?" },
+    "wasser": { "text": "Lebt es im Wasser?", "kurz": "Wasser?" }
+   },
+   "dinge": [
+    { "id": "einhorn", "name": "Einhorn", "bild": "einhorn", "ja": ["pferd"] },
+    { "id": "fee", "name": "Fee", "bild": "fee", "ja": ["fluegel"] },
+    { "id": "drache", "name": "Drache", "bild": "drache", "ja": ["fluegel", "feuer"] },
+    { "id": "meerjungfrau", "name": "Meerjungfrau", "bild": "meerjungfrau", "ja": ["wasser"] },
+    { "id": "fluegelpferd", "name": "Flügelpferd", "bild": "fluegelpferd", "ja": ["fluegel", "pferd"] }
+   ],
+   "baum": { "f": "fluegel",
+     "ja": { "f": "feuer", "ja": "drache", "nein": { "f": "pferd", "ja": "fluegelpferd", "nein": "fee" } },
+     "nein": { "f": "wasser", "ja": "meerjungfrau", "nein": "einhorn" } }
+  },
+  {
+   "id": "e13-w-fee",
+   "art": "baum",
+   "titel": "Wo landet die Fee?",
+   "aufgabe": "folgen",
+   "wer": "fee",
+   "fragen": {
+    "fluegel": { "text": "Hat es Flügel?", "kurz": "Flügel?" },
+    "feuer": { "text": "Kann es Feuer speien?", "kurz": "Feuer?" },
+    "pferd": { "text": "Ist es ein Pferd?", "kurz": "Pferd?" },
+    "wasser": { "text": "Lebt es im Wasser?", "kurz": "Wasser?" }
+   },
+   "dinge": [
+    { "id": "einhorn", "name": "Einhorn", "bild": "einhorn", "ja": ["pferd"] },
+    { "id": "fee", "name": "Fee", "bild": "fee", "ja": ["fluegel"] },
+    { "id": "drache", "name": "Drache", "bild": "drache", "ja": ["fluegel", "feuer"] },
+    { "id": "meerjungfrau", "name": "Meerjungfrau", "bild": "meerjungfrau", "ja": ["wasser"] },
+    { "id": "fluegelpferd", "name": "Flügelpferd", "bild": "fluegelpferd", "ja": ["fluegel", "pferd"] }
+   ],
+   "baum": { "f": "fluegel",
+     "ja": { "f": "feuer", "ja": "drache", "nein": { "f": "pferd", "ja": "fluegelpferd", "nein": "fee" } },
+     "nein": { "f": "wasser", "ja": "meerjungfrau", "nein": "einhorn" } }
+  },
+  {
+   "id": "e13-frage",
+   "art": "baum",
+   "titel": "Welche Frage fehlt?",
+   "aufgabe": "frage",
+   "fragen": {
+    "federn": { "text": "Hat es Federn?", "kurz": "Federn?" },
+    "beine": { "text": "Hat es Beine?", "kurz": "Beine?" },
+    "fliegen": { "text": "Kann es fliegen?", "kurz": "Fliegen?" },
+    "schwimmen": { "text": "Kann es schwimmen?", "kurz": "Schwimmen?" },
+    "schnabel": { "text": "Hat es einen Schnabel?", "kurz": "Schnabel?" }
+   },
+   "dinge": [
+    { "id": "ente", "name": "Ente", "bild": "ente", "ja": ["federn", "beine", "fliegen", "schwimmen", "schnabel"] },
+    { "id": "eule", "name": "Eule", "bild": "eule", "ja": ["federn", "beine", "fliegen", "schnabel"] },
+    { "id": "frosch", "name": "Frosch", "bild": "frosch", "ja": ["beine", "schwimmen"] },
+    { "id": "fisch", "name": "Fisch", "bild": "fisch", "ja": ["schwimmen"] }
+   ],
+   "baum": { "f": "federn",
+     "ja": { "f": "?", "ja": "ente", "nein": "eule" },
+     "nein": { "f": "beine", "ja": "frosch", "nein": "fisch" } },
+   "optionen": ["fliegen", "schwimmen", "schnabel"]
+  },
+  {
+   "id": "e13-kobold",
+   "art": "baum",
+   "titel": "Kobold im Baum",
+   "aufgabe": "kobold",
+   "fragen": {
+    "beine": { "text": "Hat es Beine?", "kurz": "Beine?" },
+    "fliegen": { "text": "Kann es fliegen?", "kurz": "Fliegen?" },
+    "federn": { "text": "Hat es Federn?", "kurz": "Federn?" },
+    "fell": { "text": "Hat es Fell?", "kurz": "Fell?" },
+    "wasser": { "text": "Lebt es im Wasser?", "kurz": "Wasser?" }
+   },
+   "dinge": [
+    { "id": "eule", "name": "Eule", "bild": "eule", "ja": ["beine", "fliegen", "federn"] },
+    { "id": "biene", "name": "Biene", "bild": "biene", "ja": ["beine", "fliegen"] },
+    { "id": "katze", "name": "Katze", "bild": "katze", "ja": ["beine", "fell"] },
+    { "id": "frosch", "name": "Frosch", "bild": "frosch", "ja": ["beine", "wasser"] },
+    { "id": "fisch", "name": "Fisch", "bild": "fisch", "ja": ["wasser"] },
+    { "id": "schnecke", "name": "Schnecke", "bild": "schnecke", "ja": [] }
+   ],
+   "baum": { "f": "beine",
+     "ja": { "f": "fliegen",
+       "ja": { "f": "federn", "ja": "biene", "nein": "eule" },
+       "nein": { "f": "fell", "ja": "katze", "nein": "frosch" } },
+     "nein": { "f": "wasser", "ja": "fisch", "nein": "schnecke" } },
+   "reparatur": { "art": "tauschen", "knoten": "ja.ja" }
+  },
+  {
+   "id": "e13-neu",
+   "art": "baum",
+   "titel": "Ein Marienkäfer kommt dazu",
+   "aufgabe": "neu",
+   "neu": "marienkaefer",
+   "fragen": {
+    "beine": { "text": "Hat es Beine?", "kurz": "Beine?" },
+    "fliegen": { "text": "Kann es fliegen?", "kurz": "Fliegen?" },
+    "federn": { "text": "Hat es Federn?", "kurz": "Federn?" },
+    "fell": { "text": "Hat es Fell?", "kurz": "Fell?" },
+    "wasser": { "text": "Lebt es im Wasser?", "kurz": "Wasser?" },
+    "punkte": { "text": "Hat es Punkte?", "kurz": "Punkte?" },
+    "stechen": { "text": "Kann es stechen?", "kurz": "Stechen?" },
+    "rot": { "text": "Ist es rot?", "kurz": "Rot?" },
+    "streifen": { "text": "Hat es Streifen?", "kurz": "Streifen?" }
+   },
+   "dinge": [
+    { "id": "eule", "name": "Eule", "bild": "eule", "ja": ["beine", "fliegen", "federn"] },
+    { "id": "biene", "name": "Biene", "bild": "biene", "ja": ["beine", "fliegen", "stechen", "streifen"] },
+    { "id": "katze", "name": "Katze", "bild": "katze", "ja": ["beine", "fell", "streifen"] },
+    { "id": "frosch", "name": "Frosch", "bild": "frosch", "ja": ["beine", "wasser"] },
+    { "id": "fisch", "name": "Fisch", "bild": "fisch", "ja": ["wasser"] },
+    { "id": "schnecke", "name": "Schnecke", "bild": "schnecke", "ja": [] },
+    { "id": "marienkaefer", "name": "Marienkäfer", "bild": "marienkaefer", "ja": ["beine", "fliegen", "punkte", "rot"] }
+   ],
+   "baum": { "f": "beine",
+     "ja": { "f": "fliegen",
+       "ja": { "f": "federn", "ja": "eule", "nein": "biene" },
+       "nein": { "f": "fell", "ja": "katze", "nein": "frosch" } },
+     "nein": { "f": "wasser", "ja": "fisch", "nein": "schnecke" } }
+  },
+  {
+   "id": "e13-w-frosch",
+   "art": "baum",
+   "titel": "Wo landet der Frosch?",
+   "aufgabe": "folgen",
+   "wer": "frosch",
+   "fragen": {
+    "beine": { "text": "Hat es Beine?", "kurz": "Beine?" },
+    "fliegen": { "text": "Kann es fliegen?", "kurz": "Fliegen?" },
+    "federn": { "text": "Hat es Federn?", "kurz": "Federn?" },
+    "fell": { "text": "Hat es Fell?", "kurz": "Fell?" },
+    "wasser": { "text": "Lebt es im Wasser?", "kurz": "Wasser?" }
+   },
+   "dinge": [
+    { "id": "eule", "name": "Eule", "bild": "eule", "ja": ["beine", "fliegen", "federn"] },
+    { "id": "biene", "name": "Biene", "bild": "biene", "ja": ["beine", "fliegen"] },
+    { "id": "katze", "name": "Katze", "bild": "katze", "ja": ["beine", "fell"] },
+    { "id": "frosch", "name": "Frosch", "bild": "frosch", "ja": ["beine", "wasser"] },
+    { "id": "fisch", "name": "Fisch", "bild": "fisch", "ja": ["wasser"] },
+    { "id": "schnecke", "name": "Schnecke", "bild": "schnecke", "ja": [] }
+   ],
+   "baum": { "f": "beine",
+     "ja": { "f": "fliegen",
+       "ja": { "f": "federn", "ja": "eule", "nein": "biene" },
+       "nein": { "f": "fell", "ja": "katze", "nein": "frosch" } },
+     "nein": { "f": "wasser", "ja": "fisch", "nein": "schnecke" } }
+  },
+  {
+   "id": "e13-w-wurzel",
+   "art": "baum",
+   "titel": "Welche Frage kommt ganz oben?",
+   "aufgabe": "frage",
+   "fragen": {
+    "beine": { "text": "Hat es Beine?", "kurz": "Beine?" },
+    "fliegen": { "text": "Kann es fliegen?", "kurz": "Fliegen?" },
+    "fell": { "text": "Hat es Fell?", "kurz": "Fell?" },
+    "wasser": { "text": "Lebt es im Wasser?", "kurz": "Wasser?" }
+   },
+   "dinge": [
+    { "id": "eule", "name": "Eule", "bild": "eule", "ja": ["beine", "fliegen"] },
+    { "id": "katze", "name": "Katze", "bild": "katze", "ja": ["beine", "fell"] },
+    { "id": "fisch", "name": "Fisch", "bild": "fisch", "ja": ["wasser"] },
+    { "id": "schnecke", "name": "Schnecke", "bild": "schnecke", "ja": [] }
+   ],
+   "baum": { "f": "?",
+     "ja": { "f": "fliegen", "ja": "eule", "nein": "katze" },
+     "nein": { "f": "wasser", "ja": "fisch", "nein": "schnecke" } },
+   "optionen": ["fliegen", "fell", "beine"]
+  },
+  {
+   "id": "e13-w-drachen4",
+   "art": "baum",
+   "titel": "Vier Drachen-Kinder",
+   "aufgabe": "einsortieren",
+   "fragen": {
+    "gruen": { "text": "Ist er grün?", "kurz": "Grün?" },
+    "krone": { "text": "Hat er eine Krone?", "kurz": "Krone?" }
+   },
+   "dinge": [
+    { "id": "b", "name": "blauer Drache ohne Krone", "bild": "drachenkind-blau-fluegel", "ja": [] },
+    { "id": "gk", "name": "grüner Drache mit Krone", "bild": "drachenkind-gruen-fluegel-krone", "ja": ["gruen", "krone"] },
+    { "id": "bk", "name": "blauer Drache mit Krone", "bild": "drachenkind-blau-fluegel-krone", "ja": ["krone"] },
+    { "id": "g", "name": "grüner Drache ohne Krone", "bild": "drachenkind-gruen-fluegel", "ja": ["gruen"] }
+   ],
+   "baum": { "f": "gruen",
+     "ja": { "f": "krone", "ja": "gk", "nein": "g" },
+     "nein": { "f": "krone", "ja": "bk", "nein": "b" } }
+  },
+  {
+   "id": "e13-drachen",
+   "art": "baum",
+   "titel": "Die 8 Drachen-Kinder",
+   "aufgabe": "bauen",
+   "maxFragen": 3,
+   "mehrereLoesungen": true,
+   "fragen": {
+    "gruen": { "text": "Ist er grün?", "kurz": "Grün?" },
+    "fluegel": { "text": "Hat er Flügel?", "kurz": "Flügel?" },
+    "krone": { "text": "Hat er eine Krone?", "kurz": "Krone?" }
+   },
+   "dinge": [
+    { "id": "gfk", "name": "grün, Flügel, Krone", "bild": "drachenkind-gruen-fluegel-krone", "ja": ["gruen", "fluegel", "krone"] },
+    { "id": "gf", "name": "grün, Flügel", "bild": "drachenkind-gruen-fluegel", "ja": ["gruen", "fluegel"] },
+    { "id": "gk", "name": "grün, Krone", "bild": "drachenkind-gruen-krone", "ja": ["gruen", "krone"] },
+    { "id": "g", "name": "grün", "bild": "drachenkind-gruen", "ja": ["gruen"] },
+    { "id": "bfk", "name": "blau, Flügel, Krone", "bild": "drachenkind-blau-fluegel-krone", "ja": ["fluegel", "krone"] },
+    { "id": "bf", "name": "blau, Flügel", "bild": "drachenkind-blau-fluegel", "ja": ["fluegel"] },
+    { "id": "bk", "name": "blau, Krone", "bild": "drachenkind-blau-krone", "ja": ["krone"] },
+    { "id": "b", "name": "blau", "bild": "drachenkind-blau", "ja": [] }
+   ],
+   "baum": { "f": "gruen",
+     "ja": { "f": "fluegel", "ja": { "f": "krone", "ja": "gfk", "nein": "gf" }, "nein": { "f": "krone", "ja": "gk", "nein": "g" } },
+     "nein": { "f": "fluegel", "ja": { "f": "krone", "ja": "bfk", "nein": "bf" }, "nein": { "f": "krone", "ja": "bk", "nein": "b" } } }
+  },
+  {
+   "id": "e13-w-drachen8",
+   "art": "baum",
+   "titel": "Acht Drachen-Kinder: Welche Frage fehlt?",
+   "aufgabe": "frage",
+   "_hinweis": "Auf dem Handy sind 8 Plätze zu schmal zum Antippen (48 px): darum hier nur Frage-Karten antippen.",
+   "fragen": {
+    "gruen": { "text": "Ist er grün?", "kurz": "Grün?" },
+    "fluegel": { "text": "Hat er Flügel?", "kurz": "Flügel?" },
+    "krone": { "text": "Hat er eine Krone?", "kurz": "Krone?" }
+   },
+   "dinge": [
+    { "id": "gfk", "name": "grün, Flügel, Krone", "bild": "drachenkind-gruen-fluegel-krone", "ja": ["gruen", "fluegel", "krone"] },
+    { "id": "gf", "name": "grün, Flügel", "bild": "drachenkind-gruen-fluegel", "ja": ["gruen", "fluegel"] },
+    { "id": "gk", "name": "grün, Krone", "bild": "drachenkind-gruen-krone", "ja": ["gruen", "krone"] },
+    { "id": "g", "name": "grün", "bild": "drachenkind-gruen", "ja": ["gruen"] },
+    { "id": "bfk", "name": "blau, Flügel, Krone", "bild": "drachenkind-blau-fluegel-krone", "ja": ["fluegel", "krone"] },
+    { "id": "bf", "name": "blau, Flügel", "bild": "drachenkind-blau-fluegel", "ja": ["fluegel"] },
+    { "id": "bk", "name": "blau, Krone", "bild": "drachenkind-blau-krone", "ja": ["krone"] },
+    { "id": "b", "name": "blau", "bild": "drachenkind-blau", "ja": [] }
+   ],
+   "baum": { "f": "gruen",
+     "ja": { "f": "fluegel", "ja": { "f": "krone", "ja": "gfk", "nein": "gf" }, "nein": { "f": "krone", "ja": "gk", "nein": "g" } },
+     "nein": { "f": "?", "ja": { "f": "fluegel", "ja": "bfk", "nein": "bk" }, "nein": { "f": "fluegel", "ja": "bf", "nein": "b" } } },
+   "optionen": ["gruen", "fluegel", "krone"]
+  },
+  {
+   "id": "e13-tiere8",
+   "art": "baum",
+   "titel": "8 Tiere, 3 Fragen, 7 Frage-Zettel",
+   "aufgabe": "bauen",
+   "maxFragen": 3,
+   "einmal": true,
+   "fragen": {
+    "fliegen": { "text": "Kann es fliegen?", "kurz": "Fliegen?" },
+    "federn": { "text": "Hat es Federn?", "kurz": "Federn?" },
+    "beine": { "text": "Hat es Beine?", "kurz": "Beine?" },
+    "fell": { "text": "Hat es Fell?", "kurz": "Fell?" },
+    "punkte": { "text": "Hat es Punkte?", "kurz": "Punkte?" },
+    "quaken": { "text": "Kann es quaken?", "kurz": "Quaken?" },
+    "flossen": { "text": "Hat es Flossen?", "kurz": "Flossen?" }
+   },
+   "dinge": [
+    { "id": "eule", "name": "Eule", "bild": "eule", "ja": ["fliegen", "federn", "beine"] },
+    { "id": "ente", "name": "Ente", "bild": "ente", "ja": ["fliegen", "federn", "beine", "quaken"] },
+    { "id": "biene", "name": "Biene", "bild": "biene", "ja": ["fliegen", "beine"] },
+    { "id": "marienkaefer", "name": "Marienkäfer", "bild": "marienkaefer", "ja": ["fliegen", "beine", "punkte"] },
+    { "id": "katze", "name": "Katze", "bild": "katze", "ja": ["beine", "fell"] },
+    { "id": "frosch", "name": "Frosch", "bild": "frosch", "ja": ["beine", "quaken"] },
+    { "id": "fisch", "name": "Fisch", "bild": "fisch", "ja": ["flossen"] },
+    { "id": "schnecke", "name": "Schnecke", "bild": "schnecke", "ja": [] }
+   ],
+   "baum": { "f": "fliegen",
+     "ja": { "f": "federn", "ja": { "f": "quaken", "ja": "ente", "nein": "eule" }, "nein": { "f": "punkte", "ja": "marienkaefer", "nein": "biene" } },
+     "nein": { "f": "beine", "ja": { "f": "fell", "ja": "katze", "nein": "frosch" }, "nein": { "f": "flossen", "ja": "fisch", "nein": "schnecke" } } }
+  },
+  {
+   "id": "e13-kette",
+   "art": "baum",
+   "titel": "Ketten-Baum (schlechter Baum)",
+   "aufgabe": "zeigen",
+   "fragen": {
+    "ist-gfk": "Ist es der grüne mit Flügeln und Krone?",
+    "ist-gf": "Ist es der grüne mit Flügeln ohne Krone?",
+    "ist-gk": "Ist es der grüne mit Krone ohne Flügel?",
+    "ist-g": "Ist es der grüne ohne Flügel und Krone?",
+    "ist-bfk": "Ist es der blaue mit Flügeln und Krone?",
+    "ist-bf": "Ist es der blaue mit Flügeln ohne Krone?",
+    "ist-bk": "Ist es der blaue mit Krone ohne Flügel?"
+   },
+   "dinge": [
+    { "id": "gfk", "name": "grün, Flügel, Krone", "bild": "drachenkind-gruen-fluegel-krone", "ja": ["ist-gfk"] },
+    { "id": "gf", "name": "grün, Flügel", "bild": "drachenkind-gruen-fluegel", "ja": ["ist-gf"] },
+    { "id": "gk", "name": "grün, Krone", "bild": "drachenkind-gruen-krone", "ja": ["ist-gk"] },
+    { "id": "g", "name": "grün", "bild": "drachenkind-gruen", "ja": ["ist-g"] },
+    { "id": "bfk", "name": "blau, Flügel, Krone", "bild": "drachenkind-blau-fluegel-krone", "ja": ["ist-bfk"] },
+    { "id": "bf", "name": "blau, Flügel", "bild": "drachenkind-blau-fluegel", "ja": ["ist-bf"] },
+    { "id": "bk", "name": "blau, Krone", "bild": "drachenkind-blau-krone", "ja": ["ist-bk"] },
+    { "id": "b", "name": "blau", "bild": "drachenkind-blau", "ja": [] }
+   ],
+   "baum": { "f": "ist-gfk", "ja": "gfk", "nein": { "f": "ist-gf", "ja": "gf", "nein": { "f": "ist-gk", "ja": "gk", "nein": { "f": "ist-g", "ja": "g", "nein": { "f": "ist-bfk", "ja": "bfk", "nein": { "f": "ist-bf", "ja": "bf", "nein": { "f": "ist-bk", "ja": "bk", "nein": "b" } } } } } } }
+  }
+ ]
+}

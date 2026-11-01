@@ -1,1 +1,586 @@
-<!-- Einheit 15: noch nicht geschrieben (Platzhalter, damit Buch und --nur 15 schon funktionieren) -->
+<!--
+  Einheit 15: Gewinnen mit Plan (Block D)
+  Strategiespiele zu zweit: Steine-Spiel „Der letzte Edelstein“ (1 oder 2 nehmen, wer den letzten nimmt, gewinnt)
+  und „Wer sagt 20?“. Gewinn-Strategie durch Rückwärts-Denken entdecken, Gewinnzahlen finden und als
+  Wenn-dann-Regel in Worten aufschreiben. Kobold: eine falsche Regel. Roboter mit fester Regel, Turnier.
+  Rätsel: raetsel/e15.json (Rätselart nim, Web-Paket e15), Löser: werkzeuge/arten/nim.mjs (Spielbaum)
+  Kern: web/kern/nim.js (Spielbaum, Roboter, Zeichnungen), Bausteine: src/bausteine/e15-nim.js
+  Jede Aussage über Gewinner, Gewinnzüge und Gewinnzahlen im Text steht in <m-e15-stimmt …> und wird
+  beim Bauen mit dem Spielbaum geprüft.
+  Blätter: 15-1 Wer sagt 20? (Spielplan), 15-2 Wer gewinnt hier?, 15-3 Meine Strategie-Karte (Kobold-Regel, Turnier, Karten; Bastelvorlage)
+-->
+<style>
+  .e15-ablauf > li { break-inside: avoid; }
+  .e15-ganz > li { break-inside: auto; orphans: 2; widows: 2; }
+  .kasten.e15-bricht { -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .kasten.e15-bricht > .kasten-titel { break-after: avoid; }
+  .kasten.e15-bricht > .kasten-titel + p, .kasten.e15-bricht > .kasten-titel + ul > li:first-child { break-before: avoid; break-inside: avoid; }
+  .kasten.material.e15-bricht > .kasten-titel + p { break-after: avoid; }
+  .kasten.material.e15-bricht > .kasten-titel + p + ul > li:first-child { break-before: avoid; break-inside: avoid; }
+  .e15-tab td, .e15-tab th { vertical-align: top; }
+  .e15-tab td:first-child { width: 17%; }
+  .e15-tab td:last-child { width: 24%; }
+  .e15-baum { display: flex; align-items: center; gap: 6mm; margin: 2mm 0 2.5mm 0; break-inside: avoid; }
+  .e15-baum.e15-schwebt { float: right; flex-direction: column; align-items: flex-start; gap: 1.5mm; width: 86mm; margin: 1mm 0 2mm 5mm; }
+  .e15-baum .e15-legende { font-size: 9.5pt; line-height: 1.35; }
+  .e15-gold { display: inline-block; width: 3.6mm; height: 3.6mm; border-radius: 50%; background: var(--gold); border: 0.3mm solid var(--tinte); vertical-align: -0.5mm; }
+  .e15-weiss { display: inline-block; width: 3.6mm; height: 3.6mm; border-radius: 50%; background: white; border: 0.3mm solid var(--tinte); vertical-align: -0.5mm; }
+  .e15-loes { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm 4mm; align-items: start; margin: 2mm 0 4mm 0; }
+  .e15-loes m-loesungen, .e15-loes .loesungen-raster { display: contents; }
+  .e15-loes > .kasten.loesung { margin: 5mm 0 0 0; font-size: 9.5pt; }
+  .e15-loes > .kasten.loesung p, .kasten.loesung.e15-weiter p { margin-bottom: 1.6mm; }
+  table.tab.e15-ltab { font-size: 9pt; line-height: 1.3; }
+  table.tab.e15-ltab td, table.tab.e15-ltab th { padding-top: 0.8mm; padding-bottom: 0.8mm; }
+  .e15-ltab td:first-child { width: 8%; }
+  .e15-ltab td:nth-child(2) { width: 37%; }
+
+  /* Blätter */
+  .e15-regelbox { display: flex; align-items: center; gap: 5mm; border: 0.7mm solid var(--akzent); background: var(--akzent-hell); border-radius: 4mm; padding: 3mm 5mm; }
+  .e15-regelbox p { margin: 0; line-height: 1.25; }
+  .e15-regelbox .e15-rb-text { display: flex; flex-direction: column; gap: 1.5mm; }
+  .e15-weg-box { display: flex; justify-content: center; }
+  .e15-neben { display: flex; align-items: center; gap: 5mm; flex-wrap: wrap; }
+  .e15-profi-reihe { display: flex; align-items: flex-end; gap: 6mm; }
+  .e15-profi-reihe > .profi { flex: 1; }
+  .e15-profi-reihe .profi p { display: flex; align-items: center; gap: 3mm; flex-wrap: wrap; }
+  .blatt .raster.s4.e15-stellungen { gap: 3mm; align-items: stretch; }
+  .e15-kobold { display: flex; align-items: center; gap: 6mm; }
+  .e15-kobold m-symbol { flex: none; }
+  .e15-kobold .e15-regeln { gap: 2mm; }
+  .e15-turnier { border-collapse: collapse; font-size: 14pt; line-height: 1.1; width: 100%; table-layout: fixed; }
+  .e15-turnier th, .e15-turnier td { border: 0.45mm solid var(--tinte); padding: 0.9mm 1.5mm; text-align: center; vertical-align: middle; }
+  .e15-turnier th { font-weight: 700; background: var(--akzent-hell); }
+  .e15-turnier th:first-child, .e15-turnier td:first-child { text-align: left; width: 40mm; white-space: nowrap; }
+  .e15-turnier td.e15-leer { height: 9.5mm; }
+  .e15-turnier .e15-spiel { font-size: 14pt; line-height: 1.05; display: flex; flex-direction: column; align-items: center; gap: 0.5mm; }
+  .e15-punkte { display: flex; align-items: center; gap: 3mm; margin-top: 2mm; font-size: 16pt; line-height: 1.1; }
+  .e15-punkte .e15-strichfeld { flex: 1; height: 9mm; border: 0.45mm solid var(--tinte); border-radius: 2mm; background: white; }
+  .e15-knobel-reihe { display: flex; align-items: center; gap: 4mm; flex-wrap: wrap; }
+  .e15-knobel-reihe > p { margin: 0; display: flex; align-items: center; gap: 2.5mm; }
+
+  /* Strategie-Karten (Bastelvorlage) */
+  .e15-karte { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 2mm; padding: 3mm 4mm; text-align: left; }
+  .e15-karte-kopf { display: flex; align-items: center; gap: 2mm; font-family: var(--text); font-weight: 900; font-size: 11pt; color: var(--akzent); }
+  .e15-karte-titel { font-family: var(--kind); font-weight: 700; font-size: 17pt; line-height: 1.1; }
+  .e15-karte-zeile { font-family: var(--kind); font-size: 13pt; line-height: 1.15; }
+  .e15-karte .e15-zahlen { gap: 1.8mm; }
+  .e15-karte-klein { font-family: var(--kind); font-size: 12pt; line-height: 1.15; color: var(--grau); }
+</style>
+
+<!-- Spickzettel: Kurzfassung der Anleitung zum Mitnehmen, höchstens zwei Seiten -->
+<section class="spick nur-buch" data-einheit="15" data-titel="Gewinnen mit Plan">
+  <p class="spick-kern"><b>Darum geht’s:</b> Strategiespiele zu zweit. {{KIND}} entdeckt eine <b>Gewinn-Strategie</b>: Mit den <b>Gewinnzahlen</b> gewinnt man immer, wenn man sie zuerst „machen“ kann. Beim Steine-Spiel (1 oder 2 nehmen, wer den letzten nimmt, gewinnt) lässt man <m-e15-stimmt spiel="steine 1-2" gz>3, 6, 9 oder 12</m-e15-stimmt> Steine liegen, bei „Wer sagt 20?“ sagt man <m-e15-stimmt spiel="zaehlen 20 1-2" gz>2, 5, 8, 11, 14, 17 und 20</m-e15-stimmt>. Gefunden wird das durch <b>Rückwärts-Denken</b> vom Ende her, aufgeschrieben als Wenn-dann-Regel: „Wenn noch 4 Steine liegen, dann nimm 1.“</p>
+
+  <div class="spick-zwei breit-links">
+    <div class="spick-block vorher">
+      <h2>Vorher, ohne {{KIND}} <small>· etwa 10 Min</small></h2>
+      <ul class="check">
+        <li><a class="blattref" href="#blatt-15-1"></a> und <a class="blattref" href="#blatt-15-3"></a> in Farbe drucken (15-3 auf dickes Papier), <a class="blattref" href="#blatt-15-2"></a> geht auch schwarz-weiß. <span class="min">2 Min</span></li>
+        <li>10 Muggelsteine ins Schüsserl, etwa 20 bereit. <span class="min">2 Min</span></li>
+        <li>Zettel „Roboter-Regel: Ich nehme immer 1 Stein.“ schreiben und falten. <span class="min">2 Min</span></li>
+        <li>Steine-Spiel einmal allein ausprobieren, Gewinnzahlen anschauen. <span class="min">4 Min</span></li>
+      </ul>
+    </div>
+    <div class="spick-block vorher">
+      <h2>Bereitlegen</h2>
+      <ul class="check">
+        <li>Muggelsteine, Drachen-Figur aus Einheit 2</li>
+        <li>Bleistift, gelber Buntstift, Schere</li>
+        <li>Platz zum Hüpfen im Gang</li>
+        <li>Stempel oder Sticker</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Gemeinsam</h2>
+  <ol class="spick-ablauf">
+    <li data-min="4"><div><b>Der letzte Edelstein.</b> 3 Runden mit 10 Steinen, abwechselnd fängt jemand an. Du spielst heimlich mit Plan: Lass nach deinem Zug 9, 6 oder 3 Steine liegen.
+      <div class="spick-spiel"><h3>Der letzte Edelstein</h3><p class="meta">10 Muggelsteine in einer Reihe</p>
+        <ul>
+          <li><b>Ein Zug:</b> 1 oder 2 Steine nehmen, nicht 0, nicht 3.</li>
+          <li><b>Ende:</b> Wer den letzten Stein nimmt, gewinnt und darf brüllen wie ein Drache.</li>
+          <li><b>Pech:</b> Liegen schon 9 (sie hat 1 genommen), nimm 1 und warte auf ihren Fehler.</li>
+        </ul></div>
+      <div class="sag">
+        <p class="sie">„Du gewinnst immer! Du schummelst!“</p>
+        <p class="du">„Ich schummle nicht. Ich habe einen Plan, eine Gewinn-Strategie. Wollen wir ihn zusammen herausfinden?“</p>
+      </div>
+    </div></li>
+    <li data-min="5"><div><b>Rückwärts denken.</b> Vom Ende her mit wenigen Steinen: 1, 2 (gewonnen), 3 (Pech!), 4, 5 (nimm so viel, dass 3 bleiben), 6 (Pech!). Dann <a class="blattref" href="#blatt-15-2"></a>, Aufgabe 1, Steine auf das Blatt legen.
+      <div class="sag">
+        <p class="du">„Es liegen noch 3 Steine und du bist dran. Was machst du?“</p>
+        <p class="sie">„Ich nehm zwei … dann nimmst du den letzten. Das ist gemein!“</p>
+        <p class="du">„Genau. Wer 3 Steine liegen lässt, gewinnt. Die 3 ist eine Gewinnzahl. Und jetzt liegen 4 da.“</p>
+        <p class="dann">Fragt sie selbst „Ist 9 auch eine?“: feiern!</p>
+      </div>
+      <m-e15-zugtabelle spiel="steine 1-2" bis="10" kopf1="Es liegen" kopf2="Wer dran ist, nimmt"></m-e15-zugtabelle>
+    </div></li>
+    <li data-min="5"><div><b>Die Gewinn-Regel.</b> <a class="blattref" href="#blatt-15-2"></a>, Aufgabe 2: Wenn-dann-Regeln schreiben. Dann Revanche mit 10 Steinen, {{KIND}} fängt an (nimm 1, dann liegen 9). Profi-Aufgabe freiwillig.
+      <div class="sag">
+        <p class="du">„Lies mir deine Regeln vor. Ich bin ein Roboter und mache genau, was du sagst.“</p>
+        <p class="sie">„Wenn noch 5 Steine liegen, dann nimm 2!“</p>
+        <p class="dann">Revanche: Mit Plan gewinnt sie, egal wie du spielst. Genießen lassen!</p>
+      </div>
+    </div></li>
+    <li data-min="7"><div><b>Wer sagt 20?</b> Eine Runde Zähl-Hüpfen im Gang, dann auf <a class="blattref" href="#blatt-15-1"></a> mit der Drachen-Figur. Gewinnzahlen rückwärts finden, gelb anmalen, Aufgaben 2 und 3. Danach beide Strategie-Karten auf <a class="blattref" href="#blatt-15-3"></a> ausfüllen.
+      <div class="spick-spiel"><h3>Wer sagt 20?</h3>
+        <ul>
+          <li><b>Ein Zug:</b> 1 oder 2 Zahlen weiterzählen. Der Erste sagt „1“ oder „1, 2“.</li>
+          <li><b>Hüpfen:</b> Für jede Zahl ein Hüpfer nach vorne.</li>
+          <li><b>Ende:</b> Wer 20 sagt, gewinnt.</li>
+        </ul></div>
+      <div class="sag">
+        <p class="du">„Welche Zahl möchtest du vor der 20 sagen, damit ich nicht hinkomme?“</p>
+        <p class="sie">„Bei 17! Dann kommst du nur bis 18 oder 19.“</p>
+        <p class="dann">„Immer 3 weniger“ ist der Kern. Wer den Plan hat, macht jede Runde auf 3 voll.</p>
+      </div>
+    </div></li>
+    <li data-min="5"><div><b>Der Roboter mit der festen Regel.</b> Du bist der Roboter und spielst streng nach dem Zettel („immer 1“). {{KIND}} gewinnt und errät die Regel. Dann <a class="blattref" href="#blatt-15-3"></a>, Aufgabe 1: die Kobold-Regel durchstreichen.
+      <div class="spick-spiel"><h3>Der Roboter mit der festen Regel</h3><p class="meta">10 Muggelsteine, Zettel „Ich nehme immer 1 Stein.“</p>
+        <ul>
+          <li><b>Du:</b> nimmst streng nach dem Zettel, auch wenn es dumm ist. „Piep. Ich nehme 1.“</li>
+          <li><b>Sie:</b> rät nach jeder Runde die Regel. Sie gewinnt immer, auch wenn du anfängst.</li>
+          <li><b>Danach:</b> Sie schreibt dem Roboter eine bessere Regel, du spielst nur noch danach.</li>
+        </ul></div>
+      <div class="sag">
+        <p class="du">„Piep. Ich habe eine geheime Regel. Findest du heraus, wie sie geht?“</p>
+        <p class="sie">„Du nimmst immer nur einen! Da gewinne ich immer.“</p>
+        <p class="dann">Kobold-Regel auf <a class="blattref" href="#blatt-15-3"></a>: <m-e15-stimmt spiel="steine 1-2" haufen="11" gewinner="du" nimm="2">Bei 11 Steinen muss man 2 nehmen</m-e15-stimmt>, nicht 1.</p>
+      </div>
+    </div></li>
+    <li data-min="2"><div><b>Sammelpass.</b> Feld „Einheit&nbsp;15“, Sterne anmalen. Das Turnier (<a class="blattref" href="#blatt-15-3"></a>) spielt ihr an den nächsten Tagen.</div></li>
+  </ol>
+
+  <div class="spick-zwei">
+    <div class="spick-block stolper">
+      <h2>Wenn es hakt</h2>
+      <ul>
+        <li><b>Nimmt 3 oder 0:</b> zwei Finger hoch, „1 oder 2“.</li>
+        <li><b>Zählt die Steine vor sich:</b> Es zählt, was in der Mitte liegen bleibt.</li>
+        <li><b>„Die Regel geht nicht!“</b> (es liegt schon eine Gewinnzahl): Pech, nimm 1 und warte.</li>
+        <li><b>Traurig nach Niederlagen:</b> mit 4 oder 5 Steinen starten, sie anfangen lassen.</li>
+        <li><b>Hilfe zum Sehen:</b> Steine in Dreier-Reihen legen.</li>
+      </ul>
+    </div>
+    <div class="spick-block schwerer">
+      <h2>Zu leicht?</h2>
+      <ul>
+        <li><b>Wer sagt 30?</b> Wer anfängt, verliert.</li>
+        <li><b>1, 2 oder 3 nehmen:</b> Gewinnzahlen 4, 8, 12.</li>
+        <li><b>Kobold-Stein:</b> Wer den letzten nimmt, verliert.</li>
+        <li><b>Zwei Haufen:</b> gleich groß machen, dann nachmachen.</li>
+        <li><b>Spielbaum</b> für 4 Steine zeichnen, <b>Regel für den Roboter</b> schreiben.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="spick-block schluss">
+    <h2>Zum Schluss nicht vergessen</h2>
+    <ul class="check">
+      <li><b>Bildschirm-Bonus,</b> nur wenn ihr mögt (höchstens 15 Min, nach den Blättern): Paket 15, QR-Code unten rechts auf <a class="blattref" href="#blatt-15-1"></a>. 8 Spiele gegen den Roboter: Steine antippen, „Nehmen“; bei „Wer sagt 20?“ die Zahlen-Taste antippen, „Los“. Einen Stern gibt es nur, wenn {{KIND}} gewinnt. Gewinnt der Roboter, kommt „Nochmal?“ mit einem Tipp. Level 1, 4, 5 und 6 sind wie am Blatt. Nach dem Ende-Bild kommt das Gerät weg.</li>
+      <li>Strategie-Karten ausschneiden und zur Werkzeugkiste legen.</li>
+      <li><b>Turnier</b> an den nächsten Tagen, Tabelle auf <a class="blattref" href="#blatt-15-3"></a>: 6 Runden, wer anfängt, wechselt. Vor jeder Runde sagen beide, wer gewinnt (richtig: 1 Punkt), wer gewinnt, bekommt noch 1 Punkt (Striche unter der Tabelle). Gleichstand: Finale „Wer sagt 30?“, {{KIND}} bestimmt, wer anfängt. Mit Plan gewinnt bei <m-e15-stimmt spiel="steine 1-2" haufen="10" anfangen="zuerst">10 Steinen</m-e15-stimmt> und <m-e15-stimmt spiel="zaehlen 20 1-2" anfangen="zuerst">„Wer sagt 20?“</m-e15-stimmt>, wer anfängt, bei <m-e15-stimmt spiel="steine 1-2" haufen="12" anfangen="zweiter">12 Steinen</m-e15-stimmt> der andere.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="anleitung" data-einheit="15" data-titel="Gewinnen mit Plan">
+
+  <div class="kasten ziel">
+    <p>Heute spielt {{KIND}} Strategiespiele zu zweit und entdeckt etwas Großartiges: Bei manchen Spielen kann man mit einem Plan <b>immer</b> gewinnen. So ein Plan heißt <span class="begriff">Gewinn-Strategie</span>. Zuerst spielt ihr „Der letzte Edelstein“: 10 Muggelsteine liegen auf dem Tisch, ihr nehmt abwechselnd 1 oder 2, und wer den letzten nimmt, gewinnt. Dann kommt „Wer sagt 20?“: Ihr zählt abwechselnd 1 oder 2 Zahlen weiter, und wer 20 sagt, gewinnt.</p>
+    <p>Das Geheimnis sind die <span class="begriff">Gewinnzahlen</span>. Beim Steine-Spiel sind es <m-e15-stimmt spiel="steine 1-2" gz>3, 6, 9 und 12</m-e15-stimmt>: Wer nach seinem Zug so viele Steine liegen lässt, gewinnt sicher, wenn er danach weiter gut spielt. Bei „Wer sagt 20?“ sind es <m-e15-stimmt spiel="zaehlen 20 1-2" gz>2, 5, 8, 11, 14, 17 und 20</m-e15-stimmt>. {{KIND}} findet sie selbst, indem sie <b>vom Ende her rückwärts denkt</b>, und schreibt ihren Plan als Wenn-dann-Regel auf: „<m-e15-stimmt spiel="steine 1-2" haufen="4" dran="du" gewinner="du" nimm="1">Wenn noch 4 Steine liegen, dann nimm 1.</m-e15-stimmt>“ So eine Regel kann sogar ein Roboter befolgen. Der Fehler-Kobold hat natürlich auch Regeln geschrieben, und eine davon stimmt nicht.</p>
+    <p>Habt ihr in der Rechen-Werkstatt schon Nim gespielt (dort steht es im Ideen-Parkplatz)? Dann kennt {{KIND}} das Steine-Spiel schon. Hier geht es um den Plan dahinter: Sie findet ihn selbst, schreibt ihn als Regel auf und testet ihn gegen einen Roboter. Das ist die erste Einheit von Block D „Strategie und Projekte“.</p>
+  </div>
+
+  <div class="kasten tipp" data-titel="Die Spielregeln (für euch beide gleich)">
+    <ul>
+      <li><b>Der letzte Edelstein (Steine-Spiel):</b> Wer dran ist, nimmt 1 oder 2 Steine, nicht 0 und nicht 3. Dann ist der andere dran. Wer den letzten Stein nimmt, gewinnt.</li>
+      <li><b>Wer sagt 20?</b> Der Erste sagt „1“ oder „1, 2“. Dann zählt der andere 1 oder 2 Zahlen weiter, dann wieder der Erste, und so fort. Wer „20“ sagt, gewinnt. Am Papier zieht ihr die Drachen-Figur auf dem Zahlen-Weg von <a class="blattref" href="#blatt-15-1"></a>.</li>
+      <li><b>Gewinnzahl:</b> eine Zahl, die man mit seinem Zug „macht“. Beim Steine-Spiel lässt man so viele Steine liegen, bei „Wer sagt 20?“ ist es die Zahl, die man als Letzte sagt. Wer eine Gewinnzahl macht und danach weiter gut spielt, gewinnt sicher: Der andere kann aus einer Gewinnzahl nie eine Gewinnzahl machen, man selbst aber immer die nächste.</li>
+      <li><b>Pech gehört dazu:</b> Ist man dran, und es liegt schon eine Gewinnzahl, kann man nicht sicher gewinnen. Dann nimmt man 1 und hofft auf einen Fehler des anderen. Das ist kein Kobold im Plan: Eine Gewinn-Strategie hilft dem, der sie als Erster benutzen kann.</li>
+      <li><b>Rückwärts denken:</b> So findet man die Gewinnzahlen jedes Spiels. Man fängt am Ende an („Wer 20 sagt, gewinnt.“) und fragt: Welche Zahl muss ich davor machen, damit der andere nicht hinkommt?</li>
+    </ul>
+  </div>
+
+  <div class="kasten material darf-brechen e15-bricht">
+    <p><b>Vorher, ohne {{KIND}} (etwa 10 Minuten):</b></p>
+    <ul>
+      <li><b>Drucken (2 Minuten):</b> <a class="blattref" href="#blatt-15-1"></a> (Spielplan) und <a class="blattref" href="#blatt-15-3"></a> (Bastelvorlage) <b>in Farbe</b>, <a class="blattref" href="#blatt-15-2"></a> (Arbeitsblatt) geht auch schwarz-weiß. Blatt 15-3 am besten auf dickerem Papier (160&nbsp;g), weil die Strategie-Karten lange halten sollen.</li>
+      <li><b>Muggelsteine zählen (2 Minuten):</b> 10 Muggelsteine in ein Schüsserl, insgesamt etwa 20 bereit. Statt Muggelsteinen gehen Knöpfe, Nudeln oder Zuckerl. Zuckerl sind besonders spannend, werden aber erst nach dem letzten Spiel gegessen.</li>
+      <li><b>Roboter-Zettel (2 Minuten):</b> Schreib auf einen kleinen Zettel „Roboter-Regel: Ich nehme immer 1 Stein.“ und falte ihn zusammen. Er kommt in Schritt 5 dran.</li>
+      <li><b>Selbst ausprobieren (4 Minuten):</b> Spiel das Steine-Spiel mit 10 Steinen kurz gegen dich selbst. Lass nach jedem Zug <m-e15-stimmt spiel="steine 1-2" gz="teil">9, 6 oder 3</m-e15-stimmt> Steine liegen und schau, wie der andere jedes Mal festsitzt. In Schritt 1 spielst du so, ohne es zu verraten. Für „Wer sagt 20?“ sind die Zahlen <m-e15-stimmt spiel="zaehlen 20 1-2" gz>2, 5, 8, 11, 14, 17 und 20</m-e15-stimmt>: immer 3 weiter.</li>
+      <li><b>Drachen-Figur</b> aus Einheit 2 (<a class="blattref" href="#blatt-2-3"></a>) bereitlegen. Sie wandert heute auf dem Zahlen-Weg.</li>
+    </ul>
+    <p><b>Material in der Einheit:</b> die Muggelsteine, die Drachen-Figur, ein Bleistift, ein gelber Buntstift (Gewinnzahlen anmalen), eine Schere für die Strategie-Karten, der Roboter-Zettel, Platz zum Hüpfen im Gang, Stempel oder Sticker für den Sammelpass.</p>
+    <p><b>Extra, außerhalb der Einheit:</b> Die Strategie-Karten bemalen, auf Karton kleben und mit Tixo überziehen (etwa 10 Minuten). Wer mag, klebt mit Malerkrepp einen Zahlen-Weg mit 20 Feldern in den Gang oder malt ihn mit Kreide in den Hof: Dann wird „Wer sagt 20?“ zum Hüpf-Spiel (Kasten „Bewegung“).</p>
+  </div>
+
+  <h2>Ablauf Schritt für Schritt</h2>
+  <ol class="ablauf e15-ablauf">
+    <li data-min="4"><span class="schritt-titel">Der letzte Edelstein</span>Leg die 10 Muggelsteine in eine Reihe und erklär die Regel (Kasten „Spiel: Der letzte Edelstein“). Spielt 3 Runden, abwechselnd fängt jemand an. <b>Du spielst heimlich mit Plan:</b> Lass nach deinem Zug immer 9, 6 oder 3 Steine liegen. Fängt {{KIND}} an und nimmt zufällig 1 (dann liegen 9), hast du Pech: Nimm 1 und warte, ob sie sich später vertut. Wenn du anfängst, nimmst du 1. Meist merkt sie nach zwei oder drei Runden: „Du gewinnst ja immer!“ Genau darauf wartest du (Beispielsätze).</li>
+    <li data-min="5"><span class="schritt-titel">Rückwärts denken</span>Jetzt sucht ihr den Plan, und zwar vom Ende her. Leg nur 1 Stein hin: „Du bist dran. Was machst du?“ (Nehmen, gewonnen.) Dann 2 (beide nehmen). Dann 3: Egal, was sie nimmt, du nimmst den Rest. Die 3 ist die erste Gewinnzahl. Dann 4 und 5: Wie viele nimmt sie, damit 3 übrig bleiben? Dann 6: wieder Pech, die nächste Gewinnzahl. Die Tabelle unter dem Ablauf hilft dir. Danach <a class="blattref" href="#blatt-15-2"></a>, Aufgabe 1: Sie legt bei jedem Bild echte Steine auf das Blatt und spielt es kurz durch.</li>
+    <li data-min="5"><span class="schritt-titel">Die Gewinn-Regel</span><a class="blattref" href="#blatt-15-2"></a>, Aufgabe 2: Sie schreibt ihren Plan als Wenn-dann-Regeln auf. Die erste Regel steht schon da: „Wenn noch 4 Steine liegen, dann nimm 1.“ Wer mag, liest die Regeln laut vor wie ein Roboter. Dann kommt die <b>Revanche</b>: 10 Steine, {{KIND}} fängt an. Mit Plan nimmt sie 1, und du kannst spielen, wie du willst: Sie gewinnt. Diesen Moment darf sie richtig genießen. Die Profi-Aufgabe (1, 2 oder 3 nehmen) ist freiwillig.</li>
+    <li data-min="7"><span class="schritt-titel">Wer sagt 20?</span>Zuerst eine Runde <b>Zähl-Hüpfen</b> im Gang (Kasten „Bewegung“), damit das Spiel in den Beinen ist. Dann am Tisch mit <a class="blattref" href="#blatt-15-1"></a> und der Drachen-Figur: Sie startet auf „Start“, wer dran ist, zieht sie 1 oder 2 Felder weiter und sagt die Zahlen laut. Dann denkt ihr wieder rückwärts: „Wer 20 sagt, gewinnt. Welche Zahl willst du davor sagen?“ Sie malt die Gewinnzahlen auf dem Weg gelb an (20 und 17 sind schon gelb) und schreibt sie bei Aufgabe 2 auf. Zum Schluss trägt sie beide Gewinnzahl-Listen in die Strategie-Karten auf <a class="blattref" href="#blatt-15-3"></a> ein.</li>
+    <li data-min="5"><span class="schritt-titel">Der Roboter mit der festen Regel</span>Du bist der Roboter und hast den gefalteten Zettel in der Hand (Kasten „Spiel: Der Roboter mit der festen Regel“). Ihr spielt das Steine-Spiel, du nimmst streng nach deiner Regel immer 1 Stein. Nach jeder Runde darf {{KIND}} raten, wie deine Regel geht. Danach kommt der Fehler-Kobold: <a class="blattref" href="#blatt-15-3"></a>, Aufgabe 1. Der Kobold hat Regeln geschrieben, eine davon ist falsch. Sie prüft jede Regel mit ihren Gewinnzahlen (oder mit echten Steinen) und streicht die falsche durch.</li>
+    <li data-min="2"><span class="schritt-titel">Sammelpass</span>Feld „Einheit&nbsp;15“ stempeln oder bekleben, Sterne anmalen. Frag: „Was war heute am lustigsten?“ Das <b>Turnier</b> mit der Tabelle auf <a class="blattref" href="#blatt-15-3"></a> spielt ihr an den nächsten Tagen, z. B. nach dem Abendessen (Kasten „Spiel: Turnier zu zweit“).</li>
+  </ol>
+
+  <div class="kasten tipp darf-brechen e15-bricht" data-titel="Rückwärts denken: die Tabelle zu Schritt 2 (vom Spielbaum geprüft)">
+    <table class="tab darf-brechen e15-tab">
+      <tr><th>Es liegen noch … und {{KIND}} ist dran</th><th>Was sie macht</th><th>Wer gewinnt?</th></tr>
+      <tr><td>1 Stein</td><td><m-e15-stimmt spiel="steine 1-2" haufen="1" gewinner="du" nimm="1">nimmt ihn: gewonnen</m-e15-stimmt></td><td>{{KIND}}</td></tr>
+      <tr><td>2 Steine</td><td><m-e15-stimmt spiel="steine 1-2" haufen="2" gewinner="du" nimm="2">nimmt beide: gewonnen</m-e15-stimmt></td><td>{{KIND}}</td></tr>
+      <tr><td>3 Steine</td><td><m-e15-stimmt spiel="steine 1-2" haufen="3" gewinner="andere">Pech: Nimmt sie 1, nimmst du 2. Nimmt sie 2, nimmst du 1.</m-e15-stimmt></td><td>du, <b>3 ist eine Gewinnzahl</b></td></tr>
+      <tr><td>4 Steine</td><td><m-e15-stimmt spiel="steine 1-2" haufen="4" gewinner="du" nimm="1">nimmt 1, dann liegen 3</m-e15-stimmt></td><td>{{KIND}}</td></tr>
+      <tr><td>5 Steine</td><td><m-e15-stimmt spiel="steine 1-2" haufen="5" gewinner="du" nimm="2">nimmt 2, dann liegen 3</m-e15-stimmt></td><td>{{KIND}}</td></tr>
+      <tr><td>6 Steine</td><td><m-e15-stimmt spiel="steine 1-2" haufen="6" gewinner="andere">Pech: Sie lässt 5 oder 4 liegen, du machst daraus 3.</m-e15-stimmt></td><td>du, <b>6 ist eine Gewinnzahl</b></td></tr>
+      <tr><td>7 Steine</td><td><m-e15-stimmt spiel="steine 1-2" haufen="7" gewinner="du" nimm="1">nimmt 1, dann liegen 6</m-e15-stimmt></td><td>{{KIND}}</td></tr>
+      <tr><td>8 Steine</td><td><m-e15-stimmt spiel="steine 1-2" haufen="8" gewinner="du" nimm="2">nimmt 2, dann liegen 6</m-e15-stimmt></td><td>{{KIND}}</td></tr>
+      <tr><td>9 Steine</td><td><m-e15-stimmt spiel="steine 1-2" haufen="9" gewinner="andere">Pech: Sie lässt 8 oder 7 liegen, du machst daraus 6.</m-e15-stimmt></td><td>du, <b>9 ist eine Gewinnzahl</b></td></tr>
+      <tr><td>10 Steine</td><td><m-e15-stimmt spiel="steine 1-2" haufen="10" gewinner="du" nimm="1">nimmt 1, dann liegen 9</m-e15-stimmt></td><td>{{KIND}}, darum gewinnt beim Edelstein-Spiel, wer anfängt</td></tr>
+    </table>
+    <p>Wer will, sieht das Muster: Die Gewinnzahlen kommen alle 3 Steine. Liegen die Steine in Dreier-Reihen, sind es genau die vollen Reihen. Warum 3? Wer den Plan hat, macht jede Runde auf 3 voll: Nimmt der andere 1, nimmt er 2. Nimmt der andere 2, nimmt er 1.</p>
+  </div>
+
+  <h3>Beispielsätze</h3>
+  <div class="sag">
+    <p class="du">„Ich hab hier 10 Edelsteine vom Drachen. Wir nehmen abwechselnd 1 oder 2. Wer den letzten nimmt, bekommt den Drachen-Schatz. Du darfst anfangen!“</p>
+    <p class="sie">(nimmt 2) „Zwei!“</p>
+    <p class="du">(nimmt auch 2, jetzt liegen 6) „Dann nehme ich auch zwei.“</p>
+    <p class="dann">So spielst du mit Plan: Lass nach deinem Zug immer <m-e15-stimmt spiel="steine 1-2" gz="teil">9, 6 oder 3</m-e15-stimmt> liegen. Sag nichts davon. Nach zwei oder drei Runden kommt meistens der Protest.</p>
+    <p class="sie">„Du gewinnst immer! Du schummelst!“</p>
+    <p class="du">„Ich schummle nicht. Ich habe einen Plan, eine Gewinn-Strategie. Wollen wir ihn zusammen herausfinden?“</p>
+    <p class="dann">Gewinnt sie eine Runde, weil sie zufällig richtig nimmt, frag: „Hattest du einen Plan?“ Das macht sie neugierig. Gewinnt sie gar nicht und wird traurig, verrat den Plan früher, das ist kein Problem.</p>
+  </div>
+  <div class="sag">
+    <p class="du">(legt 3 Steine hin) „Stell dir vor, es liegen nur noch 3 Steine und du bist dran. Was machst du?“</p>
+    <p class="sie">„Ich nehm zwei … dann nimmst du den letzten. Ich nehm einen … dann nimmst du zwei. Das ist gemein!“</p>
+    <p class="du">„Genau. Wer 3 Steine liegen lässt, gewinnt. Die 3 ist eine Gewinnzahl. Und jetzt liegen 4 da.“</p>
+    <p class="sie">„Dann nehm ich einen, und es liegen 3. Dann gewinne ich!“</p>
+    <p class="dann">Weiter mit 5 und 6. Bei 6 merkt sie: Egal, was sie nimmt, du kannst wieder 3 machen. Fragt sie von selbst „Ist 9 auch eine?“, ist das der Moment zum Feiern. Sie hat das Muster gefunden.</p>
+  </div>
+  <div class="sag">
+    <p class="du">(<a class="blattref" href="#blatt-15-1"></a>) „Wer 20 sagt, gewinnt. Welche Zahl möchtest du vorher sagen, damit ich die 20 nicht erreiche?“</p>
+    <p class="sie">„19? … Nein, dann sagst du 20. Bei 18 sagst du 19, 20. … Bei 17! Dann kommst du nur bis 18 oder bis 19.“</p>
+    <p class="du">„Super, die 17 ist eine Gewinnzahl. Und welche kommt vor der 17?“</p>
+    <p class="sie">„14! Immer 3 weniger!“</p>
+    <p class="dann">„Immer 3 weniger“ (oder „immer 3 weiter“) ist der Kern. Lass sie die Gewinnzahlen auf dem Weg gelb anmalen. Dann: „Willst du anfangen oder soll ich?“ Wer anfängt, sagt „1, 2“ und hat schon die erste Gewinnzahl, die <m-e15-stimmt spiel="zaehlen 20 1-2" stand="0" sag="2" gewinner="du">2</m-e15-stimmt>.</p>
+  </div>
+  <div class="sag">
+    <p class="du">(mit dem gefalteten Zettel) „Piep. Ich bin der Roboter. Auf meinem Zettel steht eine geheime Regel, und ich spiele genau danach. Findest du heraus, wie sie geht?“</p>
+    <p class="sie">(nach zwei Runden) „Du nimmst immer nur einen Stein!“</p>
+    <p class="du">„Piep. Richtig. Ist das eine gute Regel?“</p>
+    <p class="sie">„Nein! Da gewinne ich immer. Du musst so viele nehmen, dass 3, 6 oder 9 liegen bleiben!“</p>
+    <p class="dann">Das ist die wichtigste Einsicht des Tages: Eine Regel, die nicht schaut, wie viele Steine liegen, ist leicht zu besiegen. Gegen „immer 1“ gewinnt {{KIND}} jede Runde, wenn sie gut spielt, <m-e15-stimmt spiel="steine 1-2" haufen="10" dran="andere" gegner="immer1" gewinner="du">sogar wenn der Roboter anfängt</m-e15-stimmt>. Hat sie noch Lust, schreibt sie dem Roboter eine bessere Regel (Schwerer-Teil, Punkt 9).</p>
+  </div>
+  <div class="sag">
+    <p class="du">(<a class="blattref" href="#blatt-15-3"></a>) „Der Kobold hat Regeln geschrieben. Eine stimmt nicht. Wie findest du sie?“</p>
+    <p class="sie">„Ich schau, wie viele liegen bleiben. Bei 11 nimmt er 1, dann liegen 10. Die 10 ist keine Gewinnzahl!“</p>
+    <p class="dann">Genau so prüft man eine Regel: nachrechnen, was liegen bleibt. Will sie es mit echten Steinen testen, umso besser: 11 Steine, sie spielt nach der Kobold-Regel und nimmt 1, du spielst mit Plan. <m-e15-stimmt spiel="steine 1-2" haufen="10" dran="andere" gewinner="andere" nimm="1">Du nimmst 1 und lässt 9 liegen</m-e15-stimmt>, und du gewinnst. „Siehst du? Der Kobold hat dir den Sieg geklaut.“</p>
+  </div>
+  <div class="sag">
+    <p class="sie">(es liegen 6 Steine, sie ist dran) „Die Regel geht nicht! Egal, was ich nehme!“</p>
+    <p class="du">„Stimmt. Wenn schon eine Gewinnzahl liegt, hat der Pech, der dran ist. Was kannst du trotzdem tun?“</p>
+    <p class="sie">„Einen nehmen und hoffen, dass du dich vertust!“</p>
+    <p class="dann">Das ist eine erwachsene Einsicht: Ein Plan hilft nicht in jeder Lage, aber er sagt einem, wann man Glück braucht. Mach dann ruhig einmal absichtlich einen Fehler, damit sie die Chance nutzen kann.</p>
+  </div>
+
+  <h2>Spiele, Bewegung und Basteln</h2>
+
+  <div class="kasten spiel darf-brechen e15-bricht" data-titel="Der letzte Edelstein">
+    <p class="spiel-meta">2 Personen · 1–2 Minuten pro Runde · 10 Muggelsteine (oder Knöpfe, Nudeln, Zuckerl), ein Tisch</p>
+    <ol class="regeln">
+      <li><b>Vorbereitung:</b> Die 10 Steine liegen in einer Reihe in der Mitte. Ihr sitzt euch gegenüber.</li>
+      <li><b>Ziel:</b> Den letzten Stein nehmen. Er ist der Drachen-Edelstein.</li>
+      <li><b>Ein Zug:</b> Wer dran ist, nimmt 1 oder 2 Steine aus der Reihe und legt sie vor sich hin. Nicht 0 und nicht 3. Dann ist der andere dran. Die Steine vor einem zählen nicht, es zählt nur, was in der Mitte liegen bleibt.</li>
+      <li><b>Wer anfängt:</b> abwechselnd. In Runde 1 {{KIND}}, in Runde 2 du, und so weiter.</li>
+      <li><b>Ende:</b> Wer den letzten Stein nimmt, gewinnt die Runde und darf brüllen wie ein Drache. Nach 3 Runden ist, wer mehr Runden gewonnen hat, Drachen-Königin oder Drachen-König.</li>
+      <li><b>Dein Plan (nur für dich, bis sie ihn selbst findet):</b> Lass nach deinem Zug 9, 6 oder 3 Steine liegen. Wenn du anfängst, nimm 1. Liegt eine Gewinnzahl, wenn du dran bist, nimm 1 und warte auf einen Fehler.</li>
+    </ol>
+    <p><b>Varianten:</b></p>
+    <ul>
+      <li><b>Andere Anzahl:</b> Mit <m-e15-stimmt spiel="steine 1-2" haufen="12" anfangen="zweiter">12 Steinen</m-e15-stimmt> gewinnt, wer <b>nicht</b> anfängt, denn 12 ist eine Gewinnzahl. Mit <m-e15-stimmt spiel="steine 1-2" haufen="13" anfangen="zuerst">13</m-e15-stimmt> oder <m-e15-stimmt spiel="steine 1-2" haufen="14" anfangen="zuerst">14</m-e15-stimmt> Steinen gewinnt, wer anfängt (mit 1 bzw. 2). Wer das weiß, sagt bei 12 Steinen vorher: „Du darfst anfangen!“</li>
+      <li><b>1, 2 oder 3 nehmen:</b> neue Regel, neue Gewinnzahlen: <m-e15-stimmt spiel="steine 1-3" gz>4, 8 und 12</m-e15-stimmt> (Profi-Aufgabe auf <a class="blattref" href="#blatt-15-2"></a>).</li>
+      <li><b>Kobold-Stein:</b> Der letzte Stein ist ein Kobold-Stein. Wer ihn nehmen muss, verliert (Schwerer-Teil, Punkt 4).</li>
+      <li><b>Zwei Haufen:</b> mit einer ganz anderen Gewinn-Strategie (Schwerer-Teil, Punkt 6).</li>
+    </ul>
+  </div>
+
+  <div class="kasten spiel" data-titel="Wer sagt 20?">
+    <p class="spiel-meta">2 Personen · 1–2 Minuten pro Runde · nichts (im Auto, beim Spazierengehen) oder <a class="blattref" href="#blatt-15-1"></a> und die Drachen-Figur aus Einheit 2</p>
+    <ol class="regeln">
+      <li><b>Vorbereitung:</b> keine. Am Papier: <a class="blattref" href="#blatt-15-1"></a> zwischen euch, die Drachen-Figur auf „Start“.</li>
+      <li><b>Ziel:</b> Wer 20 sagt, gewinnt.</li>
+      <li><b>Ein Zug:</b> Wer dran ist, sagt die nächste Zahl oder die nächsten zwei Zahlen. Der Erste sagt „1“ oder „1, 2“. Mehr als zwei Zahlen auf einmal gibt es nicht.</li>
+      <li><b>Am Papier:</b> Die Drachen-Figur steht auf „Start“. Wer dran ist, zieht sie 1 oder 2 Felder weiter und sagt dabei die Zahlen laut. Wer sie auf die 20 zum Schatz bringt, gewinnt.</li>
+      <li><b>Wer anfängt:</b> abwechselnd, wie beim Steine-Spiel.</li>
+      <li><b>Ende:</b> Wer 20 sagt, gewinnt die Runde und darf einmal laut brüllen. Wer zuerst 3 Runden gewonnen hat, gewinnt das Spiel.</li>
+      <li><b>Der Plan:</b> Wer anfängt, sagt „1, 2“ und danach immer die nächste Gewinnzahl: <m-e15-stimmt spiel="zaehlen 20 1-2" gz="teil">5, 8, 11, 14, 17 und 20</m-e15-stimmt>. Sagt der andere eine Zahl, sagt man zwei. Sagt der andere zwei, sagt man eine.</li>
+    </ol>
+    <p><b>Varianten:</b> Wer sagt 30? (<m-e15-stimmt spiel="zaehlen 30 1-2" anfangen="zweiter">wer anfängt, verliert</m-e15-stimmt>, Profi-Aufgabe auf <a class="blattref" href="#blatt-15-1"></a>), Wer sagt 10? (gut fürs Auto), bis zu 3 Zahlen auf einmal (Schwerer-Teil). Mit dem Zahlen-Weg aus Malerkrepp wird es ein Hüpf-Spiel (Kasten „Bewegung“).</p>
+  </div>
+
+  <div class="kasten bewegung" data-titel="Zähl-Hüpfen">
+    <p>„Wer sagt 20?“ mit dem ganzen Körper: Ihr steht nebeneinander am Anfang des Gangs. Wer eine Zahl sagt, macht dabei einen Hüpfer nach vorne, bei zwei Zahlen zwei Hüpfer. Wer 20 sagt, macht einen Drachen-Brüller und darf die nächste Hüpf-Art aussuchen: Hasen-Hüpfer, Frosch-Sprünge oder Einhorn-Galopp. Mit dem Zahlen-Weg aus Malerkrepp (Extra) gibt es nur einen Drachen: ein Kuscheltier. Wer dran ist, trägt es 1 oder 2 Felder weiter und hüpft mit. So sieht man immer, wo ihr gerade seid.</p>
+  </div>
+
+  <div class="kasten spiel darf-brechen e15-bricht" data-titel="Der Roboter mit der festen Regel">
+    <p class="spiel-meta">2 Personen · 5 Minuten · 10 Muggelsteine, der gefaltete Roboter-Zettel, Papier und Bleistift</p>
+    <ol class="regeln">
+      <li><b>Rollen:</b> Du bist der Roboter. Ein Roboter denkt nicht nach, er macht nur, was seine Regel sagt. Auf deinem Zettel steht: „Ich nehme immer 1 Stein.“</li>
+      <li><b>Spielen:</b> das Steine-Spiel mit 10 Steinen, abwechselnd fängt jemand an. Du spielst streng nach deiner Regel, auch wenn es dumm ist, und sprichst wie ein Roboter: „Piep. Ich nehme 1.“</li>
+      <li><b>Raten:</b> Nach jeder Runde darf {{KIND}} raten, wie deine Regel geht. Errät sie sie, liest du den Zettel feierlich vor.</li>
+      <li><b>Wer gewinnt?</b> Gegen „immer 1“ gewinnt {{KIND}} jede Runde, wenn sie gut spielt: <m-e15-stimmt spiel="steine 1-2" haufen="10" dran="du" gegner="immer1" gewinner="du">wenn sie anfängt</m-e15-stimmt> und <m-e15-stimmt spiel="steine 1-2" haufen="10" dran="andere" gegner="immer1" gewinner="du">auch wenn der Roboter anfängt</m-e15-stimmt>. Er nimmt nie 2, darum kommt sie immer auf ihre Gewinnzahlen.</li>
+      <li><b>Bessere Regel:</b> Jetzt schreibt {{KIND}} eine bessere Regel für den Roboter, z. B. ihre Wenn-dann-Regeln von <a class="blattref" href="#blatt-15-2"></a>. Du spielst nur noch danach. Fehlt eine Regel, sagst du: „Piep. Dafür habe ich keine Regel.“ Dann ergänzt sie (Schwerer-Teil, Punkt 9).</li>
+      <li><b>Ende:</b> nach 2 Runden mit der Zettel-Regel und 2 Runden mit ihrer Regel. Gewonnen hat {{KIND}}, wenn sie die Zettel-Regel erraten hat. Lass den Roboter mit ihrer Regel bei 10 Steinen anfangen: Stimmt ihre Regel, <m-e15-stimmt spiel="steine 1-2" haufen="10" dran="du" gewinner="du">gewinnt er gegen dich, auch wenn du gut spielst</m-e15-stimmt>. Dann hat sie gleich noch einmal gewonnen: Ihr Programm funktioniert.</li>
+    </ol>
+    <p><b>Varianten:</b> Der Roboter mit „Ich nehme immer 2 Steine (wenn nur 1 da ist: 1).“ Gegen ihn muss sie besser aufpassen. Fängt er mit 10 Steinen an, <m-e15-stimmt spiel="steine 1-2" haufen="10" dran="andere" gegner="immer2" gewinner="du">gewinnt sie trotzdem</m-e15-stimmt>. Liegen aber nur 5 Steine und er ist dran, <m-e15-stimmt spiel="steine 1-2" haufen="5" dran="andere" gegner="immer2" gewinner="andere">gewinnt er</m-e15-stimmt>: Er nimmt 2, und bei 3 Steinen hat sie Pech. <b>Rollentausch:</b> {{KIND}} ist der Roboter und erfindet selbst eine geheime Regel. Du rätst.</p>
+  </div>
+
+  <div class="kasten spiel darf-brechen e15-bricht" data-titel="Turnier zu zweit">
+    <p class="spiel-meta">2 Personen · an mehreren Tagen je 5 Minuten · die Turnier-Tabelle auf <a class="blattref" href="#blatt-15-3"></a>, Muggelsteine</p>
+    <ol class="regeln">
+      <li><b>Sechs Runden</b> wie in der Tabelle: zweimal Steine-Spiel mit 10 Steinen, zweimal „Wer sagt 20?“, zweimal Steine-Spiel mit 12 Steinen.</li>
+      <li><b>Wer anfängt, wechselt:</b> In Runde 1, 3 und 5 fängt {{KIND}} an, in Runde 2, 4 und 6 du. Sie schreibt in die Tabelle, wer anfängt („ich“ oder „du“).</li>
+      <li><b>Vorhersage:</b> Vor jeder Runde sagt jeder laut, wer gewinnen wird. Wer richtig liegt, bekommt einen Punkt.</li>
+      <li><b>Spielen:</b> Ihr spielt beide so gut ihr könnt. Wer die Runde gewinnt, bekommt noch einen Punkt. {{KIND}} trägt den Gewinner ein und macht für jeden Punkt einen Strich in die Punkte-Zeile unter der Tabelle („ich“ oder „du“).</li>
+      <li><b>Ende:</b> Nach 6 Runden hat, wer mehr Punkte hat, das Turnier gewonnen. Bei Gleichstand: eine Runde „Wer sagt 30?“ als Finale, und {{KIND}} bestimmt, wer anfängt. Mit Plan sagt sie: „Du fängst an!“ Denn bei „Wer sagt 30?“ <m-e15-stimmt spiel="zaehlen 30 1-2" anfangen="zweiter">gewinnt, wer nicht anfängt</m-e15-stimmt>.</li>
+    </ol>
+    <p><b>Was dabei passiert:</b> Spielt ihr beide mit Plan, gewinnt bei <m-e15-stimmt spiel="steine 1-2" haufen="10" anfangen="zuerst">10 Steinen</m-e15-stimmt> und bei <m-e15-stimmt spiel="zaehlen 20 1-2" anfangen="zuerst">„Wer sagt 20?“</m-e15-stimmt> immer, wer anfängt, und bei <m-e15-stimmt spiel="steine 1-2" haufen="12" anfangen="zweiter">12 Steinen</m-e15-stimmt> immer, wer <b>nicht</b> anfängt. Dann gewinnt jeder 3 Runden, und die Vorhersagen entscheiden: Wer den Plan verstanden hat, weiß vorher, wie es ausgeht. Liegt ihr beide immer richtig, entscheidet das Finale, und auch dort gewinnt, wer den Plan kennt. Spielt sie noch ohne Plan, holt sie Punkte, sobald sie ihn entdeckt.</p>
+  </div>
+
+  <div class="kasten basteln" data-titel="Strategie-Karte">
+    <ol>
+      <li>Unten auf <a class="blattref" href="#blatt-15-3"></a> sind zwei Strategie-Karten: „Wer sagt 20?“ und „Steine-Spiel“. {{KIND}} schreibt die Gewinnzahlen in die Kreise, sobald sie sie gefunden hat (in Schritt 4). Erst dann ausschneiden, die Kobold-Aufgabe und die Turnier-Tabelle bleiben am Rest des Blatts.</li>
+      <li>Die Karten kommen zur Werkzeugkiste (Befehlskarten, Drachen-Figur, Zauber-Kasten). Beim Spielen darf die Karte am Anfang offen daneben liegen. Später spielt sie ohne Karte: Dann ist die Strategie im Kopf.</li>
+      <li><b>Extra:</b> bemalen, auf Karton kleben, mit Tixo überziehen. Auf die Rückseite darf sie eine eigene Spielregel erfinden (Schwerer-Teil, Punkt 10).</li>
+    </ol>
+  </div>
+
+  <h2>Wenn es hakt oder zu leicht ist</h2>
+
+  <div class="kasten stolper darf-brechen e15-bricht">
+    <ul>
+      <li><b>Sie nimmt 3 Steine oder gar keinen:</b> Regel freundlich wiederholen und zwei Finger hochhalten: „1 oder 2, nicht mehr und nicht weniger.“</li>
+      <li><b>Sie zählt die Steine vor sich statt in der Mitte</b> („Ich will 3 haben!“): Es zählt nur, was in der Mitte liegen bleibt. Schieb deine genommenen Steine weit weg, dann sieht sie nur die Mitte.</li>
+      <li><b>„Die Regel geht nicht!“</b> Sie ist dran, und es liegen 6 Steine: Das ist Pech, kein Fehler im Plan. Eine Gewinn-Strategie hilft nur dem, der sie als Erster benutzen kann. Dann nimmt man 1 und wartet, ob der andere sich vertut. Das ist eine wichtige und gar nicht so leichte Einsicht.</li>
+      <li><b>Sie verliert oft und wird traurig:</b> Mit 4 oder 5 Steinen spielen und sie anfangen lassen, dann gewinnt sie mit Plan sicher. Lob die Entdeckungen, nicht die Siege: „Du hast mich durchschaut!“ ist das größte Lob heute.</li>
+      <li><b>Sie verwechselt die Gewinnzahlen der beiden Spiele:</b> Jedes Spiel hat seine eigenen, darum gibt es zwei Strategie-Karten. Man findet sie aber immer gleich: rückwärts vom Ende.</li>
+      <li><b>Bei „Wer sagt 20?“ weiß sie nicht mehr, wo ihr seid:</b> Die Drachen-Figur auf dem Zahlen-Weg mitziehen oder die Zahlen an den Fingern zeigen.</li>
+      <li><b>Sie will immer anfangen:</b> Bei 12 Steinen oder bei „Wer sagt 30?“ ist Anfangen schlecht. Das Turnier zeigt es ihr ganz nebenbei.</li>
+      <li><b>Du gewinnst zu oft:</b> Mach ab und zu absichtlich einen Fehler und sag: „Oh, da hat der Kobold bei mir zugeschlagen. Merkst du, wo?“ Findet sie ihn, darf sie ihn ausnutzen.</li>
+    </ul>
+  </div>
+
+  <div class="zwei">
+    <div class="kasten leichter">
+      <ul>
+        <li>Mit wenigen Steinen anfangen (4, 5 oder 6) und erst langsam mehr nehmen.</li>
+        <li>Steine in <b>Dreier-Reihen</b> legen: Die Gewinnzahlen sind dann genau die vollen Reihen. „Nimm so viele, dass nur volle Dreier-Reihen übrig bleiben.“</li>
+        <li>„Wer sagt 10?“ statt 20, mit dem Finger auf dem Zahlen-Weg.</li>
+        <li>Laut denken: Sag bei deinen Zügen, was du dir überlegst. „Ich lasse 6 liegen, weil …“</li>
+        <li>Die Strategie-Karte liegt beim Spielen offen daneben.</li>
+      </ul>
+    </div>
+    <div class="kasten bonus" data-titel="Bonus-Knobelei">
+      <p class="klein"><i>Für zwischendurch: im Auto, beim Abendessen, beim Warten.</i></p>
+      <p><b>Wer sagt 10?</b> „Du fängst an. Was sagst du?“</p>
+      <p><b>Zuckerl-Teller:</b> „Es liegen 7 Zuckerl. Wir nehmen abwechselnd 1 oder 2, wer das letzte nimmt, gewinnt. Du fängst an. Wie viele nimmst du?“</p>
+      <p><b>Wer sagt 15?</b> „Willst du anfangen?“</p>
+      <p><b>Für Profis:</b> „Wer sagt 20?, aber man darf 1, 2 oder 3 Zahlen sagen. Willst du anfangen?“</p>
+      <p class="klein"><b>Kurz-Lösungen:</b> <m-e15-stimmt spiel="zaehlen 10 1-2" stand="0" sag="1" gewinner="du">„1“</m-e15-stimmt>, dann <m-e15-stimmt spiel="zaehlen 10 1-2" gz="teil">4, 7, 10</m-e15-stimmt>; <m-e15-stimmt spiel="steine 1-2" haufen="7" gewinner="du" nimm="1">1 Zuckerl nehmen</m-e15-stimmt>, dann liegen 6; <m-e15-stimmt spiel="zaehlen 15 1-2" anfangen="zweiter">nein</m-e15-stimmt>; <m-e15-stimmt spiel="zaehlen 20 1-3" anfangen="zweiter">nein</m-e15-stimmt>. Mehr bei den Lösungen am Ende.</p>
+    </div>
+  </div>
+
+  <div class="kasten schwerer darf-brechen e15-bricht">
+    <p>Hat {{KIND}} die Gewinnzahlen schnell gefunden, wähle hier aus. Das ist kein Zusatz „für später“, sondern ein vollwertiger Hauptteil. Der Kern: Jedes neue Spiel hat neue Gewinnzahlen, und sie findet sie selbst, mit Rückwärts-Denken und echten Steinen. Erst probieren, dann die Lösung in Klammern verraten.</p>
+    <ol class="e15-ganz">
+      <li><b>Wer sagt 30?</b> „Willst du anfangen?“ Rückwärts gedacht sind die Gewinnzahlen <m-e15-stimmt spiel="zaehlen 30 1-2" gz>3, 6, 9, 12, 15, 18, 21, 24, 27 und 30</m-e15-stimmt>. Wer anfängt, kann nur „1“ oder „1, 2“ sagen und nie die 3. Also <m-e15-stimmt spiel="zaehlen 30 1-2" anfangen="zweiter">gewinnt, wer nicht anfängt</m-e15-stimmt>: „Fang du an!“ (Profi-Aufgabe auf <a class="blattref" href="#blatt-15-1"></a>.) Frag weiter: Wie ist es bei „Wer sagt 21?“, 22 oder 23? (<m-e15-stimmt spiel="zaehlen 21 1-2" anfangen="zweiter">Bei 21</m-e15-stimmt> lieber nicht anfangen, <m-e15-stimmt spiel="zaehlen 22 1-2" anfangen="zuerst">bei 22</m-e15-stimmt> und <m-e15-stimmt spiel="zaehlen 23 1-2" anfangen="zuerst">23</m-e15-stimmt> schon.)</li>
+      <li><b>1, 2 oder 3 nehmen:</b> Beim Steine-Spiel darf man jetzt bis zu 3 Steine nehmen. Rückwärts: 1, 2 oder 3 Steine nimmt man ganz, bei 4 hat man Pech. Die Gewinnzahlen sind <m-e15-stimmt spiel="steine 1-3" gz>4, 8, 12 und 16</m-e15-stimmt>. Mit 9 Steinen nimmt man <m-e15-stimmt spiel="steine 1-3" haufen="9" gewinner="du" nimm="1">1</m-e15-stimmt> (Profi-Aufgabe auf <a class="blattref" href="#blatt-15-2"></a>). Genauso bei „Wer sagt 20?“ mit bis zu 3 Zahlen: Die Gewinnzahlen sind <m-e15-stimmt spiel="zaehlen 20 1-3" gz>4, 8, 12, 16 und 20</m-e15-stimmt>, und <m-e15-stimmt spiel="zaehlen 20 1-3" anfangen="zweiter">wer anfängt, verliert</m-e15-stimmt>.</li>
+      <li><b>Die Gewinnzahlen vorhersagen:</b> Bei „1 oder 2“ kommen sie alle 3, bei „1, 2 oder 3“ alle 4. Was ist bei „1, 2, 3 oder 4“? (Alle 5: <m-e15-stimmt spiel="steine 1-4" gz>5, 10, 15 und 20</m-e15-stimmt>.) Die Regel dahinter: die größte erlaubte Zahl plus 1. Wer so weit denkt, braucht keine Tabelle mehr. Das ist der Moment, in dem aus Probieren ein Plan wird.</li>
+      <li><b>Kobold-Stein (wer den letzten nimmt, verliert):</b> 1 oder 2 nehmen, aber wer den letzten Stein nehmen muss, verliert. Rückwärts: Wer 1 Stein liegen lässt, gewinnt. Die Gewinnzahlen sind <m-e15-stimmt spiel="steine 1-2 verliert" gz>1, 4, 7 und 10</m-e15-stimmt>, also immer eins mehr als 0, 3, 6 und 9 beim normalen Spiel. Mit 8 Steinen nimmt man <m-e15-stimmt spiel="steine 1-2 verliert" haufen="8" gewinner="du" nimm="1">1</m-e15-stimmt> (Level 7 in der App).</li>
+      <li><b>Nur 1 oder 3 nehmen:</b> Hier passiert etwas Überraschendes. Die Gewinnzahlen sind <m-e15-stimmt spiel="steine 1,3" gz>2, 4, 6, 8 und 10</m-e15-stimmt>, also alle geraden Zahlen! Warum? Jeder Zug nimmt eine ungerade Anzahl weg und macht aus gerade ungerade. Wer eine gerade Zahl liegen lässt, gibt dem anderen keine Chance. Lass sie das mit 6 Steinen ausprobieren, bevor du es verrätst.</li>
+      <li><b>Zwei Haufen:</b> Zwei Haufen mit 3 und 5 Steinen. Wer dran ist, nimmt aus <b>einem</b> Haufen so viele Steine, wie er will (mindestens einen). Wer den letzten Stein nimmt, gewinnt. Die Gewinn-Strategie ist hier keine Zahl, sondern ein Bild: <b>Mach beide Haufen gleich groß</b>, und danach <b>mach alles nach</b>, was der andere macht, nur beim anderen Haufen. Bei 3 und 5 nimmt man <m-e15-stimmt spiel="steine beliebig" haufen="3,5" gewinner="du" nimm="2" aus="2">2 Steine vom großen Haufen</m-e15-stimmt>. Sind beide Haufen schon gleich groß (z. B. <m-e15-stimmt spiel="steine beliebig" haufen="4,4" gewinner="andere">4 und 4</m-e15-stimmt>) und man ist dran, hat man Pech. Das ist die Nachmach-Strategie (Level 8 in der App).</li>
+      <li><b>Zwei Spiele, ein Plan:</b> „Wer sagt 20?“ ist eigentlich das Steine-Spiel mit 20 Steinen. Wer die 17 sagt, lässt 3 Zahlen übrig (18, 19, 20), so wie 3 Steine. Leg 20 Steine hin und spielt beides gleichzeitig: Für jede gesagte Zahl wird ein Stein weggenommen. Frag: „Wie viele Steine liegen noch, wenn du 14 gesagt hast?“ (6, also eine Gewinnzahl des Steine-Spiels.) So sieht sie, dass zwei Spiele, die verschieden aussehen, denselben Plan haben.</li>
+      <li><div class="e15-baum e15-schwebt"><m-e15-baum raetsel="e15-b4" knoten="8.5" dx="12" dy="12" links="{{KIND}},du" links-breite="20"></m-e15-baum>
+          <div class="e15-legende"><span class="e15-gold"></span> Gewinnzahl: Wer hier dran ist, verliert bei gutem Spiel des anderen.<br><span class="e15-weiss"></span> Wer hier dran ist, gewinnt.<br>Die Zahl am Ast: so viele Steine werden genommen.<br>Links: wer in dieser Zeile dran ist.</div></div><b>Den Plan beweisen (Spielbaum):</b> Für kleine Zahlen kann man alle Möglichkeiten aufzeichnen, im Spielbaum für 4 Steine (rechts). Oben stehen die 4 Steine, darunter jeder mögliche Zug (1 oder 2 nehmen), bis keiner mehr liegt. Zeichnet ihn zusammen auf ein großes Blatt, von oben nach unten. Dann färbt ihr <b>von unten</b>: Die 0 ist gold (wer 0 liegen lässt, hat gewonnen). Ein Kreis wird gold, wenn <b>alle</b> Äste darunter zu weißen Kreisen führen. Ein Kreis bleibt weiß, wenn <b>mindestens ein</b> Ast zu einem goldenen führt. Am Ende ist oben die 4 weiß: Wer bei 4 dran ist, gewinnt, und zwar mit dem Ast zur goldenen 3. Ein Spielbaum ist wie ein großer Ja-Nein-Baum, nur mit Zügen statt Fragen. Genau so hat das Programm dieser Werkstatt jede Stellung auf den Blättern geprüft.</li>
+      <li><b>Eine Regel für den Roboter:</b> {{KIND}} schreibt (oder diktiert) dem Roboter eine Regel, mit der er nie einen Sieg verschenkt. Zuerst als Liste: „Wenn noch 10 Steine liegen, dann nimm 1. Wenn noch 8 liegen, dann nimm 2 …“ Dann spielt der Roboter streng danach. Fehlt eine Zeile (z. B. für 9 Steine), sagt er „Piep. Dafür habe ich keine Regel.“ und bleibt stehen. Schafft sie es, die ganze Liste in eine Regel zu packen? (Zum Beispiel: „Wenn eine Gewinnzahl liegt, dann nimm 1. Sonst nimm so viele, dass eine Gewinnzahl liegen bleibt.“) Das ist ein echtes Programm, und der Fehler-Kobold kann sich darin verstecken: Was macht der Roboter, wenn nur noch 2 Steine liegen? Mit „Lass eine Gewinnzahl liegen“ weiß er es nicht, denn die 0 steht nicht auf der Liste <m-e15-stimmt spiel="steine 1-2" gz>3, 6, 9, 12</m-e15-stimmt>. Also fehlt eine Zeile: „<m-e15-stimmt spiel="steine 1-2" haufen="2" gewinner="du" nimm="2">Wenn 1 oder 2 Steine liegen, dann nimm alle.</m-e15-stimmt>“ Solche vergessenen Fälle am Rand findet man beim Programmieren am häufigsten, und am besten durch Testen.</li>
+      <li><b>Eigenes Spiel erfinden:</b> {{KIND}} erfindet eine neue Regel, z. B. „1 oder 4 nehmen“ oder „Wer sagt 25?“, und ihr sucht gemeinsam die Gewinnzahlen mit echten Steinen, rückwärts vom Ende. Bei „1 oder 4“ wird es knifflig: <m-e15-stimmt spiel="steine 1,4" gz>2, 5, 7, 10 und 12</m-e15-stimmt>. Die neue Regel kommt auf die Rückseite der Strategie-Karte.</li>
+    </ol>
+  </div>
+
+  <h2>Hintergrund</h2>
+  <div class="kasten warum darf-brechen e15-bricht">
+    <p>Eine Gewinn-Strategie ist ein <span class="begriff">Algorithmus</span>: eine genaue Vorschrift, die in jeder Lage sagt, was zu tun ist. {{KIND}}s Wenn-dann-Regeln („Wenn noch 4 Steine liegen, dann nimm 1“) sind <span class="begriff">Bedingungen</span>, wie sie in jedem Programm stehen. Ein <span class="begriff">Computer</span> kann so eine Regel ausführen, ohne das Spiel zu verstehen, genau wie der Roboter mit dem Zettel. Und wie beim Roboter merkt man erst beim Testen, ob die Regel wirklich alle Fälle abdeckt.</p>
+    <p>Das Rückwärts-Denken heißt in der Informatik <span class="begriff">Rückwärtsinduktion</span> im <span class="begriff">Spielbaum</span>: Man beginnt bei den Stellungen am Ende, deren Ausgang man kennt, und arbeitet sich nach oben vor. Eine Stellung ist verloren, wenn jeder Zug zu einer gewonnenen Stellung für den anderen führt, und gewonnen, wenn es mindestens einen Zug zu einer verlorenen gibt. Computer, die Schach oder Dame spielen, rechnen nach demselben Prinzip, nur mit unvorstellbar vielen Stellungen. Bei kleinen Spielen wie diesen kann man den ganzen Spielbaum ausrechnen: Das Programm dieser Werkstatt hat für jede Stellung auf den Blättern, für jede Aussage in dieser Anleitung und für jedes Level der App alle Züge durchgerechnet.</p>
+    <p>Dass die Gewinnzahlen alle 3 kommen, hat mit dem Teilen durch 3 zu tun: Gewinnzahlen sind genau die Zahlen, die beim Teilen durch 3 keinen Rest lassen. Programmierer schreiben dafür „Steine modulo 3 ist 0“, und der Gewinnzug ist „nimm Steine modulo 3“. So wird aus einer langen Liste von Wenn-dann-Regeln eine einzige kurze Regel. Das kennt {{KIND}} schon vom Wiederhol-Zauber: Kürzer schreiben ist schlauer, wenn man das Muster entdeckt hat.</p>
+  </div>
+
+  <h2>Bildschirm-Bonus</h2>
+  <div class="kasten bildschirm darf-brechen e15-bricht">
+    <p><b>Paket 15 „Gewinnen mit Plan“.</b> Den QR-Code findest du auf <a class="blattref" href="#blatt-15-1"></a> unten rechts. Nur am Schluss, nach den Blättern, höchstens 15 Minuten. Die Einheit funktioniert auch ganz ohne Bildschirm.</p>
+    <p><b>8 Levels:</b> Strategiespiele gegen den Roboter. In jedem Level kann {{KIND}} mit der Gewinn-Strategie sicher gewinnen (vom Spielbaum geprüft), der Roboter spielt danach gut. Level 1 bis 3 sind das Steine-Spiel mit 4, 7 und 10 Steinen (Level 3 ist „Der letzte Edelstein“), Level 4 ist „Wer sagt 20?“, Level 5 „Wer sagt 30?“ (der Roboter fängt an), Level 6 „1, 2 oder 3 nehmen“ mit 9 Steinen, Level 7 der Kobold-Stein (wer den letzten nimmt, verliert) und Level 8 zwei Haufen mit 3 und 5 Steinen. <b>Wie am Blatt sind Level 1 (die zweite Stellung von Aufgabe 1 auf <a class="blattref" href="#blatt-15-2"></a>), Level 4 (der Spielplan von <a class="blattref" href="#blatt-15-1"></a>), Level 5 (seine Profi-Aufgabe) und Level 6 (die Profi-Aufgabe von <a class="blattref" href="#blatt-15-2"></a>).</b> Level 2 passt zur Regel „Wenn noch 7 Steine liegen“ in Aufgabe 2 von <a class="blattref" href="#blatt-15-2"></a>, Level 7 und 8 kommen aus „Schwerer machen“. Am besten spielt {{KIND}} sie nach den Blättern.</p>
+    <p><b>So geht es:</b> Die Steine liegen auf einem Teller, die Zahl im Kreis daneben sagt, wie viele noch liegen. {{KIND}} tippt die Steine an, die sie nehmen will (sie bekommen einen gelben Ring), oder unten die Taste „1“ oder „2“ (in Level 6 auch „3“). Dann tippt sie auf die grüne Taste „Nehmen“. Tippt sie mehr Steine an als erlaubt, steht freundlich da: „Du darfst nur 1 oder 2 Steine nehmen.“ Bei zwei Haufen gibt es keine Zahlen-Tasten, sie tippt Steine aus einem Haufen an. Bei „Wer sagt 20?“ liegt der Zahlen-Weg vom Blatt am Bildschirm, und zwei Tasten zeigen, was sie sagen kann, z. B. „4“ oder „4, 5“. Nach „Los“ hüpft der Drache Feld für Feld weiter, ihre Zahlen werden gelb, die des Roboters blau. Wer dran ist, zeigt ein farbiges Schild: gelb „Du“, blau „Roboter“. Der Roboter überlegt kurz, zeigt seine Steine mit einem blauen Ring und nimmt sie dann weg. Kein Ziehen, keine Zeitgrenze, kein Ton. „Nochmal“ beginnt das Spiel von vorne.</p>
+    <p><b>Wann gibt es einen Stern?</b> Die App prüft nur das Ergebnis, mit demselben Spielbaum wie die Blätter, eine Lösung ist nicht gespeichert. Nimmt {{KIND}} den letzten Stein (in Level 4 und 5: sagt sie 20 oder 30, in Level 7: muss der Roboter den letzten Stein nehmen), wird das Spielfeld golden, und es gibt einen Stern. Gewinnt der Roboter, kommt kein Fehlerton, sondern „Der Roboter gewinnt. Nochmal?“, darunter ein Tipp zum Level (z. B. „Lass 3 Steine liegen. Dann kann der Roboter nicht alle nehmen.“) und eine große Taste „Nochmal“. Der Roboter nimmt jeden Gewinnzug, den er bekommt: Verpasst {{KIND}} einmal ihre Gewinnzahl (bei zwei Haufen: gleich große Haufen), gewinnt er. Hat er keinen Gewinnzug, zieht er nach einer festen Regel. Er spielt also immer gleich: Wer dieselben Züge macht, erlebt dieselbe Partie. So kann {{KIND}} wie beim Roboter mit dem Zettel ausprobieren, an welcher Stelle das Spiel kippt.</p>
+    <p><b>Wann weglegen:</b> Nach Level 8 kommt „Super! Jetzt zurück zum Papier.“ Dann ist Schluss, auch wenn noch Zeit wäre. Wer noch Lust hat: lieber eine Turnier-Runde am Tisch als ein weiteres Level.</p>
+  </div>
+
+  <h2>Lösungen</h2>
+  <div class="e15-loes">
+    <m-loesungen einheit="15" skala="0.39"></m-loesungen>
+    <div class="kasten loesung">
+      <p><b><a class="blattref" href="#blatt-15-1"></a>:</b> Gewinnzahlen <m-e15-text raetsel="e15-g20" was="gzab"></m-e15-text>. Wer anfängt, sagt „1, 2“ und hat die erste Gewinnzahl. Danach immer auf die nächste Gewinnzahl auffüllen: Sagt der andere eine Zahl, sagt man zwei, und umgekehrt.</p>
+      <p><b>Profi (Wer sagt 30?):</b> Die Gewinnzahlen sind <m-e15-text raetsel="e15-g30" was="gz"></m-e15-text>, die kleinste ist 3. Wer anfängt, kommt nur bis 1 oder 2, dann sagt der andere die 3. Also lieber nicht anfangen.</p>
+      <p><b><a class="blattref" href="#blatt-15-2"></a>, Aufgabe 1:</b> 3 Steine und du bist dran: Der Drache gewinnt. 4 Steine: Du gewinnst, nimm 1. 5 Steine und der Drache ist dran: Er nimmt 2 und gewinnt. 6 Steine und der Drache ist dran: Du gewinnst, denn er lässt 5 oder 4 liegen, und du machst daraus 3.</p>
+      <p><b>Aufgabe 2:</b> Bei 5 nimm 2, bei 7 nimm 1, bei 8 nimm 2. Es bleiben immer 3 oder 6 liegen.</p>
+      <p><b>Profi (1, 2 oder 3):</b> Nimm 1, dann liegen 8. Die Gewinnzahlen bis 12 sind <m-e15-text raetsel="e15-g13" was="gz"></m-e15-text>.</p>
+    </div>
+  </div>
+  <div class="kasten loesung darf-brechen e15-bricht e15-weiter">
+    <p><b><a class="blattref" href="#blatt-15-3"></a>, Aufgabe 1 (Kobold):</b> Die dritte Regel ist falsch. Bei 11 Steinen muss man 2 nehmen, dann liegen 9. Nimmt man nur 1, liegen 10, und der andere nimmt 1 und lässt 9 liegen. Die anderen Regeln stimmen: Bei 2 nimmt man beide, bei 10 bleiben 9, bei 13 bleiben 12.</p>
+    <p><b>Strategie-Karten:</b> Wer sagt 20?: <m-e15-text raetsel="e15-g20" was="gz"></m-e15-text>. Steine-Spiel: <m-e15-text raetsel="e15-g12" was="gz"></m-e15-text>. <b>Turnier-Tabelle:</b> keine falsche Lösung, sie hält fest, wie ihr gespielt habt. <b>Knobel-Ecke (Wer sagt 10?):</b> Die Gewinnzahlen sind <m-e15-text raetsel="e15-g10" was="gzab"></m-e15-text>. Wer anfängt, sagt „1“ und gewinnt.</p>
+    <p><b>Bonus-Knobelei:</b> Wer sagt 10?: „1“, dann 4, 7 und 10. Zuckerl-Teller: 1 nehmen, dann liegen 6. Wer sagt 15?: Die Gewinnzahlen sind <m-e15-stimmt spiel="zaehlen 15 1-2" gz>3, 6, 9, 12 und 15</m-e15-stimmt>, wer anfängt, verliert, also nein. Für Profis: Gewinnzahlen 4, 8, 12, 16 und 20, wer anfängt, kommt höchstens bis 3, also nein.</p>
+    <p><b>Bildschirm-Levels (zum Nachschauen):</b> In jedem Level gewinnt {{KIND}} sicher, wenn sie immer eine Gewinnzahl macht (bei zwei Haufen: gleich große Haufen; vom Spielbaum geprüft). Der Roboter nimmt jeden Gewinnzug, den er bekommt.</p>
+    <table class="tab darf-brechen e15-ltab">
+      <tr><th>Level</th><th>Spiel</th><th>Gewinnzahlen und erster Zug</th></tr>
+      <tr><td>1</td><td>Steine-Spiel, 4 Steine</td><td><m-e15-text raetsel="e15-w4" was="gz"></m-e15-text>; erster Zug: <m-e15-text raetsel="e15-w4" was="zug"></m-e15-text> (z. B. <m-e15-text raetsel="e15-w4" was="partie"></m-e15-text>)</td></tr>
+      <tr><td>2</td><td>Steine-Spiel, 7 Steine</td><td><m-e15-text raetsel="e15-w7" was="gz"></m-e15-text>; erster Zug: <m-e15-text raetsel="e15-w7" was="zug"></m-e15-text></td></tr>
+      <tr><td>3</td><td>Der letzte Edelstein, 10 Steine</td><td><m-e15-text raetsel="e15-w10" was="gz"></m-e15-text>; erster Zug: <m-e15-text raetsel="e15-w10" was="zug"></m-e15-text></td></tr>
+      <tr><td>4</td><td>Wer sagt 20? (du fängst an)</td><td>erster Zug: <m-e15-text raetsel="e15-w20" was="zug"></m-e15-text>, dann 5, 8, 11, 14, 17, 20</td></tr>
+      <tr><td>5</td><td>Wer sagt 30? (Roboter fängt an)</td><td>immer 3 weiter: <m-e15-stimmt spiel="zaehlen 30 1-2" gz="teil">3, 6, 9 … bis 30</m-e15-stimmt></td></tr>
+      <tr><td>6</td><td>1, 2 oder 3 nehmen, 9 Steine</td><td><m-e15-text raetsel="e15-w9" was="gz"></m-e15-text>; erster Zug: <m-e15-text raetsel="e15-w9" was="zug"></m-e15-text></td></tr>
+      <tr><td>7</td><td>Kobold-Stein, 8 Steine</td><td><m-e15-text raetsel="e15-wv" was="gz"></m-e15-text> liegen lassen; erster Zug: <m-e15-text raetsel="e15-wv" was="zug"></m-e15-text></td></tr>
+      <tr><td>8</td><td>Zwei Haufen, 3 und 5 Steine</td><td>erster Zug: <m-e15-text raetsel="e15-wh" was="zug"></m-e15-text>, dann liegen 3 und 3; danach alles nachmachen</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 15-1: Wer sagt 20? (Spielplan, Gewinnzahlen, Profi 30)     -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="15" data-titel="Wer sagt 20?" data-art="Spielplan" data-verteilt>
+  <div class="e15-regelbox">
+    <m-symbol name="drache" gr="16" blick="rechts"></m-symbol>
+    <div class="e15-rb-text">
+      <p>{{KIND}}, spiel mit Mama oder Papa.</p>
+      <p>Ihr zieht deine Drachen-Figur abwechselnd 1 oder 2 Felder weiter und sagt die Zahlen laut. Wer den Drachen auf die 20 bringt, gewinnt den Schatz!</p>
+    </div>
+  </div>
+
+  <div class="e15-weg-box"><m-e15-weg raetsel="e15-g20" feld="22" pro="7" gold="20,17"></m-e15-weg></div>
+
+  <div class="aufg">
+    <p class="anw">Die 20 ist eine Gewinnzahl. Die 17 auch: Danach kommt der andere nur bis 18 oder 19. Mal alle Gewinnzahlen gelb an!</p>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">Schreib die Gewinnzahlen auf.</p>
+    <m-e15-zahlen raetsel="e15-g20" vorgabe="20,17"></m-e15-zahlen>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">Du fängst an. Bis zu welcher Zahl zählst du? <m-e15-antwort raetsel="e15-g20" was="erster" l="2"></m-e15-antwort></p>
+  </div>
+
+  <div class="e15-profi-reihe">
+    <div class="profi" data-titel="Profi-Aufgabe: Wer sagt 30?">
+      <p>Jetzt gewinnt, wer 30 sagt.</p>
+      <p>Kleinste Gewinnzahl: <m-e15-antwort raetsel="e15-g30" was="kleinste" l="3"></m-e15-antwort></p>
+      <p>Willst du anfangen? <m-e15-antwort raetsel="e15-g30" was="anfangen"></m-e15-antwort></p>
+    </div>
+    <m-qr paket="e15"></m-qr>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 15-2: Wer gewinnt hier? (Stellungen, Wenn-dann-Regeln)      -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="15" data-titel="Wer gewinnt hier?" data-art="Arbeitsblatt" data-verteilt>
+  <div class="e15-regelbox">
+    <m-e15-steine n="5" gr="8"></m-e15-steine>
+    <div class="e15-rb-text">
+      <p><b>Steine-Spiel:</b> Nimm 1 oder 2 Steine. Wer den letzten Stein nimmt, gewinnt.</p>
+      <p>Der Drache spielt schlau.</p>
+    </div>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">{{KIND}}, wer gewinnt hier? Leg Steine hin und kreuz an.</p>
+    <div class="raster s4 e15-stellungen">
+      <m-e15-stellung raetsel="e15-s1"></m-e15-stellung>
+      <m-e15-stellung raetsel="e15-s2"></m-e15-stellung>
+      <m-e15-stellung raetsel="e15-s3"></m-e15-stellung>
+      <m-e15-stellung raetsel="e15-s4"></m-e15-stellung>
+    </div>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">Schreib deine Gewinn-Strategie als Regel auf.</p>
+    <m-e15-regeln raetsel="e15-r1"></m-e15-regeln>
+  </div>
+
+  <div class="profi" data-titel="Profi-Aufgabe: 1, 2 oder 3">
+    <p>Neue Regel: Du darfst 1, 2 oder 3 Steine nehmen. Es liegen 9 Steine, und du bist dran.</p>
+    <div class="e15-neben">
+      <m-e15-steine n="9" gr="7"></m-e15-steine>
+      <p style="margin:0">Ich nehme: <m-e15-antwort raetsel="e15-s9" was="nimm" l="1"></m-e15-antwort></p>
+    </div>
+    <p style="margin-top:2.5mm">Die Gewinnzahlen bis 12 sind jetzt:</p>
+    <m-e15-zahlen raetsel="e15-g13"></m-e15-zahlen>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 15-3: Meine Strategie-Karte (Kobold-Regel, Turnier, Karten) -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="15" data-titel="Meine Strategie-Karte" data-art="Bastelvorlage" data-verteilt>
+  <div class="aufg">
+    <p class="anw">{{KIND}}, der Fehler-Kobold hat Regeln für das Steine-Spiel geschrieben. Eine Regel ist falsch. Streich sie durch!</p>
+    <div class="e15-kobold">
+      <m-symbol name="kobold" gr="20"></m-symbol>
+      <m-e15-regeln raetsel="e15-k1"></m-e15-regeln>
+    </div>
+  </div>
+
+  <div class="aufg ohne-nr">
+    <p class="anw"><b>Turnier:</b> Wer fängt an? Wer gewinnt? Schreib „ich“ oder „du“ hinein. Mach für jeden Punkt einen Strich.</p>
+    <table class="e15-turnier">
+      <tr><th>Runde</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr>
+      <tr><td>Spiel</td>
+        <td><span class="e15-spiel"><m-e15-steine n="10" gr="3.2" pro="5" versatz="1"></m-e15-steine>10 Steine</span></td>
+        <td><span class="e15-spiel"><m-e15-steine n="10" gr="3.2" pro="5" versatz="2"></m-e15-steine>10 Steine</span></td>
+        <td><span class="e15-spiel">Wer sagt 20?</span></td>
+        <td><span class="e15-spiel">Wer sagt 20?</span></td>
+        <td><span class="e15-spiel"><m-e15-steine n="12" gr="2.8" pro="6" versatz="3"></m-e15-steine>12 Steine</span></td>
+        <td><span class="e15-spiel"><m-e15-steine n="12" gr="2.8" pro="6" versatz="4"></m-e15-steine>12 Steine</span></td></tr>
+      <tr><td>Wer fängt an?</td><td class="e15-leer"></td><td class="e15-leer"></td><td class="e15-leer"></td><td class="e15-leer"></td><td class="e15-leer"></td><td class="e15-leer"></td></tr>
+      <tr><td>Wer gewinnt?</td><td class="e15-leer"></td><td class="e15-leer"></td><td class="e15-leer"></td><td class="e15-leer"></td><td class="e15-leer"></td><td class="e15-leer"></td></tr>
+    </table>
+    <div class="e15-punkte"><b>Punkte:</b><span>ich</span><span class="e15-strichfeld"></span><span>du</span><span class="e15-strichfeld"></span></div>
+    <p class="lsg-nur">Hier gibt es keine falsche Lösung.</p>
+  </div>
+
+  <m-karten spalten="2" zeilen="1" hoehe="54" breite="180">
+    <div><div class="e15-karte">
+      <div class="e15-karte-kopf"><m-symbol name="drache" gr="7" blick="rechts"></m-symbol>Meine Strategie-Karte</div>
+      <div class="e15-karte-titel">Wer sagt 20?</div>
+      <div class="e15-karte-zeile">Meine Gewinnzahlen:</div>
+      <m-e15-zahlen raetsel="e15-g20" ordnung="auf" form="kreis" gr="10"></m-e15-zahlen>
+      <div class="e15-karte-klein">Wer anfängt, sagt „1, 2“.</div>
+    </div></div>
+    <div><div class="e15-karte">
+      <div class="e15-karte-kopf"><m-symbol name="drache" gr="7" blick="rechts"></m-symbol>Meine Strategie-Karte</div>
+      <div class="e15-karte-titel">Steine-Spiel (1 oder 2)</div>
+      <div class="e15-karte-zeile">So viele Steine lasse ich liegen:</div>
+      <m-e15-zahlen raetsel="e15-g12" form="kreis" gr="10"></m-e15-zahlen>
+      <div class="e15-karte-klein">Liegt schon eine Gewinnzahl? Nimm 1 und warte.</div>
+    </div></div>
+  </m-karten>
+
+  <div class="knobel" data-titel="Knobel-Ecke: Wer sagt 10?">
+    <div class="e15-knobel-reihe">
+      <p>Gewinnzahlen: <m-e15-zahlen raetsel="e15-g10" vorgabe="10" style="display:inline-block"></m-e15-zahlen></p>
+      <p>Du fängst an. Was sagst du? <m-e15-antwort raetsel="e15-g10" was="erster" l="1"></m-e15-antwort></p>
+    </div>
+  </div>
+</section>
