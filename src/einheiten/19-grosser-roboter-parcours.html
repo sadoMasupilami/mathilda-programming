@@ -1,1 +1,530 @@
-<!-- Einheit 19: noch nicht geschrieben (Platzhalter, damit Buch und --nur 19 schon funktionieren) -->
+<!--
+  Einheit 19: Großer Roboter-Parcours (Block D)
+  Alles zusammen: Befehle, Zauber-Kasten, Wenn-dann-Kasten, „bis zum Schatz“ und Zaubersprüche in einem
+  großen Parcours am Boden-Gitter (Polster, Kübel, Seil, Muggelsteine als Stationen). Roboter-Rennen
+  (wer braucht weniger Karten?), zwei Roboter gleichzeitig im Takt (Extra X1), Kobold im Parcours.
+  Keine neuen Begriffe (nur das Spielwort „Takt“), Wiederholung und Anwendung.
+  Rätsel: raetsel/e19.json (Web-Paket e19, Art pfad mit erlaubt/welten; zwei Drachen: eigene Löser-Art
+  „zweidrachen“ in werkzeuge/arten/zweidrachen.mjs, ohne Web-Spiel)
+  Eigene Bausteine: src/bausteine/e19-parcours.js (zwei Drachen, Zahlen aus der Lösung, Rekord)
+  Blätter: 19-1 Der große Parcours, 19-2 Zwei Drachen, 19-3 Kobold im Parcours
+-->
+<style>
+  .e19-ablauf > li { break-inside: avoid; }
+  .e19-ganz > li { break-inside: auto; orphans: 2; widows: 2; }
+  .kasten.e19-bricht { -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .kasten.e19-bricht > .kasten-titel { break-after: avoid; }
+  .kasten.e19-bricht > .kasten-titel + p, .kasten.e19-bricht > .kasten-titel + ul > li:first-child { break-before: avoid; break-inside: avoid; }
+  .kasten.stolper.e19-bricht li { break-inside: avoid; }
+  /* kleine Programm-Reihen im Fließtext der Anleitung */
+  .e19-mini m-programm, .e19-mini m-symbol, .e19-mini m-spruch, .e19-mini m-e19-drache { vertical-align: middle; }
+  .e19-mini .prog { gap: 0.8mm; vertical-align: middle; align-items: center; }
+  .e19-mini .prog .platz .nr { display: none; }
+  .e19-mini .prog .platz .box { border-width: 0.35mm; border-radius: 1mm; }
+  .e19-mini .prog .kasten-z { border-width: 0.5mm; border-radius: 1.6mm; padding: 0.5mm 1mm 0.9mm 1mm; gap: 0.4mm; }
+  .e19-mini .prog .kasten-z .mal { font-size: 8.5pt; }
+  .e19-mini .prog .kasten-z .innen { gap: 0.8mm; }
+  .spick .prog .kasten-w { padding: 0.8mm 1.2mm; border-width: 0.5mm; border-radius: 2mm; gap: 1mm; }
+  .spick .prog .kasten-w .w-wort { font-size: calc(var(--gr, 14mm) * 0.52); }
+  .spick .prog .kasten-z.kasten-bis .mal { font-size: calc(var(--gr, 14mm) * 0.52); }
+  .e19-werkzeuge td:first-child { width: 20%; font-weight: 700; }
+  .e19-werkzeuge td:nth-child(3) { width: 30%; }
+  .e19-tab td:first-child { width: 8%; }
+  .e19-tab th:first-child { white-space: nowrap; }
+  .e19-tab td:nth-child(3) { width: 11%; }
+  .e19-level { margin: 1mm 0 2mm 0; }
+  .e19-level > li { margin-bottom: 0.8mm; break-inside: avoid; }
+  .e19-loes { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm 4mm; align-items: start; margin: 2mm 0 4mm 0; }
+  .e19-loes m-loesungen, .e19-loes .loesungen-raster { display: contents; }
+  .e19-loes > .kasten.loesung { margin: 5mm 0 0 0; font-size: 9.5pt; }
+  .e19-loes > .kasten.loesung p, .kasten.loesung.e19-weiter p { margin-bottom: 1.6mm; }
+  table.e19-takte { width: auto; margin: 1mm 0 2.5mm 0; font-size: 9.5pt; }
+  table.e19-takte td, table.e19-takte th { padding: 0.6mm 3mm; vertical-align: middle; }
+  table.e19-takte th svg { vertical-align: middle; }
+  table.e19-takte m-symbol { vertical-align: middle; }
+  table.e19-takte tr.e19-stoss td { color: var(--rot); }
+
+  /* Bausteine aus src/bausteine/e19-parcours.js */
+  m-e19-zwei { display: inline-block; line-height: 0; }
+  m-e19-zwei svg { display: block; }
+  m-e19-prog { display: block; line-height: 1; }
+  m-e19-zahl, m-e19-janein, m-e19-rekord, m-e19-drache { display: inline-block; vertical-align: middle; line-height: 1; }
+  m-e19-zahl[text], m-e19-rekord { display: inline; vertical-align: baseline; }
+  .e19-zeilen { display: flex; flex-wrap: wrap; align-items: center; gap: 2mm 5mm; margin: 1.5mm 0 2mm 0; }
+  .e19-zeilen .e19-bl { font-size: 9.5pt; color: var(--grau); font-weight: 700; }
+  .e19-eins { display: inline-flex; align-items: center; gap: 2mm; }
+  .e19-zeile { display: inline-flex; align-items: flex-end; gap: 2mm; }
+  .e19-wer { display: inline-flex; align-items: center; justify-content: center; padding-bottom: 0.5mm; }
+  .e19-wer svg { display: block; }
+  .e19-janein { display: inline-flex; align-items: center; gap: 4mm; font-family: var(--kind); font-size: 16pt; }
+  .e19-jn { display: inline-flex; align-items: center; justify-content: center; min-width: 13mm; height: 9mm; padding: 0 2mm; border-radius: 5mm; border: 0.6mm solid transparent; }
+  .loesungsmodus .e19-jn.e19-jn-lsg { border-color: var(--rot); color: var(--rot); }
+
+  /* Blätter */
+  .e19-intro { font-size: 16pt; margin: 0 0 1mm 0; }
+  .e19-plan { display: flex; align-items: flex-start; gap: 6mm; }
+  .e19-plan > m-gitter { flex: none; }
+  .e19-legende { display: flex; flex-direction: column; gap: 3.5mm; padding-top: 1mm; }
+  .e19-legende p { display: flex; align-items: center; gap: 2.5mm; margin: 0; font-size: 15pt; line-height: 1.2; }
+  .e19-legende m-symbol { flex: none; }
+  .e19-spruch-titel { font-family: var(--kind); font-weight: 700; font-size: 15pt; color: #8a5a2b; margin: 2mm 0 1mm 0; }
+  .e19-profi-reihe { display: flex; align-items: flex-end; gap: 6mm; }
+  .e19-profi-reihe > .profi { flex: 1; }
+  .e19-regel { border: 0.7mm solid var(--grau); border-radius: 3mm; padding: 1.5mm 4mm 1.8mm 4mm; background: #f7f7fb; display: flex; align-items: center; gap: 4mm; }
+  .e19-regel p { margin: 0; font-size: 15pt; line-height: 1.3; }
+  .e19-paar { display: flex; gap: 1mm; flex: none; }
+  .e19-neben { display: flex; align-items: flex-start; gap: 6mm; }
+  .e19-neben > m-e19-zwei, .e19-neben > m-gitter { flex: none; }
+  .e19-spalte { display: flex; flex-direction: column; gap: 4mm; padding-top: 1mm; }
+  .e19-antwort { display: flex; align-items: center; gap: 3mm; margin: 0; }
+  .e19-unten { margin-top: 1.5mm; }
+  .e19-hinweis { font-size: 14pt; color: var(--grau); margin-left: 3mm; }
+  .e19-alle { display: inline-flex; flex-wrap: wrap; gap: 1.5mm 4mm; vertical-align: middle; }
+</style>
+
+<!-- Spickzettel: Kurzfassung der Anleitung zum Mitnehmen, höchstens zwei Seiten. Ablauf als Drehbuch (Minuten wie in der Anleitung) -->
+<section class="spick nur-buch" data-einheit="19" data-titel="Großer Roboter-Parcours">
+  <p class="spick-kern"><b>Darum geht’s:</b> Alles zusammen! Befehle, Zauber-Kasten, Wenn-dann-Kasten, „bis zum Schatz“ und Zaubersprüche in einem großen Parcours am Boden-Gitter (Polster, Kübel, Seil, Muggelsteine als Stationen). {{KIND}} plant ein langes Programm mit möglichst <b>wenigen Karten</b> (4 Karten, aber 15 Befehle!), dann umgekehrt. Neu ist nur ein Spiel: <b>zwei Roboter gleichzeitig</b>, Befehl für Befehl im <b>Takt</b>. Sie dürfen nie im selben Feld stehen. Keine neuen Wörter außer „Takt“.</p>
+
+  <div class="spick-zwei breit-links">
+    <div class="spick-block vorher">
+      <h2>Vorher, ohne {{KIND}} <small>· etwa 20 Min</small></h2>
+      <ul class="check">
+        <li><a class="blattref" href="#blatt-19-1"></a>, <a class="blattref" href="#blatt-19-2"></a> und <a class="blattref" href="#blatt-19-3"></a> drucken, am besten in Farbe. <span class="min">2 Min</span></li>
+        <li>Boden-Gitter 5 · 5: das 4 · 4-Gitter aus Einheit&nbsp;16 um eine Reihe und eine Spalte verlängern (oder neu kleben, im Hof mit Kreide). Polster als „oben“. <span class="min">12 Min</span></li>
+        <li>Spruch-Karte: Zettel mit Stern, darauf rechts drehen, vor, links drehen. Eine Drachen-Figur blau anmalen. <span class="min">4 Min</span></li>
+        <li>Alle Karten-Kuverts zusammensuchen. <span class="min">2 Min</span></li>
+      </ul>
+    </div>
+    <div class="spick-block vorher">
+      <h2>Bereitlegen</h2>
+      <ul class="check">
+        <li>Befehlskarten, lila Streifen, Zahlenkarten, Wenn-Karten, Wort-Karten, „bis zum Schatz“</li>
+        <li>2 Polster, Kübel, Springschnur, 2 Muggelsteine, Zuckerl</li>
+        <li>Drachen-Figuren grün und blau, Zettel, Stift</li>
+        <li>Stempel oder Sticker</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Gemeinsam</h2>
+  <ol class="spick-ablauf">
+    <li data-min="5"><div><b>Parcours bauen.</b> {{KIND}} ist Bau-Chefin mit <a class="blattref" href="#blatt-19-1"></a>: Polster links in der Mitte, Kübel oben, Seil rechts über zwei Felder, Muggelsteine auf die Edelsteine, Zuckerl auf den Schatz. Nebenbei zu jeder Karten-Art ein Satz.
+      <div class="sag">
+        <p class="du">„Heute darfst du alles benutzen, was du je gelernt hast. Aber jede Karte kostet!“</p>
+        <p class="du">„Was macht der Stern-Spruch? Probier ihn aus!“</p>
+        <p class="dann">Ein Schritt zur Seite, Nase wieder nach vorne: der Ausweich-Spruch.</p>
+      </div>
+    </div></li>
+    <li data-min="10"><div><b>Roboter-Rennen.</b> Beide planen ein Programm, du auf einem Zettel (z. B. das Papa-Programm aus der Anleitung, 8 Karten).
+      <div class="spick-spiel"><h3>Roboter-Rennen</h3>
+        <ul>
+          <li><b>Planen:</b> beide geheim, höchstens 3 Minuten.</li>
+          <li><b>Zählen:</b> laut. Der fertige Stern-Spruch zählt nicht, jeder Aufruf 1.</li>
+          <li><b>Testen:</b> beide Programme, weniger Karten zuerst. Der andere ist Roboter, dann umgedreht.</li>
+          <li><b>Punkt:</b> weniger Karten und angekommen (beide Muggelsteine, Zuckerl). Sonst das andere Programm, wenn es ankommt.</li>
+          <li><b>Ende:</b> 2 Runden (Zuckerl oder Polster versetzen), mehr Punkte gewinnt.</li>
+        </ul>
+      </div>
+      <div class="sag">
+        <p class="sie">„Ich hab nur 4 Karten: bis zum Schatz, wenn Stein, dann Stern-Spruch, sonst vor.“</p>
+        <p class="du">„Und wie viele Befehle mache ich als Roboter?“ (15, Profi-Aufgabe)</p>
+      </div>
+    </div></li>
+    <li data-min="8"><div><b>Zwei Drachen.</b> <a class="blattref" href="#blatt-19-2"></a> Aufgabe 1 mit zwei Figuren, Takt für Takt (Muggelsteine als Merker auf den Programmen). Dann am Boden, Parcours umbauen wie auf dem Blatt (links oben im großen Gitter).
+      <div class="spick-spiel"><h3>Zwei Roboter im Takt</h3>
+        <ul>
+          <li><b>Takt:</b> gemeinsam klatschen, „Takt 1!“, jeder macht seinen ersten Befehl. Drehen dauert auch einen Takt.</li>
+          <li><b>Fertig:</b> Wer fertig ist, bleibt stehen.</li>
+          <li><b>Bumm:</b> selbes Feld (auch wenn einer steht) oder aneinander vorbei: Punkt für den Kobold. Ebenso bei Stoß an einen Stein.</li>
+          <li><b>Gewonnen:</b> beide am Ziel ohne Bumm: Punkt fürs Team. 3 Runden.</li>
+        </ul>
+      </div>
+      <div class="sag">
+        <p class="du">„Takt 3: Du gehst vor, ich gehe vor … Bumm!“</p>
+        <p class="dann">Aufgabe 2: Der blaue Drache nimmt die Reihe darunter (6 Befehle). Gleich am Boden testen.</p>
+      </div>
+    </div></li>
+    <li data-min="5"><div><b>Kobold im Parcours.</b> <a class="blattref" href="#blatt-19-3"></a>: Bei Befehl 8 stößt der Drache an. Finger mitfahren lassen, Runden laut zählen.
+      <div class="sag">
+        <p class="du">„Wie oft darf der Stern-Spruch laufen, bevor ‚bis zum Schatz‘ übernimmt?“</p>
+      </div>
+    </div></li>
+    <li data-min="2"><div><b>Sammelpass.</b> Feld „Einheit&nbsp;19“, Sterne anmalen. „Was war heute am lustigsten?“</div></li>
+  </ol>
+
+  <div class="spick-zwei">
+    <div class="spick-block stolper">
+      <h2>Wenn es hakt</h2>
+      <ul>
+        <li><b>Zu viele Werkzeuge:</b> eins nach dem anderen ausprobieren, dann zusammensetzen.</li>
+        <li><b>„bis zum Schatz“:</b> nach jedem Befehl fragen „Stehst du schon auf dem Schatz?“</li>
+        <li><b>Zwei Drachen:</b> immer beide Figuren im selben Takt bewegen. Drehen kostet einen Takt, wer fertig ist, bleibt stehen.</li>
+        <li><b>Echter Zusammenstoß:</b> langsam gehen, Polster als Stoßdämpfer.</li>
+      </ul>
+    </div>
+    <div class="spick-block schwerer">
+      <h2>Zu leicht?</h2>
+      <ul>
+        <li><b>Profi-Aufgaben</b> auf allen drei Blättern.</li>
+        <li><b>Ohne Stern-Spruch:</b> geht mit 6 Karten, Profis schaffen 5.</li>
+        <li><b>Eigener Parcours</b> für die Familie mit Programm-Karte.</li>
+        <li><b>Rekord-Tanz</b> mit 6 Karten: 50 Bewegungen.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="spick-block schluss">
+    <h2>Zum Schluss nicht vergessen</h2>
+    <ul class="check">
+      <li><b>Bildschirm-Bonus,</b> nur wenn ihr mögt (höchstens 15 Min, nach den Blättern): Paket 19, QR-Code unten rechts auf <a class="blattref" href="#blatt-19-1"></a>. 7 Levels mit allen Werkzeugen, Level 3 und 5 kennt sie vom Blatt. Stern, wenn der Drache mit der erlaubten Kartenzahl ankommt (die App zählt mit). Nach dem Ende-Bild kommt das Gerät weg.</li>
+      <li>Werkzeugkiste aufheben: alle Karten, Figuren, Spruch-Karte. Das Boden-Gitter (4 · 4 reicht) braucht ihr beim Code-Fest wieder.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="anleitung" data-einheit="19" data-titel="Großer Roboter-Parcours">
+
+  <div class="kasten ziel">
+    <p>Heute kommt alles zusammen, was {{KIND}} in dieser Werkstatt über Programme gelernt hat: <b>Befehle</b>, der <b>Zauber-Kasten</b> mit Zahl, der <b>Wenn-dann-Kasten</b>, der Wiederhol-Zauber <b>„bis zum Schatz“</b> und die <b>Zaubersprüche</b>. In einem großen Parcours am Boden-Gitter (Polster, Kübel, ein Seil, Muggelsteine als Stationen) plant sie ein langes Programm mit möglichst wenigen Karten. Mit nur 4 Karten läuft der Roboter <m-e19-zahl raetsel="e19-p1" was="befehle" text l="15"></m-e19-zahl> Befehle weit! Dann wird umgedreht: Du planst, sie ist der Roboter.</p>
+    <p>Dazu kommt ein neues Spiel: <b>zwei Roboter gleichzeitig</b>. Beide machen Befehl für Befehl im selben <span class="begriff">Takt</span>, und sie dürfen nie im selben Feld stehen. Wo stoßen zwei Drachen zusammen, und wie plant man so, dass sie aneinander vorbeikommen? Natürlich versteckt sich auch der Fehler-Kobold, diesmal in einem Parcours-Programm. Es gibt keine neuen Werkzeuge, nur neue Kombinationen. Das ist die letzte Einheit vor dem großen Code-Fest.</p>
+  </div>
+
+  <div class="kasten tipp e19-mini" data-titel="Die Werkzeugkiste: alles, was {{KIND}} schon kann">
+    <table class="tab e19-werkzeuge">
+      <tr><th>Werkzeug</th><th>So sieht es aus</th><th>Karten zählen</th></tr>
+      <tr><td>Befehle</td><td><m-symbol name="vor" gr="6"></m-symbol> vor, <m-symbol name="links" gr="6"></m-symbol> links drehen, <m-symbol name="rechts" gr="6"></m-symbol> rechts drehen</td><td>je 1 Karte</td></tr>
+      <tr><td>Zauber-Kasten</td><td><m-programm befehle="3[vor]" gr="6" nummern="nein"></m-programm> 2-mal bis 5-mal, darin 1 bis 3 Teile</td><td>Zahlenkarte plus Inhalt (hier 2)</td></tr>
+      <tr><td>„bis zum Schatz“</td><td><m-programm befehle="bis[vor]" gr="6" nummern="nein"></m-programm> hört auf, sobald der Drache auf dem Schatz steht, auch mitten in der Runde</td><td>1 plus Inhalt (hier 2)</td></tr>
+      <tr><td>Wenn-dann-Kasten</td><td><m-programm befehle="wenn[stein: rechts sonst vor]" gr="6" nummern="nein"></m-programm> der Drache schaut nur, der Rand zählt wie ein Stein</td><td>Wenn-Karte plus dann und sonst (hier 3)</td></tr>
+      <tr><td>Zauberspruch</td><td><m-spruch name="stern" befehle="rechts vor links" gr="6" nummern="nein"></m-spruch> Aufruf: <m-programm befehle="@stern" gr="6" nummern="nein"></m-programm></td><td>Aufruf 1. Ein fertiger Spruch zählt nicht, ein selbst geschriebener einmal (1 plus Inhalt)</td></tr>
+    </table>
+    <p>Kein Zauber-Kasten im Zauber-Kasten (auch kein „bis zum Schatz“), kein Wenn-dann im Wenn-dann, kein Spruch im Spruch. Erlaubt ist aber: ein Wenn-dann-Kasten im Zauber-Kasten, ein Spruch-Aufruf in jedem Kasten und ein Kasten im Spruch. Die Wörter „wenn“, „dann“, „sonst“ und die lila Streifen zählen nie.</p>
+  </div>
+
+  <div class="kasten tipp" data-titel="Die Spielregeln für zwei Drachen (für euch beide gleich)">
+    <ul>
+      <li><b>Im Takt:</b> Beide Drachen laufen gleichzeitig. In jedem <b>Takt</b> macht jeder Drache genau einen Befehl: vor, links drehen oder rechts drehen. Auch eine Drehung dauert einen Takt. Bei Zauber-Kasten, Wenn-dann-Kasten und Spruch zählen nur die Befehle, die der Drache wirklich macht. Die Wenn-Karte kostet keinen Takt, der Drache schaut ja nur.</li>
+      <li><b>Fertig heißt stehen bleiben:</b> Ist ein Programm zu Ende, bleibt der Drache in seinem Feld stehen. Dort steht er dem anderen im Weg.</li>
+      <li><b>Zusammenstoß:</b> Stehen nach einem Takt beide im selben Feld, ist das ein Zusammenstoß („Bumm!“). Laufen zwei Drachen in einem Takt genau aneinander vorbei (sie tauschen die Felder), stoßen sie auch zusammen: Am Boden würdet ihr ineinander laufen. In den Rätseln der Blätter kommt das nicht vor.</li>
+      <li><b>Der andere Drache ist kein Stein:</b> Die Wenn-Karte sieht nur Steine und den Rand. An den anderen Drachen muss die Programmiererin selbst denken.</li>
+      <li><b>Wer will wohin:</b> Der grüne Drache will zum Schatz, der blaue zum Stern.</li>
+    </ul>
+  </div>
+
+  <div class="kasten material darf-brechen e19-bricht">
+    <p><b>Vorher, ohne {{KIND}} (etwa 20 Minuten):</b></p>
+    <ul>
+      <li><b>Drucken (2 Minuten):</b> <a class="blattref" href="#blatt-19-1"></a>, <a class="blattref" href="#blatt-19-2"></a> und <a class="blattref" href="#blatt-19-3"></a>, am besten in Farbe (die zwei Drachen sind grün und blau).</li>
+      <li><b>Boden-Gitter 5 · 5 (12 Minuten):</b> Klebt noch das 4 · 4-Gitter aus Einheit&nbsp;16, klebt ihr unten eine Reihe und rechts eine Spalte dazu. Sonst neu: 6 Streifen Malerkrepp waagrecht und 6 senkrecht, je 2,25 m lang, im Abstand von 45 cm (5 · 45 = 225). Zu wenig Platz? Dann 40 cm (5 · 40 = 200). Im Hof oder Garten geht es schneller mit Straßenkreide. Ein Polster an der oberen Kante zeigt, wo oben ist.</li>
+      <li><b>Spruch-Karte und blauer Drache (4 Minuten):</b> Auf einen Zettel einen großen Stern zeichnen, darunter drei Pfeile wie auf den Befehlskarten: rechts drehen, vor, links drehen. Das ist der Stern-Spruch von <a class="blattref" href="#blatt-19-1"></a>. Habt ihr in Einheit&nbsp;17 Spruch-Karten gebastelt, nehmt die. Von den Drachen-Figuren (<a class="blattref" href="#blatt-2-3"></a>) eine blau anmalen oder einen blauen Punkt darauf kleben.</li>
+      <li><b>Werkzeugkiste zusammensuchen (2 Minuten):</b> Befehlskarten (<a class="blattref" href="#blatt-1-1"></a>), lila Streifen und Zahlenkarten (<a class="blattref" href="#blatt-5-3"></a>), aus Einheit&nbsp;11 die Wenn-Karten und die türkisen Wort-Karten wenn, dann, sonst, aus Einheit&nbsp;16 das Kärtchen „bis zum Schatz“. Fehlt etwas, schreibt ihr es schnell auf einen Zettel.</li>
+    </ul>
+    <p><b>Material in der Einheit:</b> 2 Polster, 1 Kübel (Mistkübel, Wäschekorb oder Gießkanne gehen auch), 1 Springschnur oder ein Seil, 2 Muggelsteine (die Stationen), 1 Zuckerl (der Schatz), ein Zettel und ein Stift für dich, Buntstifte, ein paar Muggelsteine für Punkte, Stempel oder Sticker für den Sammelpass.</p>
+    <p><b>Extra, außerhalb der Einheit:</b> ein Parcours im Garten mit Kreide, mit Gießkanne, Ball und Hula-Hoop-Reifen als Steinen, für die ganze Familie (Schwerer-Teil, „Eigener Parcours für die Familie“).</p>
+  </div>
+
+  <h2>Ablauf Schritt für Schritt</h2>
+  <ol class="ablauf e19-ablauf">
+    <li data-min="5"><span class="schritt-titel">Parcours bauen</span>{{KIND}} ist die Bau-Chefin, <a class="blattref" href="#blatt-19-1"></a> ist der Bau-Plan. Sie sagt, wohin alles kommt, und du trägst: ein Polster links in die mittlere Reihe, den Kübel in die oberste Reihe (zweites Feld von links), das Seil rechts über zwei Felder der mittleren Reihe, auf die zwei Edelstein-Felder je einen Muggelstein (die Stationen) und auf den Schatz ganz rechts oben das Zuckerl. Startfeld ist links unten, Nase nach oben. Während ihr baut, holt sie aus jedem Kuvert eine Karte und sagt einen Satz dazu („Der Zauber-Kasten macht alles darin 3-mal.“). Zum Schluss geht sie den Stern-Spruch selbst: rechts drehen, vor, links drehen. Ein Schritt zur Seite, die Nase schaut wieder nach vorne. Das ist der <b>Ausweich-Spruch</b>.</li>
+    <li data-min="10"><span class="schritt-titel">Roboter-Rennen: Wer braucht weniger Karten?</span>Jetzt plant ihr beide ein Programm für den Parcours (Kasten „Spiel: Roboter-Rennen“). {{KIND}} darf Aufgabe 1 auf <a class="blattref" href="#blatt-19-1"></a> benutzen oder gleich mit Karten legen. Du schreibst auf einen Zettel, z. B. das Papa-Programm aus dem Kasten unter dem Ablauf (8 Karten). Das Programm mit weniger Karten wird zuerst getestet: Du bist der Roboter für ihr Programm, sammelst die Muggelsteine ein und holst das Zuckerl. Dann wird umgedreht: Sie ist der Roboter für dein Programm. Mit ihrem Programm aus 4 Karten läuft der Roboter <m-e19-zahl raetsel="e19-p1" was="befehle" text l="15"></m-e19-zahl> Befehle weit, mit deinem aus 8 Karten <m-e19-zahl raetsel="e19-l1" was="befehle" text l="16"></m-e19-zahl>. Lass sie mitzählen, das ist die Profi-Aufgabe von <a class="blattref" href="#blatt-19-1"></a>. In der zweiten Runde liegt das Zuckerl oder ein Polster woanders, und ihr plant neu.</li>
+    <li data-min="8"><span class="schritt-titel">Zwei Drachen</span><a class="blattref" href="#blatt-19-2"></a>, Aufgabe 1: Zwei Drachen-Figuren (eine grün, eine blau) ins Gitter, ein Muggelstein auf jede Programm-Reihe. In jedem Takt rückt jeder Muggelstein eine Karte weiter, und jede Figur macht ihren Befehl. In Takt <m-e19-zahl raetsel="e19-z1" was="takt" text l="3"></m-e19-zahl> wollen beide ins selbe Feld: Bumm! Dann spielt ihr es am Boden nach (Kasten „Spiel: Zwei Roboter im Takt“): Räumt den Parcours um wie auf dem Blatt, das Gitter des Blatts liegt links oben im großen Gitter. Nach dem Bumm kommt Aufgabe 2: Sie schreibt dem blauen Drachen ein neues Programm, und ihr testet es sofort am Boden. Die Profi-Aufgabe ist freiwillig.</li>
+    <li data-min="5"><span class="schritt-titel">Kobold im Parcours</span><a class="blattref" href="#blatt-19-3"></a>: Ein Programm mit allem, aber der Kobold hat eine Karte ausgetauscht. Sie fährt mit dem Finger mit, zählt die Runden des Zauber-Kastens laut und merkt: Bei Befehl <m-e19-zahl raetsel="e19-k1" was="stoss" text l="8"></m-e19-zahl> stößt der Drache an einen Stein. Welche Karte ist schuld? Wer mag, legt das reparierte Programm am Boden nach. Die Profi-Aufgabe (nur 5 Karten) ist für den Schwerer-Teil oder das nächste Mal.</li>
+    <li data-min="2"><span class="schritt-titel">Sammelpass</span>Feld „Einheit&nbsp;19“ stempeln oder bekleben, Sterne anmalen. Frag: „Was war heute am lustigsten?“ Das Boden-Gitter darf kleben bleiben: Beim Code-Fest in Einheit&nbsp;20 ist ein 4 · 4-Gitter eine der Stationen.</li>
+  </ol>
+
+  <div class="kasten tipp e19-mini" data-titel="Das Papa-Programm (oder Mama-Programm) für Schritt 2">
+    <p>Dein Programm für den Parcours, nur mit Befehlen, Zauber-Kasten und Stern-Spruch: <m-programm raetsel="e19-l1" gr="6"></m-programm>. Das sind <m-e19-zahl raetsel="e19-l1" was="karten" text l="8"></m-e19-zahl> Karten (der Stern-Spruch steht schon fertig da und zählt nicht). Es kommt an und sammelt beide Muggelsteine ein (vom Löser geprüft). {{KIND}}s Programm mit Wenn-dann-Kasten und „bis zum Schatz“ braucht nur 4 Karten: <m-programm raetsel="e19-p1" teil="beispiel" gr="6"></m-programm>. Lass sie den Unterschied selbst entdecken. Vielleicht sagt sie: „Dein Programm muss genau wissen, wo die Steine liegen. Meines schaut einfach nach.“</p>
+  </div>
+
+  <h3>Beispielsätze</h3>
+  <div class="sag">
+    <p class="du">„Heute darfst du alles benutzen, was du je gelernt hast. Aber jede Karte kostet!“</p>
+    <p class="sie">„Dann nehm ich den Zauber-Kasten. Und den Stern-Spruch.“</p>
+    <p class="du">„Was macht der Stern-Spruch? Probier ihn aus!“</p>
+    <p class="sie">(geht rechts drehen, vor, links drehen) „Ich bin zur Seite gehüpft! Wie ausweichen.“</p>
+    <p class="dann">Genau. Wann braucht der Roboter den Ausweich-Spruch? Immer dann, wenn ein Stein vor seiner Nase ist. Das ist die Wenn-dann-Regel. Den Rest findet sie meistens selbst.</p>
+  </div>
+  <div class="sag">
+    <p class="sie">„Ich hab nur 4 Karten: bis zum Schatz, wenn Stein, dann Stern-Spruch, sonst vor.“</p>
+    <p class="du">„Und ich habe 8 Karten. Wenn deines ankommt, hast du gewonnen. Wie viele Befehle mache ich als Roboter?“</p>
+    <p class="sie">„Vier? … Nein, viel mehr! Der Kasten macht ja immer weiter.“</p>
+    <p class="dann">Zählt gemeinsam mit: Es sind 15. Am Schluss fällt die letzte Drehung des Spruchs weg, weil der Roboter schon auf dem Schatz steht und „bis zum Schatz“ sofort aufhört. Wenige Karten, viele Befehle: Das ist der ganze Trick der Werkzeuge.</p>
+  </div>
+  <div class="sag">
+    <p class="du">(<a class="blattref" href="#blatt-19-2"></a>) „Takt 1: Grün geht vor, Blau geht vor. Takt 2?“</p>
+    <p class="sie">„Grün dreht rechts, Blau dreht links. Takt 3: Beide vor … oh, die sind im selben Feld!“</p>
+    <p class="du">„Bumm! Was kann der blaue Drache anders machen?“</p>
+    <p class="sie">„Er wartet!“ oder „Er geht unten herum.“</p>
+    <p class="dann">Warten hilft hier nicht: Der grüne Drache bleibt am Ende auf seinem Schatz stehen, genau im Feld über dem blauen. Aber unten herum geht es, das kürzeste Programm hat 6 Befehle. Lass sie probieren, ob ihr Programm wirklich ohne Bumm durchkommt.</p>
+  </div>
+
+  <h2>Spiele, Bewegung und Basteln</h2>
+
+  <div class="kasten spiel darf-brechen e19-bricht" data-titel="Roboter-Rennen">
+    <p class="spiel-meta">2 Personen · 10 Minuten · Parcours am Boden-Gitter, alle Karten, Zettel und Stift, Muggelsteine für Punkte</p>
+    <ol class="regeln">
+      <li><b>Ziel:</b> ein Programm, mit dem der Roboter beide Stationen (Muggelsteine) einsammelt und beim Zuckerl ankommt, mit möglichst wenigen Karten.</li>
+      <li><b>Planen:</b> Beide planen gleichzeitig und geheim, höchstens 3 Minuten. {{KIND}} legt mit den Karten (hinter dem Sofa, damit du nicht schaust), du zeichnest auf einen Zettel: Pfeile, ein lila Rahmen mit Zahl, ein türkiser Rahmen mit „wenn“.</li>
+      <li><b>Zählen:</b> Beide zeigen her und zählen laut wie immer. Der Stern-Spruch steht fertig auf der Spruch-Karte und zählt nicht, jeder Aufruf zählt 1. Erfindet jemand einen eigenen Spruch, zählt er einmal mit (1 Karte plus Inhalt).</li>
+      <li><b>Testen:</b> Beide Programme werden getestet, zuerst das mit weniger Karten. Wer es geplant hat, schaut zu, die andere Person ist der Roboter und macht genau, was dasteht. Danach legt ihr Muggelsteine und Zuckerl zurück und tauscht: So ist jede von euch in jeder Runde einmal Roboter.</li>
+      <li><b>Punkt:</b> Den Punkt bekommt das Programm mit weniger Karten, wenn der Roboter damit beide Muggelsteine einsammelt und beim Zuckerl ankommt. Schlägt der Kobold zu (Stoß, ein Muggelstein fehlt, nicht beim Zuckerl), bekommt das andere Programm den Punkt, wenn es ankommt. Bei gleich vielen Karten bekommt jedes Programm, das ankommt, 1 Punkt.</li>
+      <li><b>Neue Runde:</b> Abwechselnd legt eine von euch das Zuckerl, einen Polster oder eine Station woanders hin. Dann plant ihr neu.</li>
+      <li><b>Ende:</b> Nach 2 Runden gewinnt, wer mehr Punkte hat. Bei Gleichstand gibt es eine dritte Runde, wenn ihr mögt. Das Zuckerl bekommt sowieso {{KIND}}.</li>
+    </ol>
+    <p><b>Varianten:</b></p>
+    <ul>
+      <li><b>Kartengrenze:</b> Vorher ausmachen „höchstens 5 Karten“. Wer mehr braucht, darf nicht testen.</li>
+      <li><b>Ein Werkzeug verboten:</b> „Diese Runde ohne Wenn-dann-Kasten!“ Wie viele Karten braucht ihr dann?</li>
+      <li><b>Umbauen erlaubt:</b> Wer verliert, darf einen Polster versetzen. Kommt das Gewinner-Programm immer noch an?</li>
+    </ul>
+  </div>
+
+  <div class="kasten spiel darf-brechen e19-bricht" data-titel="Zwei Roboter im Takt">
+    <p class="spiel-meta">2 Personen · 5–8 Minuten · Boden-Gitter, zwei Programme auf Papier (<a class="blattref" href="#blatt-19-2"></a> oder Zettel), ein Polster als Stoßdämpfer</p>
+    <ol class="regeln">
+      <li><b>Vorbereitung:</b> Ihr seid beide Roboter: {{KIND}} der blaue Drache, du der grüne. Jeder stellt sich auf sein Startfeld und schaut in seine Richtung. Jeder hat sein Programm in der Hand (das Blatt oder einen Zettel) und einen Muggelstein als Merker.</li>
+      <li><b>Ein Takt:</b> Ihr klatscht gemeinsam und sagt laut „Takt 1!“. Jeder macht seinen ersten Befehl und schiebt den Merker eine Karte weiter. Dann „Takt 2!“ und so weiter. Auch Drehen dauert einen Takt. Langsam, damit niemand umfällt.</li>
+      <li><b>Fertig:</b> Wessen Programm zu Ende ist, bleibt stehen, bis der andere auch fertig ist.</li>
+      <li><b>Bumm:</b> Stehen nach einem Takt beide im selben Feld (auch wenn einer nur stehen bleibt oder sich dreht) oder laufen sie aneinander vorbei, ist das ein Zusammenstoß. Ihr ruft „Bumm!“, haltet an, und der Kobold bekommt einen Punkt (ein Muggelstein auf seine Seite). Stößt ein Drache an einen Stein oder kommt er nicht bei seinem Ziel an, bekommt der Kobold den Punkt auch.</li>
+      <li><b>Ziel:</b> Ihr spielt zusammen gegen den Kobold. Kommen beide ohne Bumm bei ihrem Ziel an, bekommt euer Team einen Punkt.</li>
+      <li><b>Ablauf:</b> Runde 1: die Programme von Aufgabe 1 (da gewinnt der Kobold). Runde 2: das neue Programm von Aufgabe 2. Runde 3: {{KIND}} plant beide Programme selbst, je 3 bis 4 Befehle reichen. Wer nach 3 Runden mehr Punkte hat, gewinnt: ihr oder der Kobold.</li>
+    </ol>
+    <p><b>Varianten:</b></p>
+    <ul>
+      <li><b>Vorhersagen:</b> Vor dem Loslaufen sagt {{KIND}}: „Wir stoßen in Takt 3 zusammen“ oder „Wir kommen durch“. Stimmt es, gibt es einen Extra-Punkt.</li>
+      <li><b>Takt-Lied:</b> Statt Klatschen ein Lied mit festem Takt, bei jedem Schlag ein Befehl.</li>
+      <li><b>Gleiches Programm:</b> Beide haben dasselbe Programm, starten aber in verschiedenen Feldern. Wo landet wer? (Profi-Aufgabe von <a class="blattref" href="#blatt-19-2"></a>.)</li>
+    </ul>
+  </div>
+
+  <div class="kasten bewegung darf-brechen e19-bricht" data-titel="Kobold-Jagd im Parcours">
+    <p>Wie in Einheit&nbsp;4, aber mit allen Werkzeugen. Du legst ein Programm mit Zauber-Kasten, Wenn-dann-Kasten und Spruch-Aufrufen und tauschst heimlich <b>eine</b> Karte aus: eine falsche Zahlenkarte, eine falsche Wenn-Karte oder einen falschen Befehl. {{KIND}} sucht den Kobold zuerst im Kopf, dann läuft sie als Roboter und schaut, ob es jetzt klappt. Gute Verstecke für den Kobold:</p>
+    <ul>
+      <li><b>Die Zahl im Zauber-Kasten:</b> eine Runde zu viel, und der Roboter läuft gegen den Kübel.</li>
+      <li><b>Die Wenn-Karte:</b> „frei“ statt „Stein“, und der Roboter dreht sich an der falschen Stelle.</li>
+      <li><b>Im Spruch:</b> Ein Fehler im Spruch passiert bei jedem Aufruf. Das ist der gemeinste Kobold.</li>
+    </ul>
+    <p>Dann tauscht ihr: {{KIND}} versteckt den Kobold, du suchst. Ruhig absichtlich lange suchen und laut denken: „Runde 1 … Runde 2 … Aha!“</p>
+  </div>
+
+  <div class="kasten basteln" data-titel="Parcours-Bau">
+    <ol>
+      <li><b>Steine:</b> alles, was nicht umfällt und worüber niemand stolpert: Polster, ein Kübel, ein Wäschekorb, große Kuscheltiere. Eine Springschnur liegt über zwei Feldern, dann sind beide Felder Steine (eine Seil-Mauer).</li>
+      <li><b>Stationen:</b> ein Muggelstein auf jedem Edelstein-Feld. Der Roboter hebt ihn auf, sobald er in das Feld kommt. Am Ende zählt ihr: Sind alle eingesammelt?</li>
+      <li><b>Rand:</b> Das Malerkrepp außen ist der Rand. „Am Rand liegen unsichtbare Steine“, für die Wenn-Karte zählt er wie ein Stein.</li>
+      <li><b>Im Garten:</b> mit Kreide 5 · 5 Felder zu 45 cm, Gießkanne und Ball als Steine, ein Stein aus dem Beet als Station. Regen wischt den Parcours von selbst weg.</li>
+      <li><b>Im Gang, ohne Gitter:</b> „vor“ ist ein großer Schritt, die Wand ist der Rand, Polster und Kübel stehen im Weg, am Ende wartet ein Kuscheltier. Probiert dort das Programm von <a class="blattref" href="#blatt-19-1"></a>: „bis zum Kuscheltier: wenn Stein vor der Nase, dann Stern-Spruch, sonst vor“. Wo müssen die Polster liegen, damit der Roboter ankommt? Das tüftelt {{KIND}} aus.</li>
+    </ol>
+  </div>
+
+  <h2>Wenn es hakt oder zu leicht ist</h2>
+
+  <div class="kasten stolper darf-brechen e19-bricht">
+    <ul>
+      <li><b>Sie will alle Werkzeuge auf einmal benutzen</b> und verliert den Überblick: Werkzeug für Werkzeug fragen. „Was wiederholt sich?“ (Zauber-Kasten oder „bis zum Schatz“) „Was kommt an mehreren Stellen gleich vor?“ (Spruch) „Wo muss der Drache schauen?“ (Wenn-dann) Kürzer ist schön, aber ein Programm, das ankommt, ist immer schon geschafft.</li>
+      <li><b>„bis zum Schatz“ hört nicht auf:</b> Nach jedem Befehl fragen: „Stehst du schon auf dem Schatz?“ Der Kasten hört sofort auf, auch mitten im Spruch. Darum fällt auf <a class="blattref" href="#blatt-19-1"></a> am Schluss das letzte links drehen weg.</li>
+      <li><b>Der Drache schaut nur einmal:</b> Im Kasten „bis zum Schatz“ schaut er in jeder Runde neu. Ein Wenn-dann-Kasten allein (ohne Kasten drumherum) schaut nur einmal.</li>
+      <li><b>Sie zählt den fertigen Spruch mit:</b> Der Stern-Spruch steht schon auf der Spruch-Karte, er zählt nicht. Jeder Aufruf zählt 1. Erst wenn sie einen Spruch selbst erfindet, zählt er (einmal).</li>
+      <li><b>Zwei Drachen: Sie bewegt die Figuren nacheinander</b> (erst Grün ganz, dann Blau ganz): Dann sieht man keinen Zusammenstoß. Immer beide im selben Takt, Muggelsteine als Merker auf den Programmen.</li>
+      <li><b>Drehen „zählt nicht“:</b> Doch, eine Drehung dauert einen Takt. Der Drache bleibt dabei im Feld, und wer in dieses Feld läuft, stößt mit ihm zusammen. Das ist der Trick der Profi-Aufgabe auf <a class="blattref" href="#blatt-19-2"></a>.</li>
+      <li><b>Ein Drache ist fertig und verschwindet:</b> Nein, er bleibt stehen. Wer am Ziel steht, steht dem anderen im Weg.</li>
+      <li><b>Echte Zusammenstöße am Boden:</b> langsam gehen, im Takt, ein Polster als Stoßdämpfer vor dem Bauch. Bei „Bumm“ bleiben beide stehen.</li>
+      <li><b>Der Drache stößt an:</b> Wie immer: „Hier hat der Kobold zugeschlagen!“ Das Programm ist an dieser Stelle zu Ende.</li>
+    </ul>
+  </div>
+
+  <m-linksrechts></m-linksrechts>
+
+  <div class="zwei">
+    <div class="kasten leichter">
+      <ul>
+        <li>Ein Werkzeug nach dem anderen: zuerst nur den Stern-Spruch gehen, dann nur „wenn Stein, dann Stern-Spruch“, erst dann alles in den Kasten „bis zum Schatz“.</li>
+        <li>Parcours kleiner: das 4 · 4-Gitter aus Einheit&nbsp;16, nur ein Polster, nur eine Station.</li>
+        <li>Zwei Drachen: zuerst bewegt sich nur einer, der andere steht. Dann beide, aber nur mit vor.</li>
+        <li>Am Papier: für jeden Takt einen Strich neben das Gitter, die Figuren immer gleichzeitig schieben.</li>
+        <li>Beim Kobold verraten, wo er steckt: „im Zauber-Kasten“.</li>
+      </ul>
+    </div>
+    <div class="kasten bonus" data-titel="Bonus-Knobelei">
+      <p class="klein"><i>Für zwischendurch: im Auto, beim Abendessen, beim Zähneputzen.</i></p>
+      <p><b>Roboter im Gang:</b> „Zwei Roboter stehen sich 4 große Schritte entfernt gegenüber. Beide machen ‚3-mal: vor‘, im selben Takt. In welchem Takt stoßen sie zusammen?“</p>
+      <p><b>Spruch im Kasten:</b> „Der Stern-Spruch ist ‚3-mal: vor‘. Ich mache 5-mal den Stern-Spruch. Wie viele Schritte?“</p>
+      <p><b>Wenn-Rätsel:</b> „Du stehst mit der Nase an der Wand. Wenn Stein vor der Nase, dann rechts drehen, sonst vor. Was machst du?“</p>
+      <p class="klein"><b>Kurz-Lösungen:</b> in Takt <m-e19-zahl raetsel="e19-b1" was="takt" text l="2"></m-e19-zahl>, genau in der Mitte; 5 · 3 = 15 Schritte; rechts drehen (die Wand ist ein Stein).</p>
+    </div>
+  </div>
+
+
+  <div class="kasten schwerer darf-brechen e19-bricht">
+    <p>{{KIND}} ist schnell, und hier gibt es keine Grenze nach oben. Das ist ein vollwertiger Hauptteil, wähle aus, was Spaß macht. Alle Lösungen stehen am Ende.</p>
+    <ol class="e19-ganz">
+      <li><b>Profi-Aufgaben auf allen Blättern:</b> <a class="blattref" href="#blatt-19-1"></a> (Befehle zählen), <a class="blattref" href="#blatt-19-2"></a> (gleiches Programm, trotzdem Bumm) und <a class="blattref" href="#blatt-19-3"></a> (nur 5 Karten, es gibt viele Wege).</li>
+      <li class="e19-mini"><b>Ohne Stern-Spruch:</b> Geht der Parcours von <a class="blattref" href="#blatt-19-1"></a> auch ohne Spruch? Ja, wenn man den Spruch in den Wenn-dann-Kasten schreibt, das sind <m-e19-zahl raetsel="e19-l3" was="karten" text l="6"></m-e19-zahl> Karten (nach „dann“ passen genau 3 Befehle). Für Profis geht es sogar mit <m-e19-zahl raetsel="e19-p1o" was="min" text l="5"></m-e19-zahl> Karten:
+        <span class="e19-zeilen"><span class="e19-eins"><span class="e19-bl">6 Karten:</span><m-programm raetsel="e19-l3" gr="6"></m-programm></span><span class="e19-eins"><span class="e19-bl">5 Karten:</span><m-programm raetsel="e19-p1o" teil="beispiel" gr="6"></m-programm></span></span>
+        Ist vor der Nase ein Stein, dreht der Drache nach rechts, sonst geht er vor und dreht nach links. Das ist eine Hand-an-der-Wand-Regel wie in Einheit&nbsp;16, nur mit der linken Hand und anders aufgeschrieben! Der Drache tastet sich an den Steinen und am Rand entlang und macht dabei <m-e19-zahl raetsel="e19-p1o" was="befehle" text l="35"></m-e19-zahl> Befehle. Ausprobieren am Boden: {{KIND}} hält die linke Hand an die Steine.</li>
+      <li class="e19-mini"><b>Ein eigener Spruch mit Wenn-dann:</b> Ein Spruch darf einen Wenn-dann-Kasten enthalten (aber keinen Spruch). {{KIND}} schreibt den Kronen-Spruch, und das ganze Programm ist dann nur noch „bis zum Schatz: Kronen-Spruch“. Es kommt an:
+        <span class="e19-zeilen"><m-spruch raetsel="e19-l2" name="krone" gr="6" nummern="nein"></m-spruch><m-programm raetsel="e19-l2" gr="6"></m-programm></span> Aber Achtung beim Zählen: Den Spruch hat sie selbst geschrieben, er zählt mit. Das sind <m-e19-zahl raetsel="e19-l2" was="kartenmitspruch" text l="8"></m-e19-zahl> Karten, mehr als ohne Spruch. Ein eigener Spruch lohnt sich erst, wenn man ihn öfter aufruft.</li>
+      <li><b>Kartengrenze für alle Werkzeuge:</b> {{KIND}} baut am Boden einen Parcours und sagt: „Du hast nur 4 Karten.“ Du musst es schaffen (oder zugeben, dass es nicht geht). Gute Grenzen findet man so: zuerst selbst ein kurzes Programm legen, die Karten zählen, das ist die Grenze. In der App gibt es eine Schlangenlinie, in der 2 Karten <m-e19-zahl raetsel="e19-w2" was="befehle" text l="21"></m-e19-zahl> Befehle machen (Level 2), und einen Polster-Berg, in dem 4 Karten <m-e19-zahl raetsel="e19-w4" was="befehle" text l="23"></m-e19-zahl> Befehle machen (Level 7).</li>
+      <li><b>Zwei Roboter mit Wenn-dann-Kasten:</b> Spielt die Profi-Aufgabe von <a class="blattref" href="#blatt-19-2"></a> am Boden nach. Legt zwei Springschnüre als Grenze, damit das Gitter nur 2 Reihen hoch und 3 Spalten breit ist. Beide haben dasselbe Programm „5-mal: wenn Stein vor der Nase, dann rechts drehen, sonst vor“ und stehen nebeneinander in der unteren Reihe: der grüne ganz links, der blaue daneben, beide mit der Nase nach oben. Vorher sagt {{KIND}} voraus, wo es kracht. Dann: Wie kann der grüne Drache sein Programm ändern, damit es nicht kracht? Zwei Ideen, beide vom Löser geprüft: 3-mal statt 5-mal (dann bleibt er ein Feld vor der Ecke stehen), oder am Anfang warten mit links drehen, rechts drehen (dann ist der blaue schon um die Ecke).</li>
+      <li><b>Eigener Parcours für die Familie:</b> {{KIND}} zeichnet einen Parcours auf Kästchenpapier (5 · 5 Felder zu je 2 · 2 Kästchen) mit Steinen, Stationen und Schatz. Auf eine Programm-Karte (Zettel) schreibt sie ein Programm mit möglichst wenigen Karten. Dann baut ihr den Parcours am Boden, und Oma, Opa oder die Nachbarin laufen als Roboter. Extra-Aufgabe für die Gäste: „Findest du ein Programm mit weniger Karten?“ {{KIND}} ist die Schiedsrichterin.</li>
+      <li><b>Rekord-Tanz mit 6 Karten:</b> In Einheit&nbsp;5 war der längste Tanz mit 4 Karten 15 Bewegungen lang. Wie lang wird der längste Tanz mit 6 Karten? Ohne Spruch sind es <m-e19-rekord karten="6" spruch="nein" l="20"></m-e19-rekord> Bewegungen, z. B. „5-mal: klatschen, stampfen“ und „5-mal: hüpfen, Arme hoch“. Mit einem selbst erfundenen Spruch (er zählt 1 Karte plus Inhalt) sind es <m-e19-rekord karten="6" spruch="ja" l="50"></m-e19-rekord>: Der Stern-Spruch ist „5-mal: klatschen, stampfen“ (4 Karten), das Programm ist „5-mal: Stern-Spruch“ (2 Karten). Das sind 5 · 10 = 50 Bewegungen. Mehr geht nicht, das hat der Computer beim Bauen dieses Hefts mit allen Programmen ausprobiert. Nicht alle 50 tanzen, die ersten zwei Runden reichen!</li>
+      <li><b>Kobold für Mama oder Papa:</b> {{KIND}} baut ein Programm mit allem und versteckt einen Kobold darin, wie auf <a class="blattref" href="#blatt-19-3"></a>. Du suchst laut denkend. Profi-Kobold: der Fehler im Spruch.</li>
+      <li><b>Blick nach unten:</b> Der blaue Drache startet in der obersten Reihe und schaut nach unten. Sein Links ist von {{KIND}} aus gesehen rechts. Hinter die Figur stellen hilft (Hilfen für links und rechts).</li>
+    </ol>
+  </div>
+
+  <h2>Hintergrund</h2>
+  <div class="kasten warum darf-brechen e19-bricht">
+    <p>Echte Programme bestehen aus genau diesen Werkzeugen: <span class="begriff">Anweisungen</span> (Befehle), <span class="begriff">Schleifen</span> mit fester Zahl (Zauber-Kasten) und mit Bedingung („bis zum Schatz“, in Programmiersprachen „repeat until“ oder „while“), <span class="begriff">Bedingungen</span> (Wenn-dann-Kasten, „if … else“) und <span class="begriff">Funktionen</span> (Zaubersprüche). Aus diesen Bausteinen sind auch große Programme gebaut, dazu kommen dort noch Variablen (Zahlen und Wörter, die sich ein Programm merkt). {{KIND}} hat heute alle vier zusammen benutzt, und zwar richtig verschachtelt: ein Spruch-Aufruf in einem Wenn-dann-Kasten in einem Zauber-Kasten.</p>
+    <p>Spannend ist der Unterschied zwischen <b>Programmlänge</b> und <b>Laufzeit</b>: 4 Karten, aber 15 Befehle. Ein kurzes Programm kann sehr lange laufen. Das Programm mit Wenn-dann-Kasten ist außerdem robuster: Es schaut nach, statt sich die Steine zu merken. Legt man einen Polster woanders hin, muss man das Papa-Programm neu schreiben. Das Programm mit Wenn-dann kommt oft trotzdem an. Probiert es aus!</p>
+    <p>Zwei Roboter gleichzeitig sind ein großes Thema der Informatik (<span class="begriff">Nebenläufigkeit</span>, auf Englisch concurrency): Lagerroboter in Paketzentren, selbstfahrende Autos an einer Kreuzung, Züge auf einem Gleis. Jedes Programm für sich ist richtig, und trotzdem kracht es, wenn beide zur selben Zeit am selben Ort sind. Darum gibt es Ampeln, Fahrpläne und Regeln wie „wer zuerst da ist, fährt zuerst“. Solche Fehler (<span class="begriff">Bugs</span>) zeigen sich oft nur in einem bestimmten Takt und sind darum besonders schwer zu finden. {{KIND}} hat genau das erlebt: zwei richtige Programme, ein Zusammenstoß.</p>
+  </div>
+
+  <h2>Bildschirm-Bonus</h2>
+  <div class="kasten bildschirm darf-brechen e19-bricht">
+    <p><b>Paket 19 „Großer Roboter-Parcours“.</b> Den QR-Code findest du auf <a class="blattref" href="#blatt-19-1"></a> unten rechts. Nur am Schluss, nach den Blättern, höchstens 15 Minuten. Die Einheit funktioniert auch ganz ohne Bildschirm.</p>
+    <p><b>7 Levels, in jedem alle Werkzeuge:</b> die drei Befehle, der Zauber-Kasten (mit Zahl oder „bis zum Schatz“), der Wenn-dann-Kasten und ein fertiger Zauberspruch. Was davon {{KIND}} nimmt, entscheidet sie selbst, nur die <b>Kartengrenze</b> ist knapp. Die Meldung unter dem Gitter sagt, was zu tun ist, z. B. „Sammle alle Edelsteine, dann zum Schatz! Höchstens 4 Karten.“ Die Steine im Gitter sind eure Polster und Kübel.</p>
+    <ul class="e19-level">
+      <li><b>Level 1, Rundlauf</b> (5 · 5, höchstens 3 Karten): Der Stern-Spruch geht eine ganze Seite entlang und dreht sich.</li>
+      <li><b>Level 2, Schlangenlinie</b> (6 · 2, höchstens 3 Karten): Im Stern-Spruch stecken zwei Zauber-Kästen, zusammen eine ganze S-Kurve. „3-mal: Stern-Spruch“ stößt am Ende an, denn ein Zauber-Kasten mit Zahl hört beim Schatz nicht auf. „Bis zum Schatz“ schon!</li>
+      <li><b>Level 3 ist Aufgabe 1 von <a class="blattref" href="#blatt-19-1"></a></b> (5 · 5, höchstens 4 Karten).</li>
+      <li><b>Level 4, zwei Gitter</b> (je 4 · 3, höchstens 4 Karten): ein Programm für beide, mit dem Mond-Spruch (ausweichen nach links).</li>
+      <li><b>Level 5 ist die Profi-Aufgabe von <a class="blattref" href="#blatt-19-3"></a></b> (4 · 4, höchstens 5 Karten, viele Wege).</li>
+      <li><b>Level 6, Kreisel</b> (4 · 4, höchstens 5 Karten, nur die Wenn-Karte Stein): Für den Edelstein dreht der Drache eine kleine Runde, ein Quadrat aus vier Feldern. Die Grenze ist genau das kürzeste Programm, und davon gibt es nur eines.</li>
+      <li><b>Level 7, Polster-Berg</b> (6 · 5, höchstens 4 Karten): Der Stern-Spruch ist eine Stufe: einen Schritt hinauf, einen nach rechts. Stufe für Stufe den Berg hinauf, oben vor dem Stein rechts drehen, mit derselben Stufe wieder hinunter zum Schatz.</li>
+    </ul>
+    <p>Der Löser hat jede Grenze geprüft: In Level 1 geht es nicht ohne Spruch, in Level 2 nicht ohne Spruch und nicht ohne „bis zum Schatz“, in Level 6 nicht ohne Spruch und nicht ohne Zauber-Kasten, in Level 3, 4 und 7 braucht es Spruch, Wenn-dann-Kasten und „bis zum Schatz“, jedes für sich. In Level 5 gibt es fünf verschiedene Wege mit 5 Karten, in Level 6 nur einen.</p>
+    <p><b>So geht es in der App (nur antippen):</b> Über dem Programm steht der fertige Spruch als braune Spruch-Reihe (Siegel, Name, seine Karten; auf dem Handy manchmal nur das Siegel). Links oben sind die Befehle und die Taste mit dem Siegel des Spruchs: Antippen ruft ihn auf. Darunter die Kasten-Tasten: „?-mal“ für den Zauber-Kasten, dann fragt die App „Wie oft?“ mit 2, 3, 4, 5 und „bis zum Schatz“. Die Taste mit dem schauenden Drachen ist der Wenn-dann-Kasten: Wenn-Karte wählen („Welche Wenn-Karte?“, Stein oder frei; in Level 6 gibt es nur Stein, dann entfällt die Wahl), Befehle oder den Spruch für „dann“ antippen, wer will „sonst“ und Befehle, dann „fertig“. Das Kreuz neben „Wie oft?“ und „Welche Wenn-Karte?“ heißt „doch nicht“. Im Zauber-Kasten tippt {{KIND}} den Inhalt an (höchstens 3 Teile) und dann „fertig“. Liegt ein Wenn-dann-Kasten im Zauber-Kasten, kommt zweimal „fertig“: zuerst das türkise für den Wenn-dann-Kasten, dann das lila für den Zauber-Kasten. Die Taste mit der Karte und dem roten Kreuz löscht Schritt für Schritt. Die App zählt die Karten wie am Papier („4 von 4 Karten“, der fertige Spruch zählt nicht). Ist die Grenze voll, werden die Tasten blass und sagen beim Antippen freundlich, warum („Mehr Karten gehen nicht.“). Rechts bleiben immer „Nochmal“ und „Los“.</p>
+    <p><b>Beim Laufen</b> leuchtet der Befehl und jeder Kasten darum: der Zauber-Kasten mit „Runde 1, 2, …“, im Wenn-dann-Kasten „dann“ oder „sonst“, bei einem Aufruf die Aufruf-Karte und die Spruch-Reihe. Bevor ein Wenn-dann-Kasten entscheidet, schaut der Drache: Die Wenn-Karte leuchtet, das Feld vor seiner Nase ist türkis umrandet. Bei zwei Gittern sagt die Meldung „Ein Programm für beide Gitter!“, und der Drache läuft erst im Gitter 1, dann im Gitter 2. Stößt er an: „Hier hat der Kobold zugeschlagen!“, die schuldige Karte ist rot. Kommt er nicht an: „Der Drache ist noch nicht beim Schatz.“, „Fast! Es fehlen noch Edelsteine.“ oder „Im Gitter 2 ist der Drache noch nicht beim Schatz.“ „Nochmal“ stellt den Drachen an den Start, das Programm bleibt liegen.</p>
+    <p><b>Sterne:</b> Einen Stern gibt es, sobald der Drache mit erlaubter Kartenzahl beim Schatz ist und alle Edelsteine eingesammelt hat (in Level 4 in beiden Gittern). Mehr Karten, als in der Meldung steht, lassen sich gar nicht legen. In Level 1 und 2 reichen sogar 2 Karten: Mit 3 Karten gibt es den Stern und dazu die „Profi-Frage: Geht es auch mit 2 Karten?“. In Level 3 bis 7 ist die Grenze schon die kleinste Kartenzahl, darum kommt dort keine Profi-Frage. Zwei Drachen gleichzeitig gibt es in der App nicht, nur am Boden und am Papier.</p>
+    <p><b>Wann weglegen:</b> Nach Level 7 kommt „Super! Jetzt zurück zum Papier.“ Dann ist Schluss, auch wenn noch Zeit wäre. Lust auf mehr? Dann lieber noch ein Roboter-Rennen am Boden.</p>
+  </div>
+
+  <h2>Lösungen</h2>
+  <div class="e19-loes">
+    <m-loesungen einheit="19" skala="0.39"></m-loesungen>
+    <div class="kasten loesung e19-mini">
+      <p><b><a class="blattref" href="#blatt-19-1"></a>, Aufgabe 1:</b></p>
+      <div class="e19-zeilen"><m-programm raetsel="e19-p1" teil="beispiel" gr="5.5"></m-programm></div>
+      <p>Bis zum Schatz: Wenn ein Stein vor der Nase ist (oder der Rand), dann Stern-Spruch (ausweichen), sonst vor. Das ist das einzige Programm mit 4 Karten, dazu seine Spiegel-Form mit „frei“ (wenn frei, dann vor, sonst Stern-Spruch). Der Löser hat geprüft: Ohne Wenn-dann-Kasten, ohne „bis zum Schatz“ oder ohne Spruch geht es mit 4 Karten nicht.</p>
+      <p><b>Profi:</b> <m-e19-zahl raetsel="e19-p1" was="befehle" text l="15"></m-e19-zahl> Befehle: 4-mal ausweichen (je 3 Befehle, beim letzten Mal nur 2, denn da steht der Drache schon auf dem Schatz) und 4-mal vor.</p>
+    </div>
+  </div>
+  <div class="kasten loesung darf-brechen e19-bricht e19-weiter e19-mini">
+    <p><b><a class="blattref" href="#blatt-19-2"></a>, Aufgabe 1:</b> In Takt <m-e19-zahl raetsel="e19-z1" was="takt" text l="3"></m-e19-zahl> stoßen sie zusammen, <m-e19-zahl raetsel="e19-z1" was="feld" text></m-e19-zahl>. Beide gehen vor, beide drehen sich, beide wollen vor in dasselbe Feld:</p>
+    <m-e19-takte raetsel="e19-z1"></m-e19-takte>
+    <p><b>Aufgabe 2:</b> <m-programm befehle="links vor vor vor rechts vor" gr="5.5" nummern="nein"></m-programm> Der blaue Drache nimmt den Weg eine Reihe tiefer und biegt erst ganz links nach oben ab. Das sind <m-e19-zahl raetsel="e19-z2" was="laenge" text l="6"></m-e19-zahl> Befehle, und es ist das einzige so kurze Programm ohne Zusammenstoß (vom Löser geprüft). Oben herum wäre es mit <m-e19-zahl raetsel="e19-z2" was="ohne" text l="5"></m-e19-zahl> Befehlen kürzer, aber dort steht der grüne Drache im Weg, am Ende sogar für immer auf seinem Schatz. Darum hilft auch Warten nicht.</p>
+    <p><b>Profi:</b> ja, in Takt <m-e19-zahl raetsel="e19-z3" was="takt" text l="4"></m-e19-zahl>, <m-e19-zahl raetsel="e19-z3" was="feld" text></m-e19-zahl>. Beide laufen hinauf, drehen sich und laufen hintereinander nach rechts. Der blaue Drache ist vorne, kommt zuerst in die Ecke und muss sich drehen. In diesem Takt bleibt er stehen, und der grüne läuft ihm hinten drauf:</p>
+    <m-e19-takte raetsel="e19-z3"></m-e19-takte>
+    <p><b><a class="blattref" href="#blatt-19-3"></a>, Aufgabe 1:</b> Der Kobold hat „4-mal“ statt „2-mal“ auf den Zauber-Kasten gelegt. Mit 4-mal läuft der Drache in der dritten Runde hinunter und stößt bei Befehl <m-e19-zahl raetsel="e19-k1" was="stoss" text l="8"></m-e19-zahl> gegen den Stein in der untersten Reihe. Richtig ist 2-mal. Keine andere einzelne Karte repariert das Programm (vom Löser geprüft). Dann geht der Drache mit dem Stern-Spruch hinauf und nach rechts zum ersten Edelstein, mit „bis zum Schatz“ hinunter zum zweiten Edelstein, dreht sich zweimal (zwei Steine) und geht hinauf zum Schatz: <m-e19-zahl raetsel="e19-k1" was="befehle" text l="11"></m-e19-zahl> Befehle.</p>
+    <p><b>Aufgabe 2:</b> <m-e19-zahl raetsel="e19-k1" was="karten" text l="6"></m-e19-zahl> Karten: der Zauber-Kasten mit Zahlenkarte und Aufruf (2), „bis zum Schatz“ mit dem Wenn-dann-Kasten (4). Der Weg ist im Bild eingezeichnet.</p>
+    <p><b>Profi:</b> <m-programm raetsel="e19-p3" teil="beispiel" gr="5.5"></m-programm> Der Drache geht einen Schritt vor, läuft mit 3-mal Stern-Spruch eine große Runde (oben über den Schatz hinweg, dann hinunter zu beiden Edelsteinen), dreht sich und geht mit dem Stern-Spruch hinauf zum Schatz. Mehr Karten braucht es nicht: Mit weniger als 5 geht es gar nicht (vom Löser geprüft). Alle Wege mit 5 Karten: <m-e19-alle raetsel="e19-p3" anzahl="5"></m-e19-alle> und dazu die Spiegel-Form mit „frei“ für die Wenn-Karten mit sonst. Jeder davon gilt.</p>
+    <p><b>Bonus-Knobelei:</b> Roboter im Gang: Nach Takt 1 sind sie noch 2 Schritte auseinander, in Takt <m-e19-zahl raetsel="e19-b1" was="takt" text l="2"></m-e19-zahl> wollen beide in das mittlere Feld. Spruch im Kasten: 5 Runden mit je 3 Schritten, 5 · 3 = 15. Wenn-Rätsel: Die Wand ist ein Stein, also rechts drehen.</p>
+    <p><b>Bildschirm-Levels (zum Nachschauen):</b> Bei Level 1 geht auch „bis zum Schatz: Stern-Spruch“ mit 2 Karten, bei Level 3, 4 und 7 auch die Spiegel-Form mit „frei“ (wenn frei, dann …, sonst …), bei Level 5 jeder Weg von <a class="blattref" href="#blatt-19-3"></a>. In Level 7 geht der Wenn-dann-Kasten auch ohne „sonst“, vor oder nach dem Spruch (alle drei Formen stehen in der Tabelle). In Level 2 und 6 gibt es mit so wenigen Karten nur diese eine Lösung. Die App prüft nur, ob der Drache mit der erlaubten Kartenzahl ankommt.</p>
+    <table class="tab e19-tab">
+      <tr><th>Level</th><th>Was ist neu?</th><th>Karten (Grenze)</th><th>Lösung</th></tr>
+      <tr><td>1</td><td>Rundlauf, Stern-Spruch: <m-spruch raetsel="e19-w1" name="stern" gr="5" nummern="nein"></m-spruch></td><td>2 (3)</td><td><m-programm raetsel="e19-w1" teil="beispiel" gr="5" nummern="nein"></m-programm></td></tr>
+      <tr><td>2</td><td>Schlangenlinie, Stern-Spruch: <m-spruch raetsel="e19-w2" name="stern" gr="5" nummern="nein"></m-spruch></td><td>2 (3)</td><td><m-programm raetsel="e19-w2" teil="beispiel" gr="5" nummern="nein"></m-programm></td></tr>
+      <tr><td>3</td><td><a class="blattref" href="#blatt-19-1"></a>, Aufgabe 1</td><td>4 (4)</td><td><m-programm raetsel="e19-p1" teil="beispiel" gr="5" nummern="nein"></m-programm></td></tr>
+      <tr><td>4</td><td>zwei Gitter, Mond-Spruch: <m-spruch raetsel="e19-w3" name="mond" gr="5" nummern="nein"></m-spruch></td><td>4 (4)</td><td><m-programm raetsel="e19-w3" teil="beispiel" gr="5" nummern="nein"></m-programm></td></tr>
+      <tr><td>5</td><td><a class="blattref" href="#blatt-19-3"></a>, Profi (5 Wege)</td><td>5 (5)</td><td><m-programm raetsel="e19-p3" teil="beispiel" gr="5" nummern="nein"></m-programm></td></tr>
+      <tr><td>6</td><td>Kreisel (kleine Runde über vier Felder), nur die Wenn-Karte Stein, Stern-Spruch: <m-spruch raetsel="e19-p2" name="stern" gr="5" nummern="nein"></m-spruch></td><td>5 (5)</td><td><m-programm raetsel="e19-p2" teil="beispiel" gr="5" nummern="nein"></m-programm></td></tr>
+      <tr><td>7</td><td>Polster-Berg, eine Stufe als Stern-Spruch: <m-spruch raetsel="e19-w4" name="stern" gr="5" nummern="nein"></m-spruch></td><td>4 (4)</td><td><m-e19-alle raetsel="e19-w4" anzahl="3" gr="5"></m-e19-alle></td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 19-1: Der große Parcours (Bau-Plan und Programm mit allem) -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="19" data-titel="Der große Parcours" data-art="Spielplan" data-verteilt>
+  <p class="e19-intro">{{KIND}}, das ist dein Parcours! Bau ihn mit Mama oder Papa am Boden auf.</p>
+  <div class="e19-plan">
+    <m-gitter raetsel="e19-p1" feld="20"></m-gitter>
+    <div class="e19-legende">
+      <p><m-symbol name="hindernis" gr="11"></m-symbol> Polster, Kübel, Seil</p>
+      <p><m-symbol name="edelstein" gr="11"></m-symbol> Station: Muggelstein einsammeln</p>
+      <p><m-symbol name="schatz" gr="11"></m-symbol> Schatz: Zuckerl</p>
+      <div>
+        <p class="e19-spruch-titel">Der Stern-Spruch weicht aus:</p>
+        <m-spruch raetsel="e19-p1" name="stern" gr="12"></m-spruch>
+      </div>
+    </div>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">Bring den Drachen zum Schatz. Sammle unterwegs beide Edelsteine. Du hast nur 4 Karten!</p>
+    <m-programm raetsel="e19-p1" teil="form"></m-programm>
+  </div>
+
+  <div class="e19-profi-reihe">
+    <div class="profi" data-titel="Profi-Aufgabe: Wie weit läuft der Drache?">
+      <p>Dein Programm hat nur 4 Karten. Wie viele Befehle macht der Drache damit? <m-e19-zahl raetsel="e19-p1" was="befehle"></m-e19-zahl></p>
+    </div>
+    <m-qr paket="e19"></m-qr>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 19-2: Zwei Drachen (Zusammenstoß finden, neu planen)       -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="19" data-titel="Zwei Drachen" data-art="Arbeitsblatt" data-verteilt>
+  <div class="e19-regel">
+    <span class="e19-paar"><m-e19-drache farbe="gruen" gr="9"></m-e19-drache><m-e19-drache farbe="blau" gr="9"></m-e19-drache></span>
+    <p>Beide gleichzeitig, Takt für Takt. Nie im selben Feld!</p>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">{{KIND}}, spiel Takt für Takt. Wo stoßen die Drachen zusammen? Mal ein Kreuz in das Feld.</p>
+    <div class="e19-neben">
+      <m-e19-zwei raetsel="e19-z1" weg="e19-z2" feld="20"></m-e19-zwei>
+      <div class="e19-spalte">
+        <m-e19-prog raetsel="e19-z1" drache="1"></m-e19-prog>
+        <m-e19-prog raetsel="e19-z1" drache="2"></m-e19-prog>
+        <p class="e19-antwort">In welchem Takt? <m-e19-zahl raetsel="e19-z1" was="takt"></m-e19-zahl></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">Schreib ein neues Programm für den blauen Drachen. Er soll zum Stern und darf den grünen nie treffen. Nimm das kürzeste!</p>
+    <m-e19-prog raetsel="e19-z2" drache="2" leer plaetze="8"></m-e19-prog>
+  </div>
+
+  <div class="profi" data-titel="Profi-Aufgabe: Das gleiche Programm">
+    <p>Beide Drachen haben dasselbe Programm. Stoßen sie zusammen?</p>
+    <div class="e19-neben">
+      <m-e19-zwei raetsel="e19-z3" feld="20"></m-e19-zwei>
+      <m-e19-prog raetsel="e19-z3" drache="beide" gr="12" ohne-bild></m-e19-prog>
+    </div>
+    <p class="e19-antwort e19-unten"><m-e19-janein raetsel="e19-z3"></m-e19-janein> Wenn ja: in Takt <m-e19-zahl raetsel="e19-z3" was="takt"></m-e19-zahl></p>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 19-3: Kobold im Parcours (Kobold, kürzestes mit Kartengrenze) -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="19" data-titel="Kobold im Parcours" data-art="Arbeitsblatt" data-verteilt>
+  <div class="aufg">
+    <p class="anw">{{KIND}}, der Kobold hat eine Karte ausgetauscht. Kreis sie ein und schreib die richtige daneben.</p>
+    <div class="e19-neben">
+      <m-gitter raetsel="e19-k1" feld="20"></m-gitter>
+      <div class="e19-spalte">
+        <m-spruch raetsel="e19-k1" name="stern" gr="12"></m-spruch>
+        <p class="e19-antwort">Er stößt an bei Befehl <m-e19-zahl raetsel="e19-k1" was="stoss"></m-e19-zahl></p>
+      </div>
+    </div>
+    <div class="e19-unten"><m-programm raetsel="e19-k1" gr="12"></m-programm></div>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">Zeichne den Weg mit der richtigen Karte ein. Wie viele Karten hat das Programm jetzt?</p>
+    <p class="e19-antwort">Karten: <m-e19-zahl raetsel="e19-k1" was="karten"></m-e19-zahl> <span class="e19-hinweis">Der Stern-Spruch ist fertig, er zählt nicht.</span></p>
+  </div>
+
+  <div class="profi" data-titel="Profi-Aufgabe: Nur 5 Karten">
+    <p>Geht es auch mit 5 Karten? Viele Wege! Zum Beispiel so:</p>
+    <m-programm raetsel="e19-p3" teil="form" gr="12"></m-programm>
+  </div>
+</section>
