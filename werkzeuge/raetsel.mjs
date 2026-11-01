@@ -430,7 +430,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
       if (r.art === 'lesen') t = 'Ende ' + JSON.stringify(l.ende);
       if (r.art === 'kuerzer') t = l.kartenLang + ' → ' + l.kartenKurz + ' Karten';
       if (PLUGINS[r.art]) { try { t = PLUGINS[r.art].bericht ? String(PLUGINS[r.art].bericht(r, CTX)) : JSON.stringify(l).slice(0, 90); } catch (e) { t = '(bericht: ' + e.message + ')'; } }
-      console.log('  ' + r.id.padEnd(20) + r.art.padEnd(10) + t);
+      console.log('  ' + r.id.padEnd(20) + (r.art + ' ').padEnd(12) + t);
     }
   }
   if (erg.fehler.length) {

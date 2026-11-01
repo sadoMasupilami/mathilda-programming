@@ -439,6 +439,8 @@
     zeichneProgramm();
     zeichneTasten();
     grundMeldung();
+    // Erst jetzt stehen Programm, Tasten und Meldung: das Raster der Gitter frisch wählen (danach springt es nicht mehr)
+    if (L.welten && L.welten.length > 1) { L.weltenRaster = null; ordneWelten(); }
   }
 
   // ----- Meldung -----
@@ -522,12 +524,20 @@
     const abstand = 10;
     const n = L.welten.length;
     const bw = Math.max(...L.welten.map((w) => w.b * 100 + 12)), bh = Math.max(...L.welten.map((w) => w.h * 100 + 12));
+    const groesse = (c) => {
+      const reihen = Math.ceil(n / c);
+      return Math.min((r.width - (c - 1) * abstand) / (c * bw), (r.height - (reihen - 1) * abstand) / (reihen * bh));
+    };
     let best = null;
     for (let c = 1; c <= n; c++) {
-      const reihen = Math.ceil(n / c);
-      const s = Math.min((r.width - (c - 1) * abstand) / (c * bw), (r.height - (reihen - 1) * abstand) / (reihen * bh));
+      const s = groesse(c);
       if (!best || s > best.s + 1e-9) best = { c, s };
     }
+    // Nicht springen: Beim Eingeben ändert sich die Höhe des Programms ein wenig (Wie oft?, Wenn-Karten, offene Kästen).
+    // Das bisherige Raster bleibt, solange es höchstens 10 % kleinere Felder gibt (gleiches Gerät, gleiche Drehung).
+    const vorher = L.weltenRaster;
+    if (vorher && vorher.c !== best.c && vorher.breite === Math.round(r.width) && groesse(vorher.c) >= best.s * 0.9) best = { c: vorher.c, s: groesse(vorher.c) };
+    L.weltenRaster = { c: best.c, breite: Math.round(r.width) };
     const s = Math.max(0, best.s);
     box.style.gridTemplateColumns = 'repeat(' + best.c + ', auto)';
     box.querySelectorAll('.gitter-box').forEach((g, wi) => {
