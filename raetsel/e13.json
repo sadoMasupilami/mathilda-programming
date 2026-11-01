@@ -220,10 +220,10 @@
     "krone": { "text": "Hat er eine Krone?", "kurz": "Krone?" }
    },
    "dinge": [
+    { "id": "b", "name": "blauer Drache ohne Krone", "bild": "drachenkind-blau-fluegel", "ja": [] },
     { "id": "gk", "name": "grüner Drache mit Krone", "bild": "drachenkind-gruen-fluegel-krone", "ja": ["gruen", "krone"] },
-    { "id": "g", "name": "grüner Drache ohne Krone", "bild": "drachenkind-gruen-fluegel", "ja": ["gruen"] },
     { "id": "bk", "name": "blauer Drache mit Krone", "bild": "drachenkind-blau-fluegel-krone", "ja": ["krone"] },
-    { "id": "b", "name": "blauer Drache ohne Krone", "bild": "drachenkind-blau-fluegel", "ja": [] }
+    { "id": "g", "name": "grüner Drache ohne Krone", "bild": "drachenkind-gruen-fluegel", "ja": ["gruen"] }
    ],
    "baum": { "f": "gruen",
      "ja": { "f": "krone", "ja": "gk", "nein": "g" },

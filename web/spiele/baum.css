@@ -1,0 +1,96 @@
+/* =====================================================================
+   Spiel-Plugin „baum“ (Einheit 13 „Ja-Nein-Bäume“), siehe web/spiele/baum.js
+   Hoch: Baum oben, Wesen bzw. Fragen und Tasten unten. Quer: Baum links, rechts Tasten.
+   Ja-Ast links und grün, Nein-Ast rechts und orange (wie links drehen und rechts drehen).
+   ===================================================================== */
+.art-baum .programm { min-height: 0; }
+.art-baum .programm:empty { display: none; }
+.art-baum .feld { overflow: hidden; }
+.art-baum .meldung.hinweis { color: var(--tinte); }
+
+/* Baum: SVG aus web/kern/baum.js, darüber die Plätze (gleiche Lage wie im SVG) */
+.baum-feld { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+.baum-flaeche { position: relative; flex: none; }
+.baum-flaeche > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.baum-plaetze { position: absolute; inset: 0; }
+.baum-platz {
+  position: absolute; margin: 0; padding: 0;
+  border: 3px solid transparent; border-radius: 10px; background: transparent;
+  display: flex; align-items: center; justify-content: center;
+}
+button.baum-platz { cursor: pointer; touch-action: manipulation; }
+button.baum-platz:disabled { opacity: 1; }
+button.baum-platz:focus-visible { outline: 4px solid var(--gold); outline-offset: 2px; }
+.baum-platz .baum-bild { width: 72%; height: 72%; margin-top: 10%; display: block; pointer-events: none; }
+.baum-frage .baum-platz .baum-bild { width: 90%; height: 90%; margin-top: 0; }
+.baum-platz .baum-bild svg { width: 100%; height: 100%; }
+.baum-nr {
+  position: absolute; top: 3px; left: 3px;
+  min-width: 20px; height: 20px; border-radius: 10px; padding: 0 4px;
+  background: var(--tinte); color: #fff; font-weight: 700; font-size: 13px; line-height: 20px; text-align: center;
+  pointer-events: none;
+}
+.baum-frage .baum-nr { display: none; }
+/* Einladung: ein Wesen ist gewählt, die freien Plätze warten */
+.baum-platz.baum-einladend { border: 3px dashed #c79500; background: rgba(255, 244, 204, 0.75); }
+.baum-platz.baum-gewaehlt { border-color: #c79500; box-shadow: 0 0 0 4px var(--gold); background: rgba(255, 244, 204, 0.85); }
+.baum-platz.baum-ok { border-color: var(--gruen); background: rgba(227, 246, 233, 0.6); }
+.baum-platz.baum-hier { border-color: #e8731a; box-shadow: 0 0 0 4px #ffc58f; background: rgba(255, 240, 227, 0.8); }
+.baum-platz.baum-falsch { border-color: var(--rot); border-style: dashed; background: rgba(253, 231, 236, 0.8); }
+.baum-haken {
+  position: absolute; top: -9px; right: -9px; width: 24px; height: 24px;
+  background: #fff; border-radius: 50%; box-shadow: 0 0 0 2px var(--gruen);
+  pointer-events: none;
+}
+.baum-haken svg { width: 100%; height: 100%; }
+
+/* Meldung mit dem Bild eines Wesens */
+.baum-meldung-bild { display: block; width: 100%; height: 100%; }
+.baum-meldung-bild svg { width: 100%; height: 100%; }
+.art-baum .meldung-bild { width: 40px; height: 40px; }
+
+/* folgen: wer gesucht wird, Ja und Nein */
+.baum-wer { display: flex; align-items: center; justify-content: center; gap: 12px; }
+.baum-wer-bild { width: 64px; height: 64px; flex: none; display: block; }
+.baum-wer-bild svg { width: 100%; height: 100%; }
+.baum-wer-text { display: flex; flex-direction: column; font-size: 1rem; line-height: 1.15; color: var(--grau); }
+.baum-wer-text b { color: var(--tinte); font-size: 1.25rem; }
+.taste.baum-ja, .taste.baum-nein { color: #fff; font-size: 1.3rem; gap: 4px; }
+.taste.baum-ja { background: #1f9d55; border-color: #157a41; padding: 0 16px 0 8px; }
+.taste.baum-nein { background: #e8731a; border-color: #b9560c; padding: 0 8px 0 16px; }
+.taste.baum-ja svg, .taste.baum-nein svg { width: calc(var(--t) * 0.6); height: calc(var(--t) * 0.6); }
+
+/* einsortieren: die Wesen zum Antippen */
+.baum-dinge { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--abst); }
+.baum-ding { width: calc(var(--t) * 1.15); height: calc(var(--t) * 1.15); flex: none; }
+.taste.baum-ding { padding: 3px; border-radius: 16px; }
+.taste.baum-ding .baum-bild { width: 100%; height: 100%; display: block; }
+.taste.baum-ding .baum-bild svg { width: 100%; height: 100%; }
+.taste.baum-ding.baum-gewaehlt { border-color: #c79500; background: var(--gold-hell); box-shadow: 0 0 0 4px var(--gold); }
+span.baum-ding.baum-leer { border: 3px dashed #c9c3b6; border-radius: 16px; }
+
+/* frage: die Frage-Tasten */
+.baum-optionen { display: flex; flex-direction: column; gap: var(--abst); width: min(100%, 400px); }
+.taste.baum-option { width: 100%; background: #fff4cc; text-align: center; line-height: 1.15; padding: 4px 14px; }
+.taste.baum-option.baum-gewaehlt { border-color: #c79500; box-shadow: 0 0 0 4px var(--gold); background: #ffe9a3; }
+
+@media (orientation: landscape) {
+  .art-baum .spalte-rechts { flex: 0 0 clamp(250px, 40%, 480px); }
+  .baum-wer { flex-direction: column; gap: 6px; text-align: center; }
+  .baum-wer-text { align-items: center; }
+  .baum-wer-bild { width: 96px; height: 96px; }
+}
+@media (orientation: landscape) and (max-height: 500px) {
+  .baum-wer-bild { width: 80px; height: 80px; }
+  .art-baum .meldung-bild { width: 34px; height: 34px; }
+}
+@media (min-width: 700px) and (min-height: 700px) {
+  .baum-wer-bild { width: 120px; height: 120px; }
+  .baum-nr { min-width: 26px; height: 26px; border-radius: 13px; font-size: 17px; line-height: 26px; }
+  .baum-haken { width: 32px; height: 32px; top: -12px; right: -12px; }
+  .art-baum .meldung-bild { width: 52px; height: 52px; }
+}
+/* Quer: Das Geschafft-Fenster liegt über der rechten Spalte, der Baum bleibt sichtbar */
+@media (orientation: landscape) {
+  .art-baum .dialog { width: min(100%, 40%, 420px); }
+}
