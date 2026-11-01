@@ -453,6 +453,53 @@ test('mitRegeln: kleinste Kartenzahl und Anzahl stimmen mit dem Durchprobieren a
   }
 });
 
+test('mitRegeln: zufällige Gitter (eins oder zwei, mit Edelstein) gegen das Durchprobieren', () => {
+  let seed = 4711;
+  const zufall = (n) => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed % n; };
+  const kombis = [
+    [['wenn', 'bis'], ['stein', 'frei', 'frei-rechts']],
+    [['zauber', 'bis'], []],
+    [['zauber', 'wenn'], ['stein', 'frei-links']],
+    [['wenn', 'bis', 'spruch'], ['stein', 'frei'], { stern: 'vor rechts' }],
+    [['zauber', 'wenn', 'bis'], ['stein', 'stein-rechts']],
+  ];
+  for (let i = 0; i < 80; i++) {
+    const b = 3 + zufall(2), h = 3 + zufall(2);
+    const feld = () => ({ x: zufall(b), y: zufall(h) });
+    const start = { ...feld(), blick: K.RICHTUNGEN[zufall(4)] };
+    const ws = [];
+    for (let j = 1 + (zufall(4) === 0 ? 1 : 0); j > 0; j--) {
+      let ziel = feld();
+      while (ziel.x === start.x && ziel.y === start.y) ziel = feld();
+      const gleich = (p, q) => p.x === q.x && p.y === q.y;
+      const hind = [];
+      for (let k = zufall(4); k > 0; k--) { const p = feld(); if (!gleich(p, start) && !gleich(p, ziel)) hind.push([p.x, p.y]); }
+      const w = { b, h, start, ziel, hindernisse: hind };
+      if (zufall(3) === 0) { const p = feld(); if (!gleich(p, start) && !hind.some((q) => q[0] === p.x && q[1] === p.y)) w.edelsteine = [[p.x, p.y]]; }
+      ws.push(w);
+    }
+    const [erl, bed, sp] = kombis[zufall(kombis.length)];
+    const mk = ws.length > 1 ? 4 : 5;
+    const roh = rohSuche(ws, mk, erl, bed, sp);
+    const m = mitRegeln(ws, mk, erl, { bedingungen: bed, sprueche: sp });
+    assert.equal(m.vollstaendig, true);
+    assert.deepEqual(m.erreichbar ? [m.minKarten, m.anzahlMin] : null, roh ? [roh.min, roh.anzahl] : null, JSON.stringify(ws) + ' ' + erl.join('+'));
+  }
+});
+
+test('mitRegeln: die 60-Befehle-Grenze zählt mit (großes Gitter, Weg am Rand entlang)', () => {
+  // 15 · 15: bis[wenn[stein: rechts sonst vor]] braucht 57 Befehle; 16 · 16: 61, das läuft im Kreis
+  const gross = (n) => ({ b: n, h: n, start: { x: 0, y: n - 1, blick: 'oben' }, ziel: { x: 2, y: n - 1 }, hindernisse: [[1, n - 1]] });
+  assert.equal(K.ausfuehren(gross(15), 'bis[wenn[stein: rechts sonst vor]]').geschafft, true);
+  assert.equal(K.ausfuehren(gross(16), 'bis[wenn[stein: rechts sonst vor]]').zuLang, true);
+  for (const n of [15, 16]) {
+    const roh = rohSuche([gross(n)], 4, ['wenn', 'bis'], ['stein', 'frei']);
+    const m = mitRegeln(gross(n), 4, ['wenn', 'bis']);
+    assert.deepEqual([m.minKarten, m.anzahlMin], [roh.min, roh.anzahl], n + ' · ' + n);
+  }
+  assert.deepEqual([mitRegeln(gross(15), 4, ['wenn', 'bis']).anzahlMin, mitRegeln(gross(16), 4, ['wenn', 'bis']).anzahlMin], [6, 2]);
+});
+
 test('mitRegeln: unerreichbar, Rechen-Grenze, mehrere freie Sprüche', () => {
   const A = { b: 4, h: 4, start: { x: 0, y: 3, blick: 'oben' }, ziel: { x: 3, y: 0 } };
   const z = mitRegeln(A, 4, ['zauber']);
@@ -529,15 +576,21 @@ test('raetsel.mjs: pfad mit erweiterten Befehlen', () => {
   assert.equal(l.erweitert.minKarten, 4);
   assert.equal(l.erweitert.anzahlMin, 6);
   assert.equal(l.erweitert.beispielKarten, 4);
-  assert.equal(l.erweitert.ohne.minKarten, null);
-  // Grenze zu groß: ohne die neuen Kästen geht es auch
+  // jeder neue Kasten für sich nötig: ohne wenn (nur bis) und ohne bis (nur wenn) geht es mit 4 Karten nicht
+  assert.deepEqual(l.erweitert.ohne.map((o) => [o.ohne, o.vollstaendig, o.minKarten]), [['wenn', true, null], ['bis', true, null]]);
+  // Grenze zu groß: ohne Wenn-dann geht es mit bis allein (6 Karten), ohne bis mit Befehlen allein (7 Karten)
   e = pruefeDatei([{ ...gut, maxKarten: 7 }]);
-  assert.match(e.fehler.join('\n'), /Ohne Wenn-dann-Kasten und Zauber-Kasten „bis zum Schatz“ geht es auch: mit 7 Karten/);
+  assert.match(e.fehler.join('\n'), /Ohne Wenn-dann-Kasten geht es auch: mit 6 Karten, z\. B\. vor vor vor rechts bis\[vor\]/);
+  assert.match(e.fehler.join('\n'), /Ohne Zauber-Kasten „bis zum Schatz“ geht es auch: mit 7 Karten/);
+  // erzwingt nur bis: dann darf es ohne Wenn-dann gehen
+  e = pruefeDatei([{ ...gut, maxKarten: 6, erzwingt: ['bis'] }]);
+  assert.deepEqual(e.fehler, []);
   // mit Zauber-Kasten: 3[vor] rechts 3[vor] = 5 Karten, die Grenze 4 erzwingt bis/wenn
   e = pruefeDatei([{ ...gut, erlaubt: ['zauber', 'wenn', 'bis'] }]);
   assert.deepEqual(e.fehler, []);
   e = pruefeDatei([{ ...gut, erlaubt: ['zauber', 'wenn', 'bis'], maxKarten: 5 }]);
-  assert.match(e.fehler.join('\n'), /geht es auch: mit 5 Karten, z\. B\. 3\[vor\] rechts 3\[vor\]/);
+  assert.match(e.fehler.join('\n'), /Ohne Wenn-dann-Kasten geht es auch: mit 5 Karten, z\. B\. 3\[vor\] rechts 3\[vor\]/);
+  assert.match(e.fehler.join('\n'), /Ohne Zauber-Kasten „bis zum Schatz“ geht es auch: mit 5 Karten/);
   // Beispiel falsch, zu lang, mit verbotenem Kasten
   e = pruefeDatei([{ ...gut, beispiel: 'bis[wenn[stein: links sonst vor]] vor' }]);
   assert.match(e.fehler.join('\n'), /5 Karten, erlaubt sind 4/);

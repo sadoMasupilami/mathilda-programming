@@ -31,7 +31,6 @@ export function weltenVon(r) {
   return r.welten.map((w) => ({ ...weltVon(r), ...weltVon(w || {}) }));
 }
 const WORT = { zauber: 'Zauber-Kasten', wenn: 'Wenn-dann-Kasten', bis: 'Zauber-Kasten „bis zum Schatz“', spruch: 'Zauberspruch' };
-const wortListe = (l) => l.map((x) => WORT[x] || x).join(' und ');
 const loesText = (p) => p.programm + (p.sprueche && Object.keys(p.sprueche).length ? ' mit ' + Object.entries(p.sprueche).map(([n, t]) => '@' + n + ' = ' + t).join(', ') : '');
 const warum = (e) => (e.stoss ? ' (Stoß bei Befehl ' + (e.stoss.nr + 1) + ')' : e.zuLang ? ' (läuft im Kreis: mehr als ' + K.MAX_SCHRITTE + ' Befehle)' : !e.amZiel ? ' (nicht am Ziel)' : ' (Edelsteine fehlen)');
 
@@ -40,7 +39,7 @@ const warum = (e) => (e.stoss ? ' (Stoß bei Befehl ' + (e.stoss.nr + 1) + ')' :
 //   erlaubt:      ["zauber", "wenn", "bis", "spruch"] – was das Kind benutzen darf (die App bietet genau das an)
 //   bedingungen:  Wenn-Karten (Standard ["stein", "frei"])
 //   maxKarten:    Kartengrenze (Standard 12); muss erzwingen, dass es ohne die neuen Kästen nicht geht
-//   erzwingt:     welche Kästen die Grenze erzwingen muss (Standard: alle neuen aus erlaubt)
+//   erzwingt:     welche Kästen die Grenze erzwingen muss, jeder für sich (Standard: alle neuen aus erlaubt)
 //   beispiel:     ein Programm, das ankommt (Kartenzahl ≤ maxKarten); mit spruchFrei dazu beispielSprueche
 //   sprueche:     vorgegebene Zaubersprüche { "stern": "vor vor links" } (zählen nicht als Karten)
 //   spruchFrei:   ["stern"] – diesen Spruch schreibt das Kind selbst (zählt: 1 Karte + Inhalt)
@@ -112,13 +111,15 @@ function pruefePfadErweitert(r, F) {
     l.beispiel = K.alsText(p);
     Object.assign(ew, { beispiel: l.beispiel, beispielSprueche: K.spruecheText(bsp), beispielKarten: karten });
   }
-  // Ohne die neuen Kästen darf es mit maxKarten nicht gehen
-  if (erzwingt.length) {
-    const basis = erlaubt.filter((x) => !erzwingt.includes(x));
+  // Jeder Kasten aus erzwingt ist nötig: ohne ihn (alles andere erlaubt) geht es mit maxKarten nicht.
+  // Daraus folgt auch: ohne alle zusammen geht es nicht.
+  ew.ohne = [];
+  for (const x of erzwingt) {
+    const basis = erlaubt.filter((y) => y !== x);
     const o = LOESER.mitRegeln(welten, maxK, basis, { ...opt, spruchFrei: basis.includes('spruch') ? frei : [] });
-    ew.ohne = { erlaubt: basis, vollstaendig: o.vollstaendig, minKarten: o.erreichbar ? o.minKarten : null };
-    if (!o.vollstaendig) F('Kann nicht beweisen, dass es ohne ' + wortListe(erzwingt) + ' mit ' + maxK + ' Karten nicht geht (' + o.grund + '). maxKarten kleiner machen oder "erzwingt" anpassen');
-    else if (o.erreichbar) F('Ohne ' + wortListe(erzwingt) + ' geht es auch: mit ' + o.minKarten + ' Karten, z. B. ' + o.kuerzeste.slice(0, 2).map(loesText).join(' | ') + '. maxKarten kleiner machen');
+    ew.ohne.push({ ohne: x, erlaubt: basis, vollstaendig: o.vollstaendig, minKarten: o.erreichbar ? o.minKarten : null });
+    if (!o.vollstaendig) F('Kann nicht beweisen, dass es ohne ' + WORT[x] + ' mit ' + maxK + ' Karten nicht geht (' + o.grund + '). maxKarten kleiner machen oder "erzwingt" anpassen');
+    else if (o.erreichbar) F('Ohne ' + WORT[x] + ' geht es auch: mit ' + o.minKarten + ' Karten, z. B. ' + o.kuerzeste.slice(0, 2).map(loesText).join(' | ') + '. maxKarten kleiner machen (oder „' + x + '“ aus "erzwingt" nehmen, wenn er nicht nötig sein muss)');
   }
   // Kleinste Kartenzahl mit allem, was erlaubt ist
   const m = LOESER.mitRegeln(welten, maxK, erlaubt, opt);
@@ -421,7 +422,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
         const ew = l.erweitert;
         t = (l.welten > 1 ? l.welten + ' Welten, ' : '') + '[' + ew.erlaubt.join('+') + '] ≤ ' + ew.maxKarten + ' Karten: ' +
           (ew.vollstaendig ? (ew.minKarten ? 'kleinste ' + ew.minKarten + ' (' + ew.anzahlMin + '×): ' + ew.kuerzeste.slice(0, 2).map(loesText).join(' | ') : 'keine') : 'Suche zu groß, nur Beispiel geprüft') +
-          (ew.ohne ? '; ohne ' + ew.erzwingt.join('+') + ': ' + (ew.ohne.minKarten ? ew.ohne.minKarten + ' Karten' : 'nicht mit ' + ew.maxKarten) : '') +
+          ew.ohne.map((o) => '; ohne ' + o.ohne + ': ' + (!o.vollstaendig ? 'Suche zu groß' : o.minKarten ? o.minKarten + ' Karten' : 'nicht mit ' + ew.maxKarten)).join('') +
           (r.beispiel ? '; Beispiel ' + ew.beispielKarten + ' Karten' : '');
       }
       if (r.art === 'kobold') t = 'gemeint: ' + (Array.isArray(l.gemeint) ? l.gemeint.join(' ') : l.gemeint || '') + '; auch: ' + (l.auch || []).length;

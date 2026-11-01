@@ -46,15 +46,15 @@
     <m-qr paket="e0"></m-qr></div>
 </section>
 
-<section class="blatt" data-einheit="0" data-titel="Wenn-dann und bis zum Schatz">
+<section class="blatt" data-einheit="0" data-titel="Wenn-dann, bis zum Schatz">
   <div class="aufg"><p class="anw">{{KIND}}, fülle den Wiederhol-Zauber „bis zum Schatz“ aus!</p>
-    <m-programm raetsel="e0-bis" teil="form"></m-programm>
+    <div class="reihe" style="gap:2mm;flex-wrap:nowrap"><m-gitter raetsel="e0-bis" feld="20"></m-gitter> <m-programm raetsel="e0-bis" teil="form" gr="12"></m-programm></div>
   </div>
   <div class="aufg"><p class="anw">Ein Programm für beide Gitter!</p>
     <div class="reihe"><m-gitter raetsel="e0-welten" welt="1" feld="20"></m-gitter> <m-gitter raetsel="e0-welten" welt="2" feld="20"></m-gitter></div>
     <m-programm raetsel="e0-welten" teil="form"></m-programm>
   </div>
-  <div class="profi"><p>Der Fehler-Kobold war im Wenn-dann-Kasten! Finde die falsche Karte.</p>
+  <div class="profi"><p>Der Kobold war im Wenn-dann-Kasten. Welche Karte ist falsch?</p>
     <m-programm raetsel="e0-kobold-wenn"></m-programm>
   </div>
 </section>

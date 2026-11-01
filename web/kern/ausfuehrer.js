@@ -455,7 +455,7 @@
   // Wo steht der Drache nach n Befehlen? (n zählt ausgeführte Befehle: Wiederhol-Zauber ausgerollt,
   // Wenn-dann und Zaubersprüche wie ausgeführt). null, wenn es Befehl n nicht gibt (Stoß, Programm kürzer).
   function standNach(weltDaten, prog, n, opt) {
-    if (n === 0) return zustand(welt(weltDaten).start);
+    if (n === 0) return zustand((weltDaten && weltDaten.imGitter ? weltDaten : welt(weltDaten)).start);
     const e = ausfuehren(weltDaten, prog, Object.assign({}, opt || {}, { max: n }));
     if (e.stoss && e.stoss.nr < n) return null;
     return e.schritte[n - 1] ? e.schritte[n - 1].nachher : null;

@@ -487,6 +487,12 @@ export function mitRegeln(welten, maxKarten, erlaubt = [], opt = {}) {
   for (const [n, l] of Object.entries(fest)) spFest[n] = l.map(uebersetze);
   const nW = liste.length;
   const C = { s: 0, m: 0, n: 0, bis: 0, f: 0 };
+  // Was ein Teil macht, hängt nur von Feld und Blick (s) ab: neues s, eingesammelte Edelsteine (g),
+  // Zahl der Befehle (n) oder ein Fehler (Stoß, läuft im Kreis: n = -1). Die Edelsteine vorher und die
+  // Befehle vorher ändern daran nichts (nur die 60-Grenze: vorher + n). Darum rechnet die Suche jeden
+  // Teil je Welt und s höchstens einmal (Stempel gen) und schlägt für alle Knoten mit diesem s nach.
+  const memo = liste.map((w) => ({ gen: new Float64Array(w.vor.length), s: new Int32Array(w.vor.length), g: new Int32Array(w.vor.length), n: new Int32Array(w.vor.length) }));
+  let gen = 0;
 
   // Ein Durchlauf der Breitensuche mit festen Sprüchen sp; startKosten = Karten für den freien Spruch
   function suche(sp, rufe, startKosten, grenze, mussRufen) {
@@ -503,14 +509,22 @@ export function mitRegeln(welten, maxKarten, erlaubt = [], opt = {}) {
         const knoten = Array.from(alt.values());
         kasten.teile(t - c, (teil, mult) => {
           const r = mussRufen && ruft(teil) ? 1 : 0;
+          gen++;
           for (const kn of knoten) {
             const st = new Int32Array(nW * 3);
             let ok = true;
             for (let w = 0; w < nW && ok; w++) {
-              C.s = kn.st[3 * w]; C.m = kn.st[3 * w + 1]; C.n = kn.st[3 * w + 2]; C.bis = 0; C.f = 0;
-              lauf(liste[w], C, teil, sp);
-              if (C.f) ok = false;
-              else { st[3 * w] = C.s; st[3 * w + 1] = C.m; st[3 * w + 2] = C.n; }
+              const M = memo[w], s0 = kn.st[3 * w];
+              if (M.gen[s0] !== gen) {
+                M.gen[s0] = gen;
+                C.s = s0; C.m = 0; C.n = 0; C.bis = 0; C.f = 0;
+                lauf(liste[w], C, teil, sp);
+                if (C.f) M.n[s0] = -1;
+                else { M.s[s0] = C.s; M.g[s0] = C.m; M.n[s0] = C.n; }
+              }
+              const dn = M.n[s0], n1 = kn.st[3 * w + 2] + dn;
+              if (dn < 0 || n1 > K.MAX_SCHRITTE) ok = false;
+              else { st[3 * w] = M.s[s0]; st[3 * w + 1] = kn.st[3 * w + 1] | M.g[s0]; st[3 * w + 2] = n1; }
             }
             zaehle();
             if (!ok) continue;

@@ -111,7 +111,7 @@
    "id": "e0-bis",
    "art": "pfad",
    "aufgabe": "ankommen",
-   "b": 3,
+   "b": 4,
    "h": 3,
    "start": {
     "x": 0,
@@ -119,9 +119,19 @@
     "blick": "oben"
    },
    "ziel": {
-    "x": 2,
-    "y": 0
+    "x": 3,
+    "y": 2
    },
+   "hindernisse": [
+    [
+     1,
+     2
+    ],
+    [
+     2,
+     2
+    ]
+   ],
    "erlaubt": [
     "wenn",
     "bis"
@@ -212,43 +222,35 @@
    "id": "e0-spruch",
    "art": "pfad",
    "aufgabe": "ankommen",
-   "b": 5,
-   "h": 5,
+   "b": 4,
+   "h": 4,
    "start": {
     "x": 0,
-    "y": 4,
+    "y": 3,
     "blick": "oben"
    },
    "ziel": {
-    "x": 4,
-    "y": 0
+    "x": 2,
+    "y": 3
    },
    "hindernisse": [
     [
      1,
-     4
-    ],
-    [
-     2,
      3
     ],
     [
-     3,
+     1,
      2
-    ],
-    [
-     4,
-     1
     ]
    ],
    "erlaubt": [
     "spruch"
    ],
    "sprueche": {
-    "stern": "vor rechts vor links"
+    "stern": "vor vor rechts"
    },
-   "maxKarten": 4,
-   "beispiel": "@stern @stern @stern @stern"
+   "maxKarten": 3,
+   "beispiel": "@stern @stern @stern"
   },
   {
    "id": "e0-spruchfrei",
