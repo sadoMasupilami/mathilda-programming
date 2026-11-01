@@ -128,9 +128,9 @@ Aufbau: oben die Vorbereitung, dann der Ablauf als **Drehbuch** (pro Schritt: wa
 }
 ```
 
-Gitter: `x` nach rechts, `y` nach unten, Feld `(0, 0)` ist links oben. `blick`: `oben`, `rechts`, `unten`, `links` (ohne Angabe: oben). Optional `edelsteine: [[x, y], …]` (alle müssen eingesammelt werden), `zielSymbol`: `schatz` (Standard), `ziel` (Zielflagge) oder `stern`.
+Gitter: `x` nach rechts, `y` nach unten, Feld `(0, 0)` ist links oben (mehrere Gitter: `"welten"`, Abschnitt 4a). `blick`: `oben`, `rechts`, `unten`, `links` (ohne Angabe: oben). Optional `edelsteine: [[x, y], …]` (alle müssen eingesammelt werden), `zielSymbol`: `schatz` (Standard), `ziel` (Zielflagge) oder `stern`.
 
-Programme als Text: `"vor vor rechts 3[vor links]"` (Befehle `vor`, `links` = links drehen, `rechts` = rechts drehen; `3[…]` = Zauber-Kasten „3-mal“, 2 bis 5, nicht verschachtelt).
+Programme als Text: `"vor vor rechts 3[vor links]"` (Befehle `vor`, `links` = links drehen, `rechts` = rechts drehen; `3[…]` = Zauber-Kasten „3-mal“, 2 bis 5, kein Zauber-Kasten im Zauber-Kasten). Ab Block C dazu `wenn[…]`, `bis[…]` und `@stern` (Abschnitt 4a).
 
 | art | Felder | Was der Löser prüft (Abbruch, wenn nicht) | Lösung |
 |---|---|---|---|
@@ -140,11 +140,39 @@ Programme als Text: `"vor vor rechts 3[vor links]"` (Befehle `vor`, `links` = li
 | `ablauf` | `karten: [{ "id", "text", "bild" }]` (≤ 8), `regeln: [["a", "b"]]` = a kommt vor b, optional `loesung`, `mehrereLoesungen` | alle gültigen Reihenfolgen gezählt; mehr als eine nur mit `"mehrereLoesungen": true` | alle Reihenfolgen, Paare mit egal-Reihenfolge |
 | `kuerzer` | `lang` (ohne Zauber-Kasten), `kurz` (mit Zauber-Kasten), optional Gitter | `kurz` macht genau dasselbe wie `lang` (gleiche ausgerollte Befehle) und braucht weniger Karten | beide Programme, Kartenzahlen |
 
-**Zauber-Kasten:** 2- bis 5-mal, darin **1 bis 3 Befehle** (höchstens 3, wie im Auftrag „eine Gruppe von 2–3 Befehlen“; Papier, Löser und App gleich, `K.MAX_INNEN`), nicht verschachtelt.
+**Zauber-Kasten:** 2- bis 5-mal, darin **1 bis 3 Befehle** (höchstens 3, wie im Auftrag „eine Gruppe von 2–3 Befehlen“; Papier, Löser und App gleich, `K.MAX_INNEN`), kein Zauber-Kasten im Zauber-Kasten (ab Block C dürfen Wenn-dann-Kästen und Spruch-Aufrufe hinein, Abschnitt 4a).
 
 **Karten zählen** (Einheit 5): Ein Befehl ist 1 Karte, ein Zauber-Kasten ist 1 Karte plus die Befehle darin. „3-mal: vor“ = 2 Karten, „vor vor vor“ = 3 Karten. **Kürzestes Programm** (ohne Zauber-Kasten): die wenigsten Befehle, Drehungen zählen mit.
 
 Achtung beim Entwerfen: Eine Kehrtwende geht mit „links links“ oder „rechts rechts“, beide gleich lang. Wer ein „finde das kürzeste“-Rätsel will, das eine Kehrtwende braucht, bekommt deshalb immer mehrere kürzeste Programme. Ebenso hat ein freies Rechteck viele gleich lange Wege (oben-dann-rechts gegen rechts-dann-oben). Hindernisse und Startrichtung so setzen, dass genau ein kürzestes Programm übrig bleibt, oder kennzeichnen. Der Löser sagt es genau: `werkzeuge/mit-nix.sh node werkzeuge/raetsel.mjs --bericht`.
+
+### 4a. Erweiterte Befehle (ab Block C: Wenn-dann, „bis zum Schatz“, Zaubersprüche)
+
+Regeln: `plan/lehrplan.md` Abschnitt 7.8 (verbindlich). Programme als Text:
+
+```
+wenn[stein: rechts]                    Wenn-dann-Kasten ohne sonst
+wenn[stein: rechts sonst vor]          mit sonst (dann: 1–3, sonst: 0–3 Befehle oder Aufrufe)
+bis[wenn[stein: rechts sonst vor]]     Wiederhol-Zauber „bis zum Schatz“ (1–3 Teile)
+3[vor wenn[frei-links: links vor]]     Zauber-Kasten mit Wenn-dann-Kasten (zusammen höchstens 3 Teile)
+@stern @stern links @stern             Zauberspruch-Aufrufe (stern, mond, krone)
+```
+
+Bedingungen: `stein`, `frei` (vor der Nase), `stein-links`, `stein-rechts`, `frei-links`, `frei-rechts` (neben dem Drachen, von ihm aus gesehen). Der Rand zählt wie ein Stein. Verschachtelung: Kein Zauber-Kasten im Zauber-Kasten, kein Wenn-dann im Wenn-dann, im Wenn-dann nur Befehle und Aufrufe, kein Aufruf in einem Spruch. Höchstens 60 ausgeführte Befehle (sonst: „Der Drache läuft im Kreis.“).
+
+**Zaubersprüche** stehen beim Rätsel: `"sprueche": { "stern": "vor vor links" }` (1–4 Teile: Befehle, Zauber-Kasten, Wenn-dann-Kasten). **Karten zählen:** Wenn-dann-Kasten = 1 (Wenn-Karte) + dann + sonst; `bis[…]` = 1 + Inhalt; Aufruf = 1; ein Spruch, den das Kind schreibt, einmal 1 + Inhalt; ein vorgegebener Spruch zählt nicht.
+
+| art | zusätzliche Felder | Was der Löser prüft |
+|---|---|---|
+| `pfad` | `erlaubt`: Teilmenge von `["zauber", "wenn", "bis", "spruch"]` (was das Kind benutzen darf, die App bietet genau das an); `bedingungen` (Wenn-Karten, Standard `["stein", "frei"]`); `maxKarten` (Standard 12); `beispiel` (ein Programm, das ankommt); `sprueche` (vorgegeben) **oder** `spruchFrei: ["stern"]` (das Kind schreibt den Spruch; dann `beispielSprueche: { "stern": "…" }`); optional `erzwingt` (welche neuen Kästen die Grenze erzwingen muss, Standard: alle neuen aus `erlaubt`); optional `welten` (siehe unten) | Beispiel kommt an, benutzt nur Erlaubtes, Kartenzahl ≤ `maxKarten`. **Ohne die neuen Kästen geht es mit `maxKarten` nicht** (sonst Fehler „Ohne … geht es auch: mit n Karten, z. B. …“ – Grenze kleiner machen). Kleinste Kartenzahl und Anzahl der Programme mit dieser Kartenzahl (gespiegelte Wenn-Karten `wenn[stein: A sonst B]` = `wenn[frei: B sonst A]` zählen beide). `aufgabe: "kuerzestes"` nur, wenn das eindeutig ist (sonst `"mehrereLoesungen": true`) und das Beispiel so kurz ist. Ohne `beispiel` nimmt der Löser das erste kürzeste. |
+| `pfad` mit `welten` | `"welten": [{ "ziel": {…} }, { "ziel": {…}, "hindernisse": […] }]` (2–4 Gitter; fehlende Felder kommen aus dem Rätsel, z. B. `b`, `h`, `start` gemeinsam). Geht mit und ohne `erlaubt` | **ein** Programm muss in **allen** Gittern ankommen („Ein Programm für alle“). Hier ist ein Wenn-dann-Kasten auch außerhalb eines Zauber-Kastens sinnvoll |
+| `lesen` | `sprueche`; `erwartetZuLang: true` (das Programm läuft absichtlich im Kreis) | wie bisher, `fragen: [5]` zählt ausgeführte Befehle (Wenn-dann und Sprüche wie ausgeführt) |
+| `kobold` | `sprueche`; optional `welten`, `bedingungen`. `reparatur.stelle` als Text: `"3"` (Teil 3), `"3.2"` (2. Teil im Zauber-Kasten 3), `"3.dann.1"`, `"3.2.sonst.1"`, `"@stern.2"` (2. Teil im Stern-Spruch). Arten: `tauschen` (`befehl`: vor, links, rechts oder `"@stern"`), `loeschen`, `einfuegen`, `bedingung` (`"bedingung": "frei"`, andere Wenn-Karte), `zahl` (`"wdh": 4`, anderes „n-mal“) | kaputt kommt nicht an (Stoß, im Kreis, nicht am Ziel), gemeinte Reparatur schon; alle anderen Ein-Karten-Reparaturen, die auch ankommen („Auch richtig: …“). In der App gehen (noch) nur Kobold-Programme aus Befehlen |
+| `kuerzer` | `sprueche` (gehören zur kurzen Lösung und zählen mit); `kurz` darf Wenn-dann und `bis[…]` enthalten, dann braucht das Rätsel ein Gitter (`b`, `h`, `start` …) | kurz macht genau dasselbe wie lang (ohne Wenn-dann/bis: dieselben Befehle; mit: im Gitter dieselben ausgeführten Befehle) und braucht weniger Karten |
+
+**Grenzen des Lösers** (ehrlich): Die Suche nach der kleinsten Kartenzahl (`mitRegeln` in `werkzeuge/loeser.mjs`) probiert alle Programme bis zur Kartengrenze durch, legt gleiche Zustände zusammen und beschneidet nur, was nie das kürzeste sein kann. Meist dauert das unter einer Sekunde. Sie hat eine Rechen-Grenze: Mit allen sechs Wenn-Karten, „bis“, Zauber-Kasten und Grenzen um 8 Karten und mehr kann sie abbrechen; dann wird nur das Beispiel geprüft (Bericht: „Suche zu groß“), und „Finde das kürzeste“ geht nicht. Höchstens **ein** selbst geschriebener Spruch (`spruchFrei`) wird durchsucht; bei zwei nur das Beispiel. Der Bericht zeigt alles: `werkzeuge/mit-nix.sh node werkzeuge/raetsel.mjs --bericht`.
+
+**Entwerfen:** Ein Wenn-dann-Kasten lohnt sich nur, wenn er mehrmals drankommt (im Zauber-Kasten, in einem Spruch) oder bei mehreren Gittern. „bis zum Schatz“ mit einer Wenn-dann-Regel braucht Gitter, in denen die Regel wirklich zum Schatz führt (Gang mit Ecken, Spirale, Labyrinth mit Hand-an-der-Wand). Den Weg im Kopf mit dem Finger nachgehen und mit dem Löser prüfen; ein Programm, das im Kreis läuft, meldet der Löser.
 
 ## 5. Bausteine
 
@@ -154,6 +182,8 @@ Achtung beim Entwerfen: Eine Kehrtwende geht mit „links links“ oder „recht
 <m-symbol name="drache" gr="20" blick="rechts"></m-symbol>
 ```
 Namen: `vor`, `links` (links drehen), `rechts` (rechts drehen), `drache`, `schatz`, `stern`, `sternLeer`, `ziel`, `hindernis`, `edelstein`, `kobold`, `haken`. Farben: vor blau, links drehen grün, rechts drehen orange (wie die rechte Pfote des Drachen). In Fließtext der Anleitung: `gr="4.5"`.
+
+Ab Block C (Lehrplan 7.4/7.8): Wenn-Karten `wenn-stein`, `wenn-frei`, `wenn-stein-links`, `wenn-frei-links`, `wenn-stein-rechts`, `wenn-frei-rechts` (türkiser Grund; der Drache schaut im Bild immer nach oben, das Feld liegt vor bzw. neben ihm), `wenn` (Wenn-dann-Kasten allgemein), `bis` („bis zum Schatz“, lila), Spruch-Siegel `spruch-stern`, `spruch-mond`, `spruch-krone` (braun). Farben: Wenn-dann-Kasten Türkis, Zaubersprüche Braun, „bis zum Schatz“ Lila wie der Zauber-Kasten.
 
 ### Gitter
 ```html
@@ -177,8 +207,29 @@ Namen: `vor`, `links` (links drehen), `rechts` (rechts drehen), `drache`, `schat
 <m-programm raetsel="e5-k1" teil="kurz" zeige></m-programm>       <!-- kuerzer: kurzes Programm gefüllt -->
 <m-programm raetsel="e5-p1" teil="zauber"></m-programm>           <!-- pfad mit zauber: leere Form des kürzesten -->
 <m-programm leer="6"></m-programm>                                <!-- 6 leere Kästchen ohne Lösung (eigene Programme) -->
+<m-programm befehle="bis[wenn[stein: rechts sonst vor]] @stern"></m-programm>  <!-- erweiterte Befehle zeigen -->
+<m-programm raetsel="e16-p1" teil="form"></m-programm>            <!-- pfad mit "erlaubt": leere Form des Beispiels, Lösung rot -->
+<m-programm raetsel="e16-p1" teil="beispiel"></m-programm>        <!-- pfad mit "erlaubt": das Beispiel gefüllt (z. B. Anleitung) -->
 ```
 `gr` = Kästchengröße in mm (Standard 14). Höchstens 12 Kästchen pro Reihe (geprüft). Bei 12 Kästchen nimmt der Baustein ohne `gr` automatisch 13 mm (12 · 14 mm plus Abstände wären breiter als das Blatt). Nummern über den Kästchen; `nummern="nein"` lässt die Nummernzeile ganz weg (für Programme im Fließtext). Bei Kobold-Rätseln markiert die Lösungsansicht die Fehlerstelle; wenn Streichen oder Einfügen an mehreren Stellen dasselbe Programm ergibt (z. B. in „vor vor vor“), werden alle diese Stellen genannt. Der Zauber-Kasten ist lila, links oben steht groß „3-mal“, kein Mal-Punkt.
+
+**Erweiterte Befehle am Papier** (Abschnitt 4a): Der Wenn-dann-Kasten ist türkis und steht in einer Zeile: „wenn“ [Wenn-Karte] „dann“ [Befehle] „sonst“ [Befehle]. „bis zum Schatz“ ist ein lila Zauber-Kasten mit Schatztruhe und „bis zum Schatz“ oben. Ein Aufruf `@stern` ist eine braune Karte mit dem Spruch-Siegel. In der leeren Form (`teil="form"`) sind Wenn-Karte, Befehle, Aufrufe und „n-mal“ leer, Kästen und die Wörter „wenn/dann/sonst/bis zum Schatz“ stehen da. Ein Wenn-dann-Kasten ist mit seinen Wörtern breit: Eine Reihe mit Kasten und Wenn-dann hat Platz für etwa 6–8 Kästchen (14 mm), sonst `gr="12"`. Kobold-Rätsel mit Stellen wie `"3.dann.1"` markieren in der Lösung die Karte und nennen die Reparatur.
+
+### Zaubersprüche
+```html
+<m-spruch name="stern" befehle="vor vor links"></m-spruch>     <!-- fertiger Spruch: Siegel, „Stern-Spruch“, Befehle -->
+<m-spruch raetsel="e17-p1" name="stern"></m-spruch>            <!-- aus dem Rätsel: vorgegeben gefüllt; spruchFrei (pfad) bzw.
+                                                                    sprueche (kuerzer): leere Kästchen, Lösung rot -->
+<m-spruch raetsel="e17-p1" name="stern" plaetze="5"></m-spruch> <!-- genau 5 leere Kästchen; teil="form": Form der Lösung; zeige: gefüllt -->
+<m-spruch name="mond" leer="4"></m-spruch>                     <!-- 4 leere Kästchen ohne Lösung (eigene Sprüche erfinden) -->
+```
+Braun wie eine Spruch-Rolle, nummerierte Reihe, höchstens 12 Kästchen. Bei Kobold-Rätseln mit Fehler im Spruch (`"@stern.2"`) markiert die Lösungsansicht die Karte im Spruch.
+
+### Mehrere Gitter („Ein Programm für alle“)
+```html
+<m-gitter raetsel="e11-w1" welt="1" feld="20"></m-gitter> <m-gitter raetsel="e11-w1" welt="2" feld="20"></m-gitter>
+```
+Bei Rätseln mit `"welten"` ist `welt` Pflicht. Die Lösung zeigt in jedem Gitter den Weg des Beispiels.
 
 ### QR-Code, Hilfen links/rechts
 ```html

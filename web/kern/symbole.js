@@ -29,6 +29,13 @@
     weg: '#d1335b',
     zauber: '#7a4fd1',
     zauberHell: '#f1ebff',
+    // Erweiterte Befehle (plan/lehrplan.md 7.4/7.8): deutlich anders als vor (blau), links drehen (grün),
+    // rechts drehen (orange) und der Zauber-Kasten (lila). „bis zum Schatz“ ist ein Zauber-Kasten: lila.
+    wenn: '#0b8a8f',       // Wenn-dann-Kasten und Wenn-Karten: Türkis
+    wennHell: '#e0f4f4',
+    spruch: '#8a5a2b',     // Zaubersprüche: Braun (wie eine Spruch-Rolle)
+    spruchHell: '#fbf0dc',
+    mond: '#8fb9f2',       // Mond-Spruch: hellblauer Mond
   };
 
   const T = FARBE.tinte;
@@ -124,11 +131,72 @@
     '<path d="M46 56 L48 60 L50 56" fill="white"' + strich(1.5) + '/>';
   const HAKEN = '<path d="M14 54 L38 78 L86 24" fill="none" stroke="' + FARBE.links + '" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>';
 
+  // ---------------------------------------------------------------------
+  // Wenn-Karten (Bedingungen): der Drache schaut immer nach oben (Nase oben), daneben das Feld, das er
+  // anschaut: ein Stein (grau) oder ein freies Feld (weiß, gestrichelter Rand). Türkiser Grund = Wenn-Karte.
+  //   wenn-stein / wenn-frei:              Feld vor der Nase (über dem Drachen)
+  //   wenn-stein-links / wenn-frei-links:  Feld links neben dem Drachen (von ihm aus gesehen)
+  //   wenn-stein-rechts / wenn-frei-rechts: Feld rechts neben dem Drachen
+  // ---------------------------------------------------------------------
+  const WENN_GRUND = '<rect x="1" y="1" width="98" height="98" rx="14" fill="' + FARBE.wennHell + '"/>';
+  const klein = (inhalt, x, y, s) => '<g transform="translate(' + x + ' ' + y + ') scale(' + s + ')">' + inhalt + '</g>';
+  const STEIN_KLEIN = (x, y) => klein(HINDERNIS, x - 2, y - 4, 0.52);
+  const FREI_KLEIN = (x, y) => '<rect x="' + (x + 3) + '" y="' + (y + 2) + '" width="42" height="40" rx="6" fill="white" stroke="' + T + '" stroke-width="3.2" stroke-dasharray="7 5"/>';
+  const DRACHE_KLEIN = (x, y) => klein(DRACHE, x, y, 0.54);
+  function wennBild(was, wo) {
+    // wo: 'vor' (über dem Drachen), 'links', 'rechts'
+    let feld, drache;
+    if (wo === 'vor') { feld = [26, 3]; drache = [23, 47]; }
+    else if (wo === 'links') { feld = [1, 29]; drache = [46, 23]; }
+    else { feld = [51, 29]; drache = [0, 23]; }
+    return WENN_GRUND + (was === 'stein' ? STEIN_KLEIN(feld[0], feld[1]) : FREI_KLEIN(feld[0], feld[1])) + DRACHE_KLEIN(drache[0], drache[1]);
+  }
+  // Allgemeine Wenn-Karte (Taste in der App): der Drache schaut auf ein Feld, Blick-Linien türkis
+  const WENN =
+    WENN_GRUND +
+    '<rect x="29" y="5" width="42" height="36" rx="6" fill="white" stroke="' + FARBE.wenn + '" stroke-width="4" stroke-dasharray="8 5"/>' +
+    '<path d="M47 52 L36 42 M53 52 L64 42" fill="none" stroke="' + FARBE.wenn + '" stroke-width="4" stroke-linecap="round"/>' +
+    DRACHE_KLEIN(23, 47);
+
+  // „bis zum Schatz“: lila Kreis-Pfeil (wiederholen) um die Schatztruhe
+  const BIS =
+    '<path d="M50 8 A42 42 0 1 1 15 27" fill="none" stroke="' + FARBE.zauber + '" stroke-width="9" stroke-linecap="round"/>' +
+    '<path d="M4 22 L22 12 L24 34 Z" fill="' + FARBE.zauber + '" stroke="' + FARBE.zauber + '" stroke-width="4" stroke-linejoin="round"/>' +
+    klein(SCHATZ, 24, 26, 0.52);
+
+  // Zaubersprüche: rundes Spruch-Siegel (braun) mit Stern, Mond oder Krone
+  const SIEGEL = '<circle cx="50" cy="50" r="45" fill="' + FARBE.spruchHell + '" stroke="' + FARBE.spruch + '" stroke-width="7"/>' +
+    '<circle cx="50" cy="50" r="36" fill="none" stroke="' + FARBE.spruch + '" stroke-width="2" stroke-dasharray="3 4"/>';
+  const SPRUCH_STERN = SIEGEL + '<path d="' + sternPfad(50, 53, 30, 13) + '" fill="' + FARBE.gold + '"' + strich(3.5) + '/>';
+  const SPRUCH_MOND = SIEGEL + '<path d="M60 18 A33 33 0 1 0 60 82 A40 40 0 0 1 60 18 Z" fill="' + FARBE.mond + '"' + strich(3.5) + '/>' +
+    '<circle cx="66" cy="34" r="3" fill="' + FARBE.gold + '"/><circle cx="72" cy="58" r="2.4" fill="' + FARBE.gold + '"/>';
+  const SPRUCH_KRONE = SIEGEL + '<path d="M24 68 L20 34 L37 50 L50 26 L63 50 L80 34 L76 68 Z" fill="' + FARBE.gold + '"' + strich(3.5) + '/>' +
+    '<rect x="24" y="66" width="52" height="11" rx="3" fill="' + FARBE.gold + '"' + strich(3.5) + '/>' +
+    '<circle cx="20" cy="31" r="4" fill="' + FARBE.gold + '"' + strich(2.5) + '/><circle cx="50" cy="23" r="4" fill="' + FARBE.gold + '"' + strich(2.5) + '/><circle cx="80" cy="31" r="4" fill="' + FARBE.gold + '"' + strich(2.5) + '/>' +
+    '<circle cx="50" cy="71.5" r="3" fill="#8fd3ff"' + strich(1.5) + '/>';
+
   const SYMBOLE = {
     vor: VOR, links: LINKS, rechts: RECHTS, drache: DRACHE, schatz: SCHATZ, stern: STERN, sternLeer: STERN_LEER,
     ziel: ZIEL, hindernis: HINDERNIS, edelstein: EDELSTEIN, kobold: KOBOLD, haken: HAKEN,
+    wenn: WENN,
+    'wenn-stein': wennBild('stein', 'vor'), 'wenn-frei': wennBild('frei', 'vor'),
+    'wenn-stein-links': wennBild('stein', 'links'), 'wenn-frei-links': wennBild('frei', 'links'),
+    'wenn-stein-rechts': wennBild('stein', 'rechts'), 'wenn-frei-rechts': wennBild('frei', 'rechts'),
+    bis: BIS,
+    'spruch-stern': SPRUCH_STERN, 'spruch-mond': SPRUCH_MOND, 'spruch-krone': SPRUCH_KRONE,
   };
-  const NAMEN = { vor: 'vor', links: 'links drehen', rechts: 'rechts drehen' };
+  const NAMEN = {
+    vor: 'vor', links: 'links drehen', rechts: 'rechts drehen',
+    wenn: 'Wenn-dann-Kasten',
+    'wenn-stein': 'wenn vor der Nase ein Stein ist', 'wenn-frei': 'wenn vor der Nase frei ist',
+    'wenn-stein-links': 'wenn links ein Stein ist', 'wenn-frei-links': 'wenn links frei ist',
+    'wenn-stein-rechts': 'wenn rechts ein Stein ist', 'wenn-frei-rechts': 'wenn rechts frei ist',
+    bis: 'bis zum Schatz',
+    'spruch-stern': 'Stern-Spruch', 'spruch-mond': 'Mond-Spruch', 'spruch-krone': 'Kronen-Spruch',
+  };
+  // Symbol-Namen zu Programmteilen: Wenn-Karte einer Bedingung, Siegel eines Zauberspruchs
+  const bedingungSymbol = (b) => 'wenn-' + b;
+  const spruchSymbol = (n) => 'spruch-' + n;
 
   // Ein Symbol als eigenständiges <svg>. groesse: z. B. '14mm' oder '48' (px)
   function symbol(name, groesse, extra) {
@@ -201,5 +269,5 @@
     return s;
   }
 
-  g.WerkstattSymbole = { FARBE, NAMEN, SYMBOLE, symbol, inhalt, gitter, figur, sternPfad };
+  g.WerkstattSymbole = { FARBE, NAMEN, SYMBOLE, symbol, inhalt, gitter, figur, sternPfad, bedingungSymbol, spruchSymbol };
 })(typeof globalThis !== 'undefined' ? globalThis : this);
