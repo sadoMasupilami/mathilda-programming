@@ -453,7 +453,7 @@
     z.probe = { k: kk, text: G.lesen(api.lv.geheimtext, kk) };
     if (!z.probiert.includes(kk)) z.probiert.push(kk);
     zeichneWort(api);
-    sag(api, 'So heißt es mit ' + kk + '. Ein echtes Wort? Dann tippe das Bild an. Sonst dreh weiter!');
+    sag(api, 'So heißt es mit ' + kk + '. Ein echtes Wort? Dann tippe das Bild an!');
   }
 
   // Bild antippen (lesen, knacken, zeichen)
@@ -480,7 +480,7 @@
     }
     if (z.aufgabe === 'knacken') {
       zeichneTasten(api);
-      return sag(api, 'Das passt nicht zu ' + lv.geheimtext + '. Dreh weiter und tippe auf „Probe“!', 'hinweis');
+      return sag(api, 'Das passt nicht. Dreh weiter und tippe auf „Probe“!', 'hinweis');
     }
     if (z.aufgabe === 'zeichen') {
       let i = 0;

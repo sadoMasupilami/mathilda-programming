@@ -85,7 +85,6 @@ async function radLage(page) {
   return page.evaluate(() => {
     const r = document.querySelector('.geheim-rad').getBoundingClientRect();
     const tasten = Array.from(document.querySelectorAll('.geheim-drehen'), (t) => { const b = t.getBoundingClientRect(); return { l: b.left, r: b.right, o: b.top, u: b.bottom }; });
-
     return { cx: r.left + r.width / 2, cy: r.top + r.height / 2, rs: (r.width / 2) * 99 / 108, tasten, innen: Array.from(document.querySelectorAll('.geheim-i text'), (t) => { const b = t.getBoundingClientRect(); return { b: t.textContent, x: b.left + b.width / 2, y: b.top + b.height / 2, breite: b.width, hoehe: b.height }; }) };
   });
 }
