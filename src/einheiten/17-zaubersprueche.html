@@ -25,8 +25,8 @@
   .e17-loes > .kasten.loesung p, .kasten.loesung.e17-weiter p { margin-bottom: 1.6mm; }
   .e17-tab td { vertical-align: middle; }
   .e17-tab td:first-child { width: 8%; }
-  .e17-tab td:nth-child(2) { width: 30%; }
-  .e17-tab td:nth-child(3) { width: 9%; }
+  .e17-tab td:nth-child(2) { width: 28%; }
+  .e17-tab td:nth-child(3) { width: 11%; }
   table.tab.e17-spartab { margin: 1.5mm 0 2mm 0; }
   .e17-spartab td:first-child { width: 30%; }
   /* kleine Programm-Reihen und Sprüche im Fließtext der Anleitung */
@@ -60,9 +60,11 @@
   .karte .e17-kk { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.2mm; width: calc(100% - 3mm); height: calc(100% - 3mm); background: #fbf0dc; border: 1.2mm solid #8a5a2b; border-radius: 3mm; }
   .karte .e17-kk .e17-kname { font-family: var(--kind); font-weight: 700; font-size: 13pt; color: #8a5a2b; line-height: 1; }
   .karte .e17-rk { display: flex; align-items: center; justify-content: center; width: calc(100% - 3mm); height: calc(100% - 3mm); background: #fbf0dc; border: 0.6mm solid #8a5a2b; border-radius: 3mm; }
-  .e17-band { display: flex; align-items: center; width: calc(100% - 2mm); height: calc(100% - 3mm); background: #8a5a2b; border-radius: 1.5mm; padding: 0 0 0 2mm; }
-  .e17-band .e17-bsiegel { flex: none; width: 8mm; height: 8mm; margin-right: 1mm; line-height: 0; }
-  .e17-band .e17-bplatz { flex: 1; height: 100%; border-left: 0.5mm dashed rgba(255, 255, 255, 0.8); display: flex; align-items: center; justify-content: center; color: white; font-family: var(--text); font-weight: 800; font-size: 8pt; }
+  /* vier gleich breite Plätze, so breit wie eine Befehlskarte (44 mm); das Siegel liegt im ersten Platz */
+  .e17-band { position: relative; display: flex; align-items: center; width: calc(100% - 2mm); height: calc(100% - 3mm); background: #8a5a2b; border-radius: 1.5mm; }
+  .e17-band .e17-bsiegel { position: absolute; left: 1.5mm; top: 50%; transform: translateY(-50%); width: 8mm; height: 8mm; line-height: 0; }
+  .e17-band .e17-bsiegel + .e17-bplatz { border-left: none; }
+  .e17-band .e17-bplatz { flex: 1 1 0; box-sizing: border-box; height: 100%; border-left: 0.5mm dashed rgba(255, 255, 255, 0.8); display: flex; align-items: center; justify-content: center; color: white; font-family: var(--text); font-weight: 800; font-size: 8pt; }
   .e17-baender .karten-raster > .schere { left: -5.5mm; }
 </style>
 
@@ -163,7 +165,7 @@
         <li><b>Profi</b> auf <a class="blattref" href="#blatt-17-1"></a> und <a class="blattref" href="#blatt-17-2"></a>.</li>
         <li><b>„4-mal: Stern-Spruch“</b> am Boden-Gitter: einmal rundherum mit 2 Karten.</li>
         <li><b>Zwei Sprüche:</b> Stern und Mond abwechselnd (Zinnen-Weg).</li>
-        <li><b>Quadrat im Gang</b> mit 9, 7, dann 6 Karten.</li>
+        <li><b>Großes Quadrat</b> (Seite 3 Schritte) mit 9, 7, dann 6 Karten.</li>
         <li><b>Spruch-Kobold zu zweit:</b> eine Karte heimlich tauschen.</li>
       </ul>
     </div>
@@ -210,7 +212,7 @@
   <h2>Ablauf Schritt für Schritt</h2>
   <ol class="ablauf e17-ablauf">
     <li data-min="3"><span class="schritt-titel">Der Hüpf-Spruch</span>Ganz ohne Karten. Du bringst {{KIND}} einen Zauberspruch bei: „Der Stern-Spruch ist hüpfen, hüpfen, klatschen.“ Sie probiert ihn einmal. Dann rufst du ein Programm: „Stern-Spruch! Stern-Spruch! Verbeugen! Stern-Spruch!“ Danach erfindet sie einen Mond-Spruch für dich, und du tanzt ihn so ernst wie ein Roboter (Beispielsätze). Frag zum Schluss: „Wie viele Bewegungen waren das? Und wie oft musste ich ‚hüpfen, hüpfen, klatschen‘ sagen?“ (10 Bewegungen, gesagt nur einmal beim Beibringen.) Das ist schon die ganze Idee.</li>
-    <li data-min="5"><span class="schritt-titel">Roboter mit Sprüchen</span>Du bist der Roboter auf dem Kreuz. {{KIND}} soll dich zum Kuscheltier bringen: 9 Schritte, aber es gibt nur 8 vor-Karten. Kennt sie noch den Zauber-Kasten? Super, heute kommt ein zweiter Trick. Leg die Stern-Kopf-Karte und das Stern-Band hin, {{KIND}} legt 3 vor-Karten auf das Band. Ins Programm kommen 3 Stern-Aufruf-Karten. Du gehst, sagst bei jedem Aufruf laut „Stern-Spruch!“ und zählst die Schritte. Karten zählen: 4 (Kopf-Karte und 3 vor) plus 3 Aufrufe sind 7. Dann darf sie im Spruch eine Karte tauschen, zum Beispiel die letzte vor-Karte gegen rechts drehen. Was passiert jetzt bei jedem Aufruf? (Der Roboter geht zwei Schritte und dreht sich, dreimal: Er läuft drei Seiten eines Quadrats.) Eine Karte getauscht, und alle drei Aufrufe machen etwas anderes.</li>
+    <li data-min="5"><span class="schritt-titel">Roboter mit Sprüchen</span>Du bist der Roboter auf dem Kreuz. {{KIND}} soll dich zum Kuscheltier bringen: 9 Schritte, aber es gibt nur 8 vor-Karten. Kennt sie noch den Zauber-Kasten? Super, heute kommt ein zweiter Trick. Leg die Stern-Kopf-Karte und das Stern-Band hin, {{KIND}} legt 3 vor-Karten auf das Band. Ins Programm kommen 3 Stern-Aufruf-Karten. Du gehst, sagst bei jedem Aufruf laut „Stern-Spruch!“ und zählst die Schritte. Karten zählen: 4 (Kopf-Karte und 3 vor) plus 3 Aufrufe sind 7. Dann darf sie im Spruch eine Karte tauschen, zum Beispiel die letzte vor-Karte gegen rechts drehen. Was passiert jetzt bei jedem Aufruf? (Der Roboter geht zwei Schritte und dreht sich, dreimal: Er läuft drei Seiten eines Quadrats, wenn der Platz reicht.) Eine Karte getauscht, und alle drei Aufrufe machen etwas anderes.</li>
     <li data-min="7"><span class="schritt-titel">Spruch-Tanz</span>Zum Aufwärmen die Knobel-Ecke unten auf <a class="blattref" href="#blatt-17-3"></a>: erst zählen, dann den Tanz wirklich tanzen und nachzählen. Dann das Spiel mit den Tanz-Karten von <a class="blattref" href="#blatt-5-3"></a> und den Spruch-Karten (Kasten „Spiel: Spruch-Tanz“). Zuerst erfindest du, dann {{KIND}}. Hier merkt sie: Mit einem Spruch wird ein Tanz mit wenigen Karten lang.</li>
     <li data-min="6"><span class="schritt-titel">Blatt „Der Stern-Spruch“</span><a class="blattref" href="#blatt-17-1"></a>. Bei Aufgabe 1 tippt der Muggelstein im Programm mit. Bei einer Stern-Karte bleibt er liegen, und ein Finger läuft den Stern-Spruch ab. Dann rückt der Muggelstein weiter. Die Drachen-Figur darf am Gitter mitlaufen. Aufgabe 2 hat eine Kartengrenze: nur 4 Karten. Der Stern-Spruch ist geschenkt, er zählt nicht. Die Profi-Aufgabe (Zauber-Kasten und Spruch zusammen) ist freiwillig.</li>
     <li data-min="7"><span class="schritt-titel">Blatt „Der Spruch-Kobold“</span><a class="blattref" href="#blatt-17-2"></a>. Bei Aufgabe 1 sucht {{KIND}} in der langen Reihe die Gruppe, die sich wiederholt (sie darf mit dem Bleistift Bögen über je 4 Karten machen). Diese Gruppe wird der Mond-Spruch. Dann zählt sie die Karten: Aus 12 Karten werden 8. Bei Aufgabe 2 hat der Kobold genau eine Karte im Mond-Spruch vertauscht. Die Profi-Aufgabe (einen eigenen Spruch erfinden) ist freiwillig. Passt das Blatt heute nicht mehr hinein, kommt es beim nächsten Mal dran.</li>
@@ -359,7 +361,7 @@
         Programm in beiden Gittern: Krone, Krone, Krone. Warum? Der Spruch zählt vom Drachen aus. Beide Gitter sind das Gitter vom Blatt, nur gedreht: das linke eine Vierteldrehung nach rechts, das rechte eine halbe Drehung. Dreh die Seite, bis der Drache im Bild nach oben schaut: Dann ist es das Gitter vom Blatt. So zeichnet ein Spruch in jedem Gitter dasselbe Muster, nur gedreht. In der App ist das Level 7: ein Programm für beide Gitter.</li>
       <li><b>Wenn-dann im Spruch</b> (für Kinder, die den Wenn-dann-Kasten schon kennen): Ein Spruch darf einen Wenn-dann-Kasten haben. Dann entscheidet der Drache bei jedem Aufruf neu:
         <div class="e17-beispiel e17-mini"><m-spruch raetsel="e17-s1" name="stern" gr="7" nummern="nein"></m-spruch> <span class="e17-bl">Programm:</span> <m-programm raetsel="e17-s1" gr="7" nummern="nein"></m-programm></div>
-        Am Boden-Gitter (3 · 3, Start links unten, Nase nach oben, Schatz rechts oben): zweimal frei, also vor, vor; dann ist vor der Nase der Rand, also rechts drehen; dann zweimal vor. Der Drache steht am Schatz (vom Löser nachgerechnet). Das sind 6 Karten, und derselbe Spruch hilft in jedem Gang mit einer Ecke.</li>
+        Am Boden-Gitter (3 · 3, Start links unten, Nase nach oben, Schatz rechts oben): zweimal frei, also vor, vor; dann ist vor der Nase der Rand, also rechts drehen; dann zweimal vor. Der Drache steht am Schatz (vom Löser nachgerechnet). Das sind 6 Karten, und derselbe Spruch hilft in jedem Gang mit einer Ecke nach rechts.</li>
       <li><b>Spruch-Kobold zu zweit:</b> {{KIND}} legt einen Spruch und ein Programm, dreht sich um, und du tauschst heimlich eine Karte im Spruch (die Kobold-Kluppe aus Einheit 4 kommt an die Kopf-Karte). Der Roboter läuft. Bei welchem Aufruf merkt sie es? Wo wohnt der Fehler? Dann ist sie der Kobold.</li>
       <li><b>Sprüche mit Namen erfinden:</b> {{KIND}} erfindet eigene Sprüche und gibt ihnen Spitznamen: Stiegen-Spruch (vor, rechts drehen, vor, links drehen), Kehrtwende-Spruch, Schlangen-Spruch. Sie schreibt die Spitznamen auf die Rückseite der Kopf-Karten. Danach programmiert ihr euch gegenseitig nur noch mit Spitznamen: „Stiegen-Spruch, Stiegen-Spruch, Kehrtwende!“</li>
     </ol>
@@ -388,8 +390,8 @@
   <div class="e17-loes">
     <m-loesungen einheit="17" skala="0.39"></m-loesungen>
     <div class="kasten loesung">
-      <p><b><a class="blattref" href="#blatt-17-1"></a>, Aufgabe 1:</b> Der Drache landet im Feld <b>rechts oben</b> und schaut nach unten. Erster Stern-Spruch: 2 Felder hinauf, rechts drehen. Dann vor (ein Feld nach rechts). Zweiter Stern-Spruch: 2 Felder nach rechts, rechts drehen. Er macht 7 Befehle mit nur 3 Karten im Programm. Die Steine liegen nicht im Weg.</p>
-      <p><b>Aufgabe 2:</b> Stern, vor, Stern, Stern: genau 4 Karten. Das ist das einzige Programm mit höchstens 4 Karten (vom Löser geprüft). Ohne Stern-Spruch braucht der Weg über die Steine 9 Befehle.</p>
+      <p><b><a class="blattref" href="#blatt-17-1"></a>, Aufgabe 1:</b> Der Drache landet im Feld <b>rechts oben</b> und schaut nach unten. Erster Stern-Spruch: 2 Felder hinauf, rechts drehen. Dann vor (ein Feld nach rechts). Zweiter Stern-Spruch: 2 Felder nach rechts, rechts drehen. Er macht 7 Befehle mit nur 3 Karten im Programm.</p>
+      <p><b>Aufgabe 2:</b> Stern, vor, Stern, Stern: 4 Karten, ohne Zauber-Kasten die einzige Lösung. Mit Zauber-Kasten auch richtig: „Stern, vor, 2-mal: Stern“ und „2-mal: Stern, vor“, dann vor (vom Löser geprüft). Ohne Spruch: 9 Befehle.</p>
       <p><b>Profi:</b> „3-mal: Stern-Spruch“, 2 Karten, die einzige Lösung mit 2 Karten. Mit drei Stern-Karten ohne Zauber-Kasten wären es 3 Karten, zu viele.</p>
       <p><b><a class="blattref" href="#blatt-17-3"></a>, Knobel-Ecke:</b> 10 Bewegungen (3 plus 3 plus 1 plus 3), 8 Karten (Kopf-Karte, 3 Tanz-Karten im Spruch, 4 Karten im Tanz). Dabei hüpft man 6-mal. Mehr Bewegungen als Karten: Das gäbe beim Spruch-Tanz einen Spar-Punkt.</p>
     </div>
@@ -397,7 +399,7 @@
   <div class="kasten loesung darf-brechen e17-bricht e17-weiter">
     <p><b><a class="blattref" href="#blatt-17-2"></a>, Aufgabe 1:</b> Mond-Spruch: vor, rechts drehen, vor, links drehen (eine Stufe einer Stiege). Programm: Mond, Mond, Mond. Lang 12 Karten, kurz 8 Karten (Kopf-Karte und 4 im Spruch, dazu 3 Aufrufe). Ein Zauber-Kasten allein geht hier nicht, weil 4 Befehle nicht hineinpassen. Mit beidem zusammen („3-mal: Mond-Spruch“) wären es 7 Karten.</p>
     <p><b>Aufgabe 2:</b> Die <b>4. Karte im Mond-Spruch</b> muss links drehen sein, nicht rechts drehen. Mit dem Kobold-Spruch steht der Drache nach dem ersten Mond-Spruch im richtigen Feld (in der Mitte), schaut aber nach unten. Beim zweiten Mond-Spruch stößt er gleich mit vor an den Stein. Repariert läuft er die Stufen hinauf zum Schatz rechts oben. Eine andere Reparatur mit einer einzigen Karte gibt es nicht (vom Löser geprüft).</p>
-    <p><b>Profi:</b> Kronen-Spruch vor, vor, links drehen, Programm Krone, Krone, Krone: 4 plus 3, also 7 Karten. Der Drache läuft links herum um die Steine. Das ist die einzige Lösung mit höchstens 7 Karten (vom Löser geprüft), ohne Spruch braucht der Weg 8 Befehle.</p>
+    <p><b>Profi:</b> Kronen-Spruch vor, vor, links drehen, Programm Krone, Krone, Krone: 4 plus 3, also 7 Karten. Der Drache läuft links herum um die Steine. Ohne Zauber-Kasten ist das die einzige Lösung mit höchstens 7 Karten (vom Löser geprüft), ohne Spruch braucht der Weg 8 Befehle. Darum steht „ohne Zauber-Kasten“ auf dem Blatt: Mit „3-mal: Krone“ wären es nur 6 Karten, und „3-mal: vor, vor, links drehen“ schafft es mit 4 Karten ganz ohne Spruch (vom Löser geprüft). Eine gute Frage für danach: „Und mit Zauber-Kasten?“</p>
     <p><b>Bonus-Knobelei:</b> Hüpf-Spruch: 3 Aufrufe mit je 2-mal hüpfen, also 6-mal hüpfen und 3-mal klatschen. Ecken-Spruch: Nach 4 Aufrufen ist der Roboter einmal ein Quadrat gelaufen (4-mal 2 Schritte und 4 Vierteldrehungen): wieder am Start, Nase wie am Anfang. Morgen-Spruch: Jede Idee gilt, zum Beispiel ein Abend-Spruch (Zähne putzen, Pyjama, Geschichte). Für Profis: 1 plus 3 plus 4, also 8 Karten mit Spruch, 4 · 3 = 12 Karten ohne.</p>
     <p><b>Bildschirm-Levels (zum Nachschauen):</b> Level 1 bis 7 gehen mit genau einem Programm mit der erlaubten Kartenzahl, Level 8 mit 6 verschiedenen (vom Löser geprüft). Die App prüft aber nur, ob der Drache mit der erlaubten Kartenzahl ankommt.</p>
     <table class="tab e17-tab e17-mini">
@@ -431,7 +433,7 @@
   </div>
 
   <div class="aufg">
-    <p class="anw">Bring den Drachen zum Schatz. Nur 4 Karten! Der Stern-Spruch ist geschenkt. Er zählt nicht.</p>
+    <p class="anw">Bring den Drachen zum Schatz. Nur 4 Karten! Der Stern-Spruch von oben ist geschenkt. Er zählt nicht.</p>
     <div class="e17-neben">
       <m-gitter raetsel="e17-p1" feld="20"></m-gitter>
       <div class="e17-stapel e17-mitqr">
@@ -445,7 +447,7 @@
     <div class="e17-neben">
       <m-gitter raetsel="e17-p2" feld="20"></m-gitter>
       <div class="e17-stapel">
-        <p>Nur 2 Karten!<br>Nimm den <span class="e17-nw">Zauber-Kasten.</span></p>
+        <p>Nur 2 Karten!<br>Nimm den <span class="e17-nw">Zauber-Kasten</span> und den <span class="e17-nw">Stern-Spruch.</span></p>
         <m-programm raetsel="e17-p2" teil="form"></m-programm>
       </div>
     </div>
@@ -484,7 +486,7 @@
     <div class="e17-neben">
       <m-gitter raetsel="e17-z1" feld="20"></m-gitter>
       <div class="e17-stapel">
-        <p>Nur 7 Karten! Dein <span class="e17-nw">Kronen-Spruch</span> zählt mit.</p>
+        <p>Nur 7 Karten, ohne <span class="e17-nw">Zauber-Kasten!</span> Dein <span class="e17-nw">Kronen-Spruch</span> zählt mit.</p>
         <m-spruch raetsel="e17-z1" name="krone" plaetze="4"></m-spruch>
         <m-programm raetsel="e17-z1" plaetze="4"></m-programm>
       </div>

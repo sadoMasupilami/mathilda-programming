@@ -155,6 +155,35 @@
       "beispielSprueche": { "mond": "vor links vor rechts" }
     },
     {
+      "id": "e17-p1-zk",
+      "art": "pfad",
+      "aufgabe": "ankommen",
+      "b": 4, "h": 3,
+      "start": { "x": 0, "y": 2, "blick": "oben" },
+      "ziel": { "x": 3, "y": 2 },
+      "hindernisse": [[1, 1], [2, 1], [1, 2], [2, 2]],
+      "erlaubt": ["zauber", "spruch"],
+      "erzwingt": ["spruch"],
+      "sprueche": { "stern": "vor vor rechts" },
+      "maxKarten": 4,
+      "beispiel": "@stern vor 2[@stern]"
+    },
+    {
+      "id": "e17-z1-zk",
+      "art": "pfad",
+      "aufgabe": "ankommen",
+      "b": 3, "h": 3,
+      "start": { "x": 2, "y": 2, "blick": "oben" },
+      "ziel": { "x": 0, "y": 2 },
+      "hindernisse": [[1, 1], [1, 2]],
+      "erlaubt": ["zauber", "spruch"],
+      "erzwingt": [],
+      "spruchFrei": ["krone"],
+      "maxKarten": 6,
+      "beispiel": "3[@krone]",
+      "beispielSprueche": { "krone": "vor vor links" }
+    },
+    {
       "id": "e17-s1",
       "art": "lesen",
       "b": 3, "h": 3,
