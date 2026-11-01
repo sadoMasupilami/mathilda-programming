@@ -60,23 +60,24 @@
 
   /* Blatt 20-2: Stationen-Karten */
   .e20-karten { display: grid; grid-template-columns: 91mm 91mm; border: 0.4mm dashed var(--grau); position: relative; width: 182mm; }
-  .e20-karte { border-right: 0.4mm dashed var(--grau); border-bottom: 0.4mm dashed var(--grau); padding: 1.8mm 2.6mm 2mm 2.6mm;
-    display: flex; flex-direction: column; align-items: center; gap: 1.4mm; overflow: hidden; }
+  .e20-karte { border-right: 0.4mm dashed var(--grau); border-bottom: 0.4mm dashed var(--grau); padding: 1.4mm 2.4mm 1.6mm 2.4mm;
+    display: flex; flex-direction: column; align-items: center; gap: 1.1mm; overflow: hidden; }
   .e20-karte.r { border-right: none; }
   .e20-karte.u { border-bottom: none; }
   .e20-karte.breit { grid-column: 1 / span 2; border-right: none; }
   .e20-schere { position: absolute; left: -2mm; top: -4.4mm; background: white; line-height: 0; }
-  .e20-kkopf { align-self: stretch; display: flex; align-items: center; gap: 2mm; border-bottom: 0.5mm solid var(--akzent); padding-bottom: 1.2mm; }
-  .e20-knr { width: 8.5mm; height: 8.5mm; flex: none; border-radius: 50%; background: var(--akzent); color: white; font-family: var(--text); font-weight: 900; font-size: 14pt;
+  .e20-kkopf { align-self: stretch; display: flex; align-items: center; gap: 2mm; border-bottom: 0.5mm solid var(--akzent); padding-bottom: 0.8mm; }
+  .e20-knr { width: 7.5mm; height: 7.5mm; flex: none; border-radius: 50%; background: var(--akzent); color: white; font-family: var(--text); font-weight: 900; font-size: 14pt;
     display: flex; align-items: center; justify-content: center; }
   .e20-kname { font-family: var(--text); font-weight: 900; font-size: 15pt; line-height: 1; }
-  .e20-kaufg { margin: 0; font-size: 15pt; line-height: 1.18; text-align: center; }
+  .e20-kaufg { margin: 0; font-size: 14.5pt; line-height: 1.1; text-align: center; }
   .e20-kmitte { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2mm; }
   .e20-kmitte.e20-quer { flex-direction: row; gap: 5mm; }
   .e20-neben { display: flex; align-items: center; gap: 4mm; }
   .e20-regel { margin: 0; font-size: 14pt; line-height: 1.2; text-align: left; }
-  .e20-zelle-knobel { padding: 3mm 0 0 3mm; display: flex; }
-  .e20-lsg-klein { margin: 0; font-size: 14pt; text-align: center; }
+  .e20-zelle-knobel { padding: 2mm 0 0 3mm; display: flex; margin: 0 -0.6mm -0.6mm 0; background: white; position: relative; }
+  .e20-lsg-klein { margin: 0; font-size: 14.5pt; line-height: 1.1; text-align: center; }
+  .loesungsmodus .e20-ohne-lsg { display: none; }
   .e20-zelle-knobel > .knobel { flex: 1; }
 
   /* Blatt 20-3: Fest-Rätsel */
@@ -236,7 +237,7 @@
 
   <div class="e20-versteck-kasten">
     <p><b>Die Verstecke.</b> Die Code-Buchstaben sind die Geheimschrift des Verstecks mit der <b>Schlüssel-Zahl 5</b> (so steht es im Fest-Rätsel). Alle Wörter sind mit derselben Rechnung wie das Geheimschrift-Rad nachgeprüft. Die Zahl der Stationen ist die Zahl der Buchstaben:</p>
-    <m-e20-verstecke raetsel="e20-verstecke"></m-e20-verstecke>
+    <m-e20-verstecke raetsel="e20-verstecke" spick></m-e20-verstecke>
     <p class="klein">Andere Wörter gehen auch: Jeden Buchstaben auf dem Rad 5 Plätze weiterschieben (Schlüssel-Zahl 5), wie in Einheit 7. Nur A bis Z, ohne Umlaute.</p>
   </div>
 
@@ -251,7 +252,7 @@
   </ol>
 
   <div class="kasten tipp" data-titel="Weniger oder mehr Zeit?">
-    <p><b>Sechs Stationen</b> sind der Vorschlag für 30 Minuten. <b>Wenig Zeit?</b> Teilt das Fest: heute Station 1 bis 3, morgen 4 bis 6 und das Fest-Rätsel. Die Karten bleiben stehen. <b>Viel Schwung?</b> Nehmt 7 oder 8 Stationen (zwei Extra-Stationen dazu) und ein Versteck mit 7 oder 8 Buchstaben. Das dauert etwa 35 Minuten, die Urkunde gibt es dann beim Abendessen. <b>Zweiter Fest-Tag:</b> vier Extra-Stationen und ein Versteck mit 4 Buchstaben (Bett, Sofa, Lade, Korb). Der Fest-Pass wird neu ausgedruckt, die Urkunde gibt es nur einmal, ein Zuckerl im Versteck reicht.</p>
+    <p><b>Sechs Stationen</b> sind der Vorschlag für 30 Minuten. <b>Wenig Zeit?</b> Teilt das Fest: heute Station 1 bis 3, morgen 4 bis 6 und das Fest-Rätsel. Die Karten bleiben stehen. <b>Viel Schwung?</b> Nehmt 7 oder 8 Stationen (zwei Extra-Stationen dazu) und ein Versteck mit 7 oder 8 Buchstaben. Das dauert etwa 35 bis 40 Minuten, die Urkunde gibt es dann beim Abendessen. <b>Zweiter Fest-Tag:</b> vier Extra-Stationen und ein Versteck mit 4 Buchstaben (Bett, Sofa, Lade, Korb). Der Fest-Pass wird neu ausgedruckt, die Urkunde gibt es nur einmal, ein Zuckerl im Versteck reicht.</p>
   </div>
 
   <h3>Beispielsätze</h3>
@@ -328,7 +329,7 @@
     <tr><td><b class="e20-stname">Halbier-Suche</b> <span class="e20-einh">(Einheit 10)</span><br>Du denkst dir eine Zahl von 1 bis 32. {{KIND}} fragt nur „Ist deine Zahl größer als …?“. Schafft sie es mit höchstens 5 Fragen?</td>
       <td>Mit Fragen genau in der Mitte reichen immer <m-e20-wert raetsel="e20-x-halbier" pfad="fragen" l="5"></m-e20-wert> Fragen (32, 16, 8, 4, 2, 1). Erste Frage: größer als 16?</td>
       <td>Von 1 bis 64: <m-e20-wert raetsel="e20-x-halbier2" pfad="fragen" l="6"></m-e20-wert> Fragen. Eine Frage mehr für doppelt so viele Zahlen.</td></tr>
-    <tr><td><b class="e20-stname">Wenn-dann-Regel</b> <span class="e20-einh">(wie in Einheit 11)</span><br>Ein Programm für beide Gitter! Erst links bauen und laufen, dann den Stein umlegen wie rechts und dasselbe Programm noch einmal. Wenn-Karten aus Einheit 11.<br><m-e20-gitter raetsel="e20-x-wenn" welt="1"></m-e20-gitter> <m-e20-gitter raetsel="e20-x-wenn" welt="2"></m-e20-gitter></td>
+    <tr><td><b class="e20-stname">Wenn-dann-Regel</b> <span class="e20-einh">(wie in Einheit 11)</span><br>Ein Programm für beide Gitter! Erst links aufbauen und laufen, dann Stein und Schatz umlegen wie rechts und dasselbe Programm noch einmal. Den Wenn-dann-Kasten zeichnet ihr auf einen Zettel, wie in Einheit 11.<br><m-e20-gitter raetsel="e20-x-wenn" welt="1"></m-e20-gitter> <m-e20-gitter raetsel="e20-x-wenn" welt="2"></m-e20-gitter></td>
       <td><m-e20-prog raetsel="e20-x-wenn" gr="4.5"></m-e20-prog> (6 Karten, das einzige mit 6 Karten). Links ist vorne frei, der Drache geht noch einmal vor, rechts liegt dort ein Stein.</td>
       <td>Regel-Spiel ohne Papier: „Wenn ich klatsche, hüpfst du. Sonst stehst du still.“ Dann erfindet {{KIND}} eine Regel für dich, mit sonst.</td></tr>
     <tr><td><b class="e20-stname">Logikgitter</b> <span class="e20-einh">(Einheit 12)</span><br>Fest-Jause: Oma, Opa und du. Kuchen, Eis und Apfel, jeder mag genau eines. Hinweise: <m-e12-hinweise raetsel="e20-x-logik" gr="4.5"></m-e12-hinweise> Ein 3 · 3-Gitter auf einen Zettel zeichnen.</td>
@@ -376,7 +377,7 @@
   <div class="kasten basteln darf-brechen e20-bricht" data-titel="Stationen aufstellen und Fest-Deko">
     <ol>
       <li><b>Stationen:</b> Jede Karte unten in eine Wäschekluppe stecken, die Kluppe steht, die Karte auch. Bei dünnem Papier die Karte auf Karton (Müslischachtel) kleben. Der Code-Buchstabe steht groß auf der Rückseite.</li>
-      <li><b>Wimpel (Extra):</b> Aus Kästchenpapier Dreiecke schneiden, auf jedes ein kleines Kästchenbild malen (die Krone der Extra-Station, ein Herz, ein Stern), an einer Schnur aufhängen. Nach dem Fest kommen die Stationen-Karten mit an die Schnur, umgedreht: Dann steht dort das Code-Wort.</li>
+      <li><b>Wimpel (Extra):</b> Aus Kästchenpapier Dreiecke schneiden, auf jedes ein kleines Kästchenbild malen (die Krone der Extra-Station, ein Herz, ein Stern), an einer Schnur aufhängen. Nach dem Fest kommen die Stationen-Karten mit an die Schnur, umgedreht: Dann hängt dort das Code-Wort in Geheimschrift, und Gäste dürfen raten.</li>
       <li><b>Fest-Pass aufheben:</b> Er kommt mit Urkunde und Sammelpass in die Werkstatt-Mappe.</li>
     </ol>
   </div>
@@ -400,6 +401,7 @@
         <li>Jede Station mit der Hilfe aus ihrer Einheit: Drachen-Figur mitschieben, Finger einzeln heben und laut zählen, beim Formen-Quadrat zuerst das Feld oben in der Mitte (Kasten „Die Fest-Runde“).</li>
         <li>Beim Fest-Rätsel liest du die Hälfte der Buchstaben, {{KIND}} die andere.</li>
         <li>Das Steine-Duell spielt sie zuerst gegen Oma, dann gegen dich.</li>
+        <li>Wollen die Finger bei der 13 nicht (Ringfinger allein hoch ist schwer): Die andere Hand darf helfen, oder sie legt die 13 mit den Ja/Nein-Karten aus <a class="blattref" href="#blatt-9-1"></a>.</li>
       </ul>
     </div>
     <div class="kasten bonus" data-titel="Bonus-Knobelei">
@@ -431,7 +433,7 @@
     <ol class="e20-ganz">
       <li><b>Profi-Station zu jedem Thema:</b> An jeder Station die Profi-Variante aus der letzten Spalte der Tabellen (Fest-Runde und Extra-Stationen). Für jede gibt es die Krone im Fest-Pass. Wer alle sechs Kronen hat, ist Kronen-Code-Meisterin.</li>
       <li><b>Mehr Stationen, längeres Versteck:</b> 7 oder 8 Stationen mit den Extra-Stationen, das Versteck hat dann 7 Buchstaben (Polster, Vorhang, Sackerl) oder 8 (Stockerl, Brotkorb). Für 8 Stationen am besten eine Bewegungs-Station dazwischen (Roboter-Spiel oder Parcours).</li>
-      <li><b>Der Brief der Fee:</b> Profi-Aufgabe auf <a class="blattref" href="#blatt-20-3"></a>. Die Schlüssel-Zahl ist 1, 2, 3 oder 4: {{KIND}} probiert sie der Reihe nach aus, bis echte Wörter herauskommen. Mit 3 heißt der Brief „DU KANNST ALLES“. Die anderen Zahlen ergeben Unsinn (zum Beispiel mit 1: FW MCPPUV CNNGU).</li>
+      <li><b>Der Brief der Fee:</b> Profi-Aufgabe auf <a class="blattref" href="#blatt-20-3"></a>. Die Schlüssel-Zahl ist 1, 2, 3 oder 4: {{KIND}} probiert sie der Reihe nach aus, bis echte Wörter herauskommen. Mit 3 heißt der Brief „DU KANNST ALLES“. Die anderen Zahlen ergeben Unsinn (zum Beispiel mit 1: <m-e7-text lies="GX NDQQVW DOOHV" k="1" soll="FW MCPPUV CNNGU"></m-e7-text>).</li>
       <li><b>Eigenes Code-Wort:</b> {{KIND}} sucht sich ein Versteck für dich aus, verschlüsselt es mit einer eigenen Schlüssel-Zahl und versteckt etwas (ein Bild, ein Zuckerl). Du musst knacken. Probe: Mit Schlüssel-Zahl 5 wird aus <m-e7-text schreibe="OMA" k="5" soll="TRF"></m-e7-text>.</li>
       <li><b>Eigene Station bauen:</b> Profi-Aufgabe auf <a class="blattref" href="#blatt-20-1"></a>. Sie erfindet eine Station für dich: ein Kobold-Programm, ein Muster, ein Formen-Quadrat, ein Logikrätsel für die Familie. Wichtig ist der Prüf-Schritt: Kennt sie die Lösung? Gibt es nur eine? Geht sie selbst einmal durch, bevor du rätselst? Das ist genau das, was der Löser im Hintergrund dieses Hefts für jedes Rätsel macht.</li>
       <li><b>Station mit allem:</b> die Extra-Station „Parcours mit allem“ am Boden-Gitter. Mit nur 4 Karten braucht es einen Zauber-Kasten und darin einen Wenn-dann-Kasten: „5-mal: vor, wenn vor der Nase ein Stein ist, dann rechts drehen“. Danach baut sie selbst einen Parcours, bei dem dasselbe Programm ankommt, und du läufst ihn als Roboter.</li>
@@ -452,7 +454,7 @@
     <p><b>Paket 20 „Code-Fest“.</b> Den QR-Code findest du auf <a class="blattref" href="#blatt-20-3"></a> unten rechts. Am Fest-Tag selbst ist dafür keine Zeit, und das ist gut so: Das Fest ist zum Laufen, Tanzen und Suchen. Das Paket ist ein Nachklang für einen anderen Tag, höchstens 15 Minuten. Die Einheit ist ohne Bildschirm vollständig.</p>
     <p><b>9 Levels, jedes eine kleine Station aus einem anderen Thema,</b> langsam schwerer. Jedes Level wird mit dem Spiel seiner Einheit gespielt, genau wie in deren Paket. Ein Stern pro Level, die App prüft nur das Ergebnis (mit denselben Programmen wie dieses Heft), kein Zeitlimit, kein Fehlerton.</p>
     <table class="tab e20-tab e20-app">
-      <thead><tr><th>Level</th><th>Station</th><th>So geht es in der App</th><th>Stern</th></tr></thead>
+      <thead><tr><th>Nr.</th><th>Station</th><th>So geht es in der App</th><th>Stern</th></tr></thead>
     <tbody>
       <tr><td>1</td><td>Muster-Tanz (wie Station 1)</td><td>Der Platz mit dem goldenen Rand ist dran. {{KIND}} tippt in der Auswahl die passende Bewegung an (Hand, Fuß, Finger), dann „Los“.</td><td>wenn beide Plätze stimmen</td></tr>
       <tr><td>2</td><td>Lampen-Code (Einheit 9): die 20 mit Lampen</td><td>Lampen antippen schaltet sie an und aus, dann „Los“. Die App zählt langsam zusammen: 16 + 4 = 20.</td><td>wenn 20 leuchtet</td></tr>
@@ -525,7 +527,7 @@
     <div class="e20-karte breit">
       <div class="e20-kkopf"><span class="e20-knr">1</span><m-e6-el name="klatschen" gr="8"></m-e6-el><span class="e20-kname">Muster-Tanz</span></div>
       <p class="e20-kaufg">Mach das Muster mit! Wie geht es weiter? Mal die nächsten 2.</p>
-      <m-e6-reihe raetsel="e20-muster" gr="11"></m-e6-reihe>
+      <m-e6-reihe raetsel="e20-muster" gr="10"></m-e6-reihe>
     </div>
     <div class="e20-karte">
       <div class="e20-kkopf"><span class="e20-knr">2</span><m-symbol name="drache" gr="8"></m-symbol><span class="e20-kname">Drachen-Station</span></div>
@@ -534,7 +536,7 @@
     </div>
     <div class="e20-karte r">
       <div class="e20-kkopf"><span class="e20-knr">3</span><m-symbol name="kobold" gr="8"></m-symbol><span class="e20-kname">Kobold-Station</span></div>
-      <p class="e20-kaufg">Ein Befehl ist falsch. Kreis ihn ein!</p>
+      <p class="e20-kaufg e20-ohne-lsg">Ein Befehl ist falsch. Kreis ihn ein!</p>
       <div class="e20-kmitte"><m-gitter raetsel="e20-kobold" feld="20"></m-gitter><m-programm raetsel="e20-kobold" gr="10"></m-programm></div>
     </div>
     <div class="e20-karte">
@@ -544,18 +546,18 @@
     </div>
     <div class="e20-karte r">
       <div class="e20-kkopf"><span class="e20-knr">5</span><m-e14-form name="stern" gr="7"></m-e14-form><span class="e20-kname">Formen-Station</span></div>
-      <p class="e20-kaufg">Mal die Formen, die fehlen.</p>
+      <p class="e20-kaufg">Mal die fehlenden Formen!<br>Jede Form einmal<br>pro Reihe und Spalte.</p>
       <div class="e20-kmitte"><m-e14-quadrat raetsel="e20-formen" feld="20"></m-e14-quadrat></div>
     </div>
     <div class="e20-karte u">
       <div class="e20-kkopf"><span class="e20-knr">6</span><m-symbol name="edelstein" gr="8"></m-symbol><span class="e20-kname">Steine-Duell</span></div>
       <m-e15-steine n="8" gr="7.5" pro="8"></m-e15-steine>
-      <p class="e20-kaufg">Nimm 1 oder 2. Wer den letzten nimmt, gewinnt. Du fängst an!</p>
-      <p class="lsg-nur e20-lsg-klein">Erst 2 nehmen: 6 bleiben.</p>
+      <p class="e20-kaufg e20-ohne-lsg">Nimm 1 oder 2. Wer den letzten nimmt, gewinnt. Du fängst an!</p>
+      <p class="lsg-nur e20-lsg-klein">Erst 2 nehmen, dann 6 und 3 liegen lassen.</p>
     </div>
     <div class="e20-zelle-knobel u r">
       <div class="knobel" data-titel="Knobel-Ecke">
-        <p>{{KIND}}, Steine-Duell mit 9 Steinen: Willst du anfangen?</p>
+        <p>{{KIND}}, Steine-Duell mit 9 Steinen. Willst du anfangen?</p>
         <m-e15-antwort raetsel="e20-steine9" was="anfangen"></m-e15-antwort>
       </div>
     </div>
