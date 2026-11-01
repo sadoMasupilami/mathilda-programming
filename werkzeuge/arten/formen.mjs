@@ -61,6 +61,8 @@ function pruefeLoesen(r, F) {
     else if (!weg.fertig) F('Ohne Raten nicht lösbar (auch nicht mit Stufe 3). "logik" weglassen oder mehr Formen vorgeben');
     else if (weg.stufe > r.logik) F('Braucht Stufe ' + weg.stufe + ' (erlaubt: ' + r.logik + ')');
   }
+  // Die App bewertet mit FQ.bewerte: Die Lösung muss dort als geschafft gelten
+  if (!FQ.bewerte(r, l.loesungen[0]).geschafft) F('web/kern/formen.js (bewerte) erkennt die Lösung nicht als geschafft');
   const aus = {
     n: q.n, formen: q.formen, farben: q.farben, diagonale: q.diagonale,
     vorgaben: q.n * q.n - p.leer.length, leer: p.leer.length,
@@ -110,6 +112,9 @@ function pruefeKobold(r, F) {
   }
   if (reparaturen.length !== 1) return F('Genau ein falsches Feld soll es geben: ' + reparaturen.length + ' Ein-Feld-Reparaturen möglich (' + reparaturen.map((a) => a.x + ',' + a.y + '=' + FQ.INFO[a.f].kurz).join(' ') + ')');
   const rep = reparaturen[0];
+  // Die App bewertet mit FQ.bewerte: Die Reparatur gilt, das unveränderte Quadrat nicht
+  if (!FQ.bewerte(r, FQ.lies({ n: q.n, formen: q.formen, vorgabe: rep.quadrat }).zellen).geschafft) F('web/kern/formen.js (bewerte) erkennt die Reparatur nicht als geschafft');
+  if (FQ.bewerte(r, q.zellen).geschafft) F('web/kern/formen.js (bewerte) hält das Kobold-Quadrat schon für geschafft');
   if (!Array.isArray(r.kobold) || r.kobold[0] !== rep.x || r.kobold[1] !== rep.y) F('Das falsche Feld ist [' + rep.x + ', ' + rep.y + '], nicht ' + JSON.stringify(r.kobold));
   const richtig = FQ.BUCHSTABE[r.richtig] || r.richtig;
   if (r.richtig !== undefined && richtig !== rep.f) F('Richtig wäre ' + FQ.INFO[rep.f].name + ', nicht ' + r.richtig);

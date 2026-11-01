@@ -10,8 +10,8 @@
      <m-e14-quadrat leer n="4" [feld="20"] [beispiel="e14-e4"] [schraege]>
          leeres Quadrat zum Selbermachen; beispiel: in der Lösungsansicht die Vorgabe
          dieses Rätsels rot eingetragen („so könnte es gehen“)
-     <m-e14-form name="kreis" [gr="6"] [farbe="blau"]>
-         eine Form (für Text, Formen-Leiste und Anleitung)
+     <m-e14-form name="kreis" [gr="6"] [farbe="blau"] [leer]>
+         eine Form (für Text, Formen-Leiste und Anleitung); leer: weiß, nur Umriss
      <m-e14-linie art="reihe|spalte" formen="K D Q" [feld="14"]>
          ein Streifen (Reihe waagrecht, Spalte senkrecht) zum Zeigen der Regel
      <m-e14-antwort raetsel="e14-k1" [gr="20"]>
@@ -122,7 +122,8 @@ m-e14-quadrat svg, m-e14-linie svg, m-e14-antwort svg, m-e14-form svg { display:
     const farbe = el.getAttribute('farbe');
     if (!FQ().INFO[name]) return H().fehler(el, 'Unbekannte Form „' + name + '“ (kreis, dreieck, quadrat, stern)');
     if (farbe && !FQ().FARBEN[farbe]) return H().fehler(el, 'Unbekannte Farbe „' + farbe + '“ (rot, blau, gelb, gruen)');
-    el.innerHTML = FQ().form(name, gr + 'mm', farbe ? { farbe: FQ().FARBEN[farbe].wert } : undefined);
+    const opt = el.hasAttribute('leer') ? { farbe: '#ffffff' } : farbe ? { farbe: FQ().FARBEN[farbe].wert } : undefined;
+    el.innerHTML = FQ().form(name, gr + 'mm', opt);
     el.classList.add('komp');
   };
 

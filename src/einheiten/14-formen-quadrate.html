@@ -18,7 +18,7 @@
   .e14-bsp { display: flex; flex-wrap: wrap; align-items: center; gap: 3mm 7mm; margin: 2mm 0 2.5mm 0; break-inside: avoid; }
   .e14-bsp figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 1.2mm; }
   .e14-bsp figcaption { font-size: 8.5pt; color: var(--grau); font-weight: 700; text-align: center; line-height: 1.2; }
-  .e14-level { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm 4mm; align-items: end; margin: 2mm 0 1mm 0; }
+  .e14-level { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm 4mm; align-items: end; margin: 2mm 0 2.5mm 0; break-inside: avoid; }
   .e14-level figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 1.2mm; break-inside: avoid; }
   .e14-level figcaption { font-size: 8.5pt; line-height: 1.2; text-align: center; }
   .e14-karten-tab { border-collapse: collapse; margin: 1.5mm 0 2mm 0; font-size: 9.5pt; }
@@ -45,6 +45,9 @@
   .e14-fuss > .profi { flex: 1; }
   .e14-tipp { margin: 2.5mm 0 0 0; text-align: center; }
   .e14-tipp-links { margin: 4mm 0 0 0; color: var(--grau); }
+  .e14-schluessel { display: flex; justify-content: center; align-items: center; gap: 2.5mm; margin: 3mm 0 0 0; }
+  .e14-luecke { width: 6mm; }
+  .e14-klecks { display: inline-block; width: 6.5mm; height: 6.5mm; border-radius: 50% 40% 55% 45%; border: 0.5mm solid var(--tinte); }
 
   /* Lösungen */
   .e14-loes { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm 4mm; align-items: start; margin: 2mm 0 4mm 0; }
@@ -93,7 +96,7 @@
         <p class="du">„Eine Reihe geht von links nach rechts, wie beim Lesen. Eine Spalte geht von oben nach unten, wie ein Spalt im Felsen.“</p>
       </div>
         </div></li>
-    <li data-min="5"><div><b>Das Karten-Quadrat.</b> Leg die 9 Karten wie in der Tabelle ins Gitter (oben = beim Polster). Sie hüpft jede Reihe als Krebs und sagt die Formen, dann jede Spalte als Känguru. Dann nimmst du 3 Karten weg, sie legt sie zurück, dann 5. Zum Schluss der Kobold: Sie dreht sich um, du tauschst das Karo in der Mitte gegen die vierte Herz-Karte.
+    <li data-min="5"><div><b>Das Karten-Quadrat.</b> Leg die 9 Karten wie in der Tabelle ins Gitter (oben = beim Polster), jede in die obere Ecke des Felds: nicht drauf hüpfen, rutschig! Sie hüpft jede Reihe als Krebs und sagt die Formen, dann jede Spalte als Känguru. Dann nimmst du 3 Karten weg, sie legt sie zurück, dann 5. Zum Schluss der Kobold: Sie dreht sich um, du tauschst das Karo in der Mitte gegen die vierte Herz-Karte.
           <table class="e14-karten-tab"><tr><td>Herz</td><td>Pik</td><td>Karo</td></tr><tr><td>Pik</td><td class="e14-kobold">Karo</td><td>Herz</td></tr><tr><td>Karo</td><td>Herz</td><td>Pik</td></tr></table>
           <div class="sag">
         <p class="du">„Was fällt dir auf, wenn du die Reihen hüpfst?“</p>
@@ -166,7 +169,7 @@
 <section class="anleitung" data-einheit="14" data-titel="Formen-Quadrate">
 
   <div class="kasten ziel">
-    <p class="e14-inline">{{KIND}} lernt das <span class="begriff">Formen-Quadrat</span> kennen: ein Quadrat aus 3 · 3 oder 4 · 4 Feldern, in dem jede Form genau einmal in jeder <span class="begriff">Reihe</span> und genau einmal in jeder <span class="begriff">Spalte</span> vorkommt. Zuerst mit drei Formen (<span class="e14-nw"><m-e14-form name="kreis" gr="4.5"></m-e14-form> Kreis</span>, <span class="e14-nw"><m-e14-form name="dreieck" gr="4.5"></m-e14-form> Dreieck</span>, <span class="e14-nw"><m-e14-form name="quadrat" gr="4.5"></m-e14-form> Quadrat</span>), dann kommt der <span class="e14-nw"><m-e14-form name="stern" gr="4.5"></m-e14-form> Stern</span> dazu. Hier wird nichts gerechnet. Es geht nur ums Denken: „Welche Formen sind in dieser Reihe schon da, welche in dieser Spalte, und was bleibt übrig?“</p>
+    <p class="e14-inline">{{KIND}} lernt das <span class="begriff">Formen-Quadrat</span> kennen: ein Quadrat aus 3 · 3 oder 4 · 4 Feldern, in dem jede Form genau einmal in jeder <span class="begriff">Reihe</span> und genau einmal in jeder <span class="begriff">Spalte</span> vorkommt. Zuerst mit drei Formen <span class="e14-nw">(<m-e14-form name="kreis" gr="4.5"></m-e14-form> Kreis</span>, <span class="e14-nw"><m-e14-form name="dreieck" gr="4.5"></m-e14-form> Dreieck</span>, <span class="e14-nw"><m-e14-form name="quadrat" gr="4.5"></m-e14-form> Quadrat</span>), dann kommt der <span class="e14-nw"><m-e14-form name="stern" gr="4.5"></m-e14-form> Stern</span> dazu. Hier wird nichts gerechnet. Es geht nur ums Denken: „Welche Formen sind in dieser Reihe schon da, welche in dieser Spalte, und was bleibt übrig?“</p>
     <p>Das ist echte Logik, wie bei den Logikrätseln aus Einheit 12: Aus zwei kleinen Regeln folgt Schritt für Schritt das ganze Quadrat. Dazu kommen ein Hüpf-Spiel für Reihe und Spalte, ein Karten-Quadrat am Boden, das Formen-Duell (ein eigenes Lege-Spiel zu zweit) und der Fehler-Kobold, der eine einzige Form vertauscht. Im Schwerer-Teil gibt es eine dritte Regel (die Schrägen), Farben <b>und</b> Formen, einen Gewinn-Plan für das Duell und die Frage, mit wie wenigen Formen ein Rätsel noch genau eine Lösung hat. Das ist die letzte Einheit von Block C.</p>
   </div>
 
@@ -179,7 +182,7 @@
     <ul>
       <li><b>Die Regel:</b> In jeder Reihe ist jede Form genau einmal. In jeder Spalte auch. Bei 3 · 3 Feldern gibt es 3 Formen, bei 4 · 4 Feldern 4 Formen. Darum ist am Ende jede Reihe und jede Spalte voll, und keine Form fehlt.</li>
       <li><b>Reihe und Spalte:</b> Eine Reihe geht waagrecht von links nach rechts, wie eine Zeile beim Lesen. Eine Spalte geht senkrecht von oben nach unten, wie ein Spalt im Felsen. Am Boden-Gitter liegt ein Polster an der oberen Kante (wie in Einheit 2): Dort ist „oben“.</li>
-      <li><b>Mit Spielkarten:</b> Herz, Pik, Karo und Kreuz sind die vier Formen. Die Zahl oder das Bild auf der Karte ist egal, es zählt nur die Form. Auf den Blättern und in der App sind es Kreis, Dreieck, Quadrat und Stern. Die Regel ist immer dieselbe.</li>
+      <li><b>Mit Spielkarten:</b> Herz, Pik, Karo und Kreuz sind die vier Formen. Die Zahl oder das Bild auf der Karte ist egal, es zählt nur die Form. Mit Muggelsteinen in 3 oder 4 Farben geht es auch, dann ist die Farbe die „Form“. Auf den Blättern und in der App sind es Kreis, Dreieck, Quadrat und Stern. Die Regel ist immer dieselbe.</li>
       <li><b>Das Wichtigste beim Lösen:</b> Für ein leeres Feld schaut man in seine Reihe <b>und</b> in seine Spalte. Was dort schon liegt, darf nicht mehr hinein. Bleibt nur eine Form übrig, ist das Feld sicher. Raten ist nie nötig: Jedes Rätsel auf den Blättern hat genau eine Lösung, und man findet sie ohne Ausprobieren (vom Löser geprüft).</li>
     </ul>
   </div>
@@ -188,7 +191,7 @@
     <p><b>Vorher, ohne {{KIND}} (etwa 15 Minuten):</b></p>
     <ul>
       <li><b>Drucken (2 Minuten):</b> <a class="blattref" href="#blatt-14-1"></a> und <a class="blattref" href="#blatt-14-2"></a> (Arbeitsblätter) <b>in Farbe</b>. <a class="blattref" href="#blatt-14-3"></a> (Formen-Profi) gehört zum Schwerer-Teil. Druck es gleich mit, wenn {{KIND}} schnell ist.</li>
-      <li><b>Spielkarten (3 Minuten):</b> ein ganz normales Kartenspiel (Rommé, Bridge oder Schnapsen). Such <b>4 Herz, 3 Pik und 3 Karo</b> heraus, welche Zahlen oder Bilder, ist egal. Eine der Herz-Karten ist die Kobold-Karte für Schritt 2, leg sie extra. Für das große Duell auf 4 · 4 im Schwerer-Teil kommen noch 1 Pik, 1 Karo und 4 Kreuz dazu (dann 4 von jeder Form). Mit einem Schnapskarten-Blatt geht es genauso: Herz, Schellen, Eichel und Laub sind die vier Formen.</li>
+      <li><b>Spielkarten (3 Minuten):</b> ein ganz normales Kartenspiel (Rommé, Bridge oder Schnapsen). Such <b>4 Herz, 3 Pik und 3 Karo</b> heraus, welche Zahlen oder Bilder, ist egal. Eine der Herz-Karten ist die Kobold-Karte für Schritt 2, leg sie extra. Für das große Duell auf 4 · 4 im Schwerer-Teil kommen noch 1 Pik, 1 Karo und 4 Kreuz dazu (dann 4 von jeder Form). Mit einem Schnapskarten-Blatt geht es genauso: Herz, Schellen, Eichel und Laub sind die vier Formen. Kein Kartenspiel da? Dann nehmt Muggelsteine in 3 Farben, von jeder Farbe 3 (und einen Extra-Stein für den Kobold).</li>
       <li><b>Boden-Gitter (8 Minuten):</b> Klebt das Malerkrepp-Gitter aus Einheit 2 noch, umso besser. Sonst klebst du ein neues 3 · 3-Gitter mit Feldern von 40 bis 50 cm in den Gang oder ins Wohnzimmer (4 lange Streifen nebeneinander, 4 quer darüber). Leg einen Polster an die obere Kante, er zeigt, wo „oben“ ist, wie auf dem Blatt. <b>Wenig Platz?</b> 9 Zeitungsblätter in 3 Reihen auflegen, oder ihr spielt am Tisch und legt die Karten in 3 Reihen mit einer Handbreit Abstand.</li>
       <li><b>Das Karten-Quadrat für Schritt 2 (2 Minuten):</b> einmal die Tabelle unter dem Ablauf anschauen. Du legst es gleich vor ihren Augen hin.</li>
     </ul>
@@ -199,8 +202,8 @@
   <h2>Ablauf Schritt für Schritt</h2>
   <ol class="ablauf e14-ablauf">
     <li data-min="3"><span class="schritt-titel">Reihe, Spalte, hüpf!</span>Am Boden-Gitter, der Polster liegt oben. Zeig zuerst mit dem Arm eine Reihe (quer vor ihr, von links nach rechts) und eine Spalte (vom Polster zu ihr her). Dann das Hüpf-Spiel aus dem Kasten „Bewegung“: Du rufst „Reihe!“ oder „Spalte!“ und welche, sie hüpft. Reihen hüpft sie seitwärts wie ein Krebs, Spalten nach vorne wie ein Känguru. Nach ein paar Runden ruft sie, und du hüpfst.</li>
-    <li data-min="5"><span class="schritt-titel">Das Karten-Quadrat</span>Leg die 9 Karten wie in der Tabelle unten ins Gitter. Sie hüpft jede Reihe als Krebs und sagt laut die Formen („Herz, Pik, Karo“), dann jede Spalte als Känguru. Was fällt ihr auf? (In jeder Reihe und jeder Spalte ist jede Form genau einmal.) Sag ihr das neue Wort: Formen-Quadrat. Dann nimmst du 3 Karten weg (aus jeder Reihe eine), sie legt sie zurück. Dann 5 Karten weg, das ist schon schwerer. Zum Schluss kommt der Kobold: Sie dreht sich um, du tauschst die Karo-Karte in der Mitte gegen die vierte Herz-Karte. Jetzt sucht sie: Welche Reihe hat zwei Herz? Welche Spalte? Wo sich beide kreuzen, sitzt der Kobold. Sie nimmt die falsche Karte heraus und legt die richtige hin.</li>
-    <li data-min="7"><span class="schritt-titel">Blatt „Formen-Quadrate“</span><a class="blattref" href="#blatt-14-1"></a>. Oben steht die Regel mit einer Reihe und einer Spalte. Sie zeichnet die fehlenden Formen mit dem Bleistift ein, schön muss es nicht sein. Bei Aufgabe 1 fehlt in jeder Reihe nur eine Form. Bei Aufgabe 2 gibt es ein Feld, bei dem erst Reihe und Spalte zusammen verraten, was hineinkommt (Beispielsätze). Aufgabe 3 ist das erste 4 · 4 mit dem Stern, wieder fehlt fast immer nur eine. Die Profi-Aufgabe (nur 2 Formen!) ist freiwillig und richtig knifflig.</li>
+    <li data-min="5"><span class="schritt-titel">Das Karten-Quadrat</span>Leg die 9 Karten wie in der Tabelle unten ins Gitter, jede in die obere Ecke ihres Felds: So bleibt Platz zum Landen, und niemand rutscht auf einer Karte aus. Sie hüpft jede Reihe als Krebs und sagt laut die Formen („Herz, Pik, Karo“), dann jede Spalte als Känguru. Was fällt ihr auf? (In jeder Reihe und jeder Spalte ist jede Form genau einmal.) Sag ihr das neue Wort: Formen-Quadrat. Dann nimmst du 3 Karten weg (aus jeder Reihe eine), sie legt sie zurück. Dann 5 Karten weg, das ist schon schwerer. Zum Schluss kommt der Kobold: Sie dreht sich um, du tauschst die Karo-Karte in der Mitte gegen die vierte Herz-Karte. Jetzt sucht sie: Welche Reihe hat zwei Herz? Welche Spalte? Wo sich beide kreuzen, sitzt der Kobold. Sie nimmt die falsche Karte heraus und legt die richtige hin.</li>
+    <li data-min="7"><span class="schritt-titel">Blatt „Formen-Quadrate“</span><a class="blattref" href="#blatt-14-1"></a>. Oben steht die Regel mit einer Reihe und einer Spalte. Sie zeichnet die fehlenden Formen mit dem Bleistift ein, schön muss es nicht sein. Bei Aufgabe 1 fehlt in jeder Reihe nur eine Form. Bei Aufgabe 2 gibt es ein Feld, bei dem erst Reihe und Spalte zusammen verraten, was hineinkommt (Beispielsätze). Aufgabe 3 ist das erste 4 · 4 mit dem Stern. Auch hier findet sie immer eine Reihe oder Spalte, in der nur eine Form fehlt. Die Profi-Aufgabe (nur 2 Formen!) ist freiwillig und richtig knifflig.</li>
     <li data-min="6"><span class="schritt-titel">Formen-Duell</span>Das Spiel aus dem Kasten „Spiel: Formen-Duell“ mit den 9 Karten im Boden-Gitter (oder am Tisch). Wer eine Karte legt, steigt in das Feld und sagt laut, warum sie passt: „Herz, weil in der Reihe und in der Spalte noch kein Herz ist.“ Ihr spielt 3 Spiele und beginnt abwechselnd.</li>
     <li data-min="5"><span class="schritt-titel">Blatt „Der Kobold im Quadrat“</span><a class="blattref" href="#blatt-14-2"></a>. Aufgabe 1 ist ein 4 · 4 mit 7 Formen. Bei Aufgabe 2 war der Kobold da: Sie sucht zuerst die Reihe, in der eine Form doppelt ist, dann die Spalte. Wo sich beide kreuzen, kreist sie rot ein und zeichnet die richtige Form ins Kästchen. Die Profi-Aufgabe (selbst ein Rätsel erfinden) ist freiwillig. Passt das Blatt heute nicht mehr hinein, kommt es beim nächsten Mal dran.</li>
     <li data-min="2"><span class="schritt-titel">Sammelpass</span>Feld „Einheit&nbsp;14“ stempeln oder bekleben, Sterne anmalen. Frag: „Was war schwerer: die Formen finden oder den Kobold?“ Damit ist Block C (Wenn-dann und Logik) geschafft.</li>
@@ -282,7 +285,7 @@
       <li>9 Blätter Papier (Rückseiten von alten Ausdrucken gehen gut) oder Karton aus einer Müslischachtel.</li>
       <li>{{KIND}} malt mit dickem Filzstift auf jedes Blatt eine große Form, so groß wie das Blatt: 3 Kreise, 3 Dreiecke, 3 Quadrate. Für 4 · 4 je 4 davon und 4 Sterne (zwei Dreiecke übereinander sind ein einfacher Stern).</li>
       <li>Wer mag, malt die Formen in ihren Farben aus: Kreis rot, Dreieck blau, Quadrat grün, Stern gelb, wie auf den Blättern.</li>
-      <li>Jetzt liegen am Boden-Gitter dieselben Formen wie auf dem Blatt. Alle Spiele gehen damit genauso wie mit Spielkarten.</li>
+      <li>Jetzt liegen am Boden-Gitter dieselben Formen wie auf dem Blatt. Klebt jedes Blatt mit zwei Stück Malerkrepp fest, sonst rutscht man beim Hüpfen darauf aus. Alle Spiele gehen damit genauso wie mit Spielkarten.</li>
     </ol>
   </div>
 
@@ -348,8 +351,8 @@
   <h2>Bildschirm-Bonus</h2>
   <div class="kasten bildschirm darf-brechen e14-bricht">
     <p><b>Paket 14 „Formen-Quadrate“.</b> Den QR-Code findest du auf <a class="blattref" href="#blatt-14-2"></a> unten rechts. Nur am Schluss, nach den Blättern, höchstens 15 Minuten. Die Einheit funktioniert auch ganz ohne Bildschirm.</p>
-    <p><b>8 Levels:</b> Formen-Quadrate mit denselben Formen wie am Papier. Level 1 bis 3 sind 3 · 3 mit Kreis, Dreieck und Quadrat, ab Level 4 kommt der Stern dazu (4 · 4). Von Level zu Level sind weniger Formen vorgegeben, Level 8 hat nur noch 5. Level 6 ist ein Kobold-Quadrat: Alle Felder sind voll, eine Form ist falsch. <b>Level 1 und 2 sind Aufgabe 1 und 2 von <a class="blattref" href="#blatt-14-1"></a>, Level 3 ist die Profi-Aufgabe dieses Blatts, Level 4 ist Aufgabe 3, und Level 6 ist der Kobold von <a class="blattref" href="#blatt-14-2"></a>.</b> Am besten spielt {{KIND}} sie nach dem Blatt.</p>
-    <p><b>So geht es in der App:</b> Ein leeres Feld antippen, dann erscheinen die Formen zur Auswahl. Eine Form antippen, schon steht sie im Feld. Nochmal auf das Feld tippen, um sie zu ändern. Die vorgegebenen Formen bleiben fest, nur beim Kobold-Level lässt sich jedes Feld ändern. Kein Ziehen nötig. Mit „Los“ prüft die App das Quadrat: Stimmt alles, gibt es einen Stern. Wenn nicht, zeigt sie freundlich, wo es noch hakt, zum Beispiel „In dieser Reihe ist der Kreis zweimal.“ (die zwei Felder leuchten auf), oder welche Felder noch leer sind. Bewertet wird nur das Ergebnis: Jedes richtige Formen-Quadrat, das zur Vorgabe passt, bekommt den Stern.</p>
+    <p><b>8 Levels:</b> Formen-Quadrate mit denselben Formen wie am Papier. Level 1 bis 3 sind 3 · 3 mit Kreis, Dreieck und Quadrat, ab Level 4 kommt der Stern dazu (4 · 4). Bei beiden Größen werden die vorgegebenen Formen immer weniger: Level 3 hat nur noch 2, Level 8 nur noch 5. Level 6 ist ein Kobold-Quadrat: Alle Felder sind voll, eine Form ist falsch. <b>Level 1 und 2 sind Aufgabe 1 und 2 von <a class="blattref" href="#blatt-14-1"></a>, Level 3 ist die Profi-Aufgabe dieses Blatts, Level 4 ist Aufgabe 3, und Level 6 ist der Kobold von <a class="blattref" href="#blatt-14-2"></a>.</b> Am besten spielt {{KIND}} sie nach dem Blatt.</p>
+    <p><b>So geht es in der App:</b> Ein leeres Feld antippen, dann erscheinen die Formen zur Auswahl. Eine Form antippen, schon steht sie im Feld. Nochmal auf das Feld tippen, um sie zu ändern. Die vorgegebenen Formen bleiben fest. Nur beim Kobold-Level lässt sich jedes Feld antippen, aber wie am Papier darf nur eine Form anders werden. Kein Ziehen nötig. Mit „Los“ prüft die App das Quadrat: Stimmt alles, gibt es einen Stern. Wenn nicht, zeigt sie freundlich, wo es noch hakt, zum Beispiel „In dieser Reihe ist der Kreis zweimal.“ (die zwei Felder leuchten auf), oder welche Felder noch leer sind. Bewertet wird nur das Ergebnis, mit denselben Regeln wie im Löser: Jedes richtige Formen-Quadrat, das zur Vorgabe passt, bekommt den Stern.</p>
     <p><b>Wann weglegen:</b> Nach Level 8 kommt „Super! Jetzt zurück zum Papier.“ Dann ist Schluss, auch wenn noch Zeit wäre. Wer noch Lust auf Quadrate hat: lieber ein Formen-Duell als ein weiteres Level.</p>
   </div>
 
@@ -364,7 +367,7 @@
     </div>
   </div>
   <div class="kasten loesung darf-brechen e14-bricht e14-inline">
-    <p><b><a class="blattref" href="#blatt-14-2"></a>, Aufgabe 1:</b> Zuerst die Spalten: In der zweiten Spalte von links fehlt nur der Kreis, in der dritten nur der Stern. Dann fehlt oben nur noch das Quadrat. Zweimal braucht es „Reihe und Spalte zusammen“, ganz ohne Raten.</p>
+    <p><b><a class="blattref" href="#blatt-14-2"></a>, Aufgabe 1:</b> Zuerst die Spalten: In der zweiten Spalte von links fehlt nur der Kreis, in der dritten nur der Stern. Dann fehlt oben nur noch das Quadrat. Zwischendurch braucht es zweimal „Reihe und Spalte zusammen“, aber nie Raten.</p>
     <p><b>Aufgabe 2 (Kobold):</b> In der zweiten Reihe von oben ist der Kreis zweimal, in der dritten Spalte von links auch. Wo sie sich kreuzen, hat der Kobold einen <span class="e14-nw"><m-e14-form name="stern" gr="4.5"></m-e14-form> Stern</span> gegen einen <span class="e14-nw"><m-e14-form name="kreis" gr="4.5"></m-e14-form> Kreis</span> getauscht. Richtig ist der Stern. Nur dieses eine Feld lässt sich so ändern, dass alles stimmt (vom Löser geprüft).</p>
     <p><b>Profi (Rätsel erfinden):</b> Mehrere Lösungen möglich. Bei 3 · 3 reichen 2 Formen genau dann, wenn sie verschieden sind und nicht in derselben Reihe oder Spalte liegen, z. B. ein Kreis links oben und ein Dreieck rechts in der Mitte (in der Lösungsansicht rot). Zwei gleiche Formen oder zwei Formen in einer Reihe oder Spalte haben immer mehrere Lösungen. Eine einzige Form reicht nie.</p>
     <p><b><a class="blattref" href="#blatt-14-3"></a>, Aufgabe 1 (Schrägen):</b> Genau eine Lösung, ohne die Schrägen-Regel wären es 6. Anfangen kann man oben: Im dritten Feld der oberen Reihe lässt die Reihe Dreieck oder Stern, die Spalte hat schon ein Dreieck, also Stern. Dann das zweite blaue Feld: Die Spalte hat den Kreis, die blaue Schräge Quadrat und Dreieck, also wieder Stern.</p>
@@ -379,14 +382,16 @@
     </div>
     <p><b>Bildschirm-Levels (zum Nachschauen):</b> Jedes Level hat genau eine Lösung und geht ohne Raten (vom Löser geprüft). Rot ist, was {{KIND}} einträgt, beim Kobold der rote Kreis.</p>
     <div class="e14-level">
-      <figure><m-e14-quadrat raetsel="e14-a1" mit-loesung feld="7"></m-e14-quadrat><figcaption>Level 1: <a class="blattref" href="#blatt-14-1"></a>, Aufgabe 1</figcaption></figure>
-      <figure><m-e14-quadrat raetsel="e14-a2" mit-loesung feld="7"></m-e14-quadrat><figcaption>Level 2: <a class="blattref" href="#blatt-14-1"></a>, Aufgabe 2</figcaption></figure>
-      <figure><m-e14-quadrat raetsel="e14-p1" mit-loesung feld="7"></m-e14-quadrat><figcaption>Level 3: <a class="blattref" href="#blatt-14-1"></a>, Profi</figcaption></figure>
-      <figure><m-e14-quadrat raetsel="e14-a3" mit-loesung feld="7"></m-e14-quadrat><figcaption>Level 4: <a class="blattref" href="#blatt-14-1"></a>, Aufgabe 3</figcaption></figure>
-      <figure><m-e14-quadrat raetsel="e14-w1" mit-loesung feld="7"></m-e14-quadrat><figcaption>Level 5: 7 Formen</figcaption></figure>
-      <figure><m-e14-quadrat raetsel="e14-k1" mit-loesung feld="7"></m-e14-quadrat><figcaption>Level 6: Kobold von <a class="blattref" href="#blatt-14-2"></a>, richtig ist der Stern</figcaption></figure>
-      <figure><m-e14-quadrat raetsel="e14-w2" mit-loesung feld="7"></m-e14-quadrat><figcaption>Level 7: 6 Formen</figcaption></figure>
-      <figure><m-e14-quadrat raetsel="e14-w3" mit-loesung feld="7"></m-e14-quadrat><figcaption>Level 8: nur 5 Formen</figcaption></figure>
+      <figure><m-e14-quadrat raetsel="e14-a1" mit-loesung feld="6"></m-e14-quadrat><figcaption>Level 1: <a class="blattref" href="#blatt-14-1"></a>, Aufgabe 1</figcaption></figure>
+      <figure><m-e14-quadrat raetsel="e14-a2" mit-loesung feld="6"></m-e14-quadrat><figcaption>Level 2: <a class="blattref" href="#blatt-14-1"></a>, Aufgabe 2</figcaption></figure>
+      <figure><m-e14-quadrat raetsel="e14-p1" mit-loesung feld="6"></m-e14-quadrat><figcaption>Level 3: <a class="blattref" href="#blatt-14-1"></a>, Profi</figcaption></figure>
+      <figure><m-e14-quadrat raetsel="e14-a3" mit-loesung feld="6"></m-e14-quadrat><figcaption>Level 4: <a class="blattref" href="#blatt-14-1"></a>, Aufgabe 3</figcaption></figure>
+    </div>
+    <div class="e14-level">
+      <figure><m-e14-quadrat raetsel="e14-w1" mit-loesung feld="6"></m-e14-quadrat><figcaption>Level 5: 7 Formen</figcaption></figure>
+      <figure><m-e14-quadrat raetsel="e14-k1" mit-loesung feld="6"></m-e14-quadrat><figcaption>Level 6: Kobold von <a class="blattref" href="#blatt-14-2"></a>, richtig ist der Stern</figcaption></figure>
+      <figure><m-e14-quadrat raetsel="e14-w2" mit-loesung feld="6"></m-e14-quadrat><figcaption>Level 7: 6 Formen</figcaption></figure>
+      <figure><m-e14-quadrat raetsel="e14-w3" mit-loesung feld="6"></m-e14-quadrat><figcaption>Level 8: nur 5 Formen</figcaption></figure>
     </div>
   </div>
 </section>
@@ -465,6 +470,7 @@
       <p class="anw">Jedes Feld hat eine Form und eine Farbe. Jede Form und jede Farbe einmal in jeder Reihe und Spalte.</p>
       <div class="e14-mitte"><m-e14-quadrat raetsel="e14-c2" feld="25"></m-e14-quadrat></div>
       <p class="e14-tipp">Tipp: Zuerst alle Formen, dann alle Farben.</p>
+      <p class="e14-schluessel"><m-e14-form name="kreis" gr="7" leer></m-e14-form><m-e14-form name="dreieck" gr="7" leer></m-e14-form><m-e14-form name="quadrat" gr="7" leer></m-e14-form><span class="e14-luecke"></span><span class="e14-klecks" style="background:#e0453a"></span><span class="e14-klecks" style="background:#3a7be0"></span><span class="e14-klecks" style="background:#f5c518"></span></p>
     </div>
   </div>
 

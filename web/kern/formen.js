@@ -193,6 +193,44 @@
   }
 
   // ---------------------------------------------------------------------
+  // Bewerten (App und Tests): Ist das Level geschafft? Nur nach dem Ergebnis.
+  //   level: Rätsel-Daten (n, vorgabe, aufgabe, diagonale, farben), zellen: aktueller Stand
+  //   aufgabe "loesen": die vorgegebenen Formen sind unverändert, und das Quadrat ist richtig und voll
+  //   aufgabe "kobold": das Quadrat ist richtig, und höchstens ein Feld ist anders als vorher
+  //   (der Löser hat bewiesen: dann ist es genau das Kobold-Feld)
+  //   Ergebnis: { geschafft, grund, doppelt, leer, geaendert }, grund: ok, leer, doppelt, vorgabe,
+  //   keinTausch, zuViele. Dazu passend: bewertungText(ergebnis)
+  // ---------------------------------------------------------------------
+  function bewerte(level, zellen) {
+    const q = lies(level);
+    const p = pruefe(q, zellen);
+    const geaendert = [];
+    for (let y = 0; y < q.n; y++) for (let x = 0; x < q.n; x++) if (q.zellen[y][x] && !gleich(q.zellen[y][x], zellen[y][x])) geaendert.push([x, y]);
+    const aus = { geschafft: false, grund: 'ok', doppelt: p.doppelt, leer: p.leer, geaendert };
+    if ((level.aufgabe || 'loesen') === 'kobold') {
+      if (geaendert.length > 1) aus.grund = 'zuViele';
+      else if (p.leer.length) aus.grund = 'leer';
+      else if (p.doppelt.length) aus.grund = geaendert.length ? 'doppelt' : 'keinTausch';
+      else aus.geschafft = true;
+      return aus;
+    }
+    if (geaendert.length) aus.grund = 'vorgabe';
+    else if (p.doppelt.length) aus.grund = 'doppelt';
+    else if (p.leer.length) aus.grund = 'leer';
+    else aus.geschafft = true;
+    return aus;
+  }
+  function bewertungText(e) {
+    if (e.geschafft) return 'Geschafft! Jede Form ist in jeder Reihe und jeder Spalte genau einmal.';
+    if (e.grund === 'doppelt') return fehlerText(e.doppelt[0]);
+    if (e.grund === 'leer') return e.leer.length === 1 ? 'Ein Feld ist noch leer.' : 'Noch ' + e.leer.length + ' Felder sind leer.';
+    if (e.grund === 'vorgabe') return 'Die vorgegebenen Formen bleiben, wie sie sind.';
+    if (e.grund === 'keinTausch') return 'Der Kobold versteckt sich noch. Such die Reihe und die Spalte mit einer doppelten Form.';
+    if (e.grund === 'zuViele') return 'Der Kobold hat nur eine Form vertauscht. Ändere nur ein Feld.';
+    return '';
+  }
+
+  // ---------------------------------------------------------------------
   // Was darf in ein leeres Feld? (Form und, bei Farben, Farbe)
   // ---------------------------------------------------------------------
   function werteVon(q) {
@@ -359,6 +397,6 @@
   g.WerkstattFormen = {
     FORMEN, INFO, BUCHSTABE, FARBEN, FARB_LISTE, MIN_N, MAX_N, ROT,
     form, formInhalt, formenVon, farbenVon, lies, kopie, alsText, zelleText, gleich,
-    linien, pruefe, fehlerText, werteVon, darf, kandidaten, loese, logikWeg, quadratSVG,
+    linien, pruefe, fehlerText, bewerte, bewertungText, werteVon, darf, kandidaten, loese, logikWeg, quadratSVG,
   };
 })(typeof globalThis !== 'undefined' ? globalThis : this);

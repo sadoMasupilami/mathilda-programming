@@ -8,11 +8,11 @@
     "levels": ["e14-a1", "e14-a2", "e14-p1", "e14-a3", "e14-w1", "e14-k1", "e14-w2", "e14-w3"]
   },
   "raetsel": [
-    { "id": "e14-a1", "art": "formen", "titel": "Drei Formen", "n": 3, "logik": 1,
+    { "id": "e14-a1", "art": "formen", "titel": "Erstes Formen-Quadrat", "n": 3, "logik": 1,
       "vorgabe": ["K.Q", "DQ.", ".KD"] },
     { "id": "e14-a2", "art": "formen", "titel": "Reihe und Spalte", "n": 3, "logik": 2,
       "vorgabe": [".Q.", "KD.", ".K."] },
-    { "id": "e14-a3", "art": "formen", "titel": "Vier Formen", "n": 4, "logik": 1,
+    { "id": "e14-a3", "art": "formen", "titel": "Jetzt mit Stern", "n": 4, "logik": 1,
       "vorgabe": ["KD.S", ".SK.", "S.DK", ".K.Q"] },
     { "id": "e14-p1", "art": "formen", "titel": "Nur zwei Formen", "n": 3, "logik": 2,
       "vorgabe": [".D.", "...", "K.."] },
@@ -35,7 +35,7 @@
       "vorgabe": ["QK..", "...D", "SD.K", "...Q"] },
     { "id": "e14-w2", "art": "formen", "titel": "Sechs Formen", "n": 4, "logik": 2,
       "vorgabe": ["S...", "...D", "..SK", ".DQ."] },
-    { "id": "e14-w3", "art": "formen", "titel": "Fünf Formen", "n": 4, "logik": 2,
+    { "id": "e14-w3", "art": "formen", "titel": "Nur fünf Formen", "n": 4, "logik": 2,
       "vorgabe": ["D...", ".Q..", "..S.", "..DQ"] },
 
     { "id": "e14-s16", "art": "formen", "titel": "Die große Karten-Knobelei", "n": 4, "farben": ["rot", "blau", "gelb", "gruen"],
