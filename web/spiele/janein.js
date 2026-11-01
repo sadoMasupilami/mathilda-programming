@@ -479,7 +479,8 @@
     api.laeuft(true);
     zeichne(api);
     api.meldung('Zusammenzählen …', 'laeuft', icon(api));
-    const tempo = Math.max(30, Math.round(api.TEMPO * 0.9));
+    // Etwa eine Karte pro Sekunde (bei TEMPO 600: 900 ms), damit das Kind mitzählen kann
+    const tempo = Math.max(30, Math.round(api.TEMPO * 1.5));
     const schritt = () => {
       if (z.zaehl.k + 1 < liste.length) {
         z.zaehl.k++;

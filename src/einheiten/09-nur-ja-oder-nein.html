@@ -15,7 +15,9 @@
   .kasten.e09-bricht > .kasten-titel { break-after: avoid; }
   .kasten.e09-bricht > .kasten-titel + p, .kasten.e09-bricht > .kasten-titel + ul > li:first-child { break-before: avoid; break-inside: avoid; }
   .e09-bsp { display: flex; flex-wrap: wrap; align-items: center; gap: 2mm 6mm; margin: 1.5mm 0 2.5mm 0; }
-  .anleitung m-e9-zeige, .spick m-e9-zeige { vertical-align: middle; }
+  /* Im Fließtext: Karten stehen auf der Grundlinie, Rechnung und Satzzeichen danach auf derselben Linie wie der Text */
+  .anleitung m-e9-zeige, .spick m-e9-zeige { vertical-align: baseline; }
+  .anleitung m-e9-zeige > .e09-zeile, .spick m-e9-zeige > .e09-zeile { align-items: baseline; }
   .anleitung .e09-rechn-text, .spick .e09-rechn-text { font-family: var(--kind); font-size: 11pt; }
   .e09-loes { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm 4mm; align-items: start; margin: 2mm 0 4mm 0; }
   .e09-loes m-loesungen, .e09-loes .loesungen-raster { display: contents; }
@@ -56,7 +58,7 @@
 
 <!-- Spickzettel: Kurzfassung der Anleitung zum Mitnehmen, höchstens zwei Seiten. Ablauf als Drehbuch (Minuten wie in der Anleitung) -->
 <section class="spick nur-buch" data-einheit="9" data-titel="Nur Ja oder Nein">
-  <p class="spick-kern"><b>Darum geht’s:</b> Fünf Ja/Nein-Karten mit 1, 2, 4, 8 und 16 Punkten, die 16 liegt links. Jede Karte bleibt auf ihrem Platz und ist entweder da (Punkte oben: <b>Ja</b>) oder umgedreht (<b>Nein</b>). Die Zahl sind alle Punkte, die man sieht: 8er, 4er und 1er da, 16er und 2er umgedreht ist 8 + 4 + 1 = 13. Jede Zahl von 0 bis 31 geht, und zwar nur auf eine Art (größte Karte zuerst). Dasselbe mit Fingern (oben/unten) und Lampen (an/aus). Am Ende verstehen wir den Gedankenlese-Trick der Rechen-Werkstatt.</p>
+  <p class="spick-kern"><b>Darum geht’s:</b> Fünf Ja/Nein-Karten mit 1, 2, 4, 8 und 16 Punkten, die 16 liegt links. Jede Karte bleibt auf ihrem Platz und ist entweder da (Punkte oben: <b>Ja</b>) oder umgedreht (<b>Nein</b>). Die Zahl: alle Punkte, die man sieht, zusammen. 8er, 4er und 1er da, 16er und 2er umgedreht ist 8 + 4 + 1 = 13. Jede Zahl von 0 bis 31 geht, und zwar nur auf eine Art (größte Karte zuerst). Dasselbe mit Fingern (oben/unten) und Lampen (an/aus). Am Ende verstehen wir den Gedankenlese-Trick der Rechen-Werkstatt.</p>
 
   <div class="spick-zwei breit-links">
     <div class="spick-block vorher">
@@ -81,7 +83,7 @@
 
   <h2>Gemeinsam</h2>
   <ol class="spick-ablauf">
-    <li data-min="4"><div><b>Fünf Karten, ganz viele Zahlen.</b> Türkise Karten gemischt hinlegen. {{KIND}} zählt die Punkte und ordnet: die meisten links. „Was fällt dir auf?“ (immer doppelt so viele). Dann auf die Leiste, alle umdrehen: 0. Du drehst die 4 und die 1 um: 5. Sie legt 3, 6, 10. Zum Schluss: alle da ist 31, die 32 geht nicht. Weitere Zahlen: leicht 5, 12; mittel 9, 14, 17, 20; knifflig 15, 23, 27, 30.
+    <li data-min="4"><div><b>Fünf Karten, ganz viele Zahlen.</b> Türkise Karten gemischt hinlegen. {{KIND}} zählt die Punkte und ordnet: die meisten links. „Was fällt dir auf?“ (immer doppelt so viele). Dann auf die Leiste, alle umdrehen: 0. Du drehst die 4 und die 1 um: 5. Sie legt 3, 6, 10. Zum Schluss: alle da ist 31, die 32 geht nicht. 31 und 0 trägt sie in die Knobel-Ecke von <a class="blattref" href="#blatt-9-1"></a> ein. Weitere Zahlen: leicht 5, 12; mittel 9, 14, 17, 20; knifflig 15, 23, 27, 30.
       <div class="sag">
         <p class="du">„Jede Karte darf nur zwei Sachen: da sein oder umgedreht sein. Ja oder Nein. Welche Zahl ist das?“</p>
         <p class="sie">„Vier und eins … fünf!“</p>
@@ -94,8 +96,8 @@
         <ul>
           <li><b>Ansagen:</b> abwechselnd eine Zahl von 0 bis 31 (Alter, Hausnummer, Geburtstag). Alle Karten umgedreht, dann „Drei, zwei, eins, los!“</li>
           <li><b>Legen:</b> Beide drehen um. Wer fertig ist, ruft „Ja!“. Du sagst dabei jede Karte laut („Sechzehn: nein …“).</li>
-          <li><b>Punkte:</b> richtig und zuerst: 2 Muggelsteine, richtig: 1.</li>
-          <li><b>Ende:</b> nach 8 Runden, mehr Muggelsteine gewinnt.</li>
+          <li><b>Punkte:</b> richtig und zuerst: 2 Muggelsteine, richtig: 1 (aus der Mitte).</li>
+          <li><b>Ende:</b> Mitte leer (spätestens nach 8 Runden), mehr Muggelsteine gewinnt.</li>
         </ul>
       </div>
       <div class="sag">
@@ -107,8 +109,8 @@
     <li data-min="6"><div><b>Blatt „Ja oder Nein?“</b> <a class="blattref" href="#blatt-9-2"></a>: Bei Aufgabe 1 darf sie Punkte zählen oder nachlegen. Aufgabe 2 zuerst mit den Karten legen, dann ankreuzen. Profi-Aufgabe freiwillig.</div></li>
     <li data-min="6"><div><b>Finger und Lampen.</b> Aufstehen, eine Hand hoch: Faust ist 0, Daumen 1, Zeigefinger 2, Mittelfinger 4, Ringfinger 8, kleiner Finger 16. Gemeinsam von 0 bis 7 zählen, dann 8, 16, 17 (kleiner Finger und Daumen). Danach <a class="blattref" href="#blatt-9-3"></a>: Hände, Lampen, Kobold.
       <div class="sag">
-        <p class="du">„Bei 4 steht nur der Mittelfinger. Das ist bei uns einfach die Zahl 4.“</p>
-        <p class="dann">Kichern ist erlaubt. Die andere Hand darf die Finger festhalten.</p>
+        <p class="du">„Deine Finger sind auch Ja/Nein-Karten! Finger oben heißt Ja.“</p>
+        <p class="dann">Daumen rechts wie die 1er-Karte (rechte Hand: in die Handfläche schauen). Kichert sie bei der 4 (nur der Mittelfinger): kurz mitlachen, „Bei uns ist das einfach die 4.“ Die andere Hand darf festhalten.</p>
       </div>
     </div></li>
     <li data-min="4"><div><b>Gedankenlesen mit Durchblick.</b> Der Höhepunkt: Warum funktioniert der Trick der Rechen-Werkstatt?
@@ -160,7 +162,7 @@
   <div class="spick-block schluss">
     <h2>Zum Schluss nicht vergessen</h2>
     <ul class="check">
-      <li><b>Bildschirm-Bonus,</b> nur wenn ihr mögt (höchstens 15 Min, nach den Blättern): Paket 9, QR-Code unten rechts auf <a class="blattref" href="#blatt-9-2"></a>. 9 Levels. Karten, Lampen oder Finger antippen (umdrehen, an/aus, hoch/runter), dann „Los“: Die App zählt langsam zusammen, die Rechnung steht darunter. Bei „Welche Zahl?“ eine von drei Zahlen antippen, beim Kobold die eine falsche Karte. Ist es noch nicht richtig, sagt die App freundlich „zu viel“ oder „zu wenig“. Ein Stern für jedes geschaffte Level. Level 2, 3, 5 und 7 sind Aufgaben von den Blättern. Nach dem Ende-Bild kommt das Gerät weg.</li>
+      <li><b>Bildschirm-Bonus,</b> nur wenn ihr mögt (höchstens 15 Min, nach den Blättern): Paket 9, QR-Code unten rechts auf <a class="blattref" href="#blatt-9-2"></a>. 9 Levels. Karten, Lampen oder Finger antippen (umdrehen, an/aus, hoch/runter), dann „Los“: Die App zählt langsam zusammen, die Rechnung steht darunter. Bei „Welche Zahl?“ eine von drei Zahlen antippen, beim Kobold die eine falsche Karte. Ist es noch nicht richtig, hilft die App freundlich weiter („zu viel“, „zu wenig“, „Such den Kobold nochmal!“). Ein Stern für jedes geschaffte Level. Level 2, 3, 5 und 7 sind Aufgaben von den Blättern. Nach dem Ende-Bild kommt das Gerät weg.</li>
       <li><b>Am Abend:</b> Lampen-Botschaft mit der Taschenlampe (Spiel-Kasten in der Anleitung): Licht aus, gemeinsam langsam „Sechzehn … acht … vier … zwei … eins“ sagen, bei Ja leuchtet die Lampe an die Decke. {{KIND}} hebt die Finger und sagt die Zahl. 3 Botschaften für jeden, die letzte ist die Gute-Nacht-Zahl.</li>
       <li>Rückmeldebogen, Zeile 9.</li>
     </ul>
@@ -198,7 +200,7 @@
 
   <h2>Ablauf Schritt für Schritt</h2>
   <ol class="ablauf e09-ablauf">
-    <li data-min="4"><span class="schritt-titel">Fünf Karten, ganz viele Zahlen</span>Leg {{KIND}}s türkise Karten gemischt und mit den Punkten nach oben auf den Tisch. Sie zählt die Punkte jeder Karte und ordnet sie: die meisten links. „Was fällt dir auf?“ Lass ihr Zeit, sie entdeckt es meistens selbst: Jede Karte hat doppelt so viele Punkte wie die daneben, die 8er-Karte sind zwei 4er-Vierecke, die 16er zwei 8er. Dann legt sie die Karten auf ihre Leiste und du erklärst die Regel (Kasten oben): Jede Karte ist da oder umgedreht. Dreh alle um: Das ist 0. Dreh die 4 und die 1 um: „Welche Zahl ist das?“ (5.) Jetzt legt sie: 3, 6, 10. Zum Schluss: „Und wenn alle da sind?“ (31.) „Geht 32?“ (Nein, alle zusammen sind nur 31.)</li>
+    <li data-min="4"><span class="schritt-titel">Fünf Karten, ganz viele Zahlen</span>Leg {{KIND}}s türkise Karten gemischt mit den Punkten nach oben hin. Sie zählt die Punkte und ordnet: die meisten links. „Was fällt dir auf?“ Lass ihr Zeit, meistens entdeckt sie es selbst: Jede Karte hat doppelt so viele Punkte wie die daneben (auf der 8er-Karte sind zwei 4er-Vierecke, auf der 16er zwei 8er-Muster). Dann kommen die Karten auf ihre Leiste, und du erklärst die Regel (Kasten oben). Dreh alle um: 0. Dreh die 4 und die 1 um: „Welche Zahl ist das?“ (5.) Jetzt legt sie 3, 6, 10. Zum Schluss: „Und wenn alle da sind?“ (31.) „Geht 32?“ (Nein.) Die 31 und die 0 schreibt sie in die Knobel-Ecke von <a class="blattref" href="#blatt-9-1"></a>.</li>
     <li data-min="6"><span class="schritt-titel">Zahlen-Wettlegen</span>Jetzt bekommst du deinen orangen Satz und deine Leiste. Ihr spielt das Spiel „Zahlen-Wettlegen“ (Kasten weiter unten). Wichtig ist deine Sonderregel: Du sagst beim Legen jede Karte laut („Sechzehn: nein. Acht: ja …“). Das bremst dich ein bisschen, und {{KIND}} hört nebenbei, wie man denkt: größte Karte zuerst. Spielt ruhig noch eine Kobold-Runde (Varianten), wenn es gut läuft.</li>
     <li data-min="6"><span class="schritt-titel">Blatt „Ja oder Nein?“</span><a class="blattref" href="#blatt-9-2"></a>. Die grauen Karten sind umgedreht, sie zählen nicht. Bei Aufgabe 1 zählt sie die Punkte der Ja-Karten zusammen, Punkte zählen ist erlaubt, Nachlegen mit den eigenen Karten auch. Bei Aufgabe 2 legt sie die Zahl zuerst mit ihren Karten und kreuzt dann die Karten an, die da sind. Die Profi-Aufgabe ist freiwillig: Sie führt zur 32er-Karte aus dem Schwerer-Teil.</li>
     <li data-min="6"><span class="schritt-titel">Finger und Lampen</span>Steht beide auf, eine Hand hoch: „Deine Finger sind auch Ja/Nein-Karten!“ Faust ist 0, Daumen 1, Zeigefinger 2, Mittelfinger 4, Ringfinger 8, kleiner Finger 16 (Kasten „Bewegung“). Zählt gemeinsam von 0 bis 7, dann zeigt ihr 8, 16 und 17 (kleiner Finger und Daumen, die „Telefon-Hand“). Dann setzt euch zu <a class="blattref" href="#blatt-9-3"></a>: Hände lesen, eine Lampen-Botschaft lesen und die Karte finden, die der Kobold umgedreht hat. Die Profi-Aufgabe (Nullen und Einsen) ist Schwerer-Teil.</li>
@@ -207,7 +209,7 @@
   </ol>
 
   <div class="kasten tipp" data-titel="Zahlen zum Legen in Schritt 1 und 2">
-    <p>Zum Anfangen gut: 3, 5, 6, 10, 12. Mittel: 9, 14, 17, 20. Knifflig, weil fast alle Karten da sind: 15, 23, 27, 30. Lieblingszahlen machen besonders Spaß: ihr Alter, eure Hausnummer, ihr Geburtstag, die Zahl der Stufen auf der Stiege. Zum Kontrollieren: <m-e9-zeige ja="16 8 2 1" zahl="27" gr="5.5" rechnung></m-e9-zeige> und <m-e9-zeige ja="16 4 2 1" zahl="23" gr="5.5" rechnung></m-e9-zeige>.</p>
+    <p>Zum Anfangen gut: 3, 5, 6, 10, 12. Mittel: 9, 14, 17, 20. Knifflig, weil fast alle Karten da sind: 15, 23, 27, 30. Lieblingszahlen machen besonders Spaß: ihr Alter, eure Hausnummer, ihr Geburtstag, die Zahl der Stufen auf der Stiege. Zum Kontrollieren: <m-e9-zeige ja="16 8 2 1" zahl="27" gr="5.5" rechnung></m-e9-zeige> und <m-e9-zeige ja="16 4 2 1" zahl="23" gr="5.5" rechnung></m-e9-zeige>. Außerdem 16 + 1 = 17, 16 + 4 = 20, 16 + 8 + 4 + 2 = 30. Alle Zahlen bis 15 stehen in der Tabelle im Schwerer-Teil.</p>
   </div>
 
   <h3>Beispielsätze</h3>
@@ -248,20 +250,20 @@
       <li><b>Vorbereitung:</b> Jeder sitzt vor seiner Leiste, die eigenen fünf Karten liegen umgedreht auf ihren Plätzen (alle Nein, also 0). Die Muggelsteine liegen in der Mitte.</li>
       <li><b>Ziel:</b> eine angesagte Zahl schneller und richtig mit den eigenen Karten legen.</li>
       <li><b>Ein Zug:</b> Ihr sagt abwechselnd eine Zahl von 0 bis 31 an. Lieblingszahlen sind erlaubt: das Alter, die Hausnummer, ein Geburtstag. Dann zählt der Ansager „Drei, zwei, eins, los!“, und erst jetzt dürfen beide umdrehen. Wer fertig ist, ruft „Ja!“ und nimmt die Hände weg. Der andere legt noch fertig.</li>
-      <li><b>Prüfen:</b> Jeder zählt beim anderen die Punkte nach.
+      <li><b>Prüfen:</b> Jeder zählt beim anderen die Punkte nach. Die Muggelsteine kommen aus der Mitte.
         <ul>
           <li>Richtig und zuerst „Ja!“ gerufen: 2 Muggelsteine.</li>
-          <li>Richtig, aber als Zweiter: 1 Muggelstein.</li>
+          <li>Richtig, aber als Zweiter: 1 Muggelstein. Liegt nur noch einer in der Mitte, bekommt ihn, wer zuerst richtig war.</li>
           <li>Falsch gelegt: kein Muggelstein. Gemeinsam schauen, welche Karte der Kobold umgedreht hat.</li>
         </ul>
       </li>
       <li><b>Deine Sonderregel:</b> Du sagst beim Legen jede Karte laut, von links nach rechts: „Sechzehn: nein. Acht: ja. Vier: nein …“ So bist du etwas langsamer, und {{KIND}} hört, wie „größte Karte zuerst“ geht. Ist sie sehr schnell, darf sie auch laut sagen, oder du legst nur mit einer Hand.</li>
-      <li><b>Ende:</b> Nach 8 Runden (jeder sagt 4-mal an) gewinnt, wer mehr Muggelsteine hat. Sind die Muggelsteine vorher aus, ist auch Schluss. Gleichstand: Die letzte Zahl legt ihr gemeinsam, die 31, alle Karten da.</li>
+      <li><b>Ende:</b> Ist die Mitte leer, gewinnt, wer mehr Muggelsteine hat. Das dauert meist 4 bis 6 Runden, mit 10 Muggelsteinen passt es gut in 6 Minuten. Spätestens nach 8 Runden ist Schluss. Gleichstand: Die letzte Zahl legt ihr gemeinsam, die 31, alle Karten da.</li>
     </ol>
     <p><b>Varianten:</b></p>
     <ul>
-      <li><b>Kobold-Runde:</b> Einer legt eine Zahl und sagt sie an, aber eine Karte ist absichtlich falsch. Wer den Kobold zuerst findet und die Karte richtig umdreht, bekommt 2 Muggelsteine. Wie auf <a class="blattref" href="#blatt-9-3"></a>.</li>
-      <li><b>Lesen statt legen:</b> Einer legt heimlich hinter einem Buch, dann wird das Buch weggenommen. Wer zuerst die richtige Zahl sagt, bekommt den Punkt.</li>
+      <li><b>Kobold-Runde:</b> Einer legt eine Zahl und sagt sie an, aber eine Karte ist absichtlich falsch. Der andere sucht den Kobold. Findet er die Karte und dreht sie richtig um, bekommt er 2 Muggelsteine. Dann wird getauscht. Wie auf <a class="blattref" href="#blatt-9-3"></a>.</li>
+      <li><b>Lesen statt legen:</b> Beide legen heimlich hinter einem Buch eine Zahl. Bücher weg: Wer zuerst die Zahl des anderen richtig sagt, bekommt einen Muggelstein.</li>
       <li><b>Eins mehr:</b> Ihr legt beide die 0. Dann sagt ihr immer „eins mehr!“ und dreht um, so schnell es geht: 1, 2, 3 … Wer zuerst bei 15 ist, gewinnt. Dabei entdeckt man die Umdreh-Regel aus dem Schwerer-Teil.</li>
       <li><b>Zufalls-Zahlen:</b> Mit geschlossenen Augen auf ein Kalenderblatt tippen, der Tag ist die Zahl (1 bis 31). Dann weiß keiner die Zahl vorher.</li>
     </ul>
@@ -275,12 +277,12 @@
   </div>
 
   <div class="kasten bewegung darf-brechen e09-bricht" data-titel="Finger-Zählen und Ja/Nein-Hüpfer">
-    <p><b>Finger-Zählen:</b> Eine Hand hat fünf Finger, genau wie es fünf Ja/Nein-Karten gibt. Finger oben ist Ja, Finger eingeklappt ist Nein. Der <b>Daumen</b> ist die 1er-Karte, der <b>Zeigefinger</b> die 2er, der <b>Mittelfinger</b> die 4er, der <b>Ringfinger</b> die 8er und der <b>kleine Finger</b> die 16er. Hält {{KIND}} die rechte Hand so, dass sie in die Handfläche schaut, ist der Daumen rechts, wie die 1er-Karte auf der Leiste. So zählt ihr gemeinsam:</p>
+    <p><b>Finger-Zählen:</b> Eine Hand hat fünf Finger, genau wie es fünf Ja/Nein-Karten gibt. Finger oben ist Ja, Finger eingeklappt ist Nein. Der <b>Daumen</b> ist die 1er-Karte, der <b>Zeigefinger</b> die 2er, der <b>Mittelfinger</b> die 4er, der <b>Ringfinger</b> die 8er und der <b>kleine Finger</b> die 16er. Der Daumen soll rechts sein, wie die 1er-Karte auf der Leiste: Das klappt mit der rechten Hand, wenn {{KIND}} in die Handfläche schaut, oder mit der linken Hand, wenn die Handfläche zu dir zeigt (so ist die Hand auf <a class="blattref" href="#blatt-9-3"></a> gezeichnet). So zählt ihr gemeinsam:</p>
     <ul>
       <li>0: Faust. 1: Daumen. 2: nur der Zeigefinger. 3: Zeigefinger und Daumen. 4: nur der Mittelfinger. 5: Mittelfinger und Daumen. 6: Mittel- und Zeigefinger. 7: Mittel-, Zeigefinger und Daumen.</li>
       <li>8: nur der Ringfinger (der ist störrisch, die andere Hand darf helfen). 16: nur der kleine Finger. 17: kleiner Finger und Daumen, die „Telefon-Hand“. 31: alle Finger oben.</li>
       <li>Beim Weiterzählen merkt ihr: Der Daumen geht <b>jedes Mal</b> auf oder zu. Bis 31 mit einer Hand ist der Schwerer-Teil.</li>
-      <li>Die 4 mit nur dem Mittelfinger sorgt oft für Gekicher. Lacht kurz mit und sagt: „Bei uns ist das einfach die 4.“ Mit der Handfläche nach vorne sieht sie freundlicher aus.</li>
+      <li>Die 4 mit nur dem Mittelfinger sorgt oft für Gekicher. Lacht kurz mit und sagt: „Bei uns ist das einfach die 4.“ Mit der Handfläche zu dir (linke Hand) sieht sie freundlicher aus.</li>
     </ul>
     <p><b>Ja/Nein-Hüpfer</b> (wenn {{KIND}} zappelig ist, statt einer zweiten Wettleg-Runde): Fünf Zettel mit 16, 8, 4, 2, 1 liegen in einer Reihe am Boden, einen großen Schritt auseinander. Du sagst eine Zahl, {{KIND}} hüpft von Zettel zu Zettel, von der 16 bis zur 1. Auf einem Ja-Zettel landet sie als <b>Stern</b> (Arme und Beine weit auseinander), auf einem Nein-Zettel als <b>Kugel</b> (in die Hocke). Du rufst nach dem letzten Sprung: „Welche Zahl bist du gehüpft?“ Dann tauscht ihr. Gut zum Hüpfen: 5, 10, 21 und 31 (fünf Sterne hintereinander).</p>
   </div>
@@ -300,12 +302,12 @@
   <div class="kasten spiel darf-brechen e09-bricht" data-titel="Lampen-Botschaft am Abend (Extra)">
     <p class="spiel-meta">2 Personen · 5–10 Minuten · eine Taschenlampe, ein dunkles Zimmer, {{KIND}}s Ja/Nein-Karten oder ihre Finger · außerhalb der Einheit, z. B. vor dem Schlafengehen</p>
     <ol class="regeln">
-      <li><b>Vorbereitung:</b> Licht aus. Der Absender steht an der Tür und hat die Taschenlampe, die Empfängerin sitzt am Bett oder am Boden. Ausmachen: Die Taschenlampe leuchtet an die Decke oder an die Wand, nie in die Augen.</li>
+      <li><b>Vorbereitung:</b> Licht aus. Der Absender steht an der Tür und hat die Taschenlampe, die Empfängerin sitzt am Bett oder am Boden. Wichtig: Die Taschenlampe leuchtet an die Decke oder an die Wand, nie in die Augen.</li>
       <li><b>Eine Botschaft:</b> Der Absender denkt sich eine Zahl von 0 bis 31 und legt sie im Kopf als Ja/Nein-Zahl. Dann sagt ihr <b>gemeinsam</b> langsam die fünf Plätze: „Sechzehn … acht … vier … zwei … eins.“ Bei jedem Platz ist die Lampe <b>an</b> (Ja) oder bleibt <b>aus</b> (Nein).</li>
       <li><b>Empfangen:</b> Die Empfängerin hebt bei jedem Licht den passenden Finger oder dreht im Dämmerlicht die passende Karte um. Am Ende sagt sie die Zahl.</li>
       <li><b>Ende:</b> Stimmt die Zahl, tauscht ihr die Taschenlampe. Nach 3 Botschaften für jeden ist Schluss: Die letzte ist die Gute-Nacht-Zahl.</li>
     </ol>
-    <p><b>Varianten:</b> <b>Geheime Bedeutungen:</b> Macht eine Liste, z. B. 7 heißt „Ich hab dich lieb“, 31 heißt „Schlaf gut“, 17 heißt „Morgen gibt’s Palatschinken“. <b>Lampen-Reihe am Fensterbrett:</b> Habt ihr fünf kleine Lichter (Taschenlampen, Fahrradlichter, LED-Teelichter), stellt sie auf fünf Plätze in eine Reihe: an oder aus. So kann {{KIND}} die Botschaft vom Garten oder Hof aus lesen, ohne Takt. <b>Buchstaben:</b> Schwerer-Teil, Nummer 10.</p>
+    <p><b>Varianten:</b> <b>Geheime Bedeutungen:</b> Macht eine Liste, z. B. 7 heißt „Ich hab dich lieb“, 31 heißt „Schlaf gut“, 17 heißt „Morgen gibt’s Palatschinken“. <b>Lampen-Reihe am Fensterbrett:</b> Habt ihr fünf kleine Lichter (Taschenlampen, Fahrradlichter, LED-Teelichter), stellt sie auf fünf Plätze in eine Reihe: an oder aus. So kann {{KIND}} die Botschaft vom Garten oder Hof aus lesen, ohne Takt. Achtung, von draußen ist die Reihe gespiegelt: Von innen gesehen steht die 16 rechts. <b>Buchstaben:</b> Schwerer-Teil, Nummer 10.</p>
   </div>
 
   <div class="kasten basteln" data-titel="Ja/Nein-Karten, die lange halten">
@@ -357,12 +359,12 @@
   <div class="kasten schwerer darf-brechen e09-bricht">
     <p>Sitzen die fünf Karten nach wenigen Minuten, wähle hier aus. Das ist kein Zusatz „für später“, sondern ein vollwertiger Hauptteil, gut auch für ein zweites Mal mit den Karten. Hier kommen auch erst die „Nullen und Einsen“.</p>
     <ol class="e09-ganz">
-      <li><b>Die 32er-Karte:</b> „Welche Karte käme nach der 16?“ {{KIND}} malt sie selbst auf ein Stück Karton: 32 Punkte, zwei 16er-Muster untereinander (die Profi-Aufgabe auf <a class="blattref" href="#blatt-9-2"></a> fragt genau das). Mit sechs Karten geht es jetzt bis 63. Legt 33, 40, 50 und 63: <m-e9-zeige ja="32 8" anzahl="6" zahl="40" gr="5.5" rechnung></m-e9-zeige>. Frag: „Wie viele Zahlen kann man jetzt legen?“ (64, von 0 bis 63: doppelt so viele wie vorher.) Mit einer 64er-Karte wären es 128. Jede neue Karte verdoppelt.</li>
-      <li><b>Muster in der Tabelle:</b> Auf Kästchenpapier schreibt {{KIND}} die Zahlen 0 bis 15 untereinander und malt daneben für die vier Karten 8, 4, 2, 1 einen vollen Kreis (Ja) oder einen leeren (Nein). Was fällt ihr auf, wenn sie die Spalten von oben nach unten liest? Die 1er-Karte wechselt <b>jedes Mal</b> (nein, ja, nein, ja), die 2er alle 2 (nein, nein, ja, ja), die 4er alle 4, die 8er alle 8. Jede Spalte ist ein Muster, das sich wiederholt, wie ein Wiederhol-Zauber: Die 2er-Spalte ist „4-mal: nein, nein, ja, ja“. Wer mag, legt sie mit dem Zauber-Kasten von <a class="blattref" href="#blatt-5-3"></a>. Zum Vergleichen:
+      <li><b>Die 32er-Karte:</b> „Welche Karte käme nach der 16?“ {{KIND}} malt sie selbst auf ein Stück Karton: 32 Punkte, zwei 16er-Muster untereinander (die Profi-Aufgabe auf <a class="blattref" href="#blatt-9-2"></a> fragt genau das). Mit sechs Karten geht es jetzt bis 63. Legt 33, 40, 50 und 63: <m-e9-zeige ja="32 8" anzahl="6" zahl="40" gr="5.5" rechnung></m-e9-zeige>. (Die anderen: 32 + 1 = 33, 32 + 16 + 2 = 50, für die 63 sind alle sechs Karten da.) Frag: „Wie viele Zahlen kann man jetzt legen?“ (64, von 0 bis 63: doppelt so viele wie vorher.) Mit einer 64er-Karte wären es 128. Jede neue Karte verdoppelt.</li>
+      <li><b>Muster in der Tabelle:</b> Auf Kästchenpapier schreibt {{KIND}} die Zahlen 0 bis 15 untereinander und malt daneben für die vier Karten 8, 4, 2, 1 einen vollen Kreis (Ja) oder einen leeren (Nein). Was fällt ihr auf, wenn sie die Spalten von oben nach unten liest? Die 1er-Karte wechselt <b>jedes Mal</b> (nein, ja, nein, ja), die 2er alle 2 (nein, nein, ja, ja), die 4er alle 4, die 8er alle 8. Jede Spalte ist ein Muster, das sich wiederholt: Der Muster-Kern der 1er-Spalte ist „nein, ja“, der 2er-Spalte „nein, nein, ja, ja“. Wie ein Wiederhol-Zauber: Von 0 bis 7 ist die 1er-Spalte „4-mal: nein, ja“. Wer mag, legt das mit dem Zauber-Kasten von <a class="blattref" href="#blatt-5-3"></a> (im Kasten eine umgedrehte und eine offene Karte). Zum Vergleichen:
         <div class="e09-bsp"><m-e9-tabelle von="0" bis="15" anzahl="4" spalten="2"></m-e9-tabelle></div></li>
       <li><b>Die Umdreh-Regel (Zählen mit Karten):</b> Wie kommt man von einer Zahl zur nächsten, ohne neu zu legen? Lass sie mit den Karten von 0 an weiterzählen und genau beobachten. Die Regel, die sie findet: „Dreh die 1er-Karte um. Ist sie jetzt weg (Nein), dreh auch die 2er um. Ist die jetzt weg, dreh auch die 4er um …“ Von 7 zur 8 drehen sich vier Karten auf einmal: <m-e9-zeige ja="4 2 1" zahl="7" gr="5.5"></m-e9-zeige> wird <m-e9-zeige ja="8" zahl="8" gr="5.5"></m-e9-zeige>. Diese Regel ist ein richtiges kleines Programm.</li>
       <li><b>Finger-Zählen bis 31 vorführen:</b> Mit der Umdreh-Regel geht es auch mit den Fingern: von 0 bis 31, langsam, laut mitzählen. Der Daumen geht jedes Mal, der Zeigefinger jedes zweite Mal. Das ist eine tolle Vorführung für die Familie beim Abendessen. Und mit zwei Händen? (Die zweite Hand hat 32, 64, 128, 256 und 512: bis 1023!)</li>
-      <li><b>Nullen und Einsen:</b> „Roboter schreiben Ja als 1 und Nein als 0.“ Die 13 sind die Karten <m-e9-zeige ja="8 4 1" zahl="13" gr="5.5"></m-e9-zeige>, also schreibt der Roboter <m-e9-zeige ja="8 4 1" aussehen="ziffern" text></m-e9-zeige>: 16 nein, 8 ja, 4 ja, 2 nein, 1 ja. Lass sie ihr Alter, ihren Geburtstag und die 31 so schreiben. Das ist die Profi-Aufgabe auf <a class="blattref" href="#blatt-9-3"></a>. Frag dann: „Darf man die Null vorne weglassen?“ (Ja: 01101 und 1101 sind dieselbe Zahl, wie eine Lampe, die aus ist. Eine Null hinten darf man nicht weglassen, dann rutschen alle Karten auf andere Plätze.)</li>
+      <li><b>Nullen und Einsen:</b> „Roboter schreiben Ja als 1 und Nein als 0.“ Die 13 sind die Karten <m-e9-zeige ja="8 4 1" zahl="13" gr="5.5"></m-e9-zeige>, also schreibt der Roboter <m-e9-zeige ja="8 4 1" aussehen="ziffern" text></m-e9-zeige>: 16 nein, 8 ja, 4 ja, 2 nein, 1 ja. Lass sie ihr Alter, ihren Geburtstag und die 31 so schreiben (6 ist 00110, 7 ist 00111, 31 ist 11111). Das ist die Profi-Aufgabe auf <a class="blattref" href="#blatt-9-3"></a>. Frag dann: „Darf man die Null vorne weglassen?“ (Ja: 01101 und 1101 sind dieselbe Zahl, wie eine Lampe, die aus ist. Eine Null hinten darf man nicht weglassen, dann rutschen alle Karten auf andere Plätze.)</li>
       <li><b>Verdoppeln heißt schieben:</b> Legt die 3 (2er und 1er). Jetzt rückt jede Ja-Karte einen Platz nach links: Die Karte links daneben wird aufgedeckt, die alte wird umgedreht (von links nach rechts arbeiten). Heraus kommt die 6 (4er und 2er). Nochmal: 12, nochmal: 24. Warum? Jede Karte links daneben hat doppelt so viele Punkte. Mit der 13 klappt es auch: Aus 8, 4, 1 wird 16, 8, 2, also 26. Und mit der 16? (Dann bräuchte man die 32er-Karte.) Umgekehrt halbiert ein Schritt nach rechts: Aus 12 wird 6. Bei ungeraden Zahlen fällt die 1er-Karte rechts hinunter: Aus 13 wird 6, und 1 bleibt übrig.</li>
       <li><b>Warum gibt es genau eine Schreibweise?</b> Mit „größte Karte zuerst“ hat man nie eine Wahl. Beispiel 22: Passt die 16? Ja, Rest 6. Die 8? Nein. Die 4? Ja, Rest 2. Die 2? Ja, Rest 0. Die 1? Nein. Warum darf man die 16 nicht einfach weglassen? Weil alle kleineren Karten zusammen nur 8 + 4 + 2 + 1 = 15 Punkte haben, also weniger als 16. Ohne die 16er-Karte schafft man die 22 nie. Und bei der 12 darf man sie nicht nehmen, weil 16 schon zu viel ist. Bei jeder Karte ist es genauso: Jede Karte hat um 1 mehr Punkte als alle kleineren zusammen (2 + 1 = 3, die 4er-Karte hat 4). Das kann {{KIND}} mit den Karten nachprüfen.</li>
       <li><b>Zusammenzählen mit zwei Sätzen:</b> Sie legt mit ihren Karten die 5, du mit deinen die 6. Jetzt schiebt ihr beide Reihen übereinander zu einer: Liegen auf einem Platz zwei Karten, tauscht ihr sie gegen eine einzige Karte links daneben (zwei 4er sind eine 8er). Aus <m-e9-zeige ja="4 1" zahl="5" gr="5.5"></m-e9-zeige> und <m-e9-zeige ja="4 2" zahl="6" gr="5.5"></m-e9-zeige> wird <m-e9-zeige ja="8 2 1" zahl="11" gr="5.5" rechnung></m-e9-zeige>, und 5 + 6 = 11 stimmt. Probiert auch 7 und 1 (da wandert der Tausch dreimal nach links, bis zur 8).</li>
@@ -386,7 +388,7 @@
     <p><b>Legen (Level 1, 3, 4, 6 und 9):</b> Oben steht die Zahl. Am Anfang sind alle Karten umgedreht, alle Lampen aus, die Hand ist eine Faust: 0. Ein Tipp dreht eine Karte um, schaltet eine Lampe an oder aus, hebt einen Finger oder klappt ihn ein. Unter den Karten liegt eine Karten-Leiste wie am Tisch, über den Fingern stehen die Punkte. Ist sie fertig, tippt sie auf „Los“: Die App zählt langsam zusammen, die gezählte Karte leuchtet golden, und darunter wächst die Rechnung bis <span class="rechnung">16 + 4 + 1 = 21</span>. Stimmt die Zahl, gibt es den Stern. Sonst sagt die App freundlich zum Beispiel „Das ist 24. Zu viel!“, und sie ändert weiter. „Nochmal“ dreht alles wieder um.</p>
     <p><b>Welche Zahl? (Level 2 und 5):</b> Die Karten (Lampen) liegen schon. Sie tippt eine von drei Zahlen an. Stimmt sie, zählt die App zur Probe zusammen, und es gibt den Stern. Sonst heißt es zum Beispiel „12 ist zu wenig. Zähl die Punkte nochmal!“. Die richtige Zahl verrät die App nicht.</p>
     <p><b>Kobold (Level 7 und 8):</b> Oben steht „Das soll 19 sein!“. Sie tippt die Karte an, die falsch liegt, und die dreht sich um. Es dreht sich immer nur eine Karte: Tippt sie eine andere an, liegt die erste wieder wie vorher. Dann „Los“: Die App zählt zusammen. Stimmt die Zahl, ist der Kobold erwischt. Sonst kommt zum Beispiel „Das ist 31, nicht 19. Such den Kobold nochmal!“.</p>
-    <p><b>Sterne und Ruhe:</b> Jedes geschaffte Level bekommt einen Stern, egal nach wie vielen Versuchen. Kein Ton, keine Zeitgrenze, nichts blinkt. Die App zählt so langsam, dass {{KIND}} laut mitrechnen kann. Das lohnt sich: So übt sie nebenbei das Zusammenzählen von der größten Karte aus.</p>
+    <p><b>Sterne und Ruhe:</b> Jedes geschaffte Level bekommt einen Stern, egal nach wie vielen Versuchen. Kein Ton, keine Zeitgrenze, nichts blinkt. Die App zählt langsam, etwa eine Karte pro Sekunde, und die Rechnung bleibt danach stehen. So kann {{KIND}} mitzählen und in Ruhe nachrechnen. Das lohnt sich: Sie übt nebenbei das Zusammenzählen von der größten Karte aus.</p>
     <p><b>Wann weglegen:</b> Nach Level 9 kommt „Super! Jetzt zurück zum Papier.“ Dann ist Schluss, auch wenn noch Zeit wäre. Lust auf mehr? Lieber eine Lampen-Botschaft am Abend als ein weiteres Level.</p>
   </div>
 
@@ -426,7 +428,7 @@
 <!-- Blatt 9-1: Bastelvorlage Ja/Nein-Karten (zwei Sätze)             -->
 <!-- =============================================================== -->
 <section class="blatt" data-einheit="9" data-titel="Meine Ja/Nein-Karten" data-art="Bastelvorlage" data-verteilt>
-  <p class="e09-hinweis">{{KIND}}, schneide deine Ja/Nein-Karten aus. Die Rückseite bleibt leer: Umgedreht heißt Nein.</p>
+  <p class="e09-hinweis">{{KIND}}, das sind deine Ja/Nein-Karten. Die Rückseite bleibt leer: Umgedreht heißt Nein.</p>
 
   <div>
     <p class="e09-satz"><span class="e09-farbe" style="background:#0f8f87"></span>Meine Karten</p>
@@ -511,7 +513,7 @@
   </div>
 
   <div class="aufg">
-    <p class="anw">Der Fehler-Kobold hat bei der Fee eine Karte umgedreht. Kreis die falsche Karte ein.</p>
+    <p class="anw">Der Fehler-Kobold hat bei der Fee eine Karte umgedreht. Kreise die falsche Karte ein.</p>
     <div class="e09-einzug"><m-e9-zahl raetsel="e9-k1" gr="16"></m-e9-zahl></div>
   </div>
 
