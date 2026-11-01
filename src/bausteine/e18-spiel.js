@@ -20,9 +20,12 @@
          Eine ausgerechnete Zahl im Text (feld: als Antwortkästchen mit roter Lösung).
          was: starter (von 100 Spielen gewinnt, wer beginnt), zweiter (gewinnt, wer
          als Zweite/r dran ist), maxZuege, mittelZuege (Median), zuegeVon / zuegeBis
-         (10 % und 90 %), schnitt (Durchschnitt, gerundet), minWuerfe (vom Start ins
-         Schloss, ohne Sonderfelder), minZuege, felder, ziel, einsenZuege (lauter 1er),
+         (10 % und 90 %), zehntelVonBis (wie viele von 10 Spielen dauern zuegeVon bis
+         zuegeBis Züge, gerundet), schnitt (Durchschnitt, gerundet), minWuerfe (vom Start
+         ins Schloss, ohne Sonderfelder), minZuege, felder, ziel, einsenZuege (lauter 1er),
          sechsenZuege (lauter 6er)
+         spiel="rennen": das reparierte Kobold-Wettrennen (6 Schritte, bei 4, 5, 6 zwei
+         Schritte, sonst einer)
      <m-e18-felder spiel="wettflug" art="stern|wirbel">   →  „3, 9 und 15“
      <m-e18-kobold l="unklar|nie|unfair">
          Drei Kästchen zum Ankreuzen (unklar · hört nie auf · unfair), Lösung rot.
@@ -48,7 +51,10 @@
     wettflug: { felder: 20, stern: [3, 9, 15], wirbel: [6, 12, 18] },
     sterne: { felder: 20, stern: [3, 9, 15], wirbel: [] },   // Wettflug ohne Wirbelwind
     leer: { felder: 20, stern: [], wirbel: [] },             // leerer Plan, nur würfeln
+    // Kobold-Wettrennen, repariert: 6 Schritte bis zum Kuscheltier, Würfel 4, 5, 6: 2 Schritte, sonst 1
+    rennen: { felder: 5, stern: [], wirbel: [], schritte: [1, 1, 1, 2, 2, 2] },
   };
+  const weite = (s, d) => (s.schritte ? s.schritte[d - 1] : d);   // so weit bringt der Würfel d
 
   function spielVon(name) {
     const s = SPIELE[name];
@@ -69,7 +75,7 @@
     const dazu = (k, p) => aus.set(k, (aus.get(k) || 0) + p);
     (function wurf(x0, p) {
       for (let d = 1; d <= 6; d++) {
-        const q = p / 6, x = x0 + d;
+        const q = p / 6, x = x0 + weite(s, d);
         if (x >= s.ziel) dazu('sieg', q);
         else if (s._art[x] === 'stern') wurf(x, q);
         else if (s._art[x] === 'wirbel') dazu(b + ',' + x, q);   // tauschen
@@ -138,6 +144,7 @@
       schnitt, minZuege,
       median: quantil(0.5), q10: quantil(0.1), q90: quantil(0.9),
     };
+    erg.anteilVonBis = ende.slice(erg.q10 - 1, erg.q90).reduce((x, y) => x + y, 0);   // Anteil der Spiele mit q10 … q90 Zügen
     s._analyse[key] = erg;
     return erg;
   }
@@ -159,7 +166,7 @@
         if (d === undefined) return { pos: p, sieger: null, zuege, wuerfe: i, schritte, offen: true };
         if (!(d >= 1 && d <= 6)) throw new Error('Würfel zeigt ' + d + ' (1 bis 6)');
         i++;
-        p[wer] += d;
+        p[wer] += weite(s, d);
         const feld = p[wer] >= s.ziel ? 'schloss' : (s._art[p[wer]] || 'leer');
         schritte.push({ wer, d, nach: Math.min(p[wer], s.ziel), feld });
         if (feld === 'schloss') return { pos: p, sieger: wer, zuege, wuerfe: i, schritte };
@@ -175,7 +182,7 @@
   // Kleinste Zahl von Würfen vom Start ins Schloss (ohne Sonderfelder: aufrunden)
   function minWuerfe(name) {
     const s = spielVon(name);
-    if (s.stern.length || s.wirbel.length) throw new Error('minWuerfe nur für ein Spiel ohne Sonderfelder');
+    if (s.stern.length || s.wirbel.length || s.schritte) throw new Error('minWuerfe nur für ein Spiel ohne Sonderfelder');
     return Math.ceil(s.ziel / 6);
   }
 
@@ -298,11 +305,11 @@
     for (let n = 1; n <= 20; n++) {
       const [x, y] = feldOrt(n, f, g, rg);
       o += '<rect x="' + (x + 0.3) + '" y="' + (y + 0.3) + '" width="' + (f - 0.6) + '" height="' + (f - 0.6) + '" rx="3.5" fill="white" stroke="' + T + '" stroke-width="0.6"/>';
-      o += '<text x="' + (x + 2.2) + '" y="' + (y + 4.4) + '" font-family="Nunito, sans-serif" font-weight="800" font-size="3.9" fill="#6b6f86">' + n + '</text>';
+      o += '<text x="' + (x + 1.8) + '" y="' + (y + 5.3) + '" font-family="Andika, sans-serif" font-weight="700" font-size="5" fill="#6b6f86">' + n + '</text>';
       if (s && s._art[n]) {
         const name = s._art[n];
         const inner = rot ? BILD[name](false).replace(/#1f2340/g, '#d1335b') : BILD[name](true);
-        o += gruppe(inner, x + f * 0.2, y + f * 0.18, f * 0.66);
+        o += gruppe(inner, x + f * 0.24, y + f * 0.24, f * 0.62);
       }
     }
     return '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + 'mm" height="' + Hh + 'mm" viewBox="-0.5 -0.5 ' + (W + 1) + ' ' + (Hh + 1) + '" role="img" aria-label="Spielplan">' + o + '</svg>';
@@ -327,17 +334,18 @@
       const bis = parseInt(el.getAttribute('bis') || '12', 10);
       const f = parseFloat(el.getAttribute('gr') || '13');
       const W = (bis + 1) * f;
+      const fs = Math.min(5.2, f * 0.42);   // bei gr 13.5: 14,7 pt (Blätter mindestens 14 pt)
+      const yz = f + 1.2 + 0.72 * fs, Hs = yz + 1.2;
       let o = '';
       for (let n = 0; n <= bis; n++) {
         const x = n * f;
         o += '<rect x="' + (x + 0.3) + '" y="0.3" width="' + (f - 0.6) + '" height="' + (f - 0.6) + '" rx="2" fill="' + (n === 0 ? '#eaf6e6' : 'white') + '" stroke="' + T + '" stroke-width="0.5"/>';
-        if (n === 0) o += '<text x="' + (x + f / 2) + '" y="' + (f / 2 + 0.2) + '" font-family="Andika, sans-serif" font-weight="700" font-size="' + (f * 0.27).toFixed(2) + '" text-anchor="middle" dominant-baseline="central" fill="' + T + '">Start</text>';
-        else {
-          o += '<text x="' + (x + f / 2) + '" y="' + (f + 4.2) + '" font-family="Andika, sans-serif" font-weight="700" font-size="' + Math.min(4.6, f * 0.42).toFixed(2) + '" text-anchor="middle" fill="' + T + '">' + n + '</text>';
-          if (s._art[n]) o += gruppe(BILD[s._art[n]](true), x + f * 0.12, f * 0.1, f * 0.76);
-        }
+        // Beschriftung unter dem Feld (wie beim Schnecken-Rennen), auch „Start“
+        o += '<text x="' + (x + f / 2) + '" y="' + yz.toFixed(2) + '" font-family="Andika, sans-serif" font-weight="700" font-size="' + fs.toFixed(2) + '" text-anchor="middle" fill="' + T + '">' + (n === 0 ? 'Start' : n) + '</text>';
+        if (n > 0 && s._art[n]) o += gruppe(BILD[s._art[n]](true), x + f * 0.12, f * 0.1, f * 0.76);
       }
-      el.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + 'mm" height="' + (f + 5.5) + 'mm" viewBox="-0.3 -0.3 ' + (W + 0.6) + ' ' + (f + 5.8) + '" role="img" aria-label="Felder">' + o + '</svg>';
+      const rl = Math.max(0.3, fs * 1.35 - f / 2);   // „Start“ ist breiter als das Feld: links Platz lassen
+      el.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="' + (W + rl - 0.3).toFixed(2) + 'mm" height="' + Hs.toFixed(2) + 'mm" viewBox="' + (-rl).toFixed(2) + ' -0.3 ' + (W + rl + 0.3).toFixed(2) + ' ' + (Hs + 0.3).toFixed(2) + '" role="img" aria-label="Felder">' + o + '</svg>';
     } catch (e) { return H().fehler(el, e.message); }
     el.classList.add('komp');
   };
@@ -399,6 +407,7 @@
       case 'mittelZuege': return a().median;
       case 'zuegeVon': return a().q10;
       case 'zuegeBis': return a().q90;
+      case 'zehntelVonBis': return Math.round(10 * a().anteilVonBis);
       case 'schnitt': return Math.round(a().schnitt);
       case 'minZuege': return a().minZuege;
       case 'minWuerfe': return minWuerfe(name);
@@ -458,13 +467,13 @@
         const x = n * (f + ab);
         o += '<rect x="' + (x + 0.3) + '" y="0.3" width="' + (f - 0.6) + '" height="' + (f - 0.6) + '" rx="2.5" fill="' + (n === 0 ? '#eaf6e6' : n === ziel ? '#e9f7c9' : 'white') + '" stroke="' + T + '" stroke-width="0.5"/>';
         if (n === ziel) o += gruppe(BILD.salat(), x + f * 0.12, f * 0.12, f * 0.76);
-        else o += '<text x="' + (x + f / 2) + '" y="' + (f + 4.4) + '" font-family="Andika, sans-serif" font-weight="700" font-size="4.2" text-anchor="middle" fill="' + T + '">' + (n === 0 ? 'Start' : n) + '</text>';
+        else o += '<text x="' + (x + f / 2) + '" y="' + (f + 4.9) + '" font-family="Andika, sans-serif" font-weight="700" font-size="5" text-anchor="middle" fill="' + T + '">' + (n === 0 ? 'Start' : n) + '</text>';
         const beide = n === rot && n === blau;
         if (n === rot) o += gruppe(BILD.schnecke('#e0453a'), x + f * 0.08, beide ? 0 : f * 0.1, beide ? f * 0.5 : f * 0.84);
         if (n === blau) o += gruppe(BILD.schnecke('#3a7be0'), x + f * (beide ? 0.45 : 0.08), beide ? f * 0.45 : f * 0.1, beide ? f * 0.5 : f * 0.84);
       }
       const W = (ziel + 1) * (f + ab) - ab;
-      el.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + 'mm" height="' + (f + 5.5) + 'mm" viewBox="-0.3 -0.3 ' + (W + 0.6) + ' ' + (f + 5.8) + '" role="img" aria-label="Schnecken-Rennen">' + o + '</svg>';
+      el.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + 'mm" height="' + (f + 6.2) + 'mm" viewBox="-0.3 -0.3 ' + (W + 0.6) + ' ' + (f + 6.5) + '" role="img" aria-label="Schnecken-Rennen">' + o + '</svg>';
     } catch (e) { return H().fehler(el, e.message); }
     el.classList.add('komp');
   };
