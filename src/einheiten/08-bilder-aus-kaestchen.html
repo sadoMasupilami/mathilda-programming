@@ -43,6 +43,7 @@
   .e08-kzeilen { display: flex; flex-direction: column; }
   .e08-kzeilen > span { display: flex; align-items: flex-end; gap: 2mm; height: 9.6mm; border-bottom: 0.35mm solid var(--linie); font-family: var(--text); font-weight: 800; font-size: 14pt; color: var(--grau); }
   .e08-von { margin-top: 2mm; font-size: 14pt; }
+  .loesungsmodus .e08-karte .e08-karte-lsg { position: absolute; right: 4mm; bottom: 3mm; margin: 0; font-size: 12pt; }
   .e08-karte p.e08-sogehts { display: flex; align-items: center; gap: 2mm; flex-wrap: wrap; }
 
   /* Anleitung */
@@ -59,6 +60,7 @@
   .e08-loes > .kasten.loesung p, .kasten.loesung.e08-weiter p { margin-bottom: 1.6mm; }
   .e08-tab td:first-child { width: 9%; }
   .e08-beispiel { margin: 1.5mm 0 2mm 0; }
+  .e08-nw { white-space: nowrap; }
   .e08-zwei-bilder { display: flex; gap: 8mm; }
 </style>
 
@@ -127,7 +129,7 @@
       <div class="sag">
         <p class="du">„Ein Herz ist links und rechts gleich. Ist deines überall gleich?“</p>
         <p class="sie">„In Zeile 5 nicht! Die ist nach links verrutscht.“</p>
-        <p class="dann">Die Kobold-Probe stimmt hier (1 + 4 + 3 = 8): Diesen Kobold findet man nur am Bild. Richtig ist 2 weiß, 4 schwarz, 2 weiß.</p>
+        <p class="dann">Die Kobold-Probe stimmt hier (<span class="e08-nw">1 + 4 + 3 = 8</span>): Diesen Kobold findet man nur am Bild. Richtig ist 2 weiß, 4 schwarz, 2 weiß.</p>
       </div>
     </div></li>
     <li data-min="2"><div><b>Sammelpass.</b> Feld „Einheit&nbsp;8“, Sterne anmalen.
@@ -180,7 +182,7 @@
   <div class="kasten tipp e08-inline" data-titel="Die Regeln des Kästchen-Codes (für euch beide gleich)">
     <ul>
       <li><b>So sieht er aus:</b> Für jede Zeile Zahl und Farbe, immer von links nach rechts. Auf den Blättern steht die Zahl neben einem kleinen Kästchen in der Farbe: <m-e8-code code="3w 2s 3w" klein></m-e8-code> heißt „3 weiß, 2 schwarz, 3 weiß“. Weiß heißt: Kästchen leer lassen, aber mitzählen.</li>
-      <li><b>Die Kobold-Probe:</b> Die Zahlen einer Zeile ergeben zusammen genau die Breite des Bilds, hier 3 + 2 + 3 = 8. Kommt etwas anderes heraus, hat der Kobold zugeschlagen.</li>
+      <li><b>Die Kobold-Probe:</b> Die Zahlen einer Zeile ergeben zusammen genau die Breite des Bilds, hier <span class="e08-nw">3 + 2 + 3 = 8</span>. Kommt etwas anderes heraus, hat der Kobold zugeschlagen.</li>
       <li><b>Gleiche Farben zusammen:</b> Nebeneinander stehen nie zwei Teile mit derselben Farbe. Statt „1 schwarz, 1 schwarz“ schreibt man „2 schwarz“. Falsch ist die lange Form nicht, nur länger.</li>
       <li><b>Kürzer mit dem Zauber-Kasten:</b> Sind Zeilen untereinander gleich, kommt die Zeile in einen lila Zauber-Kasten: „3-mal: 1 weiß, 3 schwarz, 1 weiß“ malt drei gleiche Zeilen untereinander. Profis setzen den Kasten auch mitten in eine Zeile: „2-mal: 1 schwarz, 1 weiß, dann 1 schwarz“. Es gelten die Regeln aus Einheit 5: 2-mal bis 5-mal, in einer Zeile höchstens 3 Teile im Kasten, kein Kasten im Kasten.</li>
       <li><b>Zahlen zählen:</b> Wie lang ist ein Code? Man zählt die Zahlen, die man schreiben muss, genau wie die Karten in Einheit 5. Jeder Teil („3 weiß“) ist 1 Zahl, ein Zauber-Kasten ist 1 Zahl („3-mal“) plus alles, was darin steht.</li>
@@ -251,7 +253,7 @@
     <p class="sie">„In Zeile 5 nicht! Die ist nach links verrutscht.“</p>
     <p class="du">„Und die Kobold-Probe? Stimmt die?“</p>
     <p class="sie">„1 und 4 und 3 … das sind 8. Die stimmt ja!“</p>
-    <p class="dann">Genau das macht diesen Kobold schlau: Er hat ein weißes Kästchen von links nach rechts geschoben, die Summe bleibt gleich (1 + 4 + 3 = 8 und 2 + 4 + 2 = 8). Den findet man nur am Bild. Richtig ist „2 weiß, 4 schwarz, 2 weiß“.</p>
+    <p class="dann">Genau das macht diesen Kobold schlau: Er hat ein weißes Kästchen von links nach rechts geschoben, die Summe bleibt gleich (<span class="e08-nw">1 + 4 + 3 = 8</span> und <span class="e08-nw">2 + 4 + 2 = 8</span>). Den findet man nur am Bild. Richtig ist „2 weiß, 4 schwarz, 2 weiß“.</p>
   </div>
 
   <h2>Spiele, Bewegung und Basteln</h2>
@@ -259,13 +261,13 @@
   <div class="kasten spiel darf-brechen e08-bricht" data-titel="Code-Diktat">
     <p class="spiel-meta">2 Personen · 2–3 Minuten pro Bild · Muggelstein-Brett (<a class="blattref" href="#blatt-8-3"></a>), etwa 20 Muggelsteine, Kästchenpapier mit den 6 · 6-Feldern, Bleistift, ein großes Buch als Sichtschutz, Zettel für die Punkte</p>
     <ol class="regeln">
-      <li><b>Vorbereitung:</b> Das Buch steht aufgeklappt zwischen euch wie eine Wand. Die Diktiererin legt dahinter ein geheimes Bild mit höchstens 20 Steinen auf das Brett. Sie kann ein Bild aus dem Kasten „Bilder zum Diktieren“ nehmen oder eines erfinden. Der Maler hat das Kästchenpapier mit einem leeren 6 · 6-Feld vor sich.</li>
+      <li><b>Vorbereitung:</b> Das Buch steht aufgeklappt zwischen euch wie eine Wand. Die Diktiererin legt dahinter ein geheimes Bild mit höchstens 20 Steinen auf das Brett, entweder ein eigenes oder eines aus dem Kasten „Bilder zum Diktieren“ (dann kann sie auch direkt aus der Anleitung vorlesen). Der Maler hat das Kästchenpapier mit einem leeren 6 · 6-Feld vor sich.</li>
       <li><b>Rollen:</b> Eine Person ist die <b>Diktiererin</b>, die andere der <b>Maler</b>. Nach jedem Bild tauscht ihr.</li>
       <li><b>Ein Zug:</b> Die Diktiererin sagt den Code einer Zeile, von oben nach unten: „Zeile 2: 1 weiß, 4 schwarz, 1 weiß.“ Der Maler malt die Zeile in sein Feld. Er darf nachfragen („Wie viele weiß am Anfang?“), dann sagt die Diktiererin die ganze Zeile noch einmal. Danach darf der Maler raten, was das Bild ist, aber pro Bild höchstens 2-mal.</li>
       <li><b>Punkte:</b>
         <ul>
           <li>Rät der Maler richtig, bekommt er Punkte, je früher, desto mehr: nach Zeile 1 sind es 6 Punkte, nach Zeile 2 fünf, nach Zeile 3 vier, nach Zeile 4 drei, nach Zeile 5 zwei, nach Zeile 6 einer.</li>
-          <li>Das Bild wird trotzdem fertig diktiert. Dann legt ihr das Brett neben das gemalte Feld und vergleicht Zeile für Zeile: Für jede Zeile, die genau stimmt, bekommt die Diktiererin 1 Punkt.</li>
+          <li>Das Bild wird trotzdem fertig diktiert. Dann legt ihr das Brett (oder das Bild in der Anleitung) neben das gemalte Feld und vergleicht Zeile für Zeile: Für jede Zeile, die genau stimmt, bekommt die Diktiererin 1 Punkt.</li>
           <li><b>Kobold-Jagd:</b> Stimmt eine Zeile nicht, sucht ihr gemeinsam, wo der Kobold saß: beim Sagen oder beim Malen? Die Kobold-Probe hilft: Alle Zahlen der Zeile müssen zusammen 6 ergeben.</li>
         </ul>
         So lohnt sich beides: früh raten als Maler und genau sagen als Diktiererin.</li>
@@ -319,7 +321,7 @@
       <p><b>Und das?</b> „5 Zeilen, jede heißt <m-e8-text raetsel="e8-b2" zeile="1"></m-e8-text>.“</p>
       <p><b>Wie breit?</b> „Eine Zeile heißt 3 weiß, 4 schwarz, 2 weiß. Wie breit ist das Bild?“</p>
       <p><b>Für Profis:</b> „Eine Zeile heißt <m-e8-text raetsel="e8-b3" zeile="1"></m-e8-text>. Wie viele Kästchen? Wie viele davon schwarz?“</p>
-      <p class="klein"><b>Kurz-Lösungen:</b> ein Ball (ein dicker Punkt); ein Strich von oben nach unten; 9 Kästchen, denn 3 + 4 + 2 = 9; 9 Kästchen, davon 3 schwarz. Mehr bei den Lösungen am Ende.</p>
+      <p class="klein"><b>Kurz-Lösungen:</b> ein Ball (ein dicker Punkt); ein Strich von oben nach unten; 9 Kästchen, denn <span class="e08-nw">3 + 4 + 2 = 9</span>; 9 Kästchen, davon 3 schwarz. Mehr bei den Lösungen am Ende.</p>
     </div>
   </div>
 
@@ -345,9 +347,9 @@
       <li><b>Zauber-Kasten in der Zeile.</b> Die Zinnen des Turms (<a class="blattref" href="#blatt-8-2"></a>, Zeile 1) heißen „1 schwarz, 1 weiß, 1 schwarz, 1 weiß, 1 schwarz“, das sind 5 Zahlen. Mit Kasten: „2-mal: 1 schwarz, 1 weiß, dann 1 schwarz“, 4 Zahlen. {{KIND}} legt die lila Streifen um die zwei Teile, die sich wiederholen. Der ganze Turm braucht ohne Kasten <m-e8-zahlen raetsel="e8-s4" teil="lang" nur-zahl></m-e8-zahlen> Zahlen, mit Kästen nur <m-e8-zahlen raetsel="e8-s4" teil="kurz" nur-zahl></m-e8-zahlen>, kürzer geht es nicht:
         <div class="e08-beispiel"><m-e8-mini raetsel="e8-s4" kurz ohne-titel zelle="3"></m-e8-mini></div></li>
       <li><b>Eine Gruppe im Kasten: die Leiter.</b> „Eine Leiter, 5 Kästchen breit: Zeile 1 heißt 1 schwarz, 3 weiß, 1 schwarz. Zeile 2 heißt 5 schwarz. Dann wieder Zeile 1, dann Zeile 2 … 7 Zeilen. Wie schreibt man das kurz?“ Ein Zauber-Kasten mit einer Gruppe aus zwei Zeilen: „3-mal: die Zeile 1 schwarz, 3 weiß, 1 schwarz und die Zeile 5 schwarz“, danach noch einmal 1 schwarz, 3 weiß, 1 schwarz. Das sind <m-e8-zahlen raetsel="e8-s8" teil="kurz" nur-zahl></m-e8-zahlen> Zahlen statt <m-e8-zahlen raetsel="e8-s8" teil="lang" nur-zahl></m-e8-zahlen>, der kürzeste Code (vom Löser geprüft).</li>
-      <li><b>Schachbrett-Rekord.</b> Ein Schachbrett aus 6 · 6 Kästchen, abwechselnd schwarz und weiß, links oben schwarz. Zeile für Zeile ohne Kasten braucht jedes Kästchen eine eigene Zahl: <m-e8-zahlen raetsel="e8-s2" teil="lang" nur-zahl></m-e8-zahlen> Zahlen. Mit einem Zauber-Kasten in jeder Zeile („3-mal: 1 schwarz, 1 weiß“) sind es <m-e8-zahlen raetsel="e8-s2" teil="kurz" nur-zahl></m-e8-zahlen>. Der Rekord sind <m-e8-zahlen raetsel="e8-s3" teil="kurz" nur-zahl></m-e8-zahlen> Zahlen: ein Zauber-Kasten „3-mal“ mit einer Gruppe aus den zwei verschiedenen Zeilen (6 Zahlen und 6 Zahlen, dazu die 3). Kürzer geht es nicht, solange kein Kasten in einem Kasten stehen darf.</li>
+      <li><b>Schachbrett-Rekord.</b> Ein Schachbrett aus 6 · 6 Kästchen, abwechselnd schwarz und weiß, links oben schwarz. Zeile für Zeile ohne Kasten braucht jedes Kästchen eine eigene Zahl: <m-e8-zahlen raetsel="e8-s2" teil="lang" nur-zahl></m-e8-zahlen> Zahlen. Mit einem Zauber-Kasten in jeder Zeile („3-mal: 1 schwarz, 1 weiß“) sind es <m-e8-zahlen raetsel="e8-s2" teil="kurz" nur-zahl></m-e8-zahlen>. Der Rekord sind <m-e8-zahlen raetsel="e8-s3" teil="kurz" nur-zahl></m-e8-zahlen> Zahlen: ein Zauber-Kasten „3-mal“ mit einer Gruppe aus den zwei verschiedenen Zeilen (6 Zahlen und 6 Zahlen, dazu 1 Zahl für „3-mal“). Kürzer geht es nicht, solange kein Kasten in einem Kasten stehen darf.</li>
       <li><b>Zeile für Zeile oder Spalte für Spalte?</b> Die Knobel-Ecke auf <a class="blattref" href="#blatt-8-2"></a> zeigt: Beim Zaun ist Spalte für Spalte viel kürzer. Beim Haus von <a class="blattref" href="#blatt-8-1"></a> ist es umgekehrt: Zeile für Zeile <m-e8-zahlen raetsel="e8-a2" teil="zahlen" nur-zahl></m-e8-zahlen> Zahlen, Spalte für Spalte <m-e8-zahlen raetsel="e8-a2" teil="spalten" nur-zahl></m-e8-zahlen>. Frag: „Wann ist Spalte für Spalte besser?“ (Wenn das Bild Streifen von oben nach unten hat.) Dann ein Spalten-Diktat im Spiel.</li>
-      <li><b>Kobold-Probe ohne Malen.</b> Der Rechen-Kobold hat im Herz von <a class="blattref" href="#blatt-8-2"></a> Zeile 4 so verändert: „<m-e8-text raetsel="e8-s5" teil="kaputt"></m-e8-text>“. {{KIND}} findet ihn ohne zu malen: 1 + 7 + 1 = 9, das Herz ist aber 8 Kästchen breit. Richtig ist „<m-e8-text raetsel="e8-s5" teil="richtig"></m-e8-text>“. Der Kobold auf dem Blatt war schlauer: Bei ihm stimmt die Summe. Spiel das beim Code-Diktat: Wer diktiert, baut absichtlich einen Rechen-Kobold ein, wer malt, findet ihn vorher mit der Probe.</li>
+      <li><b>Kobold-Probe ohne Malen.</b> Der Rechen-Kobold hat im Herz von <a class="blattref" href="#blatt-8-2"></a> Zeile 4 so verändert: „<m-e8-text raetsel="e8-s5" teil="kaputt"></m-e8-text>“. {{KIND}} findet ihn ohne zu malen: <span class="e08-nw">1 + 7 + 1 = 9</span>, das Herz ist aber 8 Kästchen breit. Richtig ist „<m-e8-text raetsel="e8-s5" teil="richtig"></m-e8-text>“. Der Kobold auf dem Blatt war schlauer: Bei ihm stimmt die Summe. Spiel das beim Code-Diktat: Wer diktiert, baut absichtlich einen Rechen-Kobold ein, wer malt, findet ihn vorher mit der Probe.</li>
       <li><b>Nur Zahlen (Profi-Code).</b> Bei Bildern aus weiß und schwarz kann man die Farben weglassen: Jede Zeile beginnt mit weiß, danach wechselt es immer ab. Beginnt eine Zeile mit schwarz, steht vorne eine 0 („0 weiß“). Lies ihr den Smiley so vor und lass sie ihn mit Steinen legen. Danach schreibt sie selbst den Nur-Zahlen-Code für das Haus von <a class="blattref" href="#blatt-8-1"></a>:
         <div class="e08-minis"><div><m-e8-mini raetsel="e8-s6"></m-e8-mini></div><div><m-e8-mini raetsel="e8-s9"></m-e8-mini></div></div>
         Gespart werden die Farben, nicht die Zahlen: Durch die Nullen sind es sogar ein paar Zahlen mehr.</li>
@@ -388,10 +390,10 @@
     </div>
   </div>
   <div class="kasten loesung darf-brechen e08-bricht e08-weiter">
-    <p><b><a class="blattref" href="#blatt-8-2"></a>, Aufgabe 1:</b> Die Kobold-Zeile ist Zeile <m-e8-zahlen raetsel="e8-k1" teil="zeile" nur-zahl></m-e8-zahlen>: „<m-e8-text raetsel="e8-k1" teil="kaputt"></m-e8-text>“ malt den unteren Teil des Herzens um ein Kästchen nach links verschoben. Richtig ist „<m-e8-text raetsel="e8-k1" teil="richtig"></m-e8-text>“. Die Kobold-Probe stimmt bei beiden (1 + 4 + 3 = 8 und 2 + 4 + 2 = 8), den Fehler sieht man nur am Bild: Das Herz ist nur in dieser Zeile links und rechts verschieden (vom Löser geprüft).</p>
+    <p><b><a class="blattref" href="#blatt-8-2"></a>, Aufgabe 1:</b> Die Kobold-Zeile ist Zeile <m-e8-zahlen raetsel="e8-k1" teil="zeile" nur-zahl></m-e8-zahlen>: „<m-e8-text raetsel="e8-k1" teil="kaputt"></m-e8-text>“ malt den unteren Teil des Herzens um ein Kästchen nach links verschoben. Richtig ist „<m-e8-text raetsel="e8-k1" teil="richtig"></m-e8-text>“. Die Kobold-Probe stimmt bei beiden (<span class="e08-nw">1 + 4 + 3 = 8</span> und <span class="e08-nw">2 + 4 + 2 = 8</span>), den Fehler sieht man nur am Bild: Das Herz ist nur in dieser Zeile links und rechts verschieden (vom Löser geprüft).</p>
     <p><b>Aufgabe 2:</b> „3-mal: 1 weiß, 3 schwarz, 1 weiß“. Ohne Zauber-Kasten brauchen die drei Zeilen <m-e8-zahlen raetsel="e8-z1" teil="lang" nur-zahl></m-e8-zahlen> Zahlen (3 Zeilen mit je 3), mit Zauber-Kasten <m-e8-zahlen raetsel="e8-z1" teil="kurz" nur-zahl></m-e8-zahlen> (die 3 für „3-mal“ und die 3 Zahlen der Zeile). Kürzer geht es nicht.</p>
-    <p><b>Knobel-Ecke (Zaun):</b> Zeile für Zeile <m-e8-zahlen raetsel="e8-q1" teil="zeilen" nur-zahl></m-e8-zahlen> Zahlen (3 Zeilen mit je 5 Teilen: 5 + 5 + 5 = 15). Spalte für Spalte nur <m-e8-zahlen raetsel="e8-q1" teil="spalten" nur-zahl></m-e8-zahlen>: Jede Spalte ist ganz schwarz oder ganz weiß, also „3 schwarz“, „3 weiß“, „3 schwarz“, „3 weiß“, „3 schwarz“.</p>
-    <p><b>Bonus-Knobelei:</b> Ball: Die Zeilen 2 und 3 sind ganz voll, oben und unten sind die Ecken weiß, das ist ein runder Ball (oder ein dicker Punkt). Strich: In jeder Zeile ist nur das mittlere Kästchen schwarz, also ein Strich von oben nach unten. Breite: 3 + 4 + 2 = 9 Kästchen. Profi: 3 Runden mit je 3 Kästchen (1 schwarz und 2 weiß) sind 9 Kästchen, davon 3 schwarz.</p>
+    <p><b>Knobel-Ecke (Zaun):</b> Zeile für Zeile <m-e8-zahlen raetsel="e8-q1" teil="zeilen" nur-zahl></m-e8-zahlen> Zahlen (3 Zeilen mit je 5 Teilen: <span class="e08-nw">5 + 5 + 5 = 15</span>). Spalte für Spalte nur <m-e8-zahlen raetsel="e8-q1" teil="spalten" nur-zahl></m-e8-zahlen>: Jede Spalte ist ganz schwarz oder ganz weiß, also „3 schwarz“, „3 weiß“, „3 schwarz“, „3 weiß“, „3 schwarz“.</p>
+    <p><b>Bonus-Knobelei:</b> Ball: Die Zeilen 2 und 3 sind ganz voll, oben und unten sind die Ecken weiß, das ist ein runder Ball (oder ein dicker Punkt). Strich: In jeder Zeile ist nur das mittlere Kästchen schwarz, also ein Strich von oben nach unten. Breite: <span class="e08-nw">3 + 4 + 2 = 9</span> Kästchen. Profi: 3 Runden mit je 3 Kästchen (1 schwarz und 2 weiß) sind 9 Kästchen, davon 3 schwarz.</p>
     <p><b>Bildschirm-Levels (zum Nachschauen):</b> Die App vergleicht nur das fertige Bild. Beim Code bauen gilt jeder Code, der genau das Bild malt.</p>
     <table class="tab e08-tab">
       <tr><th>Level</th><th>Was ist neu?</th><th>Bild</th><th>Lösung</th></tr>
@@ -422,6 +424,7 @@
 
   <div class="aufg">
     <p class="anw">Schreib den Kästchen-Code zum Haus.</p>
+    <p class="e08-legende">Zahl hinein, das kleine Kästchen schwarz anmalen oder weiß lassen.</p>
     <m-e8-bild raetsel="e8-a2"></m-e8-bild>
   </div>
 
@@ -476,15 +479,14 @@
 <section class="blatt" data-einheit="8" data-titel="Muggelstein-Brett" data-art="Spielplan">
   <p class="e08-hinweis">{{KIND}}, leg Kästchenbilder mit Muggelsteinen. Ein Stein ist ein schwarzes Kästchen, ein leeres Feld ist weiß.</p>
   <div class="e08-brett-reihe">
-    <m-e8-brett b="6" h="6" feld="19"></m-e8-brett>
+    <m-e8-brett b="6" h="6" feld="19" loesung="e8-q2"></m-e8-brett>
     <div class="e08-rechts">
       <div class="knobel" data-titel="Knobel-Ecke">
         <p>Jede Zeile hat diesen Code:</p>
         <p><m-e8-code code="2w 2s 2w" klein></m-e8-code></p>
         <p>Leg das Bild!</p>
-        <p class="lsg-nur">Ein Strich von oben nach unten.</p>
         <p>Und wenn jede Spalte diesen Code hat?</p>
-        <p class="lsg-nur">Ein Strich von links nach rechts.</p>
+        <p class="lsg-nur">Ein Strich quer.</p>
       </div>
       <m-qr paket="e8"></m-qr>
     </div>
@@ -505,7 +507,7 @@
       <p>Hier malen:</p>
       <m-e8-gitter b="6" h="6"></m-e8-gitter>
       <p class="e08-von">Von:</p>
-      <p class="lsg-nur">Eigenes Bild: Mehrere Lösungen möglich.</p>
+      <p class="lsg-nur e08-karte-lsg">Eigenes Bild: mehrere Lösungen möglich.</p>
     </div>
   </div>
 </section>

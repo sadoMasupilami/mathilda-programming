@@ -247,11 +247,14 @@ export default {
     if (r.aufgabe === 'zaehlen') return 'zaehlen: Zeilen ' + l.zeilen + ', Spalten ' + l.spalten + ' Zahlen';
     return JSON.stringify(l).slice(0, 90);
   },
-  // Für die App: nur die Aufgabe, nie die Lösung. Malen: der Code (das Bild rechnet die App selbst aus).
-  // Schreiben: das Bild (den Code baut das Kind). Kobold: Code mit Kobold-Zeile und das Soll-Bild als Ziel
-  // („So soll es aussehen“), aber nicht, welche Zeile falsch ist.
+  // Für die App: nur die Aufgabe, nie die Lösung. Malen: der Code (das Bild rechnet die App selbst aus,
+  // web/kern/kaestchen.js ausrollen). Schreiben: das Bild (den Code baut das Kind). Kobold: Code mit
+  // Kobold-Zeile und das Soll-Bild als Ziel („So soll es aussehen“), aber nicht, welche Zeile falsch ist.
+  // name: was das Bild zeigt (beim Malen die Auflösung, also erst im Geschafft-Fenster zeigen).
+  // farben: die Farben, die im Bild vorkommen (für die Farb-Tasten), immer mit "w".
   fuerApp(r) {
-    const basis = { id: r.id, art: r.art, aufgabe: r.aufgabe, titel: r.titel || '', farben: (r.loesung && r.loesung.farben) || r.farben || [] };
+    const farben = Array.from(new Set(['w'].concat((r.loesung && r.loesung.farben) || r.farben || [])));
+    const basis = { id: r.id, art: r.art, aufgabe: r.aufgabe, name: r.titel || '', farben };
     if (r.aufgabe === 'malen') return { ...basis, b: r.b, h: r.h, code: r.code, richtung: r.richtung || 'zeilen', format: r.format || '' };
     if (r.aufgabe === 'schreiben') return { ...basis, b: r.loesung.b, h: r.loesung.h, bild: r.bild };
     if (r.aufgabe === 'kobold') return { ...basis, b: r.loesung.b, h: r.loesung.h, bild: r.bild, code: r.code };

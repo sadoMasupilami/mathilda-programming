@@ -153,8 +153,9 @@ m-e8-bild svg, m-e8-brett svg, m-e8-gitter svg, m-e8-mini svg { display: block; 
     if (z !== 10 && !el.closest('.anleitung, .spick')) return H().fehler(el, 'Auf den Blättern sind Kästchenbilder echte 1-cm-Kästchen (zelle="10")');
     if (z !== 10 && !el.hasAttribute('nur-bild')) return H().fehler(el, 'zelle="' + z + '" nur mit nur-bild (der Code braucht 1-cm-Zeilen)');
     if (el.hasAttribute('nur-loesung') && !lsg) { el.innerHTML = ''; el.classList.add('komp'); return; }
-    const zeige = el.hasAttribute('zeige') || lsg;
     const nurBild = el.hasAttribute('nur-bild');
+    // nur das Bild (ohne Code): das ist immer das fertige Bild
+    const zeige = el.hasAttribute('zeige') || lsg || nurBild;
     const ohneNr = el.hasAttribute('ohne-nr');
     let links = '', svg = '';
     try {
@@ -309,20 +310,33 @@ m-e8-bild svg, m-e8-brett svg, m-e8-gitter svg, m-e8-mini svg { display: block; 
   };
 
   // ---------------------------------------------------------------------
-  // <m-e8-brett b="6" h="6" feld="20">  Muggelstein-Brett: große Felder, Zeilennummern links
+  // <m-e8-brett b="6" h="6" feld="20" [loesung="e8-q2"]>  Muggelstein-Brett: große Felder, Zeilennummern links
+  //   loesung: in der Lösungsansicht liegen rote Steine auf den schwarzen Kästchen dieses Rätsels
   // ---------------------------------------------------------------------
   B['m-e8-brett'] = function (el) {
     const b = parseInt(el.getAttribute('b') || '6', 10), h = parseInt(el.getAttribute('h') || '6', 10);
     const f = parseFloat(el.getAttribute('feld') || '20');
     if (f < 18) return H().fehler(el, 'Felder für Muggelsteine mindestens 18 mm');
+    let steine = null;
+    if (el.hasAttribute('loesung')) {
+      const r = H().DATEN.raetsel[el.getAttribute('loesung')];
+      if (!r || r.art !== 'kaestchen' || !r.loesung || !r.loesung.bild) return H().fehler(el, 'loesung="…" muss ein gelöstes Kästchen-Rätsel sein');
+      const bild = KK().liesBild(r.loesung.bild);
+      if (bild.length !== h || bild[0].length !== b) return H().fehler(el, 'Das Lösungsbild hat nicht ' + b + ' · ' + h + ' Kästchen');
+      if (istLoesung(el)) steine = bild;
+    }
     const links = 9, W = links + b * f + 1, Hh = h * f + 1;
     let s = '<rect x="' + links + '" y="0.5" width="' + (b * f) + '" height="' + (h * f) + '" rx="2" fill="#fbfcff"/>';
     for (let j = 0; j < h; j++) s += '<text x="' + (links - 4.5) + '" y="' + (0.5 + j * f + f / 2 + 0.3) + '" font-size="6.5" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#6b6f86" font-family="Nunito, sans-serif">' + (j + 1) + '</text>';
-    for (let j = 0; j < h; j++) for (let i = 0; i < b; i++) s += '<circle cx="' + (links + i * f + f / 2) + '" cy="' + (0.5 + j * f + f / 2) + '" r="' + (f * 0.36) + '" fill="none" stroke="#dfe2ee" stroke-width="0.35"/>';
+    for (let j = 0; j < h; j++) for (let i = 0; i < b; i++) {
+      const stein = steine && steine[j][i] !== 'w';
+      s += '<circle cx="' + (links + i * f + f / 2) + '" cy="' + (0.5 + j * f + f / 2) + '" r="' + (f * 0.36) + '"' + (stein ? ' fill="#d1335b" stroke="none"' : ' fill="none" stroke="#dfe2ee" stroke-width="0.35"') + '/>';
+    }
     for (let i = 0; i <= b; i++) s += '<line x1="' + (links + i * f) + '" y1="0.5" x2="' + (links + i * f) + '" y2="' + (0.5 + h * f) + '" stroke="#1f2340" stroke-width="' + (i === 0 || i === b ? 0.7 : 0.4) + '"/>';
     for (let j = 0; j <= h; j++) s += '<line x1="' + links + '" y1="' + (0.5 + j * f) + '" x2="' + (links + b * f) + '" y2="' + (0.5 + j * f) + '" stroke="#1f2340" stroke-width="' + (j === 0 || j === h ? 0.7 : 0.4) + '"/>';
     el.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + 'mm" height="' + Hh + 'mm" viewBox="0 0 ' + W + ' ' + Hh + '" role="img" aria-label="Muggelstein-Brett">' + s + '</svg>';
     el.classList.add('komp');
+    if (el.hasAttribute('loesung')) el.classList.add('geprueft');
   };
 
   // ---------------------------------------------------------------------
