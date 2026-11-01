@@ -7,7 +7,8 @@
 //   malen      b, h, code (Liste der Zeilen), optional bild (zur Kontrolle), titel (was es ist),
 //              farben (erlaubte Farben), richtung: "spalten" (Code Spalte für Spalte),
 //              format: "zahlen" (nur Zahlen, abwechselnd weiß und schwarz, zuerst weiß),
-//              zahlen (erwartete Zahl der Zahlen im Code)
+//              zahlen (erwartete Zahl der Zahlen im Code), artikel: "ein" (Standard) oder "eine"
+//              (die App sagt nach dem Malen „Es ist ein Hase!“)
 //              Bild nach Code malen
 //   schreiben  bild, optional code (so soll die Lösung lauten), titel
 //              Code zu einem fertigen Bild schreiben
@@ -53,16 +54,6 @@ function pruefeFarben(F, r, bild) {
   }
   return da;
 }
-// Bild aus Code: Zeilen (Richtung "zeilen") oder Spalten
-function bildAusCode(r, code) {
-  if (r.format === 'zahlen') return code.map((z) => KK.rolleZeile(KK.liesZahlen(z)));
-  const reihen = KK.ausrollen(code);
-  if (r.richtung !== 'spalten') return reihen;
-  const lang = Math.max.apply(null, reihen.map((x) => x.length));
-  const aus = [];
-  for (let y = 0; y < lang; y++) aus.push(reihen.map((s) => s[y] || 'w'));
-  return aus;
-}
 function zeilenInfo(code, r) {
   if (r.format === 'zahlen') return code.map((z, i) => ({ nr: i + 1, text: z, summe: KK.rolleZeile(KK.liesZahlen(z)).length }));
   return KK.liesCode(code).map((e, i) => ({ nr: i + 1, text: KK.eintragText(e), kasten: KK.istKasten(e) }));
@@ -74,11 +65,14 @@ const pruefen = {
     if (!r.code) return F('malen braucht code');
     if (r.richtung !== undefined && !['zeilen', 'spalten'].includes(r.richtung)) F('richtung: zeilen oder spalten');
     if (r.format !== undefined && r.format !== 'zahlen') F('format: nur "zahlen"');
+    if (r.artikel !== undefined && !['ein', 'eine'].includes(r.artikel)) F('artikel: "ein" oder "eine" (für „Es ist eine Tanne!“ in der App)');
     const code = Array.isArray(r.code) ? r.code : String(r.code).split(';').map((x) => x.trim());
-    const bild = versuch(F, () => bildAusCode(r, code), 'Code');
+    // dieselbe Rechnung wie in der App (web/kern/kaestchen.js malBild)
+    const opt = { format: r.format, richtung: r.richtung };
+    const bild = versuch(F, () => KK.malBild(code, opt), 'Code');
     if (!bild) return null;
     // jede Zeile (bzw. Spalte) genau so breit wie das Bild
-    const reihen = r.richtung === 'spalten' ? (r.format === 'zahlen' ? [] : KK.ausrollen(code)) : bild;
+    const reihen = KK.malReihen(code, opt);
     const soll = r.richtung === 'spalten' ? r.h : r.b;
     const anzahl = r.richtung === 'spalten' ? r.b : r.h;
     reihen.forEach((z, i) => { if (z.length !== soll) F((r.richtung === 'spalten' ? 'Spalte ' : 'Zeile ') + (i + 1) + ' malt ' + z.length + ' Kästchen, das Bild ist ' + soll + (r.richtung === 'spalten' ? ' hoch' : ' breit')); });
@@ -255,7 +249,7 @@ export default {
   fuerApp(r) {
     const farben = Array.from(new Set(['w'].concat((r.loesung && r.loesung.farben) || r.farben || [])));
     const basis = { id: r.id, art: r.art, aufgabe: r.aufgabe, name: r.titel || '', farben };
-    if (r.aufgabe === 'malen') return { ...basis, b: r.b, h: r.h, code: r.code, richtung: r.richtung || 'zeilen', format: r.format || '' };
+    if (r.aufgabe === 'malen') return { ...basis, b: r.b, h: r.h, code: r.code, richtung: r.richtung || 'zeilen', format: r.format || '', artikel: r.artikel || 'ein' };
     if (r.aufgabe === 'schreiben') return { ...basis, b: r.loesung.b, h: r.loesung.h, bild: r.bild };
     if (r.aufgabe === 'kobold') return { ...basis, b: r.loesung.b, h: r.loesung.h, bild: r.bild, code: r.code };
     if (r.aufgabe === 'kuerzer') return { ...basis, bild: r.loesung.bild, zahlenLang: r.loesung.zahlenLang };

@@ -167,6 +167,28 @@
   }
   function ausrollen(code) { return zeilenListe(code).map((x) => rolleZeile(x.zeile)); }
 
+  // Mal-Aufgabe (Löser und App gleich): was der Code malt.
+  //   opt.format 'zahlen': nur Zahlen (abwechselnd weiß und schwarz, zuerst weiß)
+  //   opt.richtung 'spalten': jede Code-Zeile ist eine Spalte (von oben nach unten)
+  // malReihen: die Reihen so, wie der Code sie beschreibt (Zeilen oder Spalten)
+  // malBild:   das Bild Zeile für Zeile (bei Spalten gedreht, kurze Spalten unten weiß)
+  function codeListe(code) {
+    return Array.isArray(code) ? code : String(code).split(';').map((x) => x.trim()).filter(Boolean);
+  }
+  function malReihen(code, opt) {
+    const o = opt || {};
+    const liste = codeListe(code);
+    return o.format === 'zahlen' ? liste.map((z) => rolleZeile(liesZahlen(z))) : ausrollen(liste);
+  }
+  function malBild(code, opt) {
+    const reihen = malReihen(code, opt);
+    if (!opt || opt.richtung !== 'spalten') return reihen;
+    const lang = Math.max.apply(null, reihen.map((x) => x.length));
+    const aus = [];
+    for (let y = 0; y < lang; y++) aus.push(reihen.map((s) => s[y] || 'w'));
+    return aus;
+  }
+
   // ---------------------------------------------------------------------
   // Zählen: wie viele Zahlen hat der Code?
   // ---------------------------------------------------------------------
@@ -325,8 +347,8 @@
     const falsch = unterschiede(soll, gemalt);
     return { geschafft: falsch.length === 0, falsch };
   }
-  // Malen nach Code: der Code sagt, was rauskommen soll
-  function bewerteMalen(code, gemalt) { return bewerteBild(ausrollen(code), gemalt); }
+  // Malen nach Code: der Code sagt, was rauskommen soll (opt wie bei malBild)
+  function bewerteMalen(code, gemalt, opt) { return bewerteBild(malBild(code, opt), gemalt); }
   // Code (vom Kind gebaut oder repariert) malt das Bild?
   function bewerteCode(soll, code) {
     let ist;
@@ -394,7 +416,7 @@
     FARBEN, TINTE, ROT, ZAUBER, WDH_MIN, WDH_MAX, MAX_INNEN, MAX_ZEILEN, MAX_LAUF,
     liesZeile, liesZahlen, liesEintrag, liesCode, istKasten,
     zeileText, eintragText, codeText, teilWorte, zeileWorte,
-    rolleZeile, zeilenListe, ausrollen, zahlenZeile, zahlen,
+    rolleZeile, zeilenListe, ausrollen, malReihen, malBild, zahlenZeile, zahlen,
     liesBild, bildText, pruefeRechteck, laeufe, zeileAusReihe, codeAusBild, spalten, codeSpalten,
     zahlenOhneKasten, farbenIn, zaehleFarben, gleicheReihe, unterschiede, gleich,
     spiegel, spiegelgleich, spiegelgleicheReihe, nurZahlen,
