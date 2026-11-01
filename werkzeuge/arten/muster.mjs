@@ -166,6 +166,8 @@ function pruefeWachsend(r, F) {
   if (M.istSauber(f)) F('Das ist ein normales Muster (Kern wiederholt sich) – kein wachsendes');
   if (M.einKasten(f).length) F('Ein einzelner Zauber-Kasten malt diese Folge');
   const w = mehr.slice(f.length, f.length + weiter);
+  if (M.einKasten(f.concat(w)).length) F('Ein einzelner Zauber-Kasten malt die Folge samt Fortsetzung');
+  if (M.istSauber(f.concat(w))) F('Mit der Fortsetzung wird es ein normales Muster – kein wachsendes');
   return { folge: f, weiter: w, naechsteRunde: M.wachsend(r.kopf, r.wachs, r.runden + 1).slice(f.length), kuerzeste: M.kuerzeste(f.concat(w), 3).karten };
 }
 

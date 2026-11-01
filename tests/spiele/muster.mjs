@@ -137,6 +137,9 @@ export function tests({ test, expect: erwarte, h }) {
     await h.oeffneLevel(page, f, info);
     const r = loesungKobold(f.lv);
     const perle = (i) => '.feld [data-aktion="muster-perle"][data-i="' + i + '"]';
+    // Am Anfang: wie am Blatt eine falsche Perle (nicht zwei vertauschte)
+    await erwarte(meldung(page)).toContainText('eine falsche');
+    await h.ansicht(page, 'muster-kobold-start', info);
     // Auswahl ohne angetippte Perle: grau, ein Tipp sagt, was zu tun ist
     await erwarte(page.locator(el(f.lv.palette[0]))).toHaveAttribute('aria-disabled', 'true');
     await h.tippeGrau(page, el(f.lv.palette[0]));

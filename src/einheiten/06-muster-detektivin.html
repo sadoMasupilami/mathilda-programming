@@ -33,6 +33,7 @@
   .e06-kobold-kopf p { margin: 0; font-size: 18pt; line-height: 1.25; }
   .e06-kreihen { display: flex; flex-direction: column; gap: 6mm; padding-left: 4mm; }
   .e06-kreihen > .e06-legende { margin: 0 0 -2mm 0; }
+  .e06-zliste > .e06-zleg { grid-column: 1 / -1; margin: 0 0 -4mm 0; }
   .e06-zliste { display: grid; grid-template-columns: auto auto; align-items: center; justify-content: space-between; gap: 6mm 6mm; padding-left: 4mm; }
   .e06-frage { display: flex; align-items: center; gap: 3mm; margin: 0; }
   .e06-lesen { display: flex; flex-direction: column; align-items: flex-start; gap: 4mm; padding-left: 4mm; }
@@ -88,10 +89,10 @@
         <p class="meta">Perlen-Schüssel, Zettel für Punkte</p>
         <ul>
           <li><b>Ein Zug:</b> Die Erfinderin legt den Anfang eines Musters in eine Reihe: Kern 2 bis 4 Perlen, mindestens zweimal ganz. Der Detektiv legt die nächsten 3 Perlen und sagt den Kern.</li>
-          <li><b>Punkte Detektiv:</b> 3 Perlen richtig 1, Kern (das kürzeste Stück) richtig 1, als Zauber-Kasten gesagt („4-mal: rot, gelb“) 1 extra. Kern nicht zweimal ganz gezeigt: 1.</li>
+          <li><b>Punkte Detektiv:</b> 3 Perlen richtig 1, Kern (das kürzeste Stück) richtig 1, die ganze Reihe als Zauber-Kasten gesagt („4-mal: rot, gelb“) 1 extra. Kern nicht zweimal ganz gezeigt: 1, die Erfinderin legt weiter.</li>
           <li><b>Punkte Erfinderin:</b> 1, wenn eine Perle falsch liegt.</li>
-          <li><b>Runde 5 und 6 sind Kobold-Runden:</b> fertiges Muster mit genau einer vertauschten Perle. Gefunden: 2 Punkte.</li>
-          <li><b>Ende:</b> nach 6 Runden, mehr Punkte gewinnt.</li>
+          <li><b>Runde 5 und 6 sind Kobold-Runden:</b> fertiges Muster, genau eine Perle gegen eine falsche ausgetauscht. Gefunden: 2 Punkte.</li>
+          <li><b>Ende:</b> nach 6 Runden, mehr Punkte gewinnt (gleich viele: beide).</li>
         </ul>
       </div>
       <div class="sag">
@@ -155,7 +156,7 @@
 <section class="anleitung" data-einheit="6" data-titel="Muster-Detektivin">
 
   <div class="kasten ziel">
-    <p>{{KIND}} wird heute <b>Muster-Detektivin</b>. Ein <span class="begriff">Muster</span> ist eine Reihe, in der sich immer dasselbe Stück wiederholt: rot, blau, rot, blau … oder klatschen, stampfen, stampfen, klatschen, stampfen, stampfen … Das Stück, das sich wiederholt, heißt <span class="begriff">Muster-Kern</span>. Wer den Kern gefunden hat, kann das Muster beliebig weit fortsetzen, Lücken füllen, den Fehler-Kobold darin finden (er hat genau eine Perle vertauscht) und das ganze Muster ganz kurz aufschreiben: mit dem Zauber-Kasten aus Einheit 5, z. B. „3-mal: rot, blau, blau“.</p>
+    <p>{{KIND}} wird heute <b>Muster-Detektivin</b>. Ein <span class="begriff">Muster</span> ist eine Reihe, in der sich immer dasselbe Stück wiederholt: rot, blau, rot, blau … oder klatschen, stampfen, stampfen, klatschen, stampfen, stampfen … Das Stück, das sich wiederholt, heißt <span class="begriff">Muster-Kern</span>. Wer den Kern gefunden hat, kann das Muster beliebig weit fortsetzen, Lücken füllen, den Fehler-Kobold darin finden (er hat genau eine Perle gegen eine falsche ausgetauscht) und das ganze Muster ganz kurz aufschreiben: mit dem Zauber-Kasten aus Einheit 5, z. B. „3-mal: rot, blau, blau“.</p>
     <p>Damit beginnt Block B (Muster und Geheimcodes). Heute wird geklatscht, gestampft, gelegt, gefädelt und getanzt. Im Schwerer-Teil warten Muster, bei denen Farbe und Form verschieden schnell wechseln, Muster, die wachsen (und darum in keinen Zauber-Kasten passen), und die Frage nach dem kürzesten Zauber-Kasten für ein langes Armband. In der Rechen-Werkstatt (R17) setzt {{KIND}} Zahlenmuster fort; hier sind es Farben, Formen und Bewegungen, und sie schreibt sie als Programm auf.</p>
   </div>
 
@@ -164,7 +165,7 @@
       <li><b>Muster-Kern:</b> das <b>kürzeste</b> Stück vom Anfang, das sich immer wiederholt. Bei <m-e6-folge folge="rot blau rot blau rot blau" gr="4"></m-e6-folge> ist der Kern <m-e6-folge folge="rot blau" gr="4"></m-e6-folge>. „Rot, blau, rot, blau“ wiederholt sich zwar auch, ist aber länger.</li>
       <li><b>Zweimal ganz:</b> Ein Muster zeigt seinen Kern mindestens <b>zweimal ganz</b>. Erst dann kann man wissen, wie es weitergeht. Nach „rot, blau, blau“ allein könnte alles kommen. Alle Muster auf den Blättern und in der App halten sich daran, und das Programm hat geprüft, dass jede Lücke und jede Fortsetzung nur eine Lösung hat.</li>
       <li><b>Detektiv-Trick:</b> laut im Rhythmus mitsprechen („rot – blau – blau, rot – blau – blau“) und mit dem Finger tippen. Wo fängt es wieder von vorne an? Dort ist der Kern zu Ende. Bewegungs-Muster am besten wirklich mitmachen.</li>
-      <li><b>Kobold im Muster:</b> Der Fehler-Kobold vertauscht <b>genau eine</b> Perle. Repariert wird mit genau einem Tausch. Bei jedem Kobold-Muster auf den Blättern und in der App hat das Programm alle anderen Tausch-Möglichkeiten durchprobiert: Nur eine einzige macht wieder ein sauberes Muster.</li>
+      <li><b>Kobold im Muster:</b> Der Fehler-Kobold tauscht <b>genau eine</b> Perle gegen eine falsche aus. Repariert wird mit genau einem Tausch. Bei jedem Kobold-Muster auf den Blättern und in der App hat das Programm alle anderen Tausch-Möglichkeiten durchprobiert: Nur eine einzige macht wieder ein sauberes Muster.</li>
       <li><b>Muster als Zauber-Kasten</b> (wie in Einheit 5): Der Kern kommt in den lila Kasten, die Zahl sagt, wie oft er drankommt. 2-mal bis 5-mal, 1 bis 3 Perlen im Kasten. Karten zählen wie gewohnt: Zahlenkarte plus alles im Kasten. <m-e6-programm programm="3[rot blau blau]" gr="4"></m-e6-programm> sind 4 Karten für 9 Perlen.</li>
       <li><b>Die Perlen:</b> Jede Farbe hat ihre eigene Form, so erkennt man sie auch schwarz-weiß gedruckt: <span class="e06-nw"><m-e6-el name="rot" gr="4"></m-e6-el> rot (Kreis)</span>, <span class="e06-nw"><m-e6-el name="blau" gr="4"></m-e6-el> blau (Quadrat)</span>, <span class="e06-nw"><m-e6-el name="gelb" gr="4"></m-e6-el> gelb (Dreieck)</span>, <span class="e06-nw"><m-e6-el name="gruen" gr="4"></m-e6-el> grün (Herz)</span>. Klatsch-Muster: <span class="e06-nw"><m-e6-el name="klatschen" gr="4.5"></m-e6-el> klatschen</span>, <span class="e06-nw"><m-e6-el name="stampfen" gr="4.5"></m-e6-el> stampfen</span>, <span class="e06-nw"><m-e6-el name="schnipsen" gr="4.5"></m-e6-el> schnipsen</span>. Am Papier genügt es, die Perle in der richtigen Farbe auszumalen. Die Form ist eine Hilfe, keine Pflicht.</li>
     </ul>
@@ -187,8 +188,8 @@
     <li data-min="4"><span class="schritt-titel">Klatsch-Muster</span>Fang ohne Worte an: Du klatschst und stampfst ein Muster, z. B. klatschen, stampfen, stampfen, klatschen, stampfen, stampfen, klatschen … und hörst mitten drin auf. Schau {{KIND}} erwartungsvoll an. Fast immer macht sie von selbst weiter. Nach zwei oder drei Mustern sagst du die Wörter: „Das ist ein Muster. Das Stück, das sich immer wiederholt, heißt Muster-Kern.“ Danach spielt ihr das Spiel „Klatsch-Muster“ mit einer Kobold-Runde (Kasten unten). Ganz wichtig ist die Regel „zweimal ganz“: Den Kern immer mindestens zweimal ganz vormachen.</li>
     <li data-min="7"><span class="schritt-titel">Muster-Duell mit Perlen</span>Das Hauptspiel mit der Perlen-Schüssel (Kasten „Spiel: Muster-Duell“). Zuerst legst du den Anfang eines Musters, {{KIND}} setzt fort und sagt den Kern. Dann umgekehrt. Die Perlen liegen dabei einfach in einer Reihe auf dem Tisch. Das schönste Muster darf {{KIND}} am Ende als Armband auffädeln (Kasten „Basteln“), gern auch nach der Einheit.</li>
     <li data-min="5"><span class="schritt-titel">Blatt „Muster-Detektivin“</span><a class="blattref" href="#blatt-6-1"></a>. Bei Aufgabe 1 malt sie die nächsten Perlen in die leeren Plätze und kreist in jeder Reihe den Muster-Kern ein. Die Farbe genügt, die Form ist eine Hilfe. Bei Aufgabe 2 liest sie das Klatsch-Muster vor und macht es mit dem Körper, bevor sie zeichnet: eine Hand für klatschen, einen Fuß für stampfen (ein „K“ oder „S“ im Kästchen gilt auch). Die Profi-Aufgabe (Lücken mitten im Muster) ist freiwillig.</li>
-    <li data-min="5"><span class="schritt-titel">Blatt „Kobold im Muster“</span><a class="blattref" href="#blatt-6-2"></a>. In jeder Reihe hat der Kobold genau eine Perle vertauscht. Sie kreist die falsche Perle ein und malt die richtige in den Platz darunter. Der sichere Weg: zuerst den Kern finden („rot, blau“), dann Perle für Perle prüfen. Beim Klatsch-Muster merkt man den Kobold am besten, wenn man es wirklich macht: Dort, wo man stolpert, sitzt er. Die Profi-Aufgabe (Farbe und Form) ist für schnelle Detektivinnen.</li>
-    <li data-min="6"><span class="schritt-titel">Muster-Tanz und Blatt „Muster als Zauber-Kasten“</span>Du tanzt ein Muster ohne Karten vor (Kasten „Bewegung: Muster-Tanz“). {{KIND}} schaut genau zu und legt es dann mit Tanz-Karten, lila Streifen und Zahlenkarte als Zauber-Kasten. Ihr tanzt es zusammen, und einer baut einen Kobold ein. Danach <a class="blattref" href="#blatt-6-3"></a>: Armbänder als Zauber-Kasten schreiben und umgekehrt ein Armband nach einem Zauber-Kasten malen. Passt das Blatt heute nicht mehr hinein, kommt es beim nächsten Mal dran.</li>
+    <li data-min="5"><span class="schritt-titel">Blatt „Kobold im Muster“</span><a class="blattref" href="#blatt-6-2"></a>. In jeder Reihe hat der Kobold genau eine falsche Perle hineingeschmuggelt. Sie kreist die falsche Perle ein und malt die richtige in den Platz darunter. Der sichere Weg: zuerst den Kern finden („rot, blau“), dann Perle für Perle prüfen. Beim Klatsch-Muster merkt man den Kobold am besten, wenn man es wirklich macht: Dort, wo man stolpert, sitzt er. Die Profi-Aufgabe (Farbe und Form) ist für schnelle Detektivinnen.</li>
+    <li data-min="6"><span class="schritt-titel">Muster-Tanz und Blatt „Muster als Zauber-Kasten“</span>Du tanzt ein Muster ohne Karten vor (Kasten „Bewegung: Muster-Tanz“). {{KIND}} schaut genau zu und legt es dann mit Tanz-Karten, lila Streifen und Zahlenkarte als Zauber-Kasten. Ihr tanzt es zusammen, und einer baut einen Kobold ein. Danach <a class="blattref" href="#blatt-6-3"></a>: Armbänder und ein Klatsch-Muster als Zauber-Kasten schreiben und umgekehrt ein Armband nach einem Zauber-Kasten malen. Passt das Blatt heute nicht mehr hinein, kommt es beim nächsten Mal dran.</li>
     <li data-min="2"><span class="schritt-titel">Sammelpass</span>Feld „Einheit&nbsp;6“ stempeln oder bekleben, Sterne anmalen. Frag: „Wo hast du heute noch ein Muster gesehen?“ (Fliesen, Zebrastreifen, Pullover, Zaun, die Wochentage …) Wer mag, geht danach mit dem Muster-Blick durch die Wohnung.</li>
   </ol>
 
@@ -215,7 +216,7 @@
     <p class="dann">Das ist die Regel „zweimal ganz“: Erst wenn der Kern zweimal ganz daliegt, ist es ein Muster und kein Raten. Beim Muster-Duell bekommt der Detektiv einen Punkt, wenn die Erfinderin die Regel vergisst. {{KIND}} wird sehr genau darauf achten.</p>
   </div>
   <div class="sag">
-    <p class="du">(<a class="blattref" href="#blatt-6-2"></a>, erste Reihe) „Hier hat der Kobold eine Perle vertauscht. Welche?“</p>
+    <p class="du">(<a class="blattref" href="#blatt-6-2"></a>, erste Reihe) „Hier hat der Kobold eine falsche Perle hineingeschmuggelt. Welche?“</p>
     <p class="sie">„Da sind drei blaue hintereinander. Die mittlere muss rot sein!“</p>
     <p class="du">„Wie hast du das herausgefunden?“</p>
     <p class="sie">„Es geht immer rot, blau, rot, blau.“</p>
@@ -257,11 +258,11 @@
       <li><b>Vorbereitung:</b> Die Schüssel steht in der Mitte. Jede Person legt ihre Reihe auf einen Teller oder ein Geschirrtuch, damit nichts wegrollt.</li>
       <li><b>Rollen:</b> Eine Person ist die <b>Erfinderin</b>, die andere der <b>Detektiv</b>. Ihr tauscht nach jeder Runde.</li>
       <li><b>Ein Zug:</b> Die Erfinderin legt den Anfang eines Musters in eine Reihe. Der Kern hat 2 bis 4 Perlen und liegt mindestens <b>zweimal ganz</b> da. Sie darf mitten im Kern aufhören, das ist sogar besonders spannend. Der Detektiv legt die nächsten <b>3 Perlen</b> dazu und sagt den Muster-Kern.</li>
-      <li><b>Punkte für den Detektiv:</b> Alle 3 Perlen richtig: 1 Punkt. Kern richtig gesagt (das kürzeste Stück): 1 Punkt. Sagt er das Muster auch als Zauber-Kasten, z. B. „4-mal: rot, gelb“ für 8 Perlen: 1 Extrapunkt. Liegt der Kern nicht zweimal ganz da (Regel vergessen): 1 Punkt für den Detektiv.</li>
+      <li><b>Punkte für den Detektiv:</b> Alle 3 Perlen richtig: 1 Punkt. Kern richtig gesagt (das kürzeste Stück): 1 Punkt. Sagt er die ganze Reihe als Zauber-Kasten, z. B. „4-mal: rot, gelb“ für 8 Perlen (ein Rest kommt hinter den Kasten): 1 Extrapunkt. Liegt der Kern nicht zweimal ganz da (Regel vergessen): 1 Punkt für den Detektiv, und die Erfinderin legt weiter, bis er zweimal ganz daliegt.</li>
       <li><b>Punkte für die Erfinderin:</b> Liegt eine der 3 Perlen falsch: 1 Punkt.</li>
-      <li><b>Kobold-Runden:</b> Runde 5 und 6 sind Kobold-Runden. Die Erfinderin legt ein fertiges Muster (Kern mindestens dreimal) und vertauscht dabei genau eine Perle, nicht ganz vorne und nicht ganz hinten. Der Detektiv zeigt auf die falsche Perle und tauscht sie: 2 Punkte. Zeigt er auf eine andere: 1 Punkt für die Erfinderin.</li>
+      <li><b>Kobold-Runden:</b> Runde 5 und 6 sind Kobold-Runden. Die Erfinderin legt ein fertiges Muster (Kern mindestens dreimal) und tauscht dabei genau eine Perle gegen eine falsche aus, nicht ganz vorne und nicht ganz hinten. Der Detektiv zeigt auf die falsche Perle und tauscht sie: 2 Punkte. Zeigt er auf eine andere: 1 Punkt für die Erfinderin.</li>
       <li><b>Nach jeder Runde</b> kommen die Perlen zurück in die Schüssel. Gefällt {{KIND}} ein Muster besonders, schreibt ihr es als Zauber-Kasten auf einen Zettel, dann ist es fürs Armband gemerkt.</li>
-      <li><b>Ende:</b> Nach 6 Runden (jede Person 3-mal Erfinderin) gewinnt, wer mehr Punkte hat. Danach darf {{KIND}} ihr Lieblingsmuster auffädeln.</li>
+      <li><b>Ende:</b> Nach 6 Runden (jede Person 3-mal Erfinderin) gewinnt, wer mehr Punkte hat, bei Gleichstand beide. Danach darf {{KIND}} ihr Lieblingsmuster auffädeln.</li>
     </ol>
     <p><b>Tipp für dich als Erfinder:</b> Mal knifflig (Kern 4, mitten im Kern aufhören, zwei gleiche Perlen im Kern wie rot, rot, gelb, blau), mal machbar. So holt {{KIND}} oft ihre Punkte und wird trotzdem gefordert.</p>
     <p><b>Varianten:</b></p>
@@ -274,9 +275,9 @@
 
   <div class="sag">
     <p class="sie">(legt gelb, rot, rot, gelb, rot, rot, gelb) „Jetzt du! Und du musst den Kern sagen!“</p>
-    <p class="du">„Rot, rot, gelb … Der Kern ist gelb, rot, rot. Als Zauber-Kasten: 3-mal: gelb, rot, rot!“</p>
-    <p class="sie">„Extrapunkt! Ich hab mitten im Kern aufgehört, und du hast es trotzdem gemerkt.“</p>
-    <p class="dann">Genau so soll es laufen: {{KIND}} prüft dich wie eine echte Detektivin. Mitten im Kern aufzuhören ist ein guter Trick, den sie schnell selbst verwendet.</p>
+    <p class="du">„Rot, rot, gelb … Der Kern ist gelb, rot, rot. Als Zauber-Kasten: 3-mal: gelb, rot, rot, und dahinter noch ein Gelb!“</p>
+    <p class="sie">„Extrapunkt! Dabei hab ich extra mitten im Kern aufgehört.“</p>
+    <p class="dann">Genau so soll es laufen: {{KIND}} prüft dich wie eine echte Detektivin. Mitten im Kern aufzuhören ist ein guter Trick, den sie schnell selbst verwendet. Das Gelb hinter dem Kasten muss sein: „3-mal“ allein malt nur 9 der 10 Perlen.</p>
   </div>
 
   <div class="kasten bewegung darf-brechen e06-bricht" data-titel="Muster-Tanz">
@@ -325,12 +326,12 @@
     <ul>
       <li><b>Sie nennt einen zu langen Kern</b> („rot, blau, rot, blau“): Nicht falsch, das wiederholt sich auch. Frag: „Geht es noch kürzer?“ Der Kern ist das kürzeste Stück.</li>
       <li><b>Sie kreist den Kern mitten in der Reihe ein</b> („blau, rot“ statt „rot, blau“): Auch dieses Stück wiederholt sich, das zählt als richtig. Zeig nur, dass der Kern am Anfang der Reihe am leichtesten zu finden ist.</li>
-      <li><b>Sie setzt von vorne fort statt dort, wo die Reihe aufhört:</b> Bei gelb, gelb, grün, gelb, gelb, grün, gelb malt sie gelb, gelb, grün statt gelb, grün. Mit dem Finger die letzten Perlen laut lesen und weitertippen: „gelb, gelb, grün, gelb, … was kommt nach dem ersten Gelb?“ Der Kern läuft dort weiter, wo er aufgehört hat.</li>
+      <li><b>Sie setzt von vorne fort statt dort, wo die Reihe aufhört:</b> Bei gelb, gelb, grün, gelb, gelb, grün, gelb malt sie gelb, gelb statt gelb, grün. Mit dem Finger die letzten Perlen laut lesen und weitertippen: „gelb, gelb, grün, gelb, … was kommt nach dem ersten Gelb?“ Der Kern läuft dort weiter, wo er aufgehört hat.</li>
       <li><b>Beim Kobold kreist sie die Nachbarin ein</b> (bei drei blauen Perlen die erste statt der mittleren): Ausprobieren lassen. Jede verdächtige Perle im Kopf tauschen und das Muster laut lesen. Nur ein Tausch macht es wieder sauber.</li>
       <li><b>Beim Klatsch-Muster kommt sie aus dem Takt:</b> Langsamer werden, laut zählen („eins, zwei, drei, eins, zwei, drei“), beim Kern-Anfang etwas lauter klatschen. Aus dem Takt kommen ist kein Fehler im Muster, sondern nur im Tanz.</li>
       <li><b>Sie malt am Papier nur Kreise</b> oder alles in einer Form: Kein Problem. Ein roter Kringel ist eine rote Perle. Wichtig ist, dass die Farben im Muster stimmen. Nur bei der Profi-Aufgabe auf <a class="blattref" href="#blatt-6-2"></a> zählt auch die Form.</li>
       <li><b>Sie schreibt die Perlenzahl in den Zauber-Kasten</b> („9-mal: rot, blau, blau“): „Wie oft kommt der Kern dran?“ Mit dem Finger die Kerne in der Reihe zählen. 9 Perlen sind 3 Runden mit je 3 Perlen.</li>
-      <li><b>„Das geht nicht in einen Zauber-Kasten!“</b> Stimmt manchmal wirklich: wenn der Kern mehr als 3 Perlen hat, wenn er öfter als 5-mal vorkommt oder wenn das Muster wächst. Das ist eine richtig gute Entdeckung (Schwerer-Teil).</li>
+      <li><b>„Das geht nicht in einen Zauber-Kasten!“</b> Stimmt manchmal: Kern mit mehr als 3 Perlen, öfter als 5-mal oder ein wachsendes Muster. Eine richtig gute Entdeckung (Schwerer-Teil). Hört die Reihe mitten im Kern auf, kommt der Rest hinter den Kasten.</li>
     </ul>
   </div>
 
@@ -341,12 +342,12 @@
       <li><b>Kern mit Falle:</b> Muster, deren Kern eine Wiederholung in sich hat, z. B. rot, blau, rot, rot, blau, rot, blau, rot, rot, blau. Der Anfang „rot, blau, rot“ sieht aus wie „rot, blau“, aber der Kern hat 5 Perlen (rot, blau, rot, rot, blau). Detektive schauen lange genug hin, bevor sie entscheiden. Fünf Perlen passen übrigens in keinen Zauber-Kasten, dort haben nur 3 Platz.</li>
       <li><b>Farbe und Form wechseln verschieden schnell:</b> Dieses Muster sieht wild aus:
         <div class="e06-beispiel"><m-e6-folge raetsel="e6-a9" gr="6.5"></m-e6-folge></div>
-        Schau nur auf die Farben: blau, gelb, blau, gelb … (die Farbe wechselt nach jeder Perle, Kern 2). Schau nur auf die Formen: Kreis, Quadrat, Dreieck, Kreis … (Kern 3). Zusammen wiederholt es sich erst nach <m-e6-wert raetsel="e6-a9" wert="laenge" l="6"></m-e6-wert> Perlen, denn erst dann stehen Farbe und Form gleichzeitig wieder am Anfang: 2&nbsp;·&nbsp;3&nbsp;=&nbsp;6. Wie geht es weiter? (blauer Kreis, gelbes Quadrat.) Diese Perlen-Art ist die Profi-Aufgabe auf <a class="blattref" href="#blatt-6-2"></a> (dort hat der Kobold eine Form vertauscht) und Level 9 in der App. Mit Material: zwei Nudelsorten und zwei Farben. Fragen zum Weiterdenken: Farbe alle 2 und Form alle 2: Wie lang ist der Kern? (2.) Passt ein Kern mit 6 Perlen in einen Zauber-Kasten? (Nein, höchstens 3 Perlen haben Platz.)</li>
+        Schau nur auf die Farben: blau, gelb, blau, gelb … (die Farbe wechselt nach jeder Perle, Kern 2). Schau nur auf die Formen: Kreis, Quadrat, Dreieck, Kreis … (Kern 3). Zusammen wiederholt es sich erst nach <m-e6-wert raetsel="e6-a9" wert="laenge" l="6"></m-e6-wert> Perlen, denn erst dann stehen Farbe und Form gleichzeitig wieder am Anfang: 2&nbsp;·&nbsp;3&nbsp;=&nbsp;6. Wie geht es weiter? (blauer Kreis, gelbes Quadrat.) Diese Perlen-Art ist die Profi-Aufgabe auf <a class="blattref" href="#blatt-6-2"></a> (dort stimmt bei einer Perle die Form nicht) und Level 9 in der App. Mit Material: zwei Nudelsorten und zwei Farben. Fragen zum Weiterdenken: Farbe alle 2 und Form alle 2: Wie lang ist der Kern? (2.) Passt ein Kern mit 6 Perlen in einen Zauber-Kasten? (Nein, höchstens 3 Perlen haben Platz.)</li>
       <li><b>Wachsende Muster:</b> Knobel-Ecke auf <a class="blattref" href="#blatt-6-3"></a>: rot, blau, dann rot, blau, blau, dann rot, blau, blau, blau … Das folgt auch einer Regel, aber kein Stück wiederholt sich genau: Jede Runde wird um eine blaue Perle länger. Darum gibt es keinen Zauber-Kasten dafür, denn ein Zauber-Kasten macht in jeder Runde genau dasselbe. (Das Programm hat geprüft, dass kein einzelner Kasten diese Perlen malt.) Fragen: „Wie viele blaue Perlen hat die 5. Runde?“ (5.) „Wie viele Perlen haben die ersten 4 Runden zusammen?“ (2 + 3 + 4 + 5 = 14.) Weitere wachsende Muster: klatschen, stampfen; klatschen, stampfen, stampfen; … oder eine Stiege aus Legosteinen.</li>
       <li><b>Der kürzeste Zauber-Kasten für ein langes Armband:</b> Ein Armband hat 18 Perlen, nämlich 6-mal rot, blau, blau. Aber Zahlenkarten gibt es nur bis 5-mal! Wie schreibt man es mit möglichst wenigen Karten? Mit Perlen, Zahlenkarten und lila Streifen auslegen lassen. Lösung: Es geht mit <m-e6-wert raetsel="e6-s1" wert="karten" l="7"></m-e6-wert> Karten, z. B.
         <div class="e06-beispiel"><m-e6-programm programm="5[rot blau blau] rot blau blau" gr="5.5"></m-e6-programm> <span class="e06-bl">oder</span> <m-e6-programm programm="rot 2[blau] 5[rot blau blau]" gr="5.5"></m-e6-programm></div>
         Das Programm hat <m-e6-wert raetsel="e6-s1" wert="anzahl" l="7"></m-e6-wert> verschiedene Lösungen mit 7 Karten gefunden, mit 6 Karten geht es nicht. Zwei Kästen „3-mal: rot, blau, blau“ wären 8 Karten. Wer eine Lösung hat, sucht eine zweite.</li>
-      <li><b>Eigenes Kobold-Muster:</b> {{KIND}} erfindet ein Muster mit Perlen oder auf Kästchenpapier und versteckt einen Kobold darin. Regeln für sie: Kern mindestens dreimal ganz, genau eine Perle falsch. Du suchst. Auf Kästchenpapier geht das wie beim Muster-Bild aus Einheit 5 (<a class="blattref" href="#blatt-5-1"></a>): Sie schreibt für eine Zeile einen Zauber-Kasten, malt die Zeile aber mit einem Kobold-Kästchen. Du findest das Kästchen, das nicht zum Kasten passt. Spannend wird es, wenn sie den Kobold ganz an den Anfang oder ans Ende setzt: Ist er dann noch eindeutig zu finden? (Am Rand kann man oft auch eine andere Perle tauschen, dann gibt es zwei Lösungen. Bei den Kobold-Mustern auf den Blättern hat das Programm geprüft, dass nur ein einziger Tausch hilft.)</li>
+      <li><b>Eigenes Kobold-Muster:</b> {{KIND}} erfindet ein Muster mit Perlen oder auf Kästchenpapier und versteckt einen Kobold darin. Regeln für sie: Kern mindestens dreimal ganz, genau eine Perle falsch. Du suchst. Auf Kästchenpapier geht das wie beim Muster-Bild aus Einheit 5 (<a class="blattref" href="#blatt-5-1"></a>): Sie schreibt für eine Zeile einen Zauber-Kasten, malt die Zeile aber mit einem Kobold-Kästchen. Du findest das Kästchen, das nicht zum Kasten passt. Warum dreimal? (Bei nur zwei Kernen weiß niemand, welcher stimmt: Man kann den einen oder den anderen reparieren. Ab drei Kernen zeigen zwei richtige, wie es sein muss, auch wenn der Kobold ganz vorne sitzt. Auf den Blättern hat das Programm geprüft, dass nur ein Tausch hilft.)</li>
       <li><b>Muster-Detektivin im Alltag:</b> Gemeinsam Muster suchen und den Kern sagen: Fliesen, Zebrastreifen, Zaun, Strickmuster, Wochentage, Jahreszeiten, Tag und Nacht. Gibt es auch Muster, die wachsen? (Die eigene Größe, die Kerzen am Geburtstagskuchen.)</li>
     </ol>
   </div>
@@ -354,7 +355,7 @@
   <h2>Hintergrund</h2>
   <div class="kasten warum darf-brechen e06-bricht">
     <p>Muster erkennen (Fachleute sagen <span class="begriff">Mustererkennung</span>) ist eines der wichtigsten Denkwerkzeuge beim Programmieren. Wer sieht, dass sich etwas wiederholt, kann es mit einer <span class="begriff">Schleife</span> kurz aufschreiben: Der Muster-Kern kommt in den Zauber-Kasten, die Zahl sagt, wie oft. In der Mathematik heißt der Kern die <span class="begriff">Periode</span> eines Musters.</p>
-    <p>Computer speichern Muster genauso platzsparend: Statt achtzehn einzelner Perlen steht im Speicher „6-mal: rot, blau, blau“. Das nennt man <span class="begriff">Datenkompression</span>. Gepackte Dateien und viele Bilder auf dem Handy funktionieren nach diesem Prinzip. In Einheit 8 (Bilder aus Kästchen) macht {{KIND}} das mit Kästchenbildern.</p>
+    <p>Computer speichern Muster genauso platzsparend: Statt achtzehn einzelner Perlen steht im Speicher „6-mal: rot, blau, blau“. Das nennt man <span class="begriff">Datenkompression</span>. Gepackte Dateien (ZIP) und manche Bildformate funktionieren nach diesem Prinzip. In Einheit 8 (Bilder aus Kästchen) macht {{KIND}} das mit Kästchenbildern.</p>
     <p>Der Kobold im Muster steht für etwas, das Programme ständig tun: Sie prüfen, ob Daten zu einer Regel passen, und finden Ausreißer. So merkt ein Programm, dass bei einer Übertragung ein Zeichen kaputtgegangen ist. Wachsende Muster brauchen eine Schleife mit einem Zähler, der jede Runde größer wird (eine <span class="begriff">Variable</span>), ein Ausblick auf später.</p>
   </div>
 
@@ -362,11 +363,11 @@
   <div class="kasten bildschirm darf-brechen e06-bricht">
     <p><b>Paket 6 „Muster-Detektivin“,</b> QR-Code auf <a class="blattref" href="#blatt-6-1"></a> rechts über dem Klatsch-Muster. Nur am Schluss, nach den Blättern, höchstens 15 Minuten; die Einheit geht auch ganz ohne Bildschirm. <b>9 Levels in drei Arten,</b> alles nur Antippen, dann „Los“:</p>
     <ul>
-      <li><b>Muster fortsetzen</b> (Level 1, 2, 3, 8, 9): Der Platz mit dem goldenen Rand ist dran. {{KIND}} tippt unten die passende Perle an (oder Hand, Fuß, Finger), bei Level 8 zuerst für die Lücke. Jeder Platz lässt sich antippen und ändern. Passt etwas nicht, ist die erste solche Stelle rot umrandet.</li>
-      <li><b>Kobold im Muster</b> (Level 4 und 6): die falsche Perle antippen, unten die richtige. Getauscht ist immer nur eine Perle. Stimmt es nicht, verrät die App nicht, wo der Kobold steckt.</li>
-      <li><b>Zauber-Kasten bauen</b> (Level 5 und 7): Zahl (2 bis 5) und bis zu 3 Perlen antippen, das rote Kreuz nimmt die letzte heraus. Der Kasten malt sein Armband Perle für Perle in den lila Streifen darunter und bleibt stehen, wo es nicht passt (oder sagt: zu kurz, zu lang).</li>
+      <li><b>Muster fortsetzen</b> (Level 1, 2, 3, 8, 9): Der Platz mit dem goldenen Rand ist dran. {{KIND}} tippt in der Auswahl die passende Perle an (oder Hand, Fuß, Finger), bei Level 8 zuerst für die Lücke. Jeder Platz lässt sich antippen und ändern. Passt etwas nicht, ist die erste solche Stelle rot umrandet.</li>
+      <li><b>Kobold im Muster</b> (Level 4 und 6): die falsche Perle antippen, dann in der Auswahl die richtige. Getauscht ist immer nur eine Perle. Stimmt es nicht, verrät die App nicht, wo der Kobold steckt.</li>
+      <li><b>Zauber-Kasten bauen</b> (Level 5 und 7): Zahl (2 bis 5) und bis zu 3 Perlen antippen, das rote Kreuz nimmt die letzte heraus. Der Kasten malt sein Armband Perle für Perle in den lila Streifen darunter und bleibt stehen, wo es nicht passt (oder sagt: zu wenig, zu viel).</li>
     </ul>
-    <p><b>Stern</b> für jedes gelöste Level, auch nach mehreren Versuchen; dann zeigt ein Strich unter dem Muster jeden Muster-Kern. Kein Fehlerton, keine Zeitgrenze; die App rechnet mit demselben Programm nach wie die Blätter. <b>Wie am Papier:</b> Level 1 und 3 (<a class="blattref" href="#blatt-6-1"></a>, erste Reihe und Klatsch-Muster), Level 4 (<a class="blattref" href="#blatt-6-2"></a>, erste Reihe), Level 5 und 7 (<a class="blattref" href="#blatt-6-3"></a>, erstes und drittes Armband).</p>
+    <p><b>Stern</b> für jedes gelöste Level, auch nach mehreren Versuchen; dann zeigt ein Strich unter dem Muster jeden Muster-Kern. Kein Fehlerton, keine Zeitgrenze; die App rechnet mit demselben Programm nach wie die Blätter. <b>Wie am Papier:</b> Level 1 und 3 (<a class="blattref" href="#blatt-6-1"></a>, erste Reihe und Klatsch-Muster), Level 4 (<a class="blattref" href="#blatt-6-2"></a>, erste Reihe), Level 5 und 7 (<a class="blattref" href="#blatt-6-3"></a>, erstes Armband und Klatsch-Muster).</p>
     <p><b>Wann weglegen:</b> Nach Level 9 kommt „Super! Jetzt zurück zum Papier.“ Dann ist Schluss, auch wenn noch Zeit wäre.</p>
   </div>
 
@@ -381,7 +382,7 @@
     </div>
   </div>
   <div class="kasten loesung darf-brechen e06-bricht e06-weiter">
-    <p><b><a class="blattref" href="#blatt-6-3"></a>, Aufgabe 1:</b> <m-e6-programm programm="3[rot blau blau]" gr="4"></m-e6-programm> (4 Karten statt 9), <m-e6-programm programm="5[gelb gruen]" gr="4"></m-e6-programm> (3 Karten statt 10), <m-e6-programm programm="4[klatschen klatschen schnipsen]" gr="4"></m-e6-programm> (4 Karten statt 12). Bei jedem Armband passt genau ein einziger Zauber-Kasten (vom Programm geprüft).</p>
+    <p><b><a class="blattref" href="#blatt-6-3"></a>, Aufgabe 1:</b> <m-e6-programm programm="3[rot blau blau]" gr="4"></m-e6-programm> (4 Karten statt 9), <m-e6-programm programm="5[gelb gruen]" gr="4"></m-e6-programm> (3 Karten statt 10), <m-e6-programm programm="4[klatschen klatschen schnipsen]" gr="4"></m-e6-programm> (4 Karten statt 12). Bei jedem Muster passt genau ein einziger Zauber-Kasten (vom Programm geprüft).</p>
     <p><b>Aufgabe 2:</b> <m-e6-folge raetsel="e6-l1" gr="4"></m-e6-folge>, das sind <m-e6-wert raetsel="e6-l1" wert="n" l="9"></m-e6-wert> Perlen, davon <m-e6-wert raetsel="e6-l1" wert="zaehle:rot" l="6"></m-e6-wert> rote: 3 Runden mit je 2 roten Perlen.</p>
     <p><b>Knobel-Ecke:</b> Die nächsten Perlen sind <m-e6-folge folge="rot blau blau blau blau" gr="4"></m-e6-folge>: Die 4. Runde hat eine rote und 4 blaue Perlen. Ein einzelner Zauber-Kasten geht nicht (Antwort: nein), denn jede Runde ist um eine blaue Perle länger, und ein Zauber-Kasten macht jede Runde genau gleich.</p>
     <p><b>Bonus-Knobelei:</b> Wochen-Muster: Die Woche hat 7 Tage im Kern, nach 7 und nach 14 Tagen ist wieder Montag. Perlen-Rätsel: Jede zweite Perle ist blau (die 2., 4., 6., 8., 10.), also blau. Klatsch-Rätsel: Der Kern hat 3 Bewegungen, das 3., 6. und 9. Mal ist jeweils das Ende des Kerns, also stampfen. Für Profis: Mit der 4. Perle beginnt der zweite Kern, also ist die 5. Perle die zweite im Kern (blau). Mit der 7. Perle beginnt der dritte Kern, also ist die 9. Perle die dritte im Kern (gelb). Der Kern ist rot, blau, gelb.</p>
@@ -455,7 +456,7 @@
   </div>
 
   <div class="profi" data-titel="Kobold-Profi: Farbe und Form">
-    <p>Die Farbe wechselt immer ab. Die Formen haben ihr eigenes Muster. Bei einer Perle stimmt die Form nicht. Welche?</p>
+    <p>Die Farbe wechselt immer ab. Die Formen haben ihr eigenes Muster. Bei einer Perle stimmt die Form nicht. Kreis sie ein und mal die richtige darunter.</p>
     <m-e6-reihe raetsel="e6-k4" gr="10.5"></m-e6-reihe>
   </div>
 </section>
@@ -465,19 +466,20 @@
 <!-- =============================================================== -->
 <section class="blatt" data-einheit="6" data-titel="Muster als Zauber-Kasten" data-art="Arbeitsblatt" data-verteilt>
   <div class="aufg">
-    <p class="anw">{{KIND}}, schreib jedes Armband mit einem Zauber-Kasten. Schreib die Zahl und mal den Muster-Kern hinein.</p>
+    <p class="anw">{{KIND}}, schreib jedes Muster mit einem Zauber-Kasten. Schreib die Zahl und mal den Muster-Kern hinein.</p>
     <div class="e06-zliste">
       <m-e6-reihe raetsel="e6-z1" gr="11"></m-e6-reihe>
       <m-e6-zauber raetsel="e6-z1" gr="11"></m-e6-zauber>
       <m-e6-reihe raetsel="e6-z2" gr="11"></m-e6-reihe>
       <m-e6-zauber raetsel="e6-z2" gr="11"></m-e6-zauber>
+      <p class="e06-legende e06-zleg"><m-e6-el name="klatschen" gr="9"></m-e6-el><span>klatschen</span><m-e6-el name="schnipsen" gr="9"></m-e6-el><span>schnipsen</span></p>
       <m-e6-reihe raetsel="e6-z3" gr="9.5"></m-e6-reihe>
       <m-e6-zauber raetsel="e6-z3" gr="11"></m-e6-zauber>
     </div>
   </div>
 
   <div class="aufg">
-    <p class="anw">Fädle das Armband nach diesem Zauber-Kasten. Mal die Perlen auf die Schnur.</p>
+    <p class="anw">Welches Armband macht dieser Zauber-Kasten? Mal die Perlen auf die Schnur.</p>
     <div class="e06-lesen">
       <m-e6-zauber raetsel="e6-l1" gr="11"></m-e6-zauber>
       <m-e6-reihe raetsel="e6-l1" gr="13"></m-e6-reihe>

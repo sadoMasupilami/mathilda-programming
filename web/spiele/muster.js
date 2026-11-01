@@ -255,7 +255,7 @@
       else t = z.bewegung ? 'Wie geht das Klatsch-Muster weiter?' : 'Wie geht das Muster weiter?';
       return api.meldung(t + ' Tippe an, was kommt.', '', LUPE);
     }
-    if (z.aufgabe === 'kobold') return api.meldung('Der Kobold hat ' + (z.bewegung ? 'eine Bewegung' : 'eine Perle') + ' vertauscht! Tippe sie an.', '', api.sym('kobold'));
+    if (z.aufgabe === 'kobold') return api.meldung('Der Kobold hat ' + (z.bewegung ? 'eine falsche Bewegung' : 'eine falsche Perle') + ' versteckt! Tippe sie an.', '', api.sym('kobold'));
     return api.meldung('Bau den Zauber-Kasten: Wie oft? Was kommt hinein?', 'zauber-meldung', KASTEN);
   }
 
