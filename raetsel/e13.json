@@ -280,6 +280,36 @@
      "nein": { "f": "gruen", "ja": { "f": "krone", "ja": "gk", "nein": "g" }, "nein": { "f": "krone", "ja": "bk", "nein": "b" } } }
   },
   {
+   "id": "e13-tiere8",
+   "art": "baum",
+   "titel": "8 Tiere, 3 Fragen, 7 Frage-Zettel",
+   "aufgabe": "bauen",
+   "maxFragen": 3,
+   "einmal": true,
+   "fragen": {
+    "fliegen": { "text": "Kann es fliegen?", "kurz": "Fliegen?" },
+    "federn": { "text": "Hat es Federn?", "kurz": "Federn?" },
+    "beine": { "text": "Hat es Beine?", "kurz": "Beine?" },
+    "fell": { "text": "Hat es Fell?", "kurz": "Fell?" },
+    "punkte": { "text": "Hat es Punkte?", "kurz": "Punkte?" },
+    "quaken": { "text": "Kann es quaken?", "kurz": "Quaken?" },
+    "flossen": { "text": "Hat es Flossen?", "kurz": "Flossen?" }
+   },
+   "dinge": [
+    { "id": "eule", "name": "Eule", "bild": "eule", "ja": ["fliegen", "federn", "beine"] },
+    { "id": "ente", "name": "Ente", "bild": "ente", "ja": ["fliegen", "federn", "beine", "quaken"] },
+    { "id": "biene", "name": "Biene", "bild": "biene", "ja": ["fliegen", "beine"] },
+    { "id": "marienkaefer", "name": "Marienkäfer", "bild": "marienkaefer", "ja": ["fliegen", "beine", "punkte"] },
+    { "id": "katze", "name": "Katze", "bild": "katze", "ja": ["beine", "fell"] },
+    { "id": "frosch", "name": "Frosch", "bild": "frosch", "ja": ["beine", "quaken"] },
+    { "id": "fisch", "name": "Fisch", "bild": "fisch", "ja": ["flossen"] },
+    { "id": "schnecke", "name": "Schnecke", "bild": "schnecke", "ja": [] }
+   ],
+   "baum": { "f": "fliegen",
+     "ja": { "f": "federn", "ja": { "f": "quaken", "ja": "ente", "nein": "eule" }, "nein": { "f": "punkte", "ja": "marienkaefer", "nein": "biene" } },
+     "nein": { "f": "beine", "ja": { "f": "fell", "ja": "katze", "nein": "frosch" }, "nein": { "f": "flossen", "ja": "fisch", "nein": "schnecke" } } }
+  },
+  {
    "id": "e13-kette",
    "art": "baum",
    "titel": "Ketten-Baum (schlechter Baum)",

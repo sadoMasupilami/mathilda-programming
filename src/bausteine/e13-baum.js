@@ -14,6 +14,7 @@
          Wesen mit Bild, Name und Antwortfeld „Platz“. Lösung: Platz-Nummer; mit kreis-tiefe
          werden die Wesen rot eingekreist, für die der Baum so viele Fragen braucht.
      <m-e13-weg raetsel="e13-wesen" nr="1">   Antworten als Ja-/Nein-Schilder, Feld mit der Platz-Nummer
+         (Lösung: Nummer im Feld, dahinter rot der Name, wer dort wohnt)
      <m-e13-fragen raetsel="e13-wesen" ding="drache" [l="2"]>   Feld: wie viele Fragen bis zu diesem Ding
      <m-e13-optionen raetsel="e13-frage">     Frage-Karten zum Ankreuzen (Lösung: rotes Kreuz)
      <m-e13-landet raetsel="e13-neu">         Feld (Wort): bei wem landet das neue Ding?
@@ -51,9 +52,12 @@ m-e13-baum svg, m-e13-bild svg { display: block; }
 .e13-wesen .e13-name { font-family: var(--kind); font-size: 14pt; line-height: 1.1; text-align: center; white-space: nowrap; }
 .e13-wesen .e13-platz { display: flex; align-items: center; gap: 1.5mm; font-size: 14pt; color: var(--grau); }
 .e13-kreis { display: none; }
-.loesungsmodus .e13-kreis { display: block; position: absolute; left: -1.5mm; right: -1.5mm; top: -1.5mm; bottom: -1.5mm; border: 0.9mm solid var(--rot); border-radius: 50%; }
-.e13-weg { display: inline-flex; align-items: center; gap: 2mm; }
+.loesungsmodus .e13-kreis { display: block; position: absolute; left: -3mm; right: -3mm; top: -2mm; bottom: -2.5mm; border: 0.9mm solid var(--rot); border-radius: 50%; }
+.e13-weg { position: relative; display: inline-flex; align-items: center; gap: 2mm; }
 .e13-weg .e13-pfeil { width: 6mm; height: 4mm; }
+.e13-wer { display: none; }
+/* Name nur in der Lösung, unter dem Feld: verschiebt nichts */
+.loesungsmodus .e13-wer { display: block; position: absolute; right: 0; top: 100%; margin-top: 0.8mm; white-space: nowrap; color: var(--rot); font-family: var(--kind); font-weight: 700; font-size: 14pt; line-height: 1; }
 .e13-optionen { display: flex; flex-direction: column; gap: 3mm; }
 .e13-option { display: flex; align-items: center; gap: 3mm; border: 0.6mm solid var(--tinte); border-radius: 2.5mm; background: #fff4cc; padding: 2mm 3mm; font-family: var(--kind); font-weight: 700; font-size: 15pt; line-height: 1.15; }
 .e13-kaestchen { flex: none; width: 9mm; height: 9mm; border: 0.6mm solid var(--tinte); border-radius: 1.6mm; background: white; display: flex; align-items: center; justify-content: center; }
@@ -61,7 +65,7 @@ m-e13-baum svg, m-e13-bild svg { display: block; }
 .e13-trennen .e13-linie { border-bottom: 0.4mm solid var(--tinte); height: 10mm; }
 .e13-trennen .lsg { display: none; }
 .loesungsmodus .e13-trennen .lsg { display: block; font-family: var(--kind); font-size: 13pt; line-height: 1.2; padding-top: 1mm; }
-.e13-fk { display: flex; flex-direction: column; justify-content: space-between; width: 100%; height: 100%; padding: 1.2mm 1.3mm 1.4mm 1.3mm; }
+.e13-fk { display: flex; flex-direction: column; justify-content: space-between; width: 100%; height: 100%; padding: 1.8mm 2.8mm 2.2mm 2.8mm; }
 .e13-fk-oben { display: flex; align-items: center; justify-content: center; gap: 1.2mm; flex: 1; }
 .e13-fk-text { font-family: var(--kind); font-weight: 700; font-size: 14pt; line-height: 1.05; text-align: left; }
 .e13-fk-unten { display: flex; justify-content: space-between; }
@@ -157,7 +161,9 @@ m-e13-baum svg, m-e13-bild svg { display: block; }
     const w = (r.loesung.wege || [])[nr - 1];
     if (!w) return h.fehler(el, 'Weg ' + nr + ' gibt es nicht (wege in ' + r.id + ')');
     const pfeil = '<svg class="e13-pfeil" viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg"><path d="M4 20 H46 M34 8 L50 20 L34 32" fill="none" stroke="#6b6f86" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-    el.innerHTML = '<span class="e13-weg">' + w.weg.map(pille).join('') + pfeil + 'Platz ' + h.feldHTML(String(w.nr), 'k') + '</span>';
+    const wer = dingVon(r, w.ding);
+    if (!wer) return h.fehler(el, 'Weg ' + nr + ' endet an keinem Ding');
+    el.innerHTML = '<span class="e13-weg">' + w.weg.map(pille).join('') + pfeil + 'Platz ' + h.feldHTML(String(w.nr), 'k') + '<span class="e13-wer">' + h.esc(wer.name) + '</span></span>';
     el.classList.add('komp', 'geprueft');
   };
 

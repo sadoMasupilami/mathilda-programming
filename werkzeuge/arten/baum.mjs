@@ -17,6 +17,8 @@
 //   neu           r.neu (ein Ding, das noch nicht im Baum steht): Wo landet es, welche Fragen trennen es?
 //   bauen         eigener Baum mit höchstens r.maxFragen Fragen: Wie viele solche Bäume gibt es?
 //                 r.baum ist ein Beispiel (geprüft). Mehr als einer: "mehrereLoesungen": true.
+//                 Mit "einmal": true darf jede Frage (jeder Frage-Zettel) nur einmal im Baum stehen:
+//                 Dann werden nur solche Bäume gezählt, und das Beispiel muss sich daran halten.
 // Optional: r.wege [["ja","nein"], …] → wo landet man mit diesen Antworten?
 import '../../web/kern/baum.js';
 
@@ -194,13 +196,23 @@ function pruefeBaum(r, F) {
     if (!Number.isInteger(max) || max < 1) return F('bauen: maxFragen fehlt');
     if (L.tiefe > max) F('Das Beispiel braucht ' + L.tiefe + ' Fragen, erlaubt sind ' + max);
     const ids = Object.keys(r.fragen);
-    const anzahl = B.zaehleBaeume(r.dinge, ids, max);
-    if (!anzahl) return F('Mit höchstens ' + max + ' Fragen geht es nicht');
-    if (anzahl > 1 && !r.mehrereLoesungen) F('Es gibt ' + anzahl + ' verschiedene Bäume mit höchstens ' + max + ' Fragen – "mehrereLoesungen": true setzen');
-    if (anzahl === 1 && r.mehrereLoesungen) F('„mehrereLoesungen“ gesetzt, aber es gibt genau einen Baum');
+    const alleOhneGrenze = B.zaehleBaeume(r.dinge, ids, max);
+    let anzahl = alleOhneGrenze;
+    if (r.einmal) {
+      const imBeispiel = B.fragenImBaum(r.baum).map((k) => k.f);
+      if (new Set(imBeispiel).size !== imBeispiel.length) F('einmal: Im Beispiel steht eine Frage mehrfach');
+      const liste = baeumeEinmal(r.dinge, ids, max, 100000);
+      anzahl = liste.length;
+      L.einmalBaeume = liste.length <= 5 ? liste.map((x) => x.baum) : undefined;
+      L.anzahlOhneEinmal = alleOhneGrenze;
+    }
+    const wie = r.einmal ? ' (jede Frage höchstens einmal)' : '';
+    if (!anzahl) return F('Mit höchstens ' + max + ' Fragen geht es nicht' + wie);
+    if (anzahl > 1 && !r.mehrereLoesungen) F('Es gibt ' + anzahl + ' verschiedene Bäume mit höchstens ' + max + ' Fragen' + wie + ' – "mehrereLoesungen": true setzen');
+    if (anzahl === 1 && r.mehrereLoesungen) F('„mehrereLoesungen“ gesetzt, aber es gibt genau einen Baum' + wie);
     let minFragen = 1;
     while (!B.zaehleBaeume(r.dinge, ids, minFragen)) minFragen++;
-    Object.assign(L, { maxFragen: max, anzahlBaeume: anzahl, minFragen });
+    Object.assign(L, { maxFragen: max, anzahlBaeume: anzahl, minFragen, einmal: !!r.einmal });
   }
   if (r.wege) {
     if (!Array.isArray(r.wege)) return F('wege: Liste von Antwort-Listen');
@@ -213,13 +225,35 @@ function pruefeBaum(r, F) {
   return L;
 }
 
+// Alle Bäume mit höchstens rest Fragen, in denen jede Frage höchstens einmal vorkommt (für "einmal")
+function baeumeEinmal(gruppe, ids, rest, grenze) {
+  if (gruppe.length === 1) return [{ baum: gruppe[0].id, fragen: [] }];
+  if (rest === 0) return [];
+  const aus = [];
+  for (const f of ids) {
+    const ja = gruppe.filter((d) => B.antwort(d, f));
+    const nein = gruppe.filter((d) => !B.antwort(d, f));
+    if (!ja.length || !nein.length) continue;
+    const ohne = ids.filter((x) => x !== f);
+    const A = baeumeEinmal(ja, ohne, rest - 1, grenze);
+    if (!A.length) continue;
+    const N = baeumeEinmal(nein, ohne, rest - 1, grenze);
+    for (const a of A) for (const n of N) {
+      if (a.fragen.some((x) => n.fragen.includes(x))) continue;
+      aus.push({ baum: { f, ja: a.baum, nein: n.baum }, fragen: [f].concat(a.fragen, n.fragen) });
+      if (aus.length > grenze) throw new Error('Zu viele Bäume zum Aufzählen (mehr als ' + grenze + ')');
+    }
+  }
+  return aus;
+}
+
 function bericht(r) {
   const l = r.loesung || {};
   const z = l.tiefen ? ' · Fragen ' + Object.entries(l.tiefen).map(([d, n]) => d + ' ' + n).join(', ') + ' (zusammen ' + l.summe + ', höchstens ' + l.max + ', Frage-Karten ' + l.frageKarten + ')' : '';
   if (r.aufgabe === 'frage') return 'fehlende Frage: ' + l.frage + ' („' + l.text + '“)' + (l.auchAusTabelle && l.auchAusTabelle.length ? ', auch aus der Tabelle: ' + l.auchAusTabelle.join(', ') : '') + z;
   if (r.aufgabe === 'kobold') return 'Kobold bei ' + l.knoten + ' („' + l.text + '“, ' + l.art + '), falsch: ' + (l.falsch || []).map((x) => x.ding).join(', ') + '; auch: ' + (l.auch || []).map((a) => a.knoten + ' ' + a.art + (a.frage ? ' ' + a.frage : '')).join(', ') + z;
   if (r.aufgabe === 'neu') return r.neu + ' landet bei ' + l.landetBei + ' (Platz ' + l.nr + '); neue Frage z. B. ' + (l.trennen || []).map((t) => t.frage).join(', ');
-  if (r.aufgabe === 'bauen') return l.anzahlBaeume + ' Bäume mit höchstens ' + l.maxFragen + ' Fragen (weniger geht nicht: mindestens ' + l.minFragen + ')' + z;
+  if (r.aufgabe === 'bauen') return l.anzahlBaeume + ' Bäume mit höchstens ' + l.maxFragen + ' Fragen' + (l.einmal ? ' und jeder Frage höchstens einmal (ohne diese Regel ' + l.anzahlOhneEinmal + ')' : '') + ' (weniger geht nicht: mindestens ' + l.minFragen + ')' + z;
   if (r.aufgabe === 'folgen') return r.wer + ': ' + (l.weg || []).join(' ') + ' → Platz ' + l.nr + z;
   return 'Plätze ' + Object.entries(l.plaetze || {}).map(([d, n]) => d + ' ' + n).join(', ') + (l.wege ? ' · Wege ' + l.wege.map((w) => w && (w.weg.join('-') + '→' + w.ding)).join(', ') : '') + z;
 }
