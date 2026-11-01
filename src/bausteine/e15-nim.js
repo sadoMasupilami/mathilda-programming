@@ -71,6 +71,7 @@ table.e15-zt td { text-align: center; }
 .e15-regel .e15-n { display: inline-flex; align-items: center; justify-content: center; min-width: 9mm; height: 9mm; padding: 0 1.2mm; border-radius: 2mm; background: var(--akzent-hell); font-weight: 700; }
 .e15-regel .e15-n.e15-dann { background: var(--gold-hell); }
 .e15-regel .e15-vorgabe-text { color: var(--grau); }
+.e15-punkt { display: inline-flex; align-items: center; gap: 0.6mm; }
 .e15-strich { display: none; }
 .loesungsmodus .e15-strich { display: block; position: absolute; left: -1mm; right: -1mm; top: 50%; height: 0; border-top: 0.9mm solid var(--rot); transform: rotate(-1.2deg); }
 .e15-richtig { display: none; }
@@ -226,11 +227,11 @@ table.e15-zt td { text-align: center; }
     const zeilen = r.loesung.regeln.map((g) => {
       const wenn = '<span>Wenn noch</span><span class="e15-n">' + g.wenn + '</span><span>' + (g.wenn === 1 ? 'Stein liegt,' : 'Steine liegen,') + '</span>';
       if (modus === 'kobold') {
-        return '<div class="e15-regel">' + wenn + '<span>dann nimm</span><span class="e15-n e15-dann">' + g.dann + '</span><span>.</span>' +
+        return '<div class="e15-regel">' + wenn + '<span>dann nimm</span><span class="e15-punkt"><span class="e15-n e15-dann">' + g.dann + '</span>.</span>' +
           (g.kobold ? '<span class="e15-strich"></span><span class="e15-richtig">Richtig: nimm ' + g.richtig.join(' oder ') + '.</span>' : '') + '</div>';
       }
       const dann = g.vorgabe ? '<span class="e15-n e15-dann">' + g.dann + '</span>' : h.feldHTML(String(g.dann), 'k');
-      return '<div class="e15-regel' + (g.vorgabe ? ' e15-vorgabe-text' : '') + '">' + wenn + '<span>dann nimm</span>' + dann + '<span>.</span></div>';
+      return '<div class="e15-regel' + (g.vorgabe ? ' e15-vorgabe-text' : '') + '">' + wenn + '<span>dann nimm</span><span class="e15-punkt">' + dann + '.</span></div>';
     });
     el.innerHTML = '<div class="e15-regeln">' + zeilen.join('') + '</div>';
     el.classList.add('komp', 'geprueft');

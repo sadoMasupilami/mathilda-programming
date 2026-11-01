@@ -22,7 +22,7 @@
 //                 Sie dürfen nicht gewinnen, der richtige Zug wird berechnet.
 //   spiel         Ein Spiel gegen den Roboter (Web-Level und Blatt-Spielplan): "dran": "du"|"andere".
 //                 „du“ muss bei bestem Spiel des Roboters sicher gewinnen können. "tipp" (Pflicht): freundlicher
-//                 Hinweis für „Nochmal? Tipp: …“. Geprüft wird auch, dass der Roboter (web/kern/nim.js, roboterZug)
+//                 Hinweis für „Nochmal? Tipp: …“; "tippGz": [3, 6] = die Zahlen im Tipp, die Gewinnzahlen sein müssen. Geprüft wird auch, dass der Roboter (web/kern/nim.js, roboterZug)
 //                 in jeder erreichbaren Stellung einen Gewinnzug nimmt, wenn es einen gibt.
 //   baum          Spielbaum zum Zeichnen (Anleitung): höchstens 40 Knoten.
 // Lösung (r.loesung) für die Bausteine der Blätter: siehe die Rückgaben unten.
@@ -162,6 +162,12 @@ function pruefeSpiel(r, F, v, h) {
   const dran = dranVon(r, F);
   if (!r.tipp || typeof r.tipp !== 'string') F('spiel braucht "tipp" (für „Nochmal? Tipp: …“)');
   else if (r.tipp.length > 110) F('tipp ist zu lang für das Handy (höchstens 110 Zeichen)');
+  // Zahlen, die der Tipp als Gewinnzahlen nennt („Lass 3 Steine liegen“): müssen welche sein
+  for (const x of r.tippGz || []) if (!N.istGewinnzahl(v, x)) F('tippGz: ' + x + ' ist keine Gewinnzahl');
+  if (r.tipp && r.tippGz) {
+    const imTipp = (r.tipp.match(/\d+/g) || []).map(Number);
+    for (const x of r.tippGz) if (!imTipp.includes(x)) F('tippGz: ' + x + ' steht nicht im Tipp');
+  }
   const gewinner = gewinnerVon(v, h, dran);
   if (gewinner !== 'du') F('Hier kann „du“ nicht sicher gewinnen – der Roboter gewinnt bei gutem Spiel. Stellung ändern.');
   pruefeRoboter(v, h, F);
