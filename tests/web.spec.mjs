@@ -892,9 +892,12 @@ test('Wiederhol-Zauber „bis zum Schatz“: Kasten, Runden, und „läuft im Kr
   await expect(page.locator('.meldung')).toContainText('so nicht.');
   await expect(page.locator('.dialog')).toHaveCount(0);
   await ansicht(page, 'im-kreis', info);
-  // Die Lösung: in der Runde leuchtet „Runde n“
   await tippe(page, '.tasten [data-aktion="loeschen"]');
   await expect(page.locator('.programm .kasten-z')).toHaveCount(0);
+  // Die Lösung, langsamer (neu laden): im Kasten leuchtet „Runde n“
+  await langsam(page, 450);
+  await page.reload();
+  await expect(page.locator('.spiel')).toHaveAttribute('data-level', f.lv.id);
   const l = loesePfad(f.lv);
   await gibProgrammEin(page, l.programm, l.sprueche);
   await tippe(page, '.tasten [data-aktion="los"]');

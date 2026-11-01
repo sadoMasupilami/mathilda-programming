@@ -174,6 +174,30 @@ Bedingungen: `stein`, `frei` (vor der Nase), `stein-links`, `stein-rechts`, `fre
 
 **Entwerfen:** Ein Wenn-dann-Kasten lohnt sich nur, wenn er mehrmals drankommt (im Zauber-Kasten, in einem Spruch) oder bei mehreren Gittern. „bis zum Schatz“ mit einer Wenn-dann-Regel braucht Gitter, in denen die Regel wirklich zum Schatz führt (Gang mit Ecken, Spirale, Labyrinth mit Hand-an-der-Wand). Sind alle Stücke des Gangs gleich lang, geht es auch ohne Wenn-dann (`bis[vor vor rechts]`): verschieden lange Stücke erzwingen die Regel (Beispiel `e0-bis`: erst 2 Felder hinauf, dann 3 nach rechts, dann 2 hinunter). Den Weg im Kopf mit dem Finger nachgehen und mit dem Löser prüfen; ein Programm, das im Kreis läuft, meldet der Löser.
 
+### 4b. Erweiterte Befehle in der Web-App (Bedienung und Level-Felder)
+
+Pfad-Levels mit `erlaubt` und/oder `welten` dürfen in `web.levels` (ab Einheit 11). Die App bietet **genau das an, was `erlaubt` sagt**, und bewertet nur nach dem Ergebnis, mit demselben Ausführer wie der Löser. Erweiterte Kobold-Levels (Stellen wie `"3.dann.1"`) gehen in der App noch nicht (der Build meldet das).
+
+**Was die App von einem Level bekommt** (`werkzeuge/raetsel.mjs`, `webDaten`): `erlaubt`, `bedingungen`, `maxKarten`, `sprueche`, `spruchFrei`, `welten`, `aufgabe`, `edelsteine`, `zielSymbol` und `minKarten` (die kleinste Kartenzahl, nur wenn der Löser sie bewiesen hat). **Nie** `beispiel`, `beispielSprueche` oder die Lösung.
+
+**Bedienung (nur Antippen, kein Ziehen).** Links oben die Befehle vor, links drehen, rechts drehen und je Zauberspruch eine Aufruf-Taste (Siegel); links unten die Kasten-Tasten und Löschen; rechts immer **Nochmal** und **Los** (sie bleiben an ihrer Stelle).
+
+| Kasten | So baut ihn das Kind |
+|---|---|
+| Wenn-dann-Kasten (`wenn`) | Taste mit dem schauenden Drachen → **Wenn-Karte wählen** (nur die `bedingungen` des Levels; gibt es nur eine, entfällt die Wahl) → Befehle (oder Aufrufe) für „dann“ antippen → optional **sonst** → Befehle → **fertig**. „Letzten Befehl löschen“ geht Schritt für Schritt zurück (sonst-Befehl, „sonst“, dann-Befehl, ganzer Kasten). |
+| Zauber-Kasten (`zauber`, `bis`) | Taste „?-mal“ → **Wie oft?** 2, 3, 4, 5 und, wenn `bis` erlaubt ist, **bis zum Schatz** → Inhalt antippen (Befehle, ein Wenn-dann-Kasten, Aufrufe; höchstens 3 Teile) → **fertig**. Ist nur `bis` erlaubt, zeigt die Taste das Bild „bis zum Schatz“ und legt den Kasten gleich hin. |
+| Zauberspruch vorgegeben (`sprueche`) | Steht als braune Spruch-Reihe über dem Programm (Siegel, Name, seine Teile). Das Kind ruft ihn mit der Siegel-Taste auf. |
+| Zauberspruch selbst schreiben (`spruchFrei`) | Das Level beginnt in der (leeren, gestrichelten) Spruch-Reihe: Befehle, Zauber-Kasten, Wenn-dann-Kasten hineintippen (1–4 Teile, kein Aufruf) → **fertig** (braune Taste) → im Programm aufrufen. Spruch-Reihe antippen = weiterschreiben. Ein leerer Spruch, der aufgerufen wird, läuft nicht („Dein Stern-Spruch ist noch leer.“). |
+| Mehrere Gitter (`welten`) | Die Gitter stehen nebeneinander oder untereinander (so groß wie möglich), jedes mit Nummer. Meldung: „Ein Programm für beide Gitter!“ |
+
+**Beim Laufen** läuft der Drache erst im ersten Gitter, dann im nächsten (die anderen sind blass). Der gerade laufende Befehl leuchtet, dazu alle Kästen darum: Zauber-Kasten mit „Runde n“, im Wenn-dann-Kasten der Zweig „dann“ oder „sonst“ (der andere wird blass), bei einem Aufruf die Aufruf-Karte und die Spruch-Reihe. Bevor ein Wenn-dann-Kasten entscheidet, „schaut“ der Drache kurz: Die Wenn-Karte leuchtet, das angeschaute Feld ist türkis umrandet (am Rand leuchtet die Kante). Meldungen: Stoß wie bisher („Hier hat der Kobold zugeschlagen!“, auch im Zweig oder im Spruch), nach 60 Befehlen „Der Drache läuft im Kreis. Er findet den Schatz so nicht.“ (läuft ein Programm so lange, wird der Drache nach den ersten Befehlen schneller, damit es nicht ewig dauert), bei mehreren Gittern „Im Gitter 2 ist der Drache noch nicht beim Schatz.“
+
+**Karten und Sterne:** Der Kartenzähler zählt wie am Papier (Abschnitt 4a), mit dem selbst geschriebenen Spruch (sobald etwas drinsteht). Ist eine Grenze voll, sind die Tasten grau und sagen beim Antippen freundlich, warum (Kartengrenze, nach „dann“/„sonst“ höchstens 3, im Zauber-Kasten höchstens 3, im Spruch höchstens 4 Teile). Stern: geschafft = in **allen** Gittern am Schatz (und alle Edelsteine). Bei `"aufgabe": "kuerzestes"` gibt es den Stern nur mit `minKarten` Karten (sonst „Fast geschafft! Aber es geht kürzer: mit n Karten.“); bei „ankommen“ mit mehr Karten als `minKarten` kommt nur die Profi-Frage „Geht es auch mit n Karten?“.
+
+**Für das Handy entwerfen:** Das Programm darf in mehrere Zeilen umbrechen; wird es zu hoch, zeigt die App den Spruch nur mit Siegel und macht die Karten kleiner. Getestet bis 12 Karten mit Spruch-Reihe, Wenn-dann- und Zauber-Kasten auf 667 · 375. Empfehlungen: höchstens 2 Sprüche pro Level (mit 3 Aufruf-Tasten bricht die obere Tastenreihe auf dem Handy um), 2 Gitter bis 4 · 4, 3–4 Gitter nur bis 3 · 3 (sonst werden die Felder auf dem Handy quer zu klein), höchstens 6 Wenn-Karten.
+
+**Testen ohne eigene Einheit:** Test-Levels für alle neuen Kästen liegen in `tests/fixtures/web-raetsel/` (e11 Wenn-dann und mehrere Gitter, e16 „bis zum Schatz“ und Hand-an-der-Wand, e17 Zaubersprüche). `node werkzeuge/web-bauen.mjs --raetsel tests/fixtures/web-raetsel`, dann Playwright; danach wieder `node werkzeuge/web-bauen.mjs` (echte Rätsel). Die Playwright-Tests spielen jedes Level mit einer Lösung des Lösers (`mitRegeln`) durch und prüfen die neuen Tasten, das Aufleuchten, „läuft im Kreis“, Grenzen und den Doppeltipp-Schutz; ohne solche Levels werden diese Tests übersprungen.
+
 ## 5. Bausteine
 
 ### Symbole (`web/kern/symbole.js`, einmal als SVG gezeichnet)
@@ -294,7 +318,7 @@ Ablauf-Karten (`art: "ablauf"`) dürfen ohne `bild` sein (leere Karte zum Selber
 
 Kein Schlüsselwort: Alle Pakete sind offen, der QR-Code führt direkt zum Paket. Jedes Paket hat 5–9 Levels (10–15 Minuten). Steine sollen nicht nur am Rand liegen, sondern auch mitten im Weg (direkt vor der Nase, Mauer mit Lücke, Slalom).
 
-**Sterne in der App:** 1 Stern pro geschafftem Level. Bei `pfad`-Levels mit `"aufgabe": "kuerzestes"` (ohne Zauber) gibt es den Stern nur mit einem kürzesten Programm, sonst zeigt die App „Fast geschafft! Es geht kürzer“. Bei `maxKarten` zählt die Grenze. Texte im Kasten „bildschirm“ müssen diese Regel richtig wiedergeben. Danach kommt ein klares Ende: „Super! Jetzt zurück zum Papier.“
+**Sterne in der App:** 1 Stern pro geschafftem Level. Bei `pfad`-Levels mit `"aufgabe": "kuerzestes"` (ohne Zauber) gibt es den Stern nur mit einem kürzesten Programm, sonst zeigt die App „Fast geschafft! Es geht kürzer“. Bei `maxKarten` zählt die Grenze. Ab Block C (Wenn-dann, „bis zum Schatz“, Zaubersprüche, mehrere Gitter) zählen bei „kuerzestes“ die Karten (`minKarten`), siehe Abschnitt 4b. Texte im Kasten „bildschirm“ müssen diese Regel richtig wiedergeben. Danach kommt ein klares Ende: „Super! Jetzt zurück zum Papier.“
 
 ## 7. Qualität vor dem Abgeben
 

@@ -8,6 +8,10 @@
    gespeicherten Lösungen in der App.
    Ruhig: kein Ton, keine Zeitlimits, kein Blinken, nach dem letzten
    Level ein klares Ende.
+   Ab Block C (plan/lehrplan.md 7.8, Leitfaden 4b): Pfad-Levels mit "erlaubt"
+   und/oder "welten" bekommen Wenn-dann-Kasten, Zauber-Kasten „bis zum Schatz“,
+   Zaubersprüche (vorgegeben oder selbst geschrieben) und mehrere Gitter
+   (Klasse .erw; alles nur Antippen, gleiche Farben wie am Papier).
 
    Spiel-Plugins für weitere Rätselarten (web/spiele/<art>.js, eine Datei pro Art,
    optional web/spiele/<art>.css; web-bauen.mjs bindet sie ein):

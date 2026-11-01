@@ -548,7 +548,8 @@ button.spruch-reihe:focus-visible { outline: 4px solid var(--gold); outline-offs
 .meldung.spruch-meldung { background: var(--spruch-hell); color: var(--spruch-dunkel); }
 
 /* Tasten: links zwei Reihen, rechts Nochmal und Los */
-.tasten-erw { display: flex; gap: var(--abst); align-items: stretch; justify-content: center; max-width: 100%; }
+/* Nochmal und Los bleiben rechts an derselben Stelle, auch wenn sich die Tasten links ändern („Wie oft?“, Wenn-Karten …) */
+.tasten-erw { display: flex; gap: var(--abst); align-items: stretch; justify-content: space-between; width: 100%; max-width: calc(var(--t) * 9); }
 .tasten-links { display: flex; flex-direction: column; justify-content: flex-end; gap: var(--abst); min-width: 0; }
 .tasten-erw .reihe { justify-content: flex-start; }
 .tasten-erw .steuer { display: flex; flex-direction: column; justify-content: flex-end; gap: var(--abst); }
