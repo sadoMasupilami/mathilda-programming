@@ -15,7 +15,7 @@
    "klartext": "MOND",
    "geheimtext": "PRQG",
    "schluessel": 3,
-   "bilder": ["stern", "mond", "sonne"]
+   "bilder": ["baum", "mond", "sonne"]
   },
   {
    "id": "e7-l2",
@@ -49,7 +49,7 @@
    "art": "geheim",
    "aufgabe": "kobold",
    "klartext": "SCHATZ IM KASTEN",
-   "geheimtext": "VFKRWC LP NDVWHQ",
+   "geheimtext": "VFKDAC LP NDVWHQ",
    "schluessel": 3
   },
   {
@@ -98,6 +98,14 @@
    "geheimtext": "NOB OCOV QORD JEW COO",
    "schluessel": 10,
    "haeufigkeit": true
+  },
+  {
+   "id": "e7-x4",
+   "art": "geheim",
+   "aufgabe": "knacken",
+   "klartext": "SONNE",
+   "geheimtext": "EAZZQ",
+   "schluessel": 12
   },
   {
    "id": "e7-w1",

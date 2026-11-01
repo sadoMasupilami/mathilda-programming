@@ -13,6 +13,7 @@
                 dieser Zahl (wie ein Versuch am Papier). Ist es ein echtes Wort, Bild antippen.
                 Den Stern gibt es, wenn das Bild stimmt und das Rad auf der Schlüssel-Zahl steht.
    - zeichen:   ein Wort in Feen-Zeichen lesen (Tabelle im Feld), passendes Bild antippen.
+                Die Daten enthalten nur die Zeichen (Form und Punkte), nicht das Wort.
    Antippen eines Buchstabens (oder Feen-Zeichens) oben markiert ihn am Rad bzw. die Reihe
    seiner Form in der Tabelle: eine Such-Hilfe, ablesen muss das Kind selbst.
    Bewertet wird nur nach dem Ergebnis, mit web/kern/geheim.js (WerkstattGeheim.bewerte)
@@ -164,7 +165,8 @@
       z.falsch = null;
       setzeDran(z, naechsterLeerer(z, -1));
     } else if (z.aufgabe === 'zeichen') {
-      z.wort = lv.feen;
+      // Die Daten haben nur die Zeichen (Form und Punkte); zum Zeichnen und für Hinweise zurück in Buchstaben
+      z.wort = G.feenText(lv.feen) || '';
     } else {
       z.wort = lv.geheimtext;
       if (z.aufgabe === 'knacken') { z.probe = null; z.probiert = []; }

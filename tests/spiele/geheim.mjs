@@ -16,7 +16,7 @@ function loesung(lv) {
     const w = G.lesen(lv.geheimtext, lv.schluessel);
     return { k: lv.schluessel, text: w, bild: bildFuer(lv, w) };
   }
-  if (lv.aufgabe === 'zeichen') return { text: lv.feen, bild: bildFuer(lv, lv.feen) };
+  if (lv.aufgabe === 'zeichen') { const t = G.feenText(lv.feen); return { text: t, bild: bildFuer(lv, t) }; }
   if (lv.aufgabe === 'schreiben') return { k: G.N > lv.schluessel ? lv.schluessel : 0, text: G.schreiben(lv.klartext, lv.schluessel) };
   // knacken: genau eine Schlüssel-Zahl 1 bis 25 ergibt nur echte Wörter
   const t = G.knacken(lv.geheimtext);
@@ -118,7 +118,12 @@ export function tests({ test, expect: erwarte, DATEN, h }) {
         erwarte(lv.schluessel === undefined || lv.aufgabe === 'lesen', lv.id + ': Schlüssel-Zahl beim Knacken').toBe(true);
       }
       if (lv.aufgabe === 'schreiben') erwarte(s, lv.id).not.toContain(loesung(lv).text);
-      if (lv.aufgabe === 'zeichen') erwarte(lv.klartext, lv.id).toBeUndefined();
+      if (lv.aufgabe === 'zeichen') {
+        // nur die Zeichen (Form und Punkte), das Wort steht nirgends
+        erwarte(lv.klartext, lv.id).toBeUndefined();
+        erwarte(Array.isArray(lv.feen), lv.id).toBe(true);
+        erwarte(s, lv.id).not.toContain('"' + loesung(lv).text + '"');
+      }
     }
   });
 
@@ -322,26 +327,27 @@ export function tests({ test, expect: erwarte, DATEN, h }) {
     test.skip(!f, 'kein Feen-Zeichen-Level');
     await h.oeffneLevel(page, f, info);
     const l = loesung(f.lv);
+    const feen = l.text;
     const reihe = (b) => (b === 'Z' ? 5 : Math.floor(G.nr(b) / 5));
     await h.tippe(page, KARTE(0));
-    await erwarte(page.locator('.feld .geheim-zeile.geheim-an')).toHaveAttribute('data-r', String(reihe(f.lv.feen[0])));
+    await erwarte(page.locator('.feld .geheim-zeile.geheim-an')).toHaveAttribute('data-r', String(reihe(feen[0])));
     await erwarte(meldung(page)).toContainText('Zähl die Punkte');
     await page.waitForTimeout(400);
     await h.tippe(page, KARTE(0));
     await erwarte(page.locator('.feld .geheim-zeile.geheim-an')).toHaveCount(0);
     await page.waitForTimeout(400);
     await h.doppeltipp(page, KARTE(1));
-    await erwarte(page.locator('.feld .geheim-zeile.geheim-an')).toHaveAttribute('data-r', String(reihe(f.lv.feen[1])));
+    await erwarte(page.locator('.feld .geheim-zeile.geheim-an')).toHaveAttribute('data-r', String(reihe(feen[1])));
     // ein Bild mit gleich langem Wort: Hinweis auf das erste Zeichen, das nicht passt
-    const gleich = f.lv.bilder.find((b) => b !== l.bild && G.wortVonBild(b).length === f.lv.feen.length);
+    const gleich = f.lv.bilder.find((b) => b !== l.bild && G.wortVonBild(b).length === feen.length);
     if (gleich) {
       const w = G.wortVonBild(gleich);
       let i = 0;
-      while (w[i] === f.lv.feen[i]) i++;
+      while (w[i] === feen[i]) i++;
       await h.tippe(page, BILD(gleich));
       await erwarte(meldung(page)).toContainText('Fast! Schau das goldene Zeichen');
       await erwarte(page.locator('.programm .geheim-karte.geheim-an')).toHaveAttribute('data-i', String(i));
-      await erwarte(page.locator('.feld .geheim-zeile.geheim-an')).toHaveAttribute('data-r', String(reihe(f.lv.feen[i])));
+      await erwarte(page.locator('.feld .geheim-zeile.geheim-an')).toHaveAttribute('data-r', String(reihe(feen[i])));
       await h.ansicht(page, 'geheim-zeichen-hinweis', info);
     }
     await h.tippe(page, BILD(l.bild));

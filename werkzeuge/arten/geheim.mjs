@@ -20,7 +20,8 @@
 //   - nur A bis Z und einzelne Leerzeichen, keine Umlaute, kein ß
 //   - Klartext + Schlüssel ergibt genau den gedruckten Geheimtext, und Lesen ergibt wieder den Klartext
 //   - mit Bildern: genau ein Bild passt (beim Knacken: genau ein Bild ist überhaupt eine Verschiebung)
-//   - kobold: genau ein Buchstabe ist falsch, das falsch gelesene Wort steht nicht in der Wortliste
+//   - kobold: genau ein Buchstabe ist falsch, das falsch gelesene Wort steht nicht in der Wortliste,
+//     und an keiner anderen Stelle macht ein anderer Buchstabe lauter Wörter der Wortliste
 //   - knacken: genau eine Schlüssel-Zahl 1–25 ergibt nur Wörter der Wortliste (Wortliste in
 //     web/kern/geheim.js, WORTE; außerhalb der Liste ist das nicht bewiesen, siehe Bericht)
 
@@ -119,6 +120,10 @@ const pruefen = {
         if (G.nurWorte(t)) auch.push({ stelle: j + 1, geheim: b, text: t });
       }
     }
+    // Eindeutig: Nur an der Kobold-Stelle macht ein anderer Buchstabe aus dem Brief lauter echte Wörter.
+    // Sonst wüsste das Kind nicht, welchen Buchstaben es einkreisen soll.
+    const woanders = auch.filter((a) => a.stelle !== i + 1);
+    if (woanders.length) F('Kobold nicht eindeutig: auch ' + woanders.map((a) => 'Stelle ' + a.stelle + ' mit ' + a.geheim + ' („' + a.text + '“)').join(', ') + ' ergibt lauter echte Wörter');
     return {
       klartext: klar, geheimtext: geheim, schluessel: k, stelle: i + 1, falsch: geheim[i], richtig: richtig[i],
       gelesen, falschesWort, richtigesWort: klar.split(' ')[wortNr], gelesenFalsch: gelesen[i], gelesenRichtig: klar[i], auch,
@@ -210,8 +215,8 @@ export default {
     if (r.aufgabe === 'lesen') return { ...basis, geheimtext: r.geheimtext, schluessel: r.schluessel, bilder: r.bilder };
     if (r.aufgabe === 'schreiben') return { ...basis, klartext: r.klartext, schluessel: r.schluessel, bild: r.bild, tasten: r.tasten };
     if (r.aufgabe === 'knacken') return { ...basis, geheimtext: r.geheimtext, bilder: r.bilder, bereich: r.bereich };
-    // Feen-Zeichen: die App zeichnet die Zeichen dieses Texts (das ist die Aufgabe, nicht die Antwort)
-    if (r.aufgabe === 'zeichen') return { ...basis, feen: r.klartext, bilder: r.bilder };
+    // Feen-Zeichen: nur die Zeichen (Form und Punkte), nicht das Wort; die App liest sie selbst zurück
+    if (r.aufgabe === 'zeichen') return { ...basis, feen: G.feenCode(r.klartext), bilder: r.bilder };
     throw new Error('aufgabe „' + r.aufgabe + '“ gibt es in der App nicht (nur lesen, schreiben, knacken, zeichen)');
   },
 };

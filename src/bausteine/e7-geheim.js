@@ -169,7 +169,9 @@ table.e07-post td:nth-child(2n) { font-family: var(--kind); font-weight: 700; le
   B['m-e7-kobold'] = (el) => lesenBaustein(el, ['kobold'], (r, l) =>
     '<div class="e07-antwort"><span>Richtig heißt das Wort: ' + feldHTML(l.richtigesWort, 'text') + '</span>' +
     (el.hasAttribute('geheimfeld') ? '<span>Richtiger Geheim-Buchstabe: ' + feldHTML(l.richtig, 'k') + '</span>' : '') + '</div>' +
-    '<p class="lsg-nur" style="font-size:13pt;margin:2mm 0 0 0">Der Kobold hat ' + l.falsch + ' statt ' + l.richtig + ' geschrieben (gelesen: ' + l.falschesWort + ').</p>');
+    '<p class="lsg-nur" style="font-size:13pt;margin:2mm 0 0 0">Der Kobold hat ' + l.falsch + ' statt ' + l.richtig + ' geschrieben (gelesen: ' + l.falschesWort + ').' +
+    // andere Buchstaben an derselben Stelle, die auch echte Wörter ergeben (der Löser lässt keine andere Stelle zu)
+    (l.auch && l.auch.length ? ' Auch ein echtes Wort: ' + l.auch.map((a) => esc(a.text)).join(', ') + '.' : '') + '</p>');
 
   // ---------------------------------------------------------------------
   // In Geheimschrift schreiben (Rätsel oder der Name des Kindes)

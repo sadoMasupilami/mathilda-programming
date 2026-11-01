@@ -132,7 +132,8 @@
   function bewerte(level, antwort) {
     const a = level.aufgabe;
     if (a === 'lesen') return { ok: schreiben(wortVonBild(antwort) || '', level.schluessel) === level.geheimtext };
-    if (a === 'zeichen') return { ok: wortVonBild(antwort) === level.feen };
+    // Feen-Zeichen: das Bild-Wort in Feen-Zeichen ergibt genau die gezeigten Zeichen
+    if (a === 'zeichen') { const w = wortVonBild(antwort); return { ok: !!w && feenCode(w).join(',') === (level.feen || []).join(',') }; }
     if (a === 'schreiben') return { ok: String(antwort) === schreiben(level.klartext, level.schluessel) };
     if (a === 'knacken') {
       // lesen mit k ergibt das Wort: das Wort ist der Geheimtext k Plätze zurück
@@ -153,6 +154,23 @@
     if (i < 0) throw new Error('Kein Buchstabe A bis Z: ' + b);
     if (i === 25) return { form: 'stern', punkte: 0 };
     return { form: FORMEN[Math.floor(i / 5)], punkte: (i % 5) + 1 };
+  }
+  // Feen-Zeichen als Code ohne den Klartext (für die App): ['quadrat-1', 'herz-3', …], Lücke ' '
+  function feenCode(text) {
+    return Array.from(String(text)).map((b) => { if (b === ' ') return ' '; const t = feenTeile(b); return t.form + '-' + t.punkte; });
+  }
+  // Code zurück zu Buchstaben (das Lesen mit der Tabelle); null bei einem unbekannten Zeichen
+  function feenText(code) {
+    let aus = '';
+    for (const c of code || []) {
+      if (c === ' ') { aus += ' '; continue; }
+      const m = /^([a-z]+)-(\d)$/.exec(String(c));
+      const fi = m ? FORMEN.indexOf(m[1]) : -1, p = m ? Number(m[2]) : 0;
+      if (fi === 5 && p === 0) aus += 'Z';
+      else if (fi >= 0 && fi < 5 && p >= 1 && p <= 5) aus += ABC[fi * 5 + p - 1];
+      else return null;
+    }
+    return aus;
   }
   // Würfel-Bild: Punkte um die Mitte (cx, cy), Abstand d
   function wuerfelPunkte(n, cx, cy, d) {
@@ -332,7 +350,7 @@
     ABC, N, WORTE, FORMEN, FORM_WORT, BILDER, BILD_WORT, RAD, WINKEL,
     pruefeText, istText, nr, buchstabe, schiebe, schreiben, lesen, abstand, unterschiede, haeufigkeit,
     istWort, nurWorte, knacken, verschiebung, bewerte,
-    feenTeile, feenInhalt, feenZeichen,
+    feenTeile, feenCode, feenText, feenInhalt, feenZeichen,
     hatBild, bild, wortVonBild,
     radSVG, radInnen, aussenInhalt, innenInhalt,
   };
