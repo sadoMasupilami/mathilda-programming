@@ -40,10 +40,11 @@
   const beiWem = (d) => (WORTE[d.bild] ? WORTE[d.bild][1] : null);
   // „Hat es Flügel?“ wird „Hat das Einhorn Flügel?“
   const frageFuer = (text, d) => (WORTE[d.bild] ? text.replace(/\b(es|er)\b/, wer(d)) : text);
+  // „Tippe einen Drachen an“, „Tippe ein Tier an“, „Tippe ein Wesen an“
   function gruppenWort(dinge) {
-    if (dinge.every((d) => /^drachenkind/.test(d.bild))) return 'Drachen';
-    if (dinge.every((d) => TIERE.includes(d.bild))) return 'Tier';
-    return 'Wesen';
+    if (dinge.every((d) => /^drachenkind/.test(d.bild))) return 'einen Drachen';
+    if (dinge.every((d) => TIERE.includes(d.bild))) return 'ein Tier';
+    return 'ein Wesen';
   }
 
   // ---------------------------------------------------------------------
@@ -281,7 +282,7 @@
     const z = api.zustand;
     if (!z.wahl) {
       if (!unplatziert(z).length) return api.meldung('Alle sitzen? Dann tippe auf „Los“!', 'hinweis', api.ICON.los);
-      return api.meldung('Tippe ein ' + gruppenWort(z.dinge) + ' an, dann seinen Platz.', '', bildIcon(unplatziert(z)[0]));
+      return api.meldung('Tippe ' + gruppenWort(z.dinge) + ' an, dann seinen Platz.', '', bildIcon(unplatziert(z)[0]));
     }
     const d = dingVon(z, z.wahl);
     return api.meldung('Wo wohnt ' + wer(d) + '? Tippe den Platz an.', '', bildIcon(d));
@@ -378,7 +379,7 @@
       zeichne(api);
       return wahlMeldung(api);
     }
-    api.meldung('Tippe zuerst ein ' + gruppenWort(z.dinge) + ' an.', 'hinweis', bildIcon(unplatziert(z)[0] || z.dinge[0]));
+    api.meldung('Tippe zuerst ' + gruppenWort(z.dinge) + ' an.', 'hinweis', bildIcon(unplatziert(z)[0] || z.dinge[0]));
   }
   function einsortierenLos(api) {
     const z = api.zustand;

@@ -507,7 +507,7 @@
   function layout(baum, opt) {
     const o = Object.assign({}, STANDARD, opt || {});
     // Ein Frage-Kasten ist mindestens so breit, dass die Ja- und die Nein-Pille nebeneinander passen
-    o.frageB = Math.max(o.frageB, 2 * pillenBreite(o.schrift * 0.9) + 3);
+    o.frageB = Math.max(o.frageB, 2 * pillenBreite(o.pille || o.schrift * 0.9) + 3);
     const tiefeMax = tiefe(baum);
     const breite = (k) => istBlatt(k) ? o.blattB + o.luft : Math.max(o.frageB + o.luft, breite(k.ja) + breite(k.nein));
     const fr = [], bl = [], ae = [];
@@ -559,6 +559,7 @@
   //   nummern: true       Platz-Nummer an jeder Antwort
   //   namen: true         Name unter dem Bild
   //   kurz: true          kurze Fragen ("Flügel?")
+  //   pille               Schriftgröße der Ja-/Nein-Schilder und Platz-Nummern (ohne Angabe: 0,9 · schrift)
   //   luecke: { text, rot } Text für die fehlende Frage "?" (z. B. die Lösung in Rot)
   //   kreis: pfad         Frage rot einkreisen (Kobold-Lösung)
   //   weg: ['ja', …]      Weg hervorheben;  aktiv: pfad  Frage hervorheben (App)
@@ -570,7 +571,8 @@
     const dinge = {};
     for (const d of o.dinge || []) dinge[d.id] = d;
     const gr = o.schrift;
-    const pb = pillenBreite(gr * 0.9);
+    const pg = o.pille || gr * 0.9;   // Schrift der Ja-/Nein-Schilder und Platz-Nummern
+    const pb = pillenBreite(pg);
     const wegPfade = {};
     if (o.weg) for (let i = 1; i <= o.weg.length; i++) wegPfade[pfadText(o.weg.slice(0, i))] = true;
     let x = '';
@@ -599,7 +601,7 @@
       u.zeilen.forEach((z, i) => {
         x += '<text x="' + n2(k.x) + '" y="' + n2(oben + i * zh) + '" font-size="' + n2(u.gr) + '" font-weight="700" text-anchor="middle" fill="' + farbe + '" font-family="Andika, sans-serif">' + esc(z) + '</text>';
       });
-      x += pille('ja', k.x - k.b / 2 + pb / 2 + 0.8, k.y + k.h, gr * 0.9) + pille('nein', k.x + k.b / 2 - pb / 2 - 0.8, k.y + k.h, gr * 0.9);
+      x += pille('ja', k.x - k.b / 2 + pb / 2 + 0.8, k.y + k.h, pg) + pille('nein', k.x + k.b / 2 - pb / 2 - 0.8, k.y + k.h, pg);
       if (o.kreis !== undefined && o.kreis !== null && o.kreis === k.pfad) {
         x += '<ellipse cx="' + n2(k.x) + '" cy="' + n2(k.y + k.h / 2) + '" rx="' + n2(k.b / 2 + 5) + '" ry="' + n2(k.h / 2 + 6) + '" fill="none" stroke="' + FARBE.rot + '" stroke-width="1.1"/>';
       }
@@ -629,9 +631,9 @@
         x += '<text x="' + n2(k.x) + '" y="' + n2(k.y + k.h / 2 + gr * 0.55) + '" font-size="' + n2(gr * 1.5) + '" font-weight="700" text-anchor="middle" fill="' + FARBE.grau + '" font-family="Andika, sans-serif">?</text>';
       }
       if (o.nummern) {
-        const r = gr * 0.62;
+        const r = pg * 0.69;
         x += '<circle cx="' + n2(k.x - k.b / 2 + r + 0.4) + '" cy="' + n2(k.y + r + 0.4) + '" r="' + n2(r) + '" fill="' + T + '"/>' +
-          '<text x="' + n2(k.x - k.b / 2 + r + 0.4) + '" y="' + n2(k.y + r + 0.4 + gr * 0.33) + '" font-size="' + n2(gr * 0.9) + '" font-weight="700" text-anchor="middle" fill="#ffffff" font-family="Andika, sans-serif">' + k.nr + '</text>';
+          '<text x="' + n2(k.x - k.b / 2 + r + 0.4) + '" y="' + n2(k.y + r + 0.4 + pg * 0.37) + '" font-size="' + n2(pg) + '" font-weight="700" text-anchor="middle" fill="#ffffff" font-family="Andika, sans-serif">' + k.nr + '</text>';
       }
       x += '</g>';
     }

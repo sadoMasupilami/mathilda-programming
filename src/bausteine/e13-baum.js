@@ -2,7 +2,7 @@
    Bausteine für Einheit 13 „Ja-Nein-Bäume“ (Rätselart baum)
    Zeichnung und Logik aus web/kern/baum.js (dieselbe Datei wie in der App),
    Lösungen aus dem Löser (werkzeuge/arten/baum.mjs → r.loesung).
-     <m-e13-baum raetsel="e13-wesen" modus="leer|voll|frage|kobold" [nummern] [namen] [kurz]
+     <m-e13-baum raetsel="e13-wesen" modus="leer|voll|frage|kobold" [nummern] [namen] [kurz] [pille="5"]
                  [blatt-b="30"] [blatt-h="26"] [frage-b="42"] [frage-h="15"] [bild="20"] [ebene="26"] [luft="4"]
                  [schrift="4.9"] [name-schrift="4.6"]>
          Der Ja-Nein-Baum als SVG (Maße in mm).
@@ -106,9 +106,31 @@ m-e13-baum svg, m-e13-bild svg { display: block; }
       bildGr: zahlAttr(el, 'bild', 18), ebene: zahlAttr(el, 'ebene', 26), luft: zahlAttr(el, 'luft', 4),
       schrift: zahlAttr(el, 'schrift', 4.9), frageH: zahlAttr(el, 'frage-h', 15), nameSchrift: zahlAttr(el, 'name-schrift', 4.6),
     };
-    // Auf den Blättern des Kindes: große Felder und Schrift ab 14 pt (4,9 mm)
-    if (el.closest('.blatt') && (opt.blattB < 18 || opt.bildGr < 14 || opt.schrift < 4.9)) return H().fehler(el, 'Auf dem Blatt: Plätze mindestens 18 mm, Bilder mindestens 14 mm, Schrift mindestens 4.9 (14 pt)');
+    if (el.hasAttribute('pille')) opt.pille = zahlAttr(el, 'pille', 0);
     const baum = r.baum;
+    // Auf den Blättern des Kindes: große Felder und jede Schrift im Baum ab 14 pt (4,94 mm): Fragen
+    // (auch nach dem Umbrechen), Ja/Nein-Schilder, Platz-Nummern und Namen unter den Bildern
+    if (el.closest('.blatt') && !L) {
+      const MIN = 4.94;
+      const lay = W().layout(baum, opt);
+      const zuKlein = [];
+      if (opt.blattB < 18 || opt.bildGr < 14) zuKlein.push('Plätze mindestens 18 mm, Bilder mindestens 14 mm');
+      if ((opt.pille || opt.schrift * 0.9) < MIN) zuKlein.push('Ja/Nein und Nummern (pille="5")');
+      for (const k of lay.fragen) {
+        if (k.f === '?') continue;
+        const g = W().umbrechen(W().frageText(r.fragen, k.f, opt.kurz), k.b - 3, opt.schrift).gr;
+        if (g < MIN) zuKlein.push('Frage „' + k.f + '“ (' + (g / 0.3528).toFixed(1) + ' pt)');
+      }
+      if (opt.namen) {
+        for (const b of lay.blaetter) {
+          const d = b.inhalt && dingVon(r, b.inhalt);
+          if (!d) continue;
+          const g = Math.min(opt.nameSchrift, (opt.blattB - 2) / W().textBreite(d.name, 1));
+          if (g < MIN) zuKlein.push('Name „' + d.name + '“ (' + (g / 0.3528).toFixed(1) + ' pt)');
+        }
+      }
+      if (zuKlein.length) return H().fehler(el, 'Auf dem Blatt ist im Baum etwas zu klein (mindestens 14 pt): ' + zuKlein.join(', '));
+    }
     if (modus === 'leer') {
       if (!['einsortieren', 'folgen', 'zeigen', 'bauen'].includes(r.aufgabe)) return H().fehler(el, 'modus="leer" passt nicht zu aufgabe ' + r.aufgabe);
       if (L) opt.rot = W().blaetter(baum).map((b) => b.pfad);

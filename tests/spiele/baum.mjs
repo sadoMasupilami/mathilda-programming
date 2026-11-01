@@ -267,6 +267,18 @@ export function tests({ test, expect: erwarte, DATEN, h }) {
     await erwarte(page.locator(ding(a.id))).toHaveCount(1);
   });
 
+  test('Baum einsortieren mit Drachen: Hinweis „Tippe zuerst einen Drachen an“', async ({ page }, info) => {
+    const f = h.suche('baum', (l) => l.aufgabe === 'einsortieren' && l.dinge.every((d) => /^drachenkind/.test(d.bild)));
+    test.skip(!f, 'kein Drachen-Einsortieren-Level');
+    await h.oeffneLevel(page, f, info);
+    const a = f.lv.dinge[0];
+    await h.tippe(page, ding(a.id));
+    await erwarte(page.locator('.tasten .baum-gewaehlt')).toHaveCount(0);
+    await erwarte(meldung(page)).toContainText('Tippe einen Drachen an, dann seinen Platz.');
+    await h.tippe(page, platz(B.blaetter(f.lv.baum)[0].pfad));
+    await erwarte(meldung(page)).toContainText('Tippe zuerst einen Drachen an.');
+  });
+
   test('Baum Frage fehlt: ohne Frage, falsche Frage, Doppeltipp, Nochmal', async ({ page }, info) => {
     await h.schnell(page);
     const f = h.suche('baum', (l) => l.aufgabe === 'frage');
