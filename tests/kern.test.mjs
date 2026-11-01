@@ -453,6 +453,24 @@ test('mitRegeln: kleinste Kartenzahl und Anzahl stimmen mit dem Durchprobieren a
   }
 });
 
+test('mitRegeln: gespiegelte Wenn-Karten im selbst geschriebenen Spruch zählen doppelt', () => {
+  // Drei Gitter, ein Programm: @stern @stern mit stern = rechts wenn[stein: rechts sonst vor] (7 Karten).
+  // wenn[frei: vor sonst rechts] im Spruch ist ein eigenes, gleich langes Programm (Prüfer-Fund: wurde nicht gezählt).
+  const ws = [
+    { b: 3, h: 3, start: { x: 1, y: 0, blick: 'oben' }, ziel: { x: 2, y: 0 }, hindernisse: [[2, 1]] },
+    { b: 3, h: 3, start: { x: 1, y: 0, blick: 'oben' }, ziel: { x: 0, y: 0 }, hindernisse: [[2, 1], [0, 1], [0, 2], [2, 0]] },
+    { b: 3, h: 3, start: { x: 1, y: 0, blick: 'oben' }, ziel: { x: 2, y: 1 }, hindernisse: [[1, 2], [0, 1], [2, 2]] },
+  ];
+  const sp = { stern: 'rechts wenn[frei: vor sonst rechts]' };
+  assert.ok(ws.every((w) => K.ausfuehren(w, '@stern @stern', { sprueche: sp }).geschafft));
+  const roh = rohSuche(ws, 7, ['spruch', 'wenn'], ['stein', 'frei'], {}, 'stern');
+  const m = mitRegeln(ws, 7, ['spruch', 'wenn'], { bedingungen: ['stein', 'frei'], spruchFrei: ['stern'] });
+  assert.deepEqual([m.minKarten, m.anzahlMin], [roh.min, roh.anzahl]);
+  assert.deepEqual([m.minKarten, m.anzahlMin], [7, 4]);
+  // nur die Wenn-Karte „stein“: keine Spiegel-Fassung
+  assert.deepEqual([mitRegeln(ws, 7, ['spruch', 'wenn'], { bedingungen: ['stein'], spruchFrei: ['stern'] }).anzahlMin], [rohSuche(ws, 7, ['spruch', 'wenn'], ['stein'], {}, 'stern').anzahl]);
+});
+
 test('mitRegeln: zufällige Gitter (eins oder zwei, mit Edelstein) gegen das Durchprobieren', () => {
   let seed = 4711;
   const zufall = (n) => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed % n; };

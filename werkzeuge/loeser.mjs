@@ -582,11 +582,14 @@ export function mitRegeln(welten, maxKarten, erlaubt = [], opt = {}) {
       for (let kosten = 2; ; kosten++) {
         const obergrenze = best === null ? grenze : Math.min(grenze, best);
         if (1 + kosten + 1 > obergrenze) break;
-        spruchKoerper(kastenSp, kosten, (koerper) => {
+        spruchKoerper(kastenSp, kosten, (koerper, mult) => {
           const ob = best === null ? grenze : Math.min(grenze, best);
           if (1 + kosten + 1 > ob) return;
           const sp = Object.assign({}, spFest, { [name]: koerper });
           const r = suche(sp, Object.keys(spFest).concat([name]), 1 + kosten, ob, true);
+          // Gespiegelte Wenn-Karten im Spruch (wenn[stein: A sonst B] = wenn[frei: B sonst A]) sind eigene Sprüche
+          // mit genau denselben Programmen: mitzählen (mult), auch wenn nur eine Fassung gebaut wird
+          if (r) r.anzahl *= mult;
           nimm(r, { [name]: koerper.map(knotenText).join(' ') });
         });
       }
