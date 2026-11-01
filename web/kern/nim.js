@@ -315,7 +315,8 @@
   // Zahlen-Weg für „Wer sagt …?“: Felder 0 … bis als Schlange (Reihe 1 nach rechts, Reihe 2 zurück …)
   //   o: { feld (mm, 22), proReihe (7), luecke (mm zwischen Reihen, 7), markiert: [Zahlen mit rotem Ring],
   //        gold: [Zahlen gelb hinterlegt], drache: Feld mit dem Drachen (Zahl, Standard 0 = Start; false = keiner),
-  //        schatz: true, masse }
+  //        schatz: true, masse,
+  //        fuellung: { Zahl: Farbe } (App: wer die Zahl gesagt hat), ringFarbe (statt Rot, App: Vorschau) }
   function wegFelder(bis, pro) {
     const f = [];
     for (let z = 0; z <= bis; z++) {
@@ -349,7 +350,7 @@
       const [x, y] = xy(f);
       const istStart = f.zahl === 0, istZiel = f.zahl === bis;
       const drachePos = o.drache === false ? -1 : (typeof o.drache === 'number' ? o.drache : 0);
-      const fill = istStart ? FARBE.start : gold.has(f.zahl) ? FARBE.goldHell : FARBE.weg;
+      const fill = (o.fuellung && o.fuellung[f.zahl]) || (istStart ? FARBE.start : gold.has(f.zahl) ? FARBE.goldHell : FARBE.weg);
       s += '<rect x="' + r2(x + 0.6) + '" y="' + r2(y + 0.6) + '" width="' + r2(F - 1.2) + '" height="' + r2(F - 1.2) + '" rx="' + r2(F * 0.16) + '" fill="' + fill + '" stroke="' + FARBE.wegRand + '" stroke-width="0.7"/>';
       const zahlGr = F * 0.4;
       if (istStart) {
@@ -370,7 +371,7 @@
         const dx = f.zahl === 0 ? F * 0.16 : F * 0.2, dy = f.zahl === 0 ? F * 0.04 : F * 0.02;
         s += '<g transform="translate(' + r2(x + dx) + ' ' + r2(y + dy) + ') scale(' + r2(F * gr / 100) + ') rotate(' + (rechts ? 90 : 270) + ' 50 50)">' + S.inhalt('drache') + '</g>';
       }
-      if (markiert.has(f.zahl)) s += '<circle cx="' + r2(x + F / 2) + '" cy="' + r2(y + F / 2) + '" r="' + r2(F * 0.4) + '" fill="none" stroke="' + FARBE.rot + '" stroke-width="' + r2(F * 0.07) + '"/>';
+      if (markiert.has(f.zahl)) s += '<circle cx="' + r2(x + F / 2) + '" cy="' + r2(y + F / 2) + '" r="' + r2(F * 0.4) + '" fill="none" stroke="' + (o.ringFarbe || FARBE.rot) + '" stroke-width="' + r2(F * 0.07) + '"/>';
     }
     return kopf(w, h, o, s, 'Zahlen-Weg von 0 bis ' + bis);
   }
