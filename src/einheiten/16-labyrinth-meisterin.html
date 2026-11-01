@@ -1,1 +1,501 @@
-<!-- Einheit 16: noch nicht geschrieben (Platzhalter, damit Buch und --nur 16 schon funktionieren) -->
+<!--
+  Einheit 16: Labyrinth-Meisterin (Block D)
+  Labyrinthe: kürzester Weg (Felder zählen, Sackgassen anmalen), Labyrinth als Programm,
+  die Hand-an-der-Wand-Regel zuerst mit dem Körper am Boden-Gitter, dann als Drachen-Programm
+  mit dem neuen Wiederhol-Zauber „bis zum Schatz“ und Wenn-dann-Kästen (Wenn-Karten frei rechts,
+  Stein vor der Nase). Ein Programm für viele Labyrinthe. Kobold: eine falsche Karte in der Regel.
+  Rätsel: raetsel/e16.json (Web-Paket e16, Art pfad mit erlaubt/welten, keine eigene Rätselart)
+  Eigene Bausteine: src/bausteine/e16-labyrinth.js (Sackgassen, Zahlen, ja/nein, Lösungslisten)
+  Blätter: 16-1 Labyrinth-Wege, 16-2 Die Hand an der Wand, 16-3 Ein Programm für alle
+-->
+<style>
+  .e16-ablauf > li { break-inside: avoid; }
+  .e16-ganz > li { break-inside: auto; orphans: 2; widows: 2; }
+  .kasten.e16-bricht { -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .kasten.e16-bricht > .kasten-titel { break-after: avoid; }
+  .kasten.e16-bricht > .kasten-titel + p, .kasten.e16-bricht > .kasten-titel + ul > li:first-child { break-before: avoid; break-inside: avoid; }
+  .e16-mini m-programm, .e16-mini m-symbol { vertical-align: middle; }
+  .e16-mini .prog { gap: 0.8mm; vertical-align: middle; align-items: center; }
+  .e16-mini .prog .platz .nr { display: none; }
+  .e16-mini .prog .platz .box { border-width: 0.35mm; border-radius: 1mm; }
+  .e16-mini .prog .kasten-z { border-width: 0.5mm; border-radius: 1.6mm; padding: 0.5mm 1mm 0.9mm 1mm; gap: 0.4mm; }
+  .e16-mini .prog .kasten-z .mal { font-size: 8.5pt; }
+  .e16-mini .prog .kasten-z .innen { gap: 0.8mm; }
+  .e16-regelbild { display: flex; align-items: center; justify-content: center; margin: 2mm 0 2.5mm 0; }
+  .e16-bilder { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 3mm 10mm; margin: 2mm 0 3mm 0; break-inside: avoid; }
+  .e16-bild { display: flex; flex-direction: column; align-items: center; gap: 1.2mm; }
+  .e16-bild .e16-unter { font-size: 9pt; color: var(--grau); text-align: center; max-width: 64mm; line-height: 1.25; }
+  .e16-tab td:first-child { width: 8%; }
+  .e16-tab td:nth-child(3) { width: 17%; }
+  .e16-loes { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm 4mm; align-items: start; margin: 2mm 0 4mm 0; }
+  .e16-loes m-loesungen, .e16-loes .loesungen-raster { display: contents; }
+  .e16-loes > .kasten.loesung { margin: 5mm 0 0 0; font-size: 9.5pt; }
+  .e16-loes > .kasten.loesung p, .kasten.loesung.e16-weiter p { margin-bottom: 1.6mm; }
+  .e16-progliste { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 1.2mm; vertical-align: middle; }
+  .e16-progzeile { display: block; }
+
+  /* Bausteine aus src/bausteine/e16-labyrinth.js */
+  m-e16-labyrinth { display: inline-block; line-height: 0; }
+  m-e16-labyrinth svg { display: block; }
+  m-e16-zahl, m-e16-janein { display: inline-block; vertical-align: middle; line-height: 1; }
+  m-e16-zahl[text] { vertical-align: baseline; }
+  .e16-janein { display: inline-flex; align-items: center; gap: 2mm; font-family: var(--kind); font-size: 16pt; }
+  .e16-janein > span:not(.e16-kreuz) { margin-right: 3mm; }
+  .e16-kreuz { display: inline-flex; width: 8mm; height: 8mm; border: 0.6mm solid var(--tinte); border-radius: 1.5mm; background: white; align-items: center; justify-content: center; }
+  .e16-kreuz svg { width: 6.5mm; height: 6.5mm; }
+
+  /* Blätter */
+  .e16-oben { display: flex; align-items: flex-start; gap: 7mm; }
+  .e16-oben > m-e16-labyrinth { flex: none; }
+  .e16-spalte { display: flex; flex-direction: column; gap: 8mm; padding-top: 1mm; }
+  .e16-spalte .aufg { margin: 0; }
+  .e16-antwort { display: flex; align-items: center; gap: 3mm; margin: 2mm 0 0 0; }
+  .e16-hinweis { font-size: 14pt; color: var(--grau); margin: 1.5mm 0 0 0; }
+  .e16-profi-reihe { display: flex; align-items: flex-end; gap: 6mm; }
+  .e16-profi-reihe > .profi { flex: 1; }
+  .e16-regel { border: 0.7mm solid #0b8a8f; border-radius: 3mm; padding: 2mm 4mm 2.5mm 4mm; background: #f3fbfb; }
+  .e16-regel-titel { font-family: var(--kind); font-weight: 700; font-size: 17pt; margin: 0 0 1.5mm 0; color: #0b8a8f; }
+  .e16-regel-text { margin: 2mm 0 0 0; font-size: 15pt; line-height: 1.25; }
+  .e16-zwei { display: flex; justify-content: space-around; gap: 6mm; }
+  .e16-lab { display: flex; flex-direction: column; align-items: center; gap: 2mm; }
+  .e16-etikett { font-family: var(--kind); font-weight: 700; font-size: 18pt; color: var(--grau); margin: 0; line-height: 1; }
+  .e16-frage { margin: 2.5mm 0 0 0; display: flex; align-items: center; justify-content: center; gap: 3mm; white-space: nowrap; }
+  .e16-ab { font-family: var(--kind); font-weight: 700; color: var(--grau); margin-left: 5mm; }
+  .e16-form { margin-top: 3mm; }
+  .e16-mein { display: flex; align-items: flex-start; gap: 7mm; }
+  .e16-mein-text p { margin: 0 0 3mm 0; }
+</style>
+
+<!-- Spickzettel: Kurzfassung der Anleitung zum Mitnehmen, höchstens zwei Seiten. Ablauf als Drehbuch (Minuten wie in der Anleitung) -->
+<section class="spick nur-buch" data-einheit="16" data-titel="Labyrinth-Meisterin">
+  <p class="spick-kern"><b>Darum geht’s:</b> Labyrinthe! {{KIND}} sucht den kürzesten Weg (Felder zählen, Sackgassen anmalen) und lernt die <b>Hand-an-der-Wand-Regel</b>: <i>Ist rechts frei, dreh nach rechts. Ist vor der Nase ein Stein, dreh nach links, sonst geh vor. Immer wieder, bis zum Schatz.</i> Damit findet sie aus jedem Labyrinth ohne Insel hinaus, auch wenn sie es nicht kennt. Neu ist der Wiederhol-Zauber <b>„bis zum Schatz“</b>: ein lila Zauber-Kasten ohne Zahl, der aufhört, sobald der Drache auf dem Schatz steht. Neu ist auch die Wenn-Karte <b>„frei rechts“</b>: Das Feld rechts <i>neben</i> dem Drachen ist frei (von ihm aus gesehen).</p>
+
+  <div class="spick-zwei breit-links">
+    <div class="spick-block vorher">
+      <h2>Vorher, ohne {{KIND}} <small>· etwa 20 Min</small></h2>
+      <ul class="check">
+        <li><a class="blattref" href="#blatt-16-1"></a> und <a class="blattref" href="#blatt-16-2"></a> drucken, <a class="blattref" href="#blatt-16-3"></a> für später. <span class="min">2 Min</span></li>
+        <li>Boden-Gitter 4 · 4 kleben (Felder 45 cm) oder das alte um eine Reihe und eine Spalte erweitern. Polster an die obere Kante. <span class="min">10 Min</span></li>
+        <li>Boden-Labyrinth wie im Bild in der Anleitung: 4 Steine (Polster, Kuscheltiere), Zuckerl rechts oben. <span class="min">3 Min</span></li>
+        <li>Zwei Kärtchen basteln: „bis zum Schatz“ (so groß wie eine Zahlenkarte) und die Wenn-Karte „frei rechts“ (so groß wie eine Befehlskarte). <span class="min">5 Min</span></li>
+      </ul>
+    </div>
+    <div class="spick-block vorher">
+      <h2>Bereitlegen</h2>
+      <ul class="check">
+        <li>Befehlskarten (<a class="blattref" href="#blatt-1-1"></a>), lila Streifen (<a class="blattref" href="#blatt-5-3"></a>)</li>
+        <li>Wenn-Karte „Stein“, Wort-Karten wenn, dann, sonst aus Einheit 11 (wenn da)</li>
+        <li>Drachen-Figur, Muggelstein</li>
+        <li>Bleistift, roter Buntstift, Stempel</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Gemeinsam</h2>
+  <ol class="spick-ablauf">
+    <li data-min="5"><div><b>Das Boden-Labyrinth.</b> {{KIND}} ist der Drache, Startfeld links unten, Nase zum Polster. Erst frei zum Zuckerl gehen, dann die Sackgasse rechts unten zeigen, dann den kürzesten Weg: 6 Felder, als Programm 7 Befehle (vor, vor, vor, rechts drehen, vor, vor, vor).
+      <div class="sag">
+        <p class="du">„Wo geht es hier nicht weiter?“</p>
+        <p class="sie">„Da rechts unten. Da ist nur der Rand!“</p>
+        <p class="du">„So ein Weg, der aufhört, heißt Sackgasse.“</p>
+      </div>
+    </div></li>
+    <li data-min="6"><div><b>Hand an der Wand.</b> Rechten Arm zur Seite strecken: Das ist die Hand an der Wand. Du sprichst die Regel bei jedem Feld vor, sie macht. Sie läuft in die Sackgasse, dreht zweimal links und findet den Schatz: 12 Befehle statt 7. Dann die Regel mit Karten hinlegen. Zum Schluss legst du zwei Steine um (Zuckerl bleibt), sie geht dieselbe Regel noch einmal.
+      <div class="spick-spiel"><h3>Die Hand-an-der-Wand-Regel</h3>
+        <div class="e16-mini e16-regelbild"><m-programm raetsel="e16-fh" gr="7" nummern="nein"></m-programm></div>
+        <ul>
+          <li><b>Zuerst:</b> Ist rechts frei? Dann rechts drehen.</li>
+          <li><b>Dann:</b> Ist vor der Nase ein Stein? Dann links drehen, sonst vor.</li>
+          <li><b>Immer wieder,</b> bis der Drache auf dem Schatz steht. Der Rand ist auch ein Stein. Schauen ist kein Befehl.</li>
+          <li><b>Karten:</b> 6 (bis-Karte, Wenn-Karte, rechts drehen, Wenn-Karte, links drehen, vor).</li>
+        </ul>
+      </div>
+      <div class="sag">
+        <p class="du">„Ich verrate dir einen Trick, mit dem man aus einem Labyrinth findet, auch wenn man den Weg nicht kennt.“</p>
+        <p class="sie">„Oh nein, eine Sackgasse!“ – „Was sagt die Regel?“ – „Vorne Rand: links drehen. Immer noch Rand: links drehen. Jetzt frei!“</p>
+        <p class="dann">Neue Steine: „Kennst du das Labyrinth? Brauchst du nicht. Dieselbe Regel!“</p>
+      </div>
+    </div></li>
+    <li data-min="5"><div><b>Labyrinth-Bau-Duell.</b> Heute je eine Runde.
+      <div class="spick-spiel"><h3>Labyrinth-Bau-Duell</h3><p class="meta">Boden-Gitter, 4 bis 6 Steine, Zuckerl, 16 Befehlskarten, Zettel für Punkte</p>
+        <ul>
+          <li><b>Bauen:</b> Der Drache schaut weg, die Baumeisterin legt Steine und Schatz. Der Schatz muss erreichbar sein.</li>
+          <li><b>Programmieren:</b> Der Drache legt das kürzeste Programm mit Befehlskarten, ohne hineinzugehen, und sagt die Kartenzahl. Dann geht er es genau so.</li>
+          <li><b>Punkte:</b> Kommt er an: 1 für den Drachen, sonst 1 für die Baumeisterin. Findet die Baumeisterin ein kürzeres: 1 für sie, sonst noch 1 für den Drachen.</li>
+          <li><b>Ende:</b> nach 4 Runden. Gleichstand: Hand-Regel-Finale (Befehle raten).</li>
+        </ul>
+      </div>
+    </div></li>
+    <li data-min="6"><div><b>Blatt „Labyrinth-Wege“.</b> <a class="blattref" href="#blatt-16-1"></a>: zuerst jede Sackgasse bis zur Abzweigung grau anmalen, dann bleibt nur der Weg übrig. Das Startfeld zählt nicht. Beim Programm zählen Drehungen mit.</div></li>
+    <li data-min="5"><div><b>Blatt „Die Hand an der Wand“.</b> <a class="blattref" href="#blatt-16-2"></a>: Die Regel oben gemeinsam lesen. Drachen-Figur mitschieben, bei jedem Feld zuerst rechts schauen, dann vorne. Profi: Kobold-Karte finden.
+      <div class="sag">
+        <p class="du">„Ist das der kürzeste Weg?“</p>
+        <p class="sie">„Bei B nicht, da geht er in die Sackgasse. Aber er kommt an!“</p>
+      </div>
+    </div></li>
+    <li data-min="2"><div><b>Sammelpass.</b> Feld „Einheit&nbsp;16“, Sterne anmalen. <a class="blattref" href="#blatt-16-3"></a> kommt beim nächsten Mal dran.</div></li>
+  </ol>
+
+  <div class="spick-zwei">
+    <div class="spick-block stolper">
+      <h2>Wenn es hakt</h2>
+      <ul>
+        <li><b>Vergisst „rechts schauen“:</b> Arm ausgestreckt lassen, zuerst immer rechts fragen.</li>
+        <li><b>Dreht und geht zugleich:</b> Drehen ist ein Befehl, vor der nächste.</li>
+        <li><b>„Die Regel geht ja falsch!“</b> Sie ist nicht die kürzeste, aber sie kommt an.</li>
+        <li><b>Sackgasse nur am Ende angemalt:</b> alles bis zur Abzweigung.</li>
+        <li><b>Links und rechts:</b> Hand ausstrecken, Blatt drehen, Figur mitdrehen.</li>
+      </ul>
+    </div>
+    <div class="spick-block schwerer">
+      <h2>Zu leicht?</h2>
+      <ul>
+        <li><b>Linke Hand:</b> Im Boden-Labyrinth nur 7 Befehle.</li>
+        <li><b>Insel:</b> 3 Polster in die Mitte, Zuckerl ins vierte Mittelfeld. Die Regel läuft im Kreis.</li>
+        <li><b>Rekord-Labyrinth:</b> Wo braucht die Regel am längsten?</li>
+        <li><a class="blattref" href="#blatt-16-3"></a>: ein Programm für zwei Labyrinthe.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="spick-block schluss">
+    <h2>Zum Schluss nicht vergessen</h2>
+    <ul class="check">
+      <li><b>Bildschirm-Bonus,</b> nur wenn ihr mögt (höchstens 15 Min, nach den Blättern): Paket 16, QR-Code unten rechts auf <a class="blattref" href="#blatt-16-1"></a>. Neue Tasten: Zauber-Kasten „bis zum Schatz“, Wenn-dann-Kasten mit 4 Wenn-Karten. Nach dem Ende-Bild kommt das Gerät weg.</li>
+      <li>„bis zum Schatz“-Karte und Wenn-Karte „frei rechts“ zu den Befehlskarten ins Kuvert. Das Boden-Gitter darf kleben bleiben (Einheit 19).</li>
+    </ul>
+  </div>
+</section>
+
+<section class="anleitung" data-einheit="16" data-titel="Labyrinth-Meisterin">
+
+  <div class="kasten ziel">
+    <p>Heute geht es um <span class="begriff">Labyrinthe</span>. Zuerst sucht {{KIND}} den kürzesten Weg: Felder zählen, <span class="begriff">Sackgassen</span> (Wege, die aufhören, ohne zum Schatz zu führen) erkennen und grau anmalen, dann den Weg als Programm schreiben. Das kann sie schon, neu ist nur das Labyrinth.</p>
+    <p>Dann kommt der Höhepunkt: die <span class="begriff">Hand-an-der-Wand-Regel</span>. Wer im Labyrinth die rechte Hand an die Wand legt und sie nie loslässt, findet hinaus, auch wenn er den Weg nicht kennt (solange es keine Insel in der Mitte gibt). {{KIND}} erlebt das zuerst mit dem Körper am Boden-Gitter, dann schreibt sie es als Drachen-Programm: mit dem neuen <span class="begriff">Wiederhol-Zauber „bis zum Schatz“</span> und zwei Wenn-dann-Kästen wie in Einheit&nbsp;11. Der große Aha-Moment: <b>Ein Programm für viele Labyrinthe.</b> Die Regel geht nicht immer den kürzesten Weg, aber sie kommt an. Und der Fehler-Kobold versteckt eine falsche Karte in der Regel.</p>
+  </div>
+
+  <div class="kasten tipp e16-mini" data-titel="Die Spielregeln von „bis zum Schatz“ und der neuen Wenn-Karte (für euch beide gleich)">
+    <ul>
+      <li><b>So sieht er aus:</b> ein lila Zauber-Kasten wie in Einheit&nbsp;5, aber oben steht statt einer Zahl eine Schatztruhe und „bis zum Schatz“: <m-programm befehle="bis[vor]" gr="6" nummern="nein"></m-programm>. Am Boden legt ihr die Karte „bis zum Schatz“ auf den Platz für die Zahlenkarte.</li>
+      <li><b>So läuft er ab:</b> Der Drache macht die Runden immer wieder, <b>bis er auf dem Schatz steht</b>. Nach jedem Befehl wird nachgeschaut: Steht er auf dem Schatz, hört der Kasten sofort auf, auch mitten in einer Runde. Steht er schon am Anfang drauf, passiert gar nichts. Im Kasten liegen wie immer höchstens 3 Teile (ein Wenn-dann-Kasten ist ein Teil).</li>
+      <li><b>Die neue Wenn-Karte „frei rechts“</b> <m-symbol name="wenn-frei-rechts" gr="7"></m-symbol>: Das Feld <b>rechts neben</b> dem Drachen ist frei, von ihm aus gesehen. Im Bild schaut der Drache nach oben, das gestrichelte Feld liegt rechts von ihm. Dazu kennt {{KIND}} aus Einheit&nbsp;11 schon <m-symbol name="wenn-stein" gr="7"></m-symbol> „Stein vor der Nase“ und <m-symbol name="wenn-frei" gr="7"></m-symbol> „frei vor der Nase“. In der App gibt es auch <m-symbol name="wenn-stein-rechts" gr="7"></m-symbol> „Stein rechts“. Der Rand zählt immer wie ein Stein.</li>
+      <li><b>Läuft er im Kreis?</b> Findet der Drache den Schatz nie, würde der Kasten nie aufhören. Darum ist nach 60 Befehlen Schluss: „Der Drache läuft im Kreis. Er findet den Schatz so nicht.“ Das ist nicht geschafft.</li>
+      <li><b>Karten zählen:</b> Der Kasten „bis zum Schatz“ ist 1 Karte plus sein Inhalt, ein Wenn-dann-Kasten 1 Karte (die Wenn-Karte) plus die Befehle nach „dann“ und „sonst“. Die lila Streifen und die Wörter wenn, dann, sonst zählen nicht.</li>
+    </ul>
+  </div>
+
+  <div class="kasten tipp e16-mini" data-titel="Die Hand-an-der-Wand-Regel">
+    <div class="e16-regelbild"><m-programm raetsel="e16-la" gr="8" nummern="nein"></m-programm></div>
+    <ul>
+      <li><b>In Worten:</b> Bis zum Schatz: Wenn rechts frei ist, dreh nach rechts. Wenn vor der Nase ein Stein ist, dreh nach links, sonst geh vor.</li>
+      <li><b>Mit dem Körper:</b> Die rechte Hand ist seitlich ausgestreckt und „klebt“ an der Wand. Geht rechts ein Weg ab, biegt man mit der Hand ab (rechts drehen, dann vor). Steht vorne eine Wand, dreht man sich, bis vorne frei ist (links drehen). In einer Sackgasse sind das zweimal links drehen, dann geht es zurück.</li>
+      <li><b>Warum sie funktioniert:</b> Die Hand bleibt immer an derselben Wand. Wer einer Wand folgt, kommt an allem vorbei, was an dieser Wand liegt, und irgendwann zum Schatz. Sie findet nicht immer den kürzesten Weg, aber sie kommt an, ohne dass man das Labyrinth kennt. Nur wenn der Schatz an einer <b>Insel</b> in der Mitte liegt (Steine, die nicht mit dem Rand verbunden sind), läuft sie im Kreis (Schwerer-Teil).</li>
+      <li><b>Karten:</b> 1 (bis zum Schatz) + 2 (Wenn-Karte, rechts drehen) + 3 (Wenn-Karte, links drehen, vor) = 6 Karten.</li>
+    </ul>
+  </div>
+
+  <div class="kasten material darf-brechen e16-bricht">
+    <p><b>Vorher, ohne {{KIND}} (etwa 20 Minuten):</b></p>
+    <ul>
+      <li><b>Drucken (2 Minuten):</b> <a class="blattref" href="#blatt-16-1"></a> und <a class="blattref" href="#blatt-16-2"></a>, dazu <a class="blattref" href="#blatt-16-3"></a> für den Schwerer-Teil oder das nächste Mal. Farbe ist schön, Schwarz-Weiß geht auch.</li>
+      <li><b>Boden-Gitter 4 · 4 (10 Minuten):</b> Klebt noch das 3 · 3-Gitter aus Einheit&nbsp;2, klebt ihr eine Reihe und eine Spalte dazu. Sonst neu: 5 Streifen Malerkrepp waagrecht und 5 senkrecht, je 1,80 m lang, im Abstand von 45 cm (4 · 45 = 180). Der Polster liegt an der oberen Kante, er zeigt, wo oben ist.</li>
+      <li><b>Boden-Labyrinth aufbauen (3 Minuten):</b> 4 „Steine“ wie im linken Bild unten, z. B. zwei Polster und zwei große Kuscheltiere (Hausschuhe oder ein Wäschekorb gehen auch). Das Zuckerl kommt ins Feld rechts oben. Startfeld ist links unten.</li>
+      <li><b>Zwei Kärtchen basteln (5 Minuten):</b> Ein Kärtchen so groß wie eine Zahlenkarte von <a class="blattref" href="#blatt-5-3"></a> (etwa 3 · 1,3 cm), darauf „bis zum Schatz“ und eine kleine Schatztruhe. Ein zweites so groß wie eine Befehlskarte, darauf die Wenn-Karte „frei rechts“ wie im Bild <m-symbol name="wenn-frei-rechts" gr="7"></m-symbol>: ein Drache von oben, Nase nach oben, rechts neben ihm ein leeres Feld mit gestricheltem Rand.</li>
+    </ul>
+    <p><b>Material in der Einheit:</b> die Befehlskarten (<a class="blattref" href="#blatt-1-1"></a>), die lila Streifen (<a class="blattref" href="#blatt-5-3"></a>), aus Einheit&nbsp;11 die Wenn-Karte „Stein“ und die türkisen Wort-Karten wenn, dann, sonst (habt ihr sie nicht, lest ihr die Regel einfach vor). Die Drachen-Figur (<a class="blattref" href="#blatt-2-3"></a>), ein Muggelstein, ein Bleistift zum Anmalen der Sackgassen, ein roter Buntstift, ein Zettel für Punkte, Stempel oder Sticker für den Sammelpass.</p>
+    <p><b>Extra, außerhalb der Einheit:</b> „Hand an der Wand durch die Wohnung“ und ein großes Kreide-Labyrinth im Hof (Kästen weiter unten). Das Boden-Gitter darf kleben bleiben, Einheit&nbsp;19 braucht es wieder.</p>
+  </div>
+
+  <div class="e16-bilder">
+    <div class="e16-bild"><m-gitter raetsel="e16-f1" feld="20"></m-gitter><span class="e16-unter">So baust du das Boden-Labyrinth auf: 4 Steine, das Zuckerl rechts oben. Start links unten, Nase zum Polster.</span></div>
+    <div class="e16-bild"><span class="loesungsmodus"><m-gitter raetsel="e16-fh" feld="20"></m-gitter></span><span class="e16-unter">So läuft die Hand-Regel: in die Sackgasse rechts unten, zweimal links drehen, hinauf zum Schatz. Das sind <m-e16-zahl raetsel="e16-fh" was="befehle" l="12" text></m-e16-zahl> Befehle.</span></div>
+  </div>
+
+  <h2>Ablauf Schritt für Schritt</h2>
+  <ol class="ablauf e16-ablauf">
+    <li data-min="5"><span class="schritt-titel">Das Boden-Labyrinth</span>{{KIND}} steht als Drache im Startfeld links unten, die Nase zum Polster. „Das ist ein Labyrinth. Finde den Weg zum Schatz!“ Zuerst darf sie einfach gehen (nicht durch Steine, nicht über den Rand), so wie sie will. Dann fragst du: „Wo geht es nicht weiter?“ Das Feld rechts unten ist eine Sackgasse: ein Weg, der aufhört, ohne zum Schatz zu führen. Zum Schluss sucht sie den kürzesten Weg und zählt die Felder (das Startfeld zählt nicht): 3 hinauf und 3 nach rechts, also 6 Felder. Als Programm sind das <m-e16-zahl raetsel="e16-f1" was="kuerzestes" l="7" text></m-e16-zahl> Befehle, die Drehung zählt mit: vor, vor, vor, rechts drehen, vor, vor, vor. Wer mag, legt es mit Befehlskarten und du läufst es als Roboter.</li>
+    <li data-min="6"><span class="schritt-titel">Hand an der Wand</span>Zurück zum Start. Jetzt streckt {{KIND}} den rechten Arm zur Seite: Das ist ihre Hand an der Wand. Bei jedem Feld fragt sie sich zuerst: „Ist rechts frei?“ Wenn ja, dreht sie nach rechts. Dann: „Ist vor meiner Nase ein Stein?“ Wenn ja, dreht sie nach links, sonst geht sie vor. Du sprichst die Regel anfangs bei jedem Feld mit (Kasten „Die Hand-an-der-Wand-Regel“). Sie geht nach rechts in die Sackgasse, dreht sich mit zweimal links drehen um und geht hinauf zum Schatz: 12 Befehle statt 7. Dann legst du die Regel mit Karten hin (Kasten „Die Regel zum Hinlegen“). Zum Schluss dreht sie sich um, du legst zwei Steine woanders hin (das Zuckerl bleibt rechts oben), und sie geht <b>dieselbe Regel</b> noch einmal. Sie findet den Schatz wieder, ohne das neue Labyrinth zu kennen.</li>
+    <li data-min="5"><span class="schritt-titel">Labyrinth-Bau-Duell</span>Jetzt baut ihr euch gegenseitig Labyrinthe (Kasten „Spiel: Labyrinth-Bau-Duell“). Zuerst baust du, {{KIND}} programmiert, dann umgekehrt. Heute reicht eine Runde für jede Person, die ganzen 4 Runden passen gut ein anderes Mal.</li>
+    <li data-min="6"><span class="schritt-titel">Blatt „Labyrinth-Wege“</span><a class="blattref" href="#blatt-16-1"></a>. Zuerst malt sie jede Sackgasse mit Bleistift grau an, immer bis zur Abzweigung. Dann bleibt nur noch der Weg übrig, den malt sie rot und zählt die Felder. Beim Programm zählen die Drehungen mit, 12 Kästchen sind genug. Die Profi-Aufgabe ist freiwillig.</li>
+    <li data-min="5"><span class="schritt-titel">Blatt „Die Hand an der Wand“</span><a class="blattref" href="#blatt-16-2"></a>. Lest die Regel oben gemeinsam. Bei Labyrinth A schiebt sie die Drachen-Figur mit und fragt bei jedem Feld wie am Boden: zuerst rechts, dann vorne. Den Weg zeichnet sie mit Bleistift ein. Dann B. Die Frage „Kürzester Weg?“ beantwortet sie mit Blick auf ihre Linie. Die Profi-Aufgabe ist die Kobold-Jagd: Eine Karte in der Regel ist falsch. Passt das Blatt heute nicht mehr, kommt es beim nächsten Mal dran.</li>
+    <li data-min="2"><span class="schritt-titel">Sammelpass</span>Feld „Einheit&nbsp;16“ stempeln oder bekleben, Sterne anmalen. Frag: „Wo ist die Hand-Regel schlau, und wo ist sie nicht die kürzeste?“ <a class="blattref" href="#blatt-16-3"></a> (ein Programm für zwei Labyrinthe, eigenes Labyrinth) ist für den Schwerer-Teil oder das nächste Mal.</li>
+  </ol>
+
+  <div class="kasten basteln e16-mini" data-titel="Die Regel zum Hinlegen">
+    <ol>
+      <li>Die Karte „bis zum Schatz“ kommt auf den Platz der Zahlenkarte im lila Kopf-Streifen von <a class="blattref" href="#blatt-5-3"></a>.</li>
+      <li>Darunter zwei Reihen. Erste Reihe: wenn, Wenn-Karte „frei rechts“, dann, rechts drehen. Zweite Reihe: wenn, Wenn-Karte „Stein“, dann, links drehen, sonst, vor.</li>
+      <li>Die Reihen sind länger als die lila Streifen: Legt die Streifen einfach locker außen herum, oder legt eine lila Wollschnur um alles. Wichtig ist nur, dass man sieht, was im Kasten liegt.</li>
+      <li>So sieht es am Papier und in der App aus: <m-programm raetsel="e16-la" gr="6" nummern="nein"></m-programm></li>
+    </ol>
+  </div>
+
+  <h3>Beispielsätze</h3>
+  <div class="sag">
+    <p class="du">„Wo geht es hier nicht weiter?“</p>
+    <p class="sie">„Da rechts unten! Da ist nur der Rand.“</p>
+    <p class="du">„Genau. So ein Weg, der aufhört, ohne zum Schatz zu führen, heißt Sackgasse. Auf der Straße gibt es dafür sogar ein eigenes Schild.“</p>
+    <p class="dann">Lass sie selbst entdecken, dass eine Sackgasse auch länger sein kann als ein Feld (auf <a class="blattref" href="#blatt-16-1"></a> ist eine 4 Felder lang). Wichtig ist: Am Ende geht es nicht weiter, und der Schatz liegt nicht dort.</p>
+  </div>
+  <div class="sag">
+    <p class="du">„Ich verrate dir einen Trick, mit dem man aus einem Labyrinth findet, auch wenn man den Weg gar nicht kennt. Streck deine rechte Hand zur Seite. Das ist deine Hand an der Wand.“</p>
+    <p class="sie">„Und dann?“</p>
+    <p class="du">„Bei jedem Feld fragst du zuerst: Ist rechts frei? Dann drehst du nach rechts. Dann: Ist vor deiner Nase ein Stein? Dann drehst du nach links, sonst gehst du vor. Immer wieder, bis zum Schatz.“</p>
+    <p class="sie">(in der Sackgasse) „Oh nein, eine Sackgasse!“</p>
+    <p class="du">„Was sagt die Regel?“</p>
+    <p class="sie">„Rechts ist Rand, vorne ist Rand: links drehen. Vorne ist immer noch Rand: noch einmal links drehen. Jetzt ist vorne frei!“</p>
+    <p class="dann">Genau so kommt die Regel aus jeder Sackgasse wieder heraus. Lob den Plan, nicht nur das Ankommen: „Du hast die Regel ganz genau befolgt, wie ein echter Roboter.“</p>
+  </div>
+  <div class="sag">
+    <p class="du">(legt die lila Streifen und die Karte „bis zum Schatz“) „Das ist ein neuer Zauber-Kasten. Oben steht keine Zahl. Wie oft wiederholt er?“</p>
+    <p class="sie">„So lange, bis der Drache beim Schatz ist!“</p>
+    <p class="du">„Und wenn er mitten in einer Runde auf den Schatz kommt?“</p>
+    <p class="sie">„Dann hört er sofort auf. Sonst geht er ja wieder weg!“</p>
+    <p class="dann">Fragt sie: „Und wenn er den Schatz nie findet?“, ist das eine großartige Frage. Dann würde er für immer im Kreis laufen. Am Papier und in der App ist nach 60 Befehlen Schluss: „Der Drache läuft im Kreis.“ Das ist die Insel aus dem Schwerer-Teil.</p>
+  </div>
+  <div class="sag">
+    <p class="du">(hat zwei Steine umgelegt) „Kennst du dieses Labyrinth?“</p>
+    <p class="sie">„Nein, das ist neu!“</p>
+    <p class="du">„Brauchst du auch nicht. Nimm dieselbe Regel.“</p>
+    <p class="dann">Sie findet den Schatz wieder. Das ist der Aha-Moment: ein Programm für viele Labyrinthe. Mit dem Zuckerl in der Ecke rechts oben klappt das im 4 · 4-Gitter bei jeder Aufstellung, bei der man überhaupt hinkommt (wir haben alle mit dem Computer durchprobiert).</p>
+  </div>
+  <div class="sag">
+    <p class="du">(<a class="blattref" href="#blatt-16-2"></a>) „Ist das der kürzeste Weg?“</p>
+    <p class="sie">„Bei A schon. Bei B nicht, da geht er zuerst in die Sackgasse.“</p>
+    <p class="du">„Ist die Regel dann dumm?“</p>
+    <p class="sie">„Nein. Sie kommt immer an, auch wenn man das Labyrinth nicht kennt!“</p>
+  </div>
+
+  <h2>Spiele, Bewegung und Basteln</h2>
+
+  <div class="kasten spiel darf-brechen e16-bricht" data-titel="Labyrinth-Bau-Duell">
+    <p class="spiel-meta">2 Personen · 5–15 Minuten · Boden-Gitter 4 · 4, 4 bis 6 Steine (Polster, Kuscheltiere, Hausschuhe), ein Zuckerl als Schatz, die 16 Befehlskarten, ein Zettel für die Punkte</p>
+    <ol class="regeln">
+      <li><b>Vorbereitung:</b> Das Gitter ist leer. Start ist wie immer links unten, Nase zum Polster. Steine und Zuckerl liegen neben dem Gitter.</li>
+      <li><b>Rollen:</b> Eine Person ist die <b>Baumeisterin</b>, die andere der <b>Drache</b>. Nach jeder Runde tauscht ihr.</li>
+      <li><b>Bauen:</b> Der Drache dreht sich um und hält sich die Augen zu. Die Baumeisterin legt 4 bis 6 Steine und das Zuckerl (nicht aufs Startfeld). Der Schatz muss erreichbar sein, ein Labyrinth ohne Weg gilt nicht.</li>
+      <li><b>Programmieren:</b> Der Drache schaut sich das Labyrinth von außen an, er darf nicht hineingehen. Er legt das kürzeste Programm mit den Befehlskarten neben das Gitter und sagt laut, wie viele Karten es sind.</li>
+      <li><b>Laufen:</b> Die Baumeisterin liest das Programm Karte für Karte vor, der Drache geht genau das, auch wenn es falsch ist.</li>
+      <li><b>Punkte:</b>
+        <ul>
+          <li>Der Drache kommt beim Zuckerl an: 1 Punkt für den Drachen. Stößt er an oder landet woanders: „Hier hat der Kobold zugeschlagen!“ und 1 Punkt für die Baumeisterin.</li>
+          <li><b>Kürzer-Wette:</b> Die Baumeisterin darf ein kürzeres Programm hinlegen. Kommt es an, bekommt sie 1 Punkt. Findet sie keines, bekommt der Drache noch 1 Punkt.</li>
+        </ul></li>
+      <li><b>Ende:</b> Nach 4 Runden (jede Person ist 2-mal Baumeisterin) gewinnt, wer mehr Punkte hat. Bei Gleichstand: Hand-Regel-Finale. Der Drache geht das letzte Labyrinth mit der Hand-an-der-Wand-Regel, vorher raten beide, wie viele Befehle es werden. Wer näher dran ist, gewinnt. Das Zuckerl bekommt sowieso der Drache.</li>
+    </ol>
+    <p><b>Varianten:</b></p>
+    <ul>
+      <li><b>Rekord-Labyrinth (schwerer):</b> Die Baumeisterin will ein Labyrinth, in dem die Hand-Regel möglichst lange braucht. Der Drache geht es mit der Regel, die Baumeisterin zählt die Befehle (Schauen zählt nicht). Die Zahl ist der Punktestand der Runde. Tipp: Das Zuckerl muss gar nicht weit weg liegen (Schwerer-Teil).</li>
+      <li><b>Sackgassen-Jagd:</b> Bevor der Drache programmiert, zeigt er alle Sackgassen. Für jede, die er findet, 1 Punkt.</li>
+      <li><b>Mit Papier:</b> Im leeren Gitter auf <a class="blattref" href="#blatt-16-3"></a> oder auf Kästchenpapier (jedes Feld 2 · 2 Kästchen) mit der Drachen-Figur und den Stein-Plättchen von <a class="blattref" href="#blatt-2-3"></a>.</li>
+    </ul>
+    <p><b>Tipp für dich als Baumeister:</b> Baue zuerst Labyrinthe mit einem einzigen kürzesten Programm. Gibt es zwei gleich kurze, gilt jedes. Mal ein Labyrinth mit Sackgasse, mal eines, bei dem der kürzeste Weg nicht der ist, der zuerst ins Auge springt.</p>
+  </div>
+
+  <div class="sag">
+    <p class="sie">(baut) „So! Und der Schatz liegt ganz hinten in der Ecke.“</p>
+    <p class="du">(legt 9 Karten) „Mein Programm hat 9 Karten.“</p>
+    <p class="sie">„Ha! Ich weiß eins mit 8!“</p>
+    <p class="dann">Schafft sie das, hat sie den Punkt verdient. Achte darauf, dass sie wirklich Karten zählt (Drehungen mit) und nicht Felder.</p>
+  </div>
+
+  <div class="kasten bewegung darf-brechen e16-bricht" data-titel="Hand an der Wand durch die Wohnung (Extra)">
+    <p>Die echte Hand-Regel, mit echten Wänden. Leg ein Zuckerl in einem anderen Zimmer auf den Boden, <b>direkt an die Wand</b>. {{KIND}} startet im Kinderzimmer, legt die rechte Hand an die Wand und lässt sie nie los. Steht ein Kasten oder ein Sofa an der Wand, geht die Hand am Möbel entlang. Kommt eine offene Tür, geht die Hand um den Türstock herum ins nächste Zimmer. So kommt sie an allem vorbei, was an „ihrer“ Wand liegt, und irgendwann beim Zuckerl.</p>
+    <ul>
+      <li><b>Sicherheit:</b> nur mit offenen Augen und langsam. Wohnungstür, Stiege und Küche bleiben zu (eine geschlossene Tür ist einfach Wand).</li>
+      <li><b>Das Insel-Experiment:</b> Dann liegt das Zuckerl mitten im Zimmer auf dem Teppich. Findet die Hand-Regel es? Nein! Sie geht an allen Wänden entlang und kommt wieder am Start an. Das Zuckerl liegt auf einer „Insel“, die Hand kommt nie dorthin. Frag: „Was müsste man anders machen?“ (Die Hand einmal loslassen und mitten durchs Zimmer gehen.)</li>
+    </ul>
+  </div>
+
+  <div class="kasten bewegung darf-brechen e16-bricht" data-titel="Kreide-Labyrinth im Hof (Extra)">
+    <p>Draußen geht alles größer: ein Gitter mit 5 · 5 Feldern (je etwa 50 cm) aus Straßenkreide, die Steine sind dick ausgemalte Felder. Malt das Labyrinth von <a class="blattref" href="#blatt-16-1"></a> nach. {{KIND}} geht es zuerst mit der rechten Hand an der Wand (<m-e16-zahl raetsel="e16-mr" was="befehle" l="31" text></m-e16-zahl> Befehle, ganz schön weit!), dann mit der linken (<m-e16-zahl raetsel="e16-ml" was="befehle" l="17" text></m-e16-zahl> Befehle). Das kürzeste Programm hat nur <m-e16-zahl raetsel="e16-m1" was="kuerzestes" l="11" text></m-e16-zahl>. Danach malt sie selbst ein Labyrinth für dich.</p>
+  </div>
+
+  <h2>Wenn es hakt oder zu leicht ist</h2>
+
+  <div class="zwei">
+    <div class="kasten leichter e16-mini">
+      <ul>
+        <li><b>Zuerst die Gang-Regel:</b> nur mit „Stein vor der Nase“ aus Einheit&nbsp;11, in einem Gang mit Ecken nach rechts: <m-programm raetsel="e16-g1" teil="beispiel" gr="5.5" nummern="nein"></m-programm></li>
+        <li>Du sprichst die Regel bei jedem Feld vor, sie macht nur.</li>
+        <li>Boden-Gitter 3 · 3 mit 2 Steinen, das Zuckerl in der Ecke.</li>
+        <li><a class="blattref" href="#blatt-16-1"></a>: zuerst mit dem Finger fahren, Sackgassen nur mit einem Kreuz am Ende markieren.</li>
+        <li><a class="blattref" href="#blatt-16-2"></a>: nur Labyrinth A, für jeden Befehl einen Muggelstein ablegen.</li>
+      </ul>
+    </div>
+    <div class="kasten bonus" data-titel="Bonus-Knobelei">
+      <p class="klein"><i>Für zwischendurch: im Auto, beim Abendessen, beim Zähneputzen.</i></p>
+      <p><b>Offene Tür:</b> „Du gehst mit der rechten Hand an der Wand. Plötzlich ist rechts eine offene Tür. Was sagt die Regel?“</p>
+      <p><b>Ecke:</b> „Vorne ist eine Wand, rechts auch. Was jetzt?“</p>
+      <p><b>Sackgasse:</b> „Wie oft dreht sich der Drache in einer Sackgasse, bis er wieder hinausschaut?“</p>
+      <p><b>Gang:</b> „Ein Gang geht 3 Felder hinauf, dann 2 Felder nach rechts zum Schatz. Wie viele Befehle macht die Hand-Regel?“</p>
+      <p><b>Für Profis:</b> „Wie heißt die Regel für die linke Hand?“</p>
+      <p class="klein"><b>Kurz-Lösungen:</b> rechts drehen und durch die Tür; links drehen; zweimal links drehen; <m-e16-zahl raetsel="e16-gb" was="befehle" l="6" text></m-e16-zahl> Befehle; wenn links frei ist, links drehen, wenn vor der Nase ein Stein ist, rechts drehen, sonst vor. Mehr bei den Lösungen.</p>
+    </div>
+  </div>
+
+  <div class="kasten stolper darf-brechen e16-bricht">
+    <ul>
+      <li><b>Sie vergisst, zuerst rechts zu schauen,</b> und geht einfach geradeaus weiter: Arm ausgestreckt lassen. Die Reihenfolge ist immer gleich: zuerst rechts, dann vorne. Am Papier darf sie mit dem Finger zuerst auf das Feld rechts neben dem Drachen tippen, dann auf das Feld vor der Nase.</li>
+      <li><b>Sie dreht und geht in einem:</b> Rechts drehen ist ein Befehl, vor ist der nächste. Am Boden zuerst auf der Stelle drehen, Pause, dann gehen. Das hilft auch beim Zählen.</li>
+      <li><b>„Die Regel geht ja falsch!“</b> (weil sie in eine Sackgasse läuft): Das darf sie. Die Regel kennt das Labyrinth nicht, sie folgt nur der Wand. Sie ist nicht die kürzeste, aber sie kommt an. Genau das ist der Unterschied zwischen „kürzestes Programm“ und „Regel für alle Labyrinthe“.</li>
+      <li><b>Rechts ist frei, sie will aber geradeaus,</b> weil sie den Schatz dort sieht: Die Regel sagt rechts drehen. Wer die Regel befolgt, darf nicht schummeln, auch wenn der Schatz woanders liegt. Genau so macht es ein Roboter.</li>
+      <li><b>„bis zum Schatz“ hört nicht auf:</b> Sobald der Drache auf dem Schatz steht, ist Schluss, auch mitten in der Runde. Am Papier: Finger auf den Schatz, fertig.</li>
+      <li><b>Sackgassen nur halb angemalt:</b> Eine Sackgasse geht bis zur Abzweigung. Frag: „Muss der Drache jemals hier durch?“ Wenn nein, wird das Feld grau.</li>
+      <li><b>Felder zählen:</b> Das Startfeld zählt nicht, das Schatzfeld schon. Beim Programm zählen die Drehungen mit, darum hat ein Programm mehr Befehle als der Weg Felder.</li>
+      <li><b>Links und rechts verwechselt,</b> wenn der Drache nach unten oder zur Seite schaut: Das ist am Papier schwer. Blatt drehen oder die Figur mitdrehen, am Boden die Hand wirklich ausstrecken (Hilfen unten).</li>
+    </ul>
+  </div>
+
+  <m-linksrechts></m-linksrechts>
+
+  <div class="kasten schwerer darf-brechen e16-bricht e16-mini">
+    <p>Klappt die Hand-Regel am Boden schnell, wähle hier aus. Das ist ein vollwertiger Hauptteil. Der Kern: Die Regel ist ein Programm für viele Labyrinthe, aber nicht für alle, und nicht immer das kürzeste.</p>
+    <ol class="e16-ganz">
+      <li><b>Linke Hand statt rechte:</b> Die Regel geht genauso mit der linken Hand: <m-programm raetsel="e16-ml" gr="5.5" nummern="nein"></m-programm>. Im Boden-Labyrinth braucht sie nur <m-e16-zahl raetsel="e16-fl" was="befehle" l="7" text></m-e16-zahl> Befehle (genau das kürzeste Programm), die rechte Hand <m-e16-zahl raetsel="e16-fh" was="befehle" l="12" text></m-e16-zahl>. Auf <a class="blattref" href="#blatt-16-2"></a> ist es umgekehrt: Labyrinth A mit links <m-e16-zahl raetsel="e16-lal" was="befehle" l="22" text></m-e16-zahl> Befehle statt <m-e16-zahl raetsel="e16-la" was="befehle" l="10" text></m-e16-zahl>, B mit links <m-e16-zahl raetsel="e16-lbl" was="befehle" l="16" text></m-e16-zahl> statt <m-e16-zahl raetsel="e16-lb" was="befehle" l="14" text></m-e16-zahl>. Frag vorher: „Welche Hand ist hier schneller?“ Man kann es nur durch Ausprobieren wissen, und das ist eine schöne Einsicht.</li>
+      <li><b>Kürzester Weg gegen Hand-Regel:</b> Im Labyrinth von <a class="blattref" href="#blatt-16-1"></a> hat das kürzeste Programm <m-e16-zahl raetsel="e16-m1" was="kuerzestes" l="11" text></m-e16-zahl> Befehle, die rechte Hand braucht <m-e16-zahl raetsel="e16-mr" was="befehle" l="31" text></m-e16-zahl>, die linke <m-e16-zahl raetsel="e16-ml" was="befehle" l="17" text></m-e16-zahl>. Mit dem Finger nachfahren und zählen (das Schauen zählt nicht). Wer kennt den Weg und wer nicht? Das kürzeste Programm schreibt nur, wer das Labyrinth von oben sieht. Die Regel geht auch, wenn man nur das nächste Feld sieht.</li>
+      <li><b>Die Insel in der Mitte:</b> Am Boden-Gitter liegen nur in der Mitte Steine: Von den vier Mittelfeldern bekommen drei einen Polster, ins vierte (rechts unten in der Mitte) kommt das Zuckerl, wie im Bild. Die Hand-Regel läuft außen herum, am Schatz vorbei, immer im Kreis. Mit der linken Hand auch!
+        <div class="e16-bilder"><div class="e16-bild"><span class="loesungsmodus"><m-gitter raetsel="e16-ih" feld="20" loesung="nach:16"></m-gitter></span><span class="e16-unter">Die Insel: Die rechte Hand läuft außen herum, nach <m-e16-zahl raetsel="e16-ih" was="zurueck" l="16" text></m-e16-zahl> Befehlen ist sie wieder am Start. Nach 60 Befehlen: „Der Drache läuft im Kreis.“</span></div></div>
+        Was hilft? Ein eigenes Programm: rechts drehen, vor, vor, links drehen, vor (5 Karten). Oder die Hand an die Insel legen: <m-e16-kuerzeste raetsel="e16-i1" karten="4" programm="bis[vor wenn[frei-rechts: rechts]]" gr="5.5"></m-e16-kuerzeste> Der Drache geht zuerst vor und dreht nach rechts, sobald rechts frei ist. So läuft seine rechte Hand an der Insel entlang (Level 7 in der App).</li>
+      <li><b>Rekord-Labyrinth:</b> Wer baut im 4 · 4-Gitter (Start links unten, Nase nach oben) ein Labyrinth, in dem die Hand-Regel am längsten braucht? Unser Rekord: <m-e16-zahl raetsel="e16-rk" was="befehle" l="39" text></m-e16-zahl> Befehle mit nur 4 Steinen, und der Schatz liegt direkt vor der Nase des Drachen! Mehr geht im 4 · 4-Gitter nicht (wir haben alle Labyrinthe mit dem Computer durchprobiert).
+        <div class="e16-bilder"><div class="e16-bild"><m-gitter raetsel="e16-rk" feld="20"></m-gitter><span class="e16-unter">Der Rekord: Am Start ist rechts frei, also dreht der Drache weg vom Schatz und läuft einmal ganz herum.</span></div></div></li>
+      <li><b>Die 5-Karten-Regel:</b> Die App fragt nach der Hand-Regel: „Geht es auch mit 5 Karten?“ Ja, mit einer Tast-Regel: <m-e16-kuerzeste raetsel="e16-b1" karten="5" programm="bis[wenn[stein: links sonst vor rechts]]" gr="5.5"></m-e16-kuerzeste> In Worten: Wenn vor der Nase ein Stein ist, dreh nach links, sonst geh vor und dreh nach rechts. Nach jedem Schritt dreht der Drache nach rechts und „tastet“, ob die Wand noch da ist. Er wackelt dabei hin und her und braucht viel mehr Befehle, aber weniger Karten. Das ist eine echte Profi-Knobelei, sie darf sie auch einfach bestaunen.</li>
+      <li><b>Ein Programm für alle:</b> <a class="blattref" href="#blatt-16-3"></a>, Aufgabe 1: Sie schreibt die Hand-Regel selbst in die leere Form und prüft sie in beiden Labyrinthen. Dazu passen Level 5 und 8 in der App (zwei und drei Labyrinthe auf einmal).</li>
+      <li><b>Labyrinth für Mama oder Papa:</b> Im leeren Gitter auf <a class="blattref" href="#blatt-16-3"></a> (Knobel-Ecke) oder auf Kästchenpapier baut sie ein Labyrinth. Du suchst das kürzeste Programm, sie prüft mit der Hand-Regel. Schafft sie eines, in dem die Regel im Kreis läuft? (Mit einer Insel.)</li>
+      <li><b>Kobold-Regeln:</b> Du sagst absichtlich eine falsche Regel, zum Beispiel: „Wenn rechts frei ist, dreh nach <i>links</i>.“ Im Boden-Labyrinth geht der Drache dann ein Feld vor, dreht um, geht zurück, dreht um, und findet den Schatz nie (in der App nach 60 Befehlen: „Der Drache läuft im Kreis“). {{KIND}} sagt vorher, was passiert, und repariert die Regel. Dann ist sie dran und verdreht eine Karte für dich.</li>
+    </ol>
+  </div>
+
+  <h2>Hintergrund</h2>
+  <div class="kasten warum darf-brechen e16-bricht">
+    <p>Die Hand-an-der-Wand-Regel ist ein echter <span class="begriff">Algorithmus</span>, der „Wandfolger“: eine genaue Vorschrift, die für viele Labyrinthe funktioniert, nicht nur für eines. Das ist der große Unterschied zum kürzesten Programm: Das kürzeste Programm passt genau zu einem Labyrinth, und man muss es dafür von oben kennen. Die Regel braucht kein Wissen über das Labyrinth, nur zwei Fragen in jedem Feld. Manche Saugroboter fahren so an Wänden entlang, und auch Programmierer schreiben am liebsten Programme, die für viele Fälle gelten.</p>
+    <p>Der Wiederhol-Zauber „bis zum Schatz“ ist eine <span class="begriff">Schleife mit Abbruchbedingung</span>: „wiederhole, bis …“ (in vielen Programmiersprachen „while“ oder „repeat until“). Anders als bei „3-mal“ weiß man vorher nicht, wie oft sie läuft. Die Wenn-dann-Kästen darin sind <span class="begriff">Bedingungen</span> wie in Einheit&nbsp;11. Und wenn die Abbruchbedingung nie eintritt, läuft das Programm für immer: eine <span class="begriff">Endlosschleife</span>, einer der häufigsten Fehler beim Programmieren. Darum hört der Drache nach 60 Befehlen auf.</p>
+    <p>Die Insel zeigt die Grenze des Wandfolgers: In Labyrinthen mit Ringen (Wegen im Kreis) hilft er nicht immer. Dann braucht man Algorithmen mit Gedächtnis, zum Beispiel Kreidezeichen an jeder Kreuzung. Der Computer, der alle Rätsel in diesem Heft prüft, geht noch gründlicher vor: Er probiert vom Start aus alle Felder und Blickrichtungen Schritt für Schritt durch, immer die nächsten zuerst (<span class="begriff">Breitensuche</span>), und findet so das kürzeste Programm. Auch „Sackgassen auffüllen“ ist ein echtes Verfahren: Wer alle Sackgassen zumacht, behält nur die Wege, die wirklich zum Ziel führen. So ähnlich rechnet ein Navi den kürzesten Weg aus.</p>
+  </div>
+
+  <h2>Bildschirm-Bonus</h2>
+  <div class="kasten bildschirm darf-brechen e16-bricht">
+    <p><b>Paket 16 „Labyrinth-Meisterin“.</b> Den QR-Code findest du auf <a class="blattref" href="#blatt-16-1"></a> unten rechts. Nur am Schluss, nach den Blättern, höchstens 15 Minuten. Die Einheit funktioniert auch ganz ohne Bildschirm.</p>
+    <p><b>8 Levels:</b> Level 1 ist das Boden-Labyrinth, <b>Level 2 ist Aufgabe 3 von <a class="blattref" href="#blatt-16-1"></a></b>. Hier gibt es nur Befehle, gesucht ist das kürzeste Programm. Den Stern gibt es erst mit dem kürzesten, sonst sagt die App: „Der Drache ist da! Aber es geht kürzer: mit … Befehlen.“ Ab Level 3 kommt „bis zum Schatz“: Level 3 nur mit dem Zauber-Kasten „bis zum Schatz“, Level 4 ein Gang mit Wenn-dann-Kasten. <b>Level 5 ist Aufgabe 1 von <a class="blattref" href="#blatt-16-3"></a></b>: ein Programm für beide Labyrinthe. Level 6 ist wieder das Labyrinth von <a class="blattref" href="#blatt-16-1"></a>, aber mit höchstens 6 Karten. Der Zauber-Kasten mit Zahl ist auch da, aber ohne Wenn-dann und „bis zum Schatz“ geht es nicht (vom Löser geprüft). Level 7 hat eine Insel: Die Hand-Regel läuft im Kreis, ein eigenes Programm kommt an. Level 8 ist das Finale: drei Labyrinthe, ein Programm.</p>
+    <p><b>So geht es in der App:</b> Links oben sind die Befehle, darunter die Kasten-Tasten. Die Zauber-Kasten-Taste zeigt das Bild „bis zum Schatz“ und legt den lila Kasten gleich hin. Nur in Level 6 zeigt sie „?-mal“, dann fragt die App „Wie oft?“ mit 2, 3, 4, 5 und „bis zum Schatz“. In den Kasten tippt {{KIND}} Befehle oder einen Wenn-dann-Kasten: Taste mit dem schauenden Drachen, dann die Wenn-Karte wählen („Welche Wenn-Karte?“, ab Level 5 sind es vier: Stein vor der Nase, frei vor der Nase, Stein rechts, frei rechts), dann die Befehle nach „dann“, wer will „sonst“ und Befehle, dann „fertig“. Das erste „fertig“ schließt den Wenn-dann-Kasten, das zweite den Zauber-Kasten. Die Taste mit der Karte und dem roten X löscht Schritt für Schritt. Die App zählt die Karten mit („4 von 6 Karten“). Rechts bleiben immer „Nochmal“ und „Los“. Beim Laufen leuchtet der Befehl, der Zauber-Kasten zeigt die Runde, und bevor ein Wenn-dann-Kasten entscheidet, schaut der Drache sichtbar auf das Feld. Bei zwei oder drei Labyrinthen läuft er zuerst im ersten, dann im nächsten.</p>
+    <p><b>Sterne:</b> Ab Level 3 gibt es den Stern, sobald der Drache mit erlaubter Kartenzahl in jedem Labyrinth beim Schatz ist. Geht es mit weniger Karten, fragt die App freundlich: „Profi-Frage: Geht es auch mit 5 Karten?“ (bei Level 7: mit 4). Das ist nur ein Angebot, die Lösungen stehen unten und im Schwerer-Teil. Läuft der Drache im Kreis, sagt die App nach 60 Befehlen: „Der Drache läuft im Kreis. Er findet den Schatz so nicht.“</p>
+    <p><b>Wann weglegen:</b> Nach Level 8 kommt „Super! Jetzt zurück zum Papier.“ Dann ist Schluss, auch wenn noch Zeit wäre. Lust auf mehr? Dann lieber ein Labyrinth für Mama oder Papa bauen.</p>
+  </div>
+
+  <h2>Lösungen</h2>
+  <div class="e16-loes">
+    <m-loesungen einheit="16" skala="0.39"></m-loesungen>
+    <div class="kasten loesung e16-mini">
+      <p><b><a class="blattref" href="#blatt-16-1"></a>, Aufgabe 1:</b> <m-e16-zahl raetsel="e16-m1" was="sackgassen" l="3" text></m-e16-zahl> Sackgassen: links oben (2 Felder), rechts neben dem Start (1 Feld) und die lange in der Mitte: von der Kreuzung hinunter, nach rechts und ein Feld hinauf (4 Felder).</p>
+      <p><b>Aufgabe 2:</b> <m-e16-zahl raetsel="e16-m1" was="felder" l="8" text></m-e16-zahl> Felder: 2 hinauf, 2 nach rechts, 2 hinauf, 2 nach rechts.</p>
+      <p><b>Aufgabe 3:</b> <span class="loesungsmodus"><m-programm raetsel="e16-m1" plaetze="11" gr="5.5" nummern="nein"></m-programm></span> Das ist das einzige Programm mit <m-e16-zahl raetsel="e16-m1" was="kuerzestes" l="11" text></m-e16-zahl> Befehlen (vom Löser geprüft).</p>
+      <p><b>Profi:</b> <m-e16-zahl raetsel="e16-m1" was="zu" l="3" text></m-e16-zahl> Steine, je einer ins erste Feld jeder Sackgasse, gleich an der Abzweigung (rote Kreuze). Ein Stein am Ende einer Sackgasse macht sie nur kürzer.</p>
+    </div>
+  </div>
+  <div class="kasten loesung darf-brechen e16-bricht e16-weiter e16-mini">
+    <p><b><a class="blattref" href="#blatt-16-2"></a>, Labyrinth A:</b> rechts drehen, vor, vor, links drehen, vor, vor, rechts drehen, vor, links drehen, vor: <m-e16-zahl raetsel="e16-la" was="befehle" l="10" text></m-e16-zahl> Befehle. Kürzester Weg? <b>ja</b>, der Weg der Regel ist auch das kürzeste Programm. In die Sackgasse links oben geht er gar nicht.</p>
+    <p><b>Labyrinth B:</b> <m-e16-zahl raetsel="e16-lb" was="befehle" l="14" text></m-e16-zahl> Befehle. Der Drache geht ein Feld hinauf, nach rechts bis zur Mitte, dann hinunter in die Sackgasse, dreht sich dort mit zweimal links drehen um und geht hinauf und nach rechts zum Schatz. Kürzester Weg? <b>nein</b>, das kürzeste Programm hat nur <m-e16-zahl raetsel="e16-lbk" was="kuerzestes" l="10" text></m-e16-zahl> Befehle.</p>
+    <p><b>Profi (Kobold):</b> Im zweiten Wenn-dann-Kasten steht nach „dann“ rechts drehen statt links drehen. Mit der Kobold-Regel dreht der Drache an jeder Wand nach rechts. In der Sackgasse geht das noch gut (zweimal rechts drehen ist auch umgedreht), aber in der Ecke vor dem Schatz dreht er weg vom Schatz, geht zurück, dreht wieder um und läuft für immer zwischen den zwei Feldern rechts in der zweiten Reihe hin und her. <b>Auch richtig</b> (vom Löser gefunden): hinter das rechts drehen ein zweites rechts drehen legen, dann dreht er sich an jeder Wand ganz um.</p>
+    <p><b><a class="blattref" href="#blatt-16-3"></a>, Aufgabe 1:</b> die Hand-an-der-Wand-Regel. In diese Form passen genau 4 Programme, die in beiden Labyrinthen ankommen (vom Computer durchprobiert). Jedes gilt:</p>
+    <p><m-e16-form raetsel="e16-b1" anzahl="4" gr="5.5"></m-e16-form></p>
+    <p>Darunter sind die Hand-Regel und dieselbe mit gespiegelter Wenn-Karte („frei vor der Nase: vor, sonst links drehen“ macht genau dasselbe). Im Labyrinth 1 braucht die Hand-Regel <m-e16-zahl raetsel="e16-b1l1" was="befehle" l="10" text></m-e16-zahl> Befehle, im Labyrinth 2 <m-e16-zahl raetsel="e16-b1l2" was="befehle" l="14" text></m-e16-zahl> (mit der Sackgasse rechts neben dem Start). Mit 5 Karten geht es auch, aber nicht in dieser Form: <m-e16-kuerzeste raetsel="e16-b1" karten="5" max="2" gr="5.5"></m-e16-kuerzeste></p>
+    <p><b>Knobel-Ecke:</b> Mehrere Lösungen möglich. Jedes Labyrinth gilt, bei dem der Schatz erreichbar ist. Im Kreis läuft die Hand-Regel, wenn der Schatz neben einer Insel liegt, die nicht mit dem Rand verbunden ist, wie im Bild im Schwerer-Teil.</p>
+    <p><b>Bonus-Knobelei:</b> Offene Tür: rechts drehen, dann vor durch die Tür. Ecke: links drehen (und dann noch einmal schauen). Sackgasse: zweimal links drehen, dann schaut er hinaus. Gang: vor, vor, vor, rechts drehen, vor, vor, das sind <m-e16-zahl raetsel="e16-gb" was="befehle" l="6" text></m-e16-zahl> Befehle (oben im Gang ist rechts frei). Für Profis: <m-programm raetsel="e16-ml" gr="5.5" nummern="nein"></m-programm></p>
+    <p><b>Bildschirm-Levels (zum Nachschauen):</b> Die App prüft nur, ob der Drache mit der erlaubten Kartenzahl ankommt. Bei Level 1 und 2 gibt es den Stern nur mit dem kürzesten Programm, es ist jeweils das einzige. Ab Level 3 gilt jedes Programm, das ankommt. Level 3 geht nur so, bei den anderen gibt es mehrere Lösungen (vom Löser gezählt).</p>
+    <table class="tab e16-tab">
+      <tr><th>Level</th><th>Was ist neu?</th><th>Stern mit</th><th>Eine Lösung</th></tr>
+      <tr><td>1</td><td>Boden-Labyrinth, kürzestes Programm</td><td>7 Befehlen</td><td><span class="loesungsmodus"><m-programm raetsel="e16-f1" plaetze="7" gr="5.5" nummern="nein"></m-programm></span></td></tr>
+      <tr><td>2</td><td><a class="blattref" href="#blatt-16-1"></a>, Aufgabe 3</td><td>11 Befehlen</td><td><span class="loesungsmodus"><m-programm raetsel="e16-m1" plaetze="11" gr="5.5" nummern="nein"></m-programm></span></td></tr>
+      <tr><td>3</td><td>„bis zum Schatz“</td><td>höchstens 4 Karten</td><td><m-programm raetsel="e16-r1" teil="beispiel" gr="5.5" nummern="nein"></m-programm></td></tr>
+      <tr><td>4</td><td>Gang mit Wenn-dann</td><td>höchstens 4 Karten</td><td><m-programm raetsel="e16-g1" teil="beispiel" gr="5.5" nummern="nein"></m-programm></td></tr>
+      <tr><td>5</td><td><a class="blattref" href="#blatt-16-3"></a>, Aufgabe 1</td><td>höchstens 6 Karten</td><td><m-programm raetsel="e16-b1" teil="beispiel" gr="5.5" nummern="nein"></m-programm> (mit 5 Karten: Schwerer-Teil)</td></tr>
+      <tr><td>6</td><td><a class="blattref" href="#blatt-16-1"></a> mit 6 Karten</td><td>höchstens 6 Karten</td><td><m-programm raetsel="e16-z1" teil="beispiel" gr="5.5" nummern="nein"></m-programm></td></tr>
+      <tr><td>7</td><td>Insel</td><td>höchstens 6 Karten</td><td><m-programm raetsel="e16-i1" teil="beispiel" gr="5.5" nummern="nein"></m-programm> (mit 4 Karten: Schwerer-Teil)</td></tr>
+      <tr><td>8</td><td>drei Labyrinthe</td><td>höchstens 6 Karten</td><td><m-programm raetsel="e16-d1" teil="beispiel" gr="5.5" nummern="nein"></m-programm></td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 16-1: Labyrinth-Wege (Sackgassen, kürzester Weg, Programm) -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="16" data-titel="Labyrinth-Wege" data-art="Arbeitsblatt" data-verteilt>
+  <div class="e16-oben">
+    <m-e16-labyrinth raetsel="e16-m1" feld="21" zeige="sackgassen weg zu"></m-e16-labyrinth>
+    <div class="e16-spalte">
+      <div class="aufg">
+        <p class="anw">{{KIND}}, mal jede Sackgasse grau an, bis zur Abzweigung.</p>
+        <p class="e16-antwort">Sackgassen: <m-e16-zahl raetsel="e16-m1" was="sackgassen"></m-e16-zahl></p>
+      </div>
+      <div class="aufg">
+        <p class="anw">Mal den Weg zum Schatz rot. Wie viele Felder geht der Drache?</p>
+        <p class="e16-antwort">Felder: <m-e16-zahl raetsel="e16-m1" was="felder"></m-e16-zahl></p>
+        <p class="e16-hinweis">Das Startfeld zählt nicht.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">Schreib das kürzeste Programm zum Schatz. Drehungen zählen mit!</p>
+    <m-programm raetsel="e16-m1" plaetze="12"></m-programm>
+  </div>
+
+  <div class="e16-profi-reihe">
+    <div class="profi" data-titel="Profi-Aufgabe: Sackgassen zumachen">
+      <p>Du darfst Steine dazulegen. Mach alle Sackgassen zu, mit so wenigen Steinen wie möglich. Mal die Steine als Kreuz ein.</p>
+      <p class="e16-antwort">Steine: <m-e16-zahl raetsel="e16-m1" was="zu"></m-e16-zahl></p>
+    </div>
+    <m-qr paket="e16"></m-qr>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 16-2: Die Hand an der Wand (Regel lesen, Kobold)          -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="16" data-titel="Die Hand an der Wand" data-art="Arbeitsblatt" data-verteilt>
+  <div class="e16-regel">
+    <p class="e16-regel-titel">Die Hand-an-der-Wand-Regel</p>
+    <m-programm raetsel="e16-la" gr="11" nummern="nein"></m-programm>
+    <p class="e16-regel-text">Ist rechts frei? Dann dreh nach rechts. Ist vor der Nase ein Stein? Dann dreh nach links, sonst geh vor. Immer wieder, bis zum Schatz!</p>
+  </div>
+
+  <div class="aufg">
+    <p class="anw">{{KIND}}, spiel die Regel in beiden Labyrinthen durch. Zeichne den Weg des Drachen ein.</p>
+    <div class="e16-zwei">
+      <div class="e16-lab"><p class="e16-etikett">A</p><m-gitter raetsel="e16-la" feld="20"></m-gitter></div>
+      <div class="e16-lab"><p class="e16-etikett">B</p><m-gitter raetsel="e16-lb" feld="20"></m-gitter></div>
+    </div>
+    <p class="e16-frage">Kürzester Weg? <span class="e16-ab">A</span><m-e16-janein raetsel="e16-la"></m-e16-janein> <span class="e16-ab">B</span><m-e16-janein raetsel="e16-lb"></m-e16-janein></p>
+  </div>
+
+  <div class="profi" data-titel="Kobold-Jagd: Die Regel läuft im Kreis">
+    <p>Der Kobold hat eine Karte vertauscht. Jetzt läuft der Drache in B hin und her. Kreis die falsche Karte ein!</p>
+    <m-programm raetsel="e16-k1" gr="10" nummern="nein"></m-programm>
+  </div>
+</section>
+
+<!-- =============================================================== -->
+<!-- Blatt 16-3: Ein Programm für alle (zwei Labyrinthe), eigenes Labyrinth -->
+<!-- =============================================================== -->
+<section class="blatt" data-einheit="16" data-titel="Ein Programm für alle" data-art="Arbeitsblatt" data-verteilt>
+  <div class="aufg">
+    <p class="anw">{{KIND}}, schreib ein Programm für beide Labyrinthe!</p>
+    <div class="e16-zwei">
+      <div class="e16-lab"><p class="e16-etikett">1</p><m-gitter raetsel="e16-b1" welt="1" feld="20"></m-gitter></div>
+      <div class="e16-lab"><p class="e16-etikett">2</p><m-gitter raetsel="e16-b1" welt="2" feld="20"></m-gitter></div>
+    </div>
+    <div class="e16-form"><m-programm raetsel="e16-b1" teil="form" gr="12" nummern="nein"></m-programm></div>
+  </div>
+
+  <div class="knobel" data-titel="Knobel-Ecke: Mein Labyrinth">
+    <div class="e16-mein">
+      <m-gitter deko b="4" h="4" start="0,3,oben" feld="20"></m-gitter>
+      <div class="e16-mein-text">
+        <p>Bau dein eigenes Labyrinth! Mal Steine grau an und zeichne einen Schatz ein.</p>
+        <p>Findet die Hand-Regel den Schatz?</p>
+        <p>Schaffst du eines, in dem der Drache im Kreis läuft?</p>
+        <p class="lsg-nur">Mehrere Lösungen möglich. Im Kreis: Schatz neben einer Insel in der Mitte.</p>
+      </div>
+    </div>
+  </div>
+</section>
