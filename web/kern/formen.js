@@ -230,7 +230,7 @@
     if (e.grund === 'leer') return e.leer.length === 1 ? 'Ein Feld ist noch leer.' : 'Noch ' + e.leer.length + ' Felder sind leer.';
     if (e.grund === 'vorgabe') return 'Die vorgegebenen Formen bleiben, wie sie sind.';
     if (e.grund === 'keinTausch') return 'Der Kobold ist noch da! Such eine Reihe mit zwei gleichen Formen.';
-    if (e.grund === 'zuViele') return 'Der Kobold hat nur eine Form vertauscht. Ändere nur ein Feld.';
+    if (e.grund === 'zuViele') return 'Der Kobold hat nur eine Form ausgetauscht. Ändere nur ein Feld.';
     return '';
   }
 

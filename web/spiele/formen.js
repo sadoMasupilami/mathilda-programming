@@ -170,7 +170,7 @@
   }
   function grundMeldung(api) {
     const lv = api.lv, z = api.zustand;
-    if (istKobold(lv)) return api.meldung('Der Kobold hat eine Form vertauscht! Findest du sie?', '', api.sym('kobold'));
+    if (istKobold(lv)) return api.meldung('Der Kobold hat eine Form ausgetauscht! Findest du sie?', '', api.sym('kobold'));
     if (api.nr === 0) return api.meldung('Tippe ein leeres Feld an. Dann tippe eine Form an.', '', quadratIcon(true));
     if (z.q.diagonale) return api.meldung('Neu: Die blauen Felder haben jede Form einmal. Die gelben auch!', 'formen-neu', schraegenIcon());
     if (z.n === 4 && erstesVier(api)) return api.meldung('Jetzt mit Stern! Jede Form einmal in jeder Reihe und Spalte.', '', formBild('stern'));
