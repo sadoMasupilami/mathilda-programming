@@ -253,7 +253,7 @@
       if (luecken && z.weiter) t = (luecken > 1 ? 'Füll die Lücken' : 'Füll die Lücke') + ' und mach weiter!';
       else if (luecken) t = luecken > 1 ? 'Füll die Lücken!' : 'Füll die Lücke!';
       else t = z.bewegung ? 'Wie geht das Klatsch-Muster weiter?' : 'Wie geht das Muster weiter?';
-      return api.meldung(t + ' Tippe unten an.', '', LUPE);
+      return api.meldung(t + ' Tippe an, was kommt.', '', LUPE);
     }
     if (z.aufgabe === 'kobold') return api.meldung('Der Kobold hat ' + (z.bewegung ? 'eine Bewegung' : 'eine Perle') + ' vertauscht! Tippe sie an.', '', api.sym('kobold'));
     return api.meldung('Bau den Zauber-Kasten: Wie oft? Was kommt hinein?', 'zauber-meldung', KASTEN);
@@ -279,7 +279,7 @@
     if (z.fertig) return;
     z.dran = i;
     zeichne(api);
-    api.meldung('Was kommt hierher? Tippe unten an.', 'hinweis', LUPE);
+    api.meldung('Was kommt hierher? Tippe es an.', 'hinweis', LUPE);
   }
   function fortsetzenLos(api) {
     const z = api.zustand;
@@ -321,11 +321,11 @@
     zeichne(api);
     if (z.wahl === null) return grundMeldung(api);
     if (zurueck) return api.meldung('Nur eine ist falsch: Die andere ist wieder wie vorher.', 'hinweis', api.sym('kobold'));
-    api.meldung('Was gehört hierher? Tippe unten ' + W(z).die + ' an.', 'hinweis', api.sym('kobold'));
+    api.meldung('Was gehört hierher? Tippe ' + W(z).die + ' an.', 'hinweis', api.sym('kobold'));
   }
   function koboldWahl(api, x) {
     const z = api.zustand;
-    if (z.wahl === null) return api.meldung('Tippe zuerst ' + W(z).falsche + ' oben an.', 'hinweis', api.sym('kobold'));
+    if (z.wahl === null) return api.meldung('Tippe zuerst ' + W(z).falsche + ' im Muster an.', 'hinweis', api.sym('kobold'));
     z.werte[z.wahl] = x;
     z.wahl = null;
     zeichne(api);
@@ -360,7 +360,7 @@
   function zauberHinweis(api) {
     const z = api.zustand;
     if (!z.wdh) return api.meldung('Wie oft? Tippe eine Zahl an.', 'zauber-meldung', KASTEN);
-    if (!z.teile.length) return api.meldung('Was kommt in den Kasten? Tippe es unten an.', 'zauber-meldung', KASTEN);
+    if (!z.teile.length) return api.meldung('Was kommt in den Kasten? Tippe es an.', 'zauber-meldung', KASTEN);
     if (z.teile.length < M.MAX_INNEN) return api.meldung('Noch etwas hinein? Sonst tippe auf „Los“.', 'zauber-meldung', KASTEN);
     api.meldung('Der Kasten ist voll. Tippe auf „Los“.', 'zauber-meldung', KASTEN);
   }
