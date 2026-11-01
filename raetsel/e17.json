@@ -1,0 +1,182 @@
+{
+  "paket": "e17",
+  "einheit": 17,
+  "titel": "Zaubersprüche",
+  "web": {
+    "titel": "Zaubersprüche",
+    "art": "pfad",
+    "levels": ["e17-w1", "e17-p1", "e17-w2", "e17-p2", "e17-w3", "e17-z1", "e17-z2", "e17-w4"]
+  },
+  "raetsel": [
+    {
+      "id": "e17-l1",
+      "art": "lesen",
+      "b": 4, "h": 3,
+      "start": { "x": 0, "y": 2, "blick": "oben" },
+      "hindernisse": [[1, 1], [2, 2]],
+      "sprueche": { "stern": "vor vor rechts" },
+      "programm": "@stern vor @stern",
+      "fragen": [3]
+    },
+    {
+      "id": "e17-p1",
+      "art": "pfad",
+      "aufgabe": "ankommen",
+      "b": 4, "h": 3,
+      "start": { "x": 0, "y": 2, "blick": "oben" },
+      "ziel": { "x": 3, "y": 2 },
+      "hindernisse": [[1, 1], [2, 1], [1, 2], [2, 2]],
+      "erlaubt": ["spruch"],
+      "sprueche": { "stern": "vor vor rechts" },
+      "maxKarten": 4,
+      "beispiel": "@stern vor @stern @stern"
+    },
+    {
+      "id": "e17-p2",
+      "art": "pfad",
+      "aufgabe": "ankommen",
+      "b": 3, "h": 3,
+      "start": { "x": 0, "y": 2, "blick": "oben" },
+      "ziel": { "x": 2, "y": 2 },
+      "hindernisse": [[1, 1], [1, 2]],
+      "erlaubt": ["zauber", "spruch"],
+      "erzwingt": ["spruch", "zauber"],
+      "sprueche": { "stern": "vor vor rechts" },
+      "maxKarten": 2,
+      "beispiel": "3[@stern]"
+    },
+    {
+      "id": "e17-k1",
+      "art": "kuerzer",
+      "lang": "vor rechts vor links vor rechts vor links vor rechts vor links",
+      "kurz": "@mond @mond @mond",
+      "sprueche": { "mond": "vor rechts vor links" }
+    },
+    {
+      "id": "e17-k2",
+      "art": "kuerzer",
+      "lang": "vor rechts vor links vor rechts vor links vor rechts vor links",
+      "kurz": "3[@mond]",
+      "sprueche": { "mond": "vor rechts vor links" }
+    },
+    {
+      "id": "e17-kb1",
+      "art": "kobold",
+      "b": 3, "h": 3,
+      "start": { "x": 0, "y": 2, "blick": "oben" },
+      "ziel": { "x": 2, "y": 0 },
+      "hindernisse": [[1, 2], [0, 0]],
+      "sprueche": { "mond": "vor rechts vor rechts" },
+      "programm": "@mond @mond",
+      "reparatur": { "art": "tauschen", "stelle": "@mond.4", "befehl": "links" }
+    },
+    {
+      "id": "e17-z1",
+      "art": "pfad",
+      "aufgabe": "ankommen",
+      "b": 3, "h": 3,
+      "start": { "x": 2, "y": 2, "blick": "oben" },
+      "ziel": { "x": 0, "y": 2 },
+      "hindernisse": [[1, 1], [1, 2]],
+      "erlaubt": ["spruch"],
+      "spruchFrei": ["krone"],
+      "maxKarten": 7,
+      "beispiel": "@krone @krone @krone",
+      "beispielSprueche": { "krone": "vor vor links" }
+    },
+    {
+      "id": "e17-z2",
+      "art": "pfad",
+      "aufgabe": "ankommen",
+      "b": 3, "h": 3,
+      "welten": [
+        { "start": { "x": 2, "y": 2, "blick": "oben" }, "ziel": { "x": 0, "y": 2 }, "hindernisse": [[1, 1], [1, 2]] },
+        { "start": { "x": 0, "y": 2, "blick": "rechts" }, "ziel": { "x": 0, "y": 0 }, "hindernisse": [[1, 1], [0, 1]] }
+      ],
+      "erlaubt": ["spruch"],
+      "spruchFrei": ["krone"],
+      "maxKarten": 7,
+      "beispiel": "@krone @krone @krone",
+      "beispielSprueche": { "krone": "vor vor links" }
+    },
+    {
+      "id": "e17-w1",
+      "art": "pfad",
+      "aufgabe": "ankommen",
+      "b": 3, "h": 3,
+      "start": { "x": 0, "y": 2, "blick": "oben" },
+      "ziel": { "x": 2, "y": 2 },
+      "hindernisse": [[1, 1], [1, 2]],
+      "erlaubt": ["spruch"],
+      "sprueche": { "stern": "vor vor rechts" },
+      "maxKarten": 3,
+      "beispiel": "@stern @stern @stern"
+    },
+    {
+      "id": "e17-w2",
+      "art": "pfad",
+      "aufgabe": "ankommen",
+      "b": 4, "h": 4,
+      "start": { "x": 0, "y": 3, "blick": "oben" },
+      "ziel": { "x": 2, "y": 3 },
+      "hindernisse": [[1, 1], [2, 1], [1, 2], [2, 2], [1, 3]],
+      "erlaubt": ["spruch"],
+      "sprueche": { "stern": "vor vor vor rechts" },
+      "maxKarten": 4,
+      "beispiel": "@stern @stern @stern vor"
+    },
+    {
+      "id": "e17-w3",
+      "art": "pfad",
+      "aufgabe": "ankommen",
+      "b": 5, "h": 3,
+      "start": { "x": 0, "y": 2, "blick": "oben" },
+      "ziel": { "x": 4, "y": 2 },
+      "hindernisse": [[0, 0], [2, 0], [4, 0]],
+      "erlaubt": ["spruch"],
+      "sprueche": { "stern": "vor rechts vor rechts", "mond": "vor links vor links" },
+      "maxKarten": 4,
+      "beispiel": "@stern @mond @stern @mond"
+    },
+    {
+      "id": "e17-w4",
+      "art": "pfad",
+      "aufgabe": "ankommen",
+      "b": 4, "h": 4,
+      "start": { "x": 3, "y": 3, "blick": "oben" },
+      "ziel": { "x": 0, "y": 0 },
+      "hindernisse": [[3, 1], [3, 0], [2, 0], [2, 3], [1, 3], [0, 3], [1, 2], [0, 2], [0, 1]],
+      "erlaubt": ["zauber", "spruch"],
+      "erzwingt": ["spruch", "zauber"],
+      "spruchFrei": ["mond"],
+      "maxKarten": 7,
+      "beispiel": "3[@mond]",
+      "beispielSprueche": { "mond": "vor links vor rechts" }
+    },
+    {
+      "id": "e17-s1",
+      "art": "lesen",
+      "b": 3, "h": 3,
+      "start": { "x": 0, "y": 2, "blick": "oben" },
+      "ziel": { "x": 2, "y": 0 },
+      "sprueche": { "stern": "wenn[stein: rechts sonst vor]" },
+      "programm": "5[@stern]"
+    },
+    {
+      "id": "e17-s2",
+      "art": "lesen",
+      "b": 3, "h": 3,
+      "start": { "x": 0, "y": 2, "blick": "oben" },
+      "sprueche": { "stern": "2[vor] rechts" },
+      "programm": "@stern @stern @stern @stern"
+    },
+    {
+      "id": "e17-s3",
+      "art": "lesen",
+      "b": 4, "h": 4,
+      "start": { "x": 0, "y": 3, "blick": "oben" },
+      "sprueche": { "stern": "3[vor] rechts" },
+      "programm": "4[@stern]"
+    }
+  ]
+}
