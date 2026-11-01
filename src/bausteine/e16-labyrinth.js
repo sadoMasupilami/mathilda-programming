@@ -17,10 +17,11 @@
      <m-e16-janein raetsel="e16-la" frage="kuerzester">
          „ja / nein“ zum Ankreuzen. Lösung: Geht die Regel (lesen-Rätsel) den kürzesten
          Weg, also über so wenige Felder wie das kürzeste Programm?
-     <m-e16-form raetsel="e16-b1">
+     <m-e16-form raetsel="e16-b1" [anzahl="4"] [bedingungen="alle"]>
          Nur für die Lösung: Alle Programme in der Form des Beispiels (gleiche Kästen,
-         jede Wenn-Karte aus "bedingungen", jeder Befehl vor/links/rechts), die in allen
-         Gittern ankommen, als Liste von <m-programm> (der Baustein zeichnet sie gleich selbst).
+         jede Wenn-Karte aus "bedingungen", mit bedingungen="alle" jede der sechs Wenn-Karten,
+         jeder Befehl vor/links/rechts), die in allen Gittern ankommen, als Liste von <m-programm>
+         (der Baustein zeichnet sie gleich selbst). anzahl prüft, wie viele es sind.
      <m-e16-kuerzeste raetsel="e16-b1" [karten="5"] [max="2"] [programm="…"]>
          Nur für die Lösung: die Programme mit der kleinsten Kartenzahl, die der Löser
          gefunden hat (r.loesung.erweitert.kuerzeste), als <m-programm>. karten prüft die
@@ -224,13 +225,13 @@
 
   // ---------------------------------------------------------------------
   // Alle Füllungen der Form des Beispiels, die in allen Gittern ankommen
-  function formFuellungen(r) {
+  function formFuellungen(r, alle) {
     const L = r.loesung;
     const ew = L.erweitert;
     if (!ew || !ew.beispiel) throw new Error('m-e16-form nur bei pfad-Rätseln mit "erlaubt" und Beispiel');
     const welten = (r.welten || [{}]).map((x) => Object.assign(weltVon(r), weltVon(x)));
     const form = K().lies(ew.beispiel);
-    const bed = ew.bedingungen && ew.bedingungen.length ? ew.bedingungen : ['stein', 'frei'];
+    const bed = alle ? K().BEDINGUNGEN : (ew.bedingungen && ew.bedingungen.length ? ew.bedingungen : ['stein', 'frei']);
     // Plätze sammeln: Befehle und Wenn-Karten (Zahl im Zauber-Kasten bleibt fest)
     const plaetze = [];
     const geh = (l) => l.forEach((t, i) => {
@@ -256,7 +257,11 @@
       if (welten.every((w) => K().ausfuehren(w, text).geschafft)) gute.push(text);
     }
     if (!gute.includes(K().alsText(form))) throw new Error('m-e16-form: das Beispiel selbst kommt nicht an?');
-    return gute;
+    // Reihenfolge: zuerst das Beispiel, dann die mit denselben Wenn-Karten wie im Beispiel (vorne zuerst)
+    const karten = (t) => (t.match(/wenn\[[a-z-]+/g) || []).map((w) => w.slice(5));
+    const bk = karten(K().alsText(form));
+    const schluessel = (t) => karten(t).map((c, i) => (c === bk[i] ? '0' : '1')).join('');
+    return gute.map((t, i) => ({ t, i })).sort((a, b) => schluessel(a.t).localeCompare(schluessel(b.t)) || a.i - b.i).map((x) => x.t);
   }
   function liste(el, programme, gr) {
     el.innerHTML = '<span class="e16-progliste">' + programme.map((p) => '<span class="e16-progzeile"><m-programm befehle="' + H().esc(p) + '" gr="' + gr + '" nummern="nein"></m-programm></span>').join('') + '</span>';
@@ -268,7 +273,9 @@
     const r = raetsel(el, ['pfad']);
     if (!r) return;
     let gute;
-    try { gute = formFuellungen(r); } catch (e) { return H().fehler(el, e.message); }
+    const bAttr = el.getAttribute('bedingungen');
+    if (bAttr && bAttr !== 'alle') return H().fehler(el, 'bedingungen="alle" oder weglassen');
+    try { gute = formFuellungen(r, bAttr === 'alle'); } catch (e) { return H().fehler(el, e.message); }
     if (el.hasAttribute('anzahl') && +el.getAttribute('anzahl') !== gute.length) return H().fehler(el, 'In die Form passen ' + gute.length + ' Programme, die ankommen, nicht ' + el.getAttribute('anzahl'));
     liste(el, gute, el.getAttribute('gr') || '6');
     el.dataset.anzahl = String(gute.length);

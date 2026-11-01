@@ -87,6 +87,37 @@
    "programm": "bis[wenn[frei-rechts: rechts] wenn[stein: links sonst vor]]"
   },
   {
+   "id": "e16-b1m1",
+   "art": "lesen",
+   "b": 4,
+   "h": 3,
+   "start": { "x": 0, "y": 2, "blick": "oben" },
+   "ziel": { "x": 3, "y": 0 },
+   "hindernisse": [[1, 0], [3, 1], [1, 2], [2, 2], [3, 2]],
+   "programm": "bis[wenn[frei-links: links] wenn[stein: rechts sonst vor]]"
+  },
+  {
+   "id": "e16-b1m2",
+   "art": "lesen",
+   "b": 4,
+   "h": 3,
+   "start": { "x": 0, "y": 2, "blick": "oben" },
+   "ziel": { "x": 2, "y": 0 },
+   "hindernisse": [[1, 0], [3, 0], [2, 2], [3, 2]],
+   "programm": "bis[wenn[frei-links: links] wenn[stein: rechts sonst vor]]"
+  },
+  {
+   "id": "e16-lf",
+   "art": "lesen",
+   "b": 5,
+   "h": 5,
+   "start": { "x": 0, "y": 4, "blick": "oben" },
+   "ziel": { "x": 2, "y": 2 },
+   "hindernisse": [],
+   "programm": "bis[wenn[frei-rechts: rechts] wenn[stein: links sonst vor]]",
+   "erwartetZuLang": true
+  },
+  {
    "id": "e16-f1",
    "art": "pfad",
    "b": 4,
