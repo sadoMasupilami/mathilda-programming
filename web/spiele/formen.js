@@ -274,8 +274,6 @@
   }
 
   function start(api) {
-    const sp = api.feld.closest('.spiel');
-    if (sp) sp.dataset.formen = istKobold(api.lv) ? 'kobold' : 'loesen';
     neu(api);
     zeichneBrett(api);
     zeichneTasten(api);
