@@ -241,13 +241,15 @@ export function tests({ test, expect, h }) {
 
   // Die Spiel-Skripte lädt index.html nach app.js: Die erste Ansicht nach dem Laden zeichnet app.js noch ohne
   // dieses Plugin. Das Plugin zeichnet sie dann neu (hier an der Paket-Seite und der Block-Seite geprüft: Bild des Pakets).
-  test('Logikrätsel: Paket-Seite und Kachel direkt geöffnet zeigen das Gitter-Bild', async ({ page }) => {
+  test('Logikrätsel: Paket-Seite und Kachel direkt geöffnet zeigen das Gitter-Bild', async ({ page }, info) => {
     const f = h.suche('logik', (l) => !istWF(l));
     test.skip(!f, 'kein Logikgitter');
     await page.goto('./#' + f.p.paket);
     await expect(page.locator('body')).toHaveAttribute('data-ansicht', 'paket');
     await expect(page.locator('.paket-bild .logik-icon')).toBeVisible();
+    await h.ansicht(page, 'logik-paket', info);
     await page.goto(h.kachelSeite(f.p));
     await expect(page.locator('.kachel[data-paket="' + f.p.paket + '"] .logik-icon')).toBeVisible();
+    await h.ansicht(page, 'logik-kachel', info);
   });
 }

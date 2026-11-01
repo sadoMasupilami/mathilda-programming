@@ -59,7 +59,6 @@
     const ja = { 0: 1, 1: 2, 2: 0 };
     const k = 22, c = 26;
     let s = '<svg class="logik-icon" viewBox="0 0 100 100" aria-hidden="true">';
-    s += '<rect x="1" y="1" width="98" height="98" rx="10" fill="#ffffff"/>';
     s += '<rect x="1" y="' + (k + 1) + '" width="' + (k - 1) + '" height="' + (3 * c - 2) + '" rx="4" fill="#fff0e3"/>';
     s += '<rect x="' + (k + 1) + '" y="1" width="' + (3 * c - 2) + '" height="' + (k - 1) + '" rx="4" fill="#fff0e3"/>';
     for (let i = 0; i < 3; i++) {
