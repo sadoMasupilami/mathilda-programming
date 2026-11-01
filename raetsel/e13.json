@@ -258,8 +258,9 @@
   {
    "id": "e13-w-drachen8",
    "art": "baum",
-   "titel": "Acht Drachen-Kinder",
-   "aufgabe": "einsortieren",
+   "titel": "Acht Drachen-Kinder: Welche Frage fehlt?",
+   "aufgabe": "frage",
+   "_hinweis": "Auf dem Handy sind 8 Plätze zu schmal zum Antippen (48 px): darum hier nur Frage-Karten antippen.",
    "fragen": {
     "gruen": { "text": "Ist er grün?", "kurz": "Grün?" },
     "fluegel": { "text": "Hat er Flügel?", "kurz": "Flügel?" },
@@ -275,9 +276,10 @@
     { "id": "bk", "name": "blau, Krone", "bild": "drachenkind-blau-krone", "ja": ["krone"] },
     { "id": "b", "name": "blau", "bild": "drachenkind-blau", "ja": [] }
    ],
-   "baum": { "f": "fluegel",
-     "ja": { "f": "gruen", "ja": { "f": "krone", "ja": "gfk", "nein": "gf" }, "nein": { "f": "krone", "ja": "bfk", "nein": "bf" } },
-     "nein": { "f": "gruen", "ja": { "f": "krone", "ja": "gk", "nein": "g" }, "nein": { "f": "krone", "ja": "bk", "nein": "b" } } }
+   "baum": { "f": "gruen",
+     "ja": { "f": "fluegel", "ja": { "f": "krone", "ja": "gfk", "nein": "gf" }, "nein": { "f": "krone", "ja": "gk", "nein": "g" } },
+     "nein": { "f": "?", "ja": { "f": "fluegel", "ja": "bfk", "nein": "bk" }, "nein": { "f": "fluegel", "ja": "bf", "nein": "b" } } },
+   "optionen": ["gruen", "fluegel", "krone"]
   },
   {
    "id": "e13-tiere8",
