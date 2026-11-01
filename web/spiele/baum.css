@@ -38,7 +38,7 @@ button.baum-platz:focus-visible { outline: 4px solid var(--gold); outline-offset
 .baum-platz.baum-hier { border-color: #e8731a; box-shadow: 0 0 0 4px #ffc58f; background: rgba(255, 240, 227, 0.8); }
 .baum-platz.baum-falsch { border-color: var(--rot); border-style: dashed; background: rgba(253, 231, 236, 0.8); }
 .baum-haken {
-  position: absolute; top: -9px; right: -9px; width: 24px; height: 24px;
+  position: absolute; top: -7px; right: -7px; width: clamp(15px, 36%, 24px); height: auto; aspect-ratio: 1;
   background: #fff; border-radius: 50%; box-shadow: 0 0 0 2px var(--gruen);
   pointer-events: none;
 }
@@ -87,7 +87,7 @@ span.baum-ding.baum-leer { border: 3px dashed #c9c3b6; border-radius: 16px; }
 @media (min-width: 700px) and (min-height: 700px) {
   .baum-wer-bild { width: 120px; height: 120px; }
   .baum-nr { min-width: 26px; height: 26px; border-radius: 13px; font-size: 17px; line-height: 26px; }
-  .baum-haken { width: 32px; height: 32px; top: -12px; right: -12px; }
+  .baum-haken { width: clamp(18px, 30%, 32px); top: -11px; right: -11px; }
   .art-baum .meldung-bild { width: 52px; height: 52px; }
 }
 /* Quer: Das Geschafft-Fenster liegt über der rechten Spalte, der Baum bleibt sichtbar */

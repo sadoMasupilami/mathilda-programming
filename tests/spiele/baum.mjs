@@ -314,6 +314,8 @@ export function tests({ test, expect: erwarte, DATEN, h }) {
     // das Frage-Level mit den meisten Plätzen: Das Durchlaufen dauert lange genug
     const f = h.suche('baum', (l) => l.aufgabe === 'frage' && B.blaetter(l.baum).length >= 8) || h.suche('baum', (l) => l.aufgabe === 'frage');
     test.skip(!f, 'kein Frage-Level');
+    // langsam: Auch auf einer ausgelasteten Maschine laufen sie noch, wenn „Nochmal“ kommt
+    await page.addInitScript(() => { window.WERKSTATT_TEMPO = 4000; });
     await h.oeffneLevel(page, f, info);
     await h.tippe(page, option(passendeOption(f.lv)));
     await h.tippe(page, LOS);
