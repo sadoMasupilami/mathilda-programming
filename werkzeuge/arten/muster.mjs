@@ -206,13 +206,13 @@ export default {
     if (r.aufgabe === 'wachsend') return t(l.folge) + ' → ' + t(l.weiter);
     return '';
   },
-  // Für die App: nur was sie zum Spielen braucht, keine Lösung (Kobold-Stelle, Füllung, Programm)
+  // Für die App: nur was sie zum Spielen braucht, keine Lösung (Kobold-Stelle, Füllung, Programm).
+  // Auch keine Kartenzahl beim Zauber-Kasten: Sie verriete die Länge des Muster-Kerns.
   fuerApp(r) {
     if (!APP_AUFGABEN.includes(r.aufgabe)) throw new Error('Muster-Level ' + r.id + ': aufgabe „' + r.aufgabe + '“ kann die App nicht (' + APP_AUFGABEN.join(', ') + ')');
     const f = M.lies(r.folge);
     const aus = { id: r.id, art: r.art, aufgabe: r.aufgabe, folge: f, palette: palette(r, f) };
     if (r.aufgabe === 'fortsetzen') aus.weiter = r.weiter || 0;
-    if (r.aufgabe === 'zauber' && r.loesung) aus.minKarten = r.loesung.karten;
     if (r.titel) aus.titel = r.titel;
     return aus;
   },
