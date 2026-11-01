@@ -5,7 +5,7 @@
   "web": {
     "titel": "Logikrätsel",
     "art": "logik",
-    "levels": ["e12-a1", "e12-w1", "e12-a2", "e12-w2", "e12-w3", "e12-k1", "e12-w4", "e12-p1"]
+    "levels": ["e12-a1", "e12-w1", "e12-a2", "e12-w2", "e12-w5", "e12-k1", "e12-w3", "e12-w4", "e12-p1"]
   },
   "raetsel": [
     {
@@ -105,6 +105,20 @@
       "hinweise": [
         { "text": "Der {drache} und die {katze} mögen keinen {kuchen}.", "regel": "drache!=kuchen & katze!=kuchen" },
         { "text": "Die {katze} oder der {hase} mag die {karotte}.", "regel": "katze=karotte | hase=karotte" }
+      ]
+    },
+    {
+      "id": "e12-w5", "art": "logik", "aufgabe": "wahrfalsch", "titel": "Wahr oder falsch?",
+      "szene": [
+        { "tier": "hase", "hat": ["muetze-gruen", "karotte"] },
+        { "tier": "eule", "hat": ["muetze-blau", "fisch"] },
+        { "tier": "drache", "hat": ["muetze-gelb", "kuchen"] }
+      ],
+      "aussagen": [
+        { "text": "Der {hase} hat eine {muetze-gruen} und eine {karotte}.", "regel": "hase=muetze-gruen & hase=karotte", "soll": "wahr" },
+        { "text": "Die {eule} hat keinen {fisch}.", "regel": "eule!=fisch", "soll": "falsch" },
+        { "text": "Der {drache} hat eine {muetze-gelb} und einen {fisch}.", "regel": "drache=muetze-gelb & drache=fisch", "soll": "falsch" },
+        { "text": "Der {drache} hat eine {muetze-rot} oder einen {kuchen}.", "regel": "drache=muetze-rot | drache=kuchen", "soll": "wahr" }
       ]
     },
     {

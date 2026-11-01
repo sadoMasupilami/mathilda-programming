@@ -193,7 +193,14 @@ export default {
     return t;
   },
   // Die App bekommt nur das Rätsel, nie die Lösung: sie prüft mit WerkstattLogik.pruefeGitter
+  // bzw. rechnet jeden Satz mit WerkstattLogik.wert am Bild aus (ohne "soll", ohne Kobold-Feld, ohne "ueberfluessig")
   fuerApp(r) {
+    if (r.aufgabe === 'wahrfalsch') {
+      const wf = { id: r.id, art: r.art, aufgabe: 'wahrfalsch', szene: r.szene, aussagen: (r.aussagen || []).map((a) => ({ text: a.text, regel: a.regel })) };
+      if (r.titel) wf.titel = r.titel;
+      if (r.woerter) wf.woerter = r.woerter;
+      return wf;
+    }
     const aus = { id: r.id, art: r.art, aufgabe: r.aufgabe || 'gitter', zeilen: r.zeilen, spalten: r.spalten, hinweise: (r.hinweise || []).map((h) => ({ text: h.text, regel: h.regel })) };
     if (r.titel) aus.titel = r.titel;
     if (r.woerter) aus.woerter = r.woerter;
