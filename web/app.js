@@ -14,7 +14,8 @@
    (Klasse .erw; alles nur Antippen, gleiche Farben wie am Papier).
 
    Spiel-Plugins für weitere Rätselarten (web/spiele/<art>.js, eine Datei pro Art,
-   optional web/spiele/<art>.css; web-bauen.mjs bindet sie ein):
+   optional web/spiele/<art>.css; web-bauen.mjs bindet sie VOR app.js ein, damit schon die erste
+   Ansicht – QR-Code, Lesezeichen, Neuladen eines Levels – das Spiel kennt):
      window.WerkstattSpiele = window.WerkstattSpiele || {};
      window.WerkstattSpiele['<art>'] = {
        icon(paket, api)       Bild für Kachel und Paket-Seite (SVG-Text), optional

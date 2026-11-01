@@ -359,6 +359,25 @@ for (const p of DATEN.pakete) {
   });
 }
 
+// QR-Code am Blatt, Lesezeichen, Neuladen: Paket und Level direkt über die Adresse öffnen.
+// Die Spiel-Plugins laden vor app.js, darum zeigt schon die erste Ansicht das richtige Spiel (ohne Fehler).
+test('Direkt geöffnet: jedes Paket und jedes Level über die Adresse, auch nach dem Neuladen', async ({ page }) => {
+  for (const p of DATEN.pakete) {
+    await page.goto('./#' + p.paket);
+    await expect(page.locator('body')).toHaveAttribute('data-ansicht', 'paket');
+    await expect(page.locator('.paket [data-aktion="level"].haupt')).toBeVisible();
+    for (let i = 0; i < p.levels.length; i++) {
+      await page.goto('./#' + p.paket + '/' + (i + 1));
+      await expect(page.locator('body')).toHaveAttribute('data-ansicht', 'level');
+      await expect(page.locator('.tasten [data-aktion]').first()).toBeVisible();
+      const art = p.levels[i].art || p.art;
+      if (SPIEL_TESTS[art]) await expect(page.locator('#app [class*="' + art + '-"]').first(), 'Spiel ' + art + ' in #' + p.paket + '/' + (i + 1)).toBeAttached();
+    }
+    await page.reload();
+    await expect(page.locator('body')).toHaveAttribute('data-ansicht', 'level');
+  }
+});
+
 const pfadPaket = DATEN.pakete.find((p) => p.levels.some((l) => einfach(l) && !l.zauber)) || DATEN.pakete.find((p) => p.levels.some(einfach));
 test('Drache läuft Schritt für Schritt, Kobold-Stoß', async ({ page }, info) => {
   test.skip(!pfadPaket, 'kein Pfad-Paket');
