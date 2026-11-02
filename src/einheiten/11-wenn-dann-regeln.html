@@ -12,6 +12,7 @@
   section[data-einheit="11"] { --e11-wenn: #0b8a8f; --e11-wenn-hell: #e0f4f4; }
   .e11-ablauf > li { break-inside: avoid; }
   .e11-ganz > li { break-inside: auto; orphans: 2; widows: 2; }
+  ol.spick-ablauf > li.e11-zusammen { break-inside: avoid; }
   .kasten.e11-bricht { -webkit-box-decoration-break: clone; box-decoration-break: clone; }
   .kasten.e11-bricht > .kasten-titel { break-after: avoid; }
   .kasten.e11-bricht > .kasten-titel + p, .kasten.e11-bricht > .kasten-titel + ul > li:first-child { break-before: avoid; break-inside: avoid; }
@@ -32,6 +33,8 @@
   .e11-auf-klein figcaption { font-size: 8.3pt; }
   .e11-spick-auf { break-inside: avoid; margin-bottom: 3mm; }
   .e11-auf m-e11-aufstellung svg { display: block; }
+  /* Kasten „Die Aufstellungen“: alle fünf Bilder bleiben zusammen, brechen darf er nur im Schlussabsatz */
+  .e11-auf-block { break-inside: avoid; }
   .e11-prog-zeile { display: flex; align-items: center; gap: 3mm; margin: 1mm 0 1.5mm 0; break-after: avoid; page-break-after: avoid; }
   .e11-prog-zeile .e11-bl { font-size: 9.5pt; font-weight: 700; color: var(--grau); }
   .e11-loes { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm 4mm; align-items: start; margin: 2mm 0 4mm 0; }
@@ -145,7 +148,7 @@
       </div>
     </div></li>
     <li data-min="6"><div><b>Blatt „Der Drache schaut“.</b> <a class="blattref" href="#blatt-11-1"></a>: Drachen-Figur mitschieben, vor jeder Wenn-Karte mit dem Finger auf das Feld vor der Nase tippen. Aufgabe 2: das Programm in Gitter 1 <b>und</b> Gitter 2 prüfen. Profi (Karten und Befehle zählen) freiwillig.</div></li>
-    <li data-min="5"><div><b>Blatt „Die Regel im Zauber-Kasten“.</b> <a class="blattref" href="#blatt-11-2"></a>: Runden laut zählen, für jeden Befehl einen Strich. Aufgabe 2 hat nur 4 Karten. Profi: Der Kobold hat eine Wenn-Karte ausgetauscht. Passt das Blatt heute nicht mehr: nächstes Mal.
+    <li data-min="5" class="e11-zusammen"><div><b>Blatt „Die Regel im Zauber-Kasten“.</b> <a class="blattref" href="#blatt-11-2"></a>: Runden laut zählen, für jeden Befehl einen Strich. Aufgabe 2 hat nur 4 Karten. Profi: Der Kobold hat eine Wenn-Karte ausgetauscht. Passt das Blatt heute nicht mehr: nächstes Mal.
       <div class="sag">
         <p class="du">„Runde 2. Was ist jetzt vor der Nase?“</p>
         <p class="dann">Schaut sie nur in der ersten Runde: „In jeder Runde neu schauen!“</p>
@@ -231,28 +234,12 @@
   <h2>Ablauf Schritt für Schritt</h2>
   <ol class="ablauf e11-ablauf">
     <li data-min="6"><span class="schritt-titel">Regel-Spiel „Wenn ich klatsche …“</span>Fang ohne Vorrede an: „Heute bist du ein Roboter mit einer Regel. Wenn ich klatsche, dann hüpfst du.“ Klatsch ein paar Mal, zwischendurch stampfst du einmal: eine Falle, denn für Stampfen gibt es keine Regel, also bleibt der Roboter stehen. Dann kommt eine zweite Regel dazu („Wenn ich stampfe, dann machst du einen Kreisel“). Danach das Spiel mit Karten (Kasten „Spiel: Regel-Spiel“): zwei Runden, zuerst ist {{KIND}} der Roboter, dann du. Zum Abschluss die Knobel-Ecke auf <a class="blattref" href="#blatt-11-3"></a>: erst lesen und zählen, dann wirklich hüpfen und stampfen. Hier hört sie das erste Mal das Wort „sonst“, ganz nebenbei.</li>
-    <li data-min="5"><span class="schritt-titel">Der Drache schaut</span>{{KIND}} steht als Drache am Boden-Gitter im Startfeld links unten, die Nase zum Polster. Zeig ihr die zwei Wenn-Karten: „Der Drache kann jetzt schauen. Bevor er etwas tut, schaut er auf das Feld vor seiner Nase.“ Leg das Programm neben das Gitter: vor, dann ein Wenn-dann-Kasten aus Wort-Karten (wenn, Stein, dann, rechts drehen), dann noch einmal vor. Zuerst liegt das Kuscheltier im Feld links oben (Aufstellung 1, Bild unter dem Ablauf). Sie sagt vorher, wo sie landet, dann geht sie: vor, schauen, Kuscheltier vor der Nase, also rechts drehen, vor. Sie landet in der Mitte. Dann nimmst du das Kuscheltier weg (Aufstellung 2): vor, schauen, frei, also nichts, vor. Jetzt landet sie links oben. „Gleiches Programm, anderes Ende!“</li>
+    <li data-min="5"><span class="schritt-titel">Der Drache schaut</span>{{KIND}} steht als Drache am Boden-Gitter im Startfeld links unten, die Nase zum Polster. Zeig ihr die zwei Wenn-Karten: „Der Drache kann jetzt schauen. Bevor er etwas tut, schaut er auf das Feld vor seiner Nase.“ Leg das Programm neben das Gitter: vor, dann ein Wenn-dann-Kasten aus Wort-Karten (wenn, Stein, dann, rechts drehen), dann noch einmal vor. Zuerst liegt das Kuscheltier im Feld links oben (Aufstellung 1, Bild im Kasten nach den Beispielsätzen). Sie sagt vorher, wo sie landet, dann geht sie: vor, schauen, Kuscheltier vor der Nase, also rechts drehen, vor. Sie landet in der Mitte. Dann nimmst du das Kuscheltier weg (Aufstellung 2): vor, schauen, frei, also nichts, vor. Jetzt landet sie links oben. „Gleiches Programm, anderes Ende!“</li>
     <li data-min="5"><span class="schritt-titel">Die Regel im Zauber-Kasten</span>Jetzt kommt der Wenn-dann-Kasten in einen lila Zauber-Kasten „4-mal“, dazu eine vor-Karte: <span class="e11-mini"><m-programm befehle="4[wenn[stein: rechts] vor]" gr="6" nummern="nein"></m-programm></span>. Leg das Zuckerl vorher ins Zielfeld und frag: „Kommt der Drache mit diesem Programm zum Zuckerl?“ Aufstellung A: Kuscheltier links oben, Zuckerl rechts unten. Sie zählt die Runden laut: „Runde 1: schauen, frei, vor.“ Landet sie auf dem Zuckerl, gehört es ihr (oder es bleibt für die nächste Aufstellung liegen). Dann B: kein Kuscheltier, Zuckerl rechts oben, hier ist der Rand oben der Stein. Zum Schluss C: Kuscheltier rechts oben, Zuckerl in der Mitte. Das ist der Aha-Moment: ein Programm, drei Aufstellungen, und der Drache findet jedes Mal den Weg.</li>
     <li data-min="6"><span class="schritt-titel">Blatt „Der Drache schaut“</span><a class="blattref" href="#blatt-11-1"></a>. Bei Aufgabe 1 läuft die Drachen-Figur mit, und vor dem Wenn-dann-Kasten tippt sie mit dem Finger auf das Feld vor der Nase. Neben dem Programm erklärt ein kleiner Kasten die zwei Wenn-Karten. Bei Aufgabe 2 sucht sie ein Programm für beide Gitter: Am besten probiert sie es zuerst in Gitter 1 mit der Figur und prüft es dann in Gitter 2. In das türkise Kästchen malt sie einen Stein oder ein leeres Feld (oder sie schreibt „Stein“ oder „frei“). Die Profi-Aufgabe ist freiwillig: Dort zählt sie Karten und Befehle und merkt, dass ein Programm mit 6 Karten im einen Gitter 5 Befehle macht und im anderen nur 2.</li>
     <li data-min="5"><span class="schritt-titel">Blatt „Die Regel im Zauber-Kasten“</span><a class="blattref" href="#blatt-11-2"></a>. Bei Aufgabe 1 tippt sie mit dem Muggelstein mit und zählt die Runden laut, für jeden Befehl macht sie einen Strich neben das Gitter. Aufgabe 2 hat eine <b>Kartengrenze</b>: nur 4 Karten, und das Programm muss in beiden Gittern ankommen. Die Profi-Aufgabe ist die Kobold-Jagd dieser Einheit: Eine Wenn-Karte ist falsch. Sie kreist sie ein und sagt, welche Karte richtig wäre, dann prüft sie es mit der Figur. Passt das Blatt heute nicht mehr hinein, kommt es beim nächsten Mal dran.</li>
     <li data-min="2"><span class="schritt-titel">Sammelpass</span>Feld „Einheit&nbsp;11“ stempeln oder bekleben, Sterne anmalen. Frag: „Welche Regel war heute am lustigsten?“ Mit dieser Einheit beginnt Block C, Wenn-dann und Logik.</li>
   </ol>
-
-  <div class="kasten tipp e11-mini darf-brechen e11-bricht" data-titel="Die Aufstellungen am Boden-Gitter (Schritt 2 und 3)">
-    <p>Das Boden-Gitter von oben gesehen, der Polster ist oben. Grau ist das Kuscheltier (der Stein), rot der Weg, der blasse Drache steht am Ende. Startfeld immer links unten, Nase zum Polster.</p>
-    <div class="e11-prog-zeile"><span class="e11-bl">Schritt 2:</span><m-programm raetsel="e11-b1" gr="6" nummern="nein"></m-programm></div>
-    <div class="e11-auf">
-      <figure><m-e11-aufstellung feld="7" raetsel="e11-b1"></m-e11-aufstellung><figcaption><b>1:</b> Kuscheltier links oben. <m-e11-ende raetsel="e11-b1" ende="1,1,rechts" befehle="3">Der Drache landet in der Mitte, Blick nach rechts.</m-e11-ende></figcaption></figure>
-      <figure><m-e11-aufstellung feld="7" raetsel="e11-b2"></m-e11-aufstellung><figcaption><b>2:</b> kein Kuscheltier. <m-e11-ende raetsel="e11-b2" ende="0,0,oben" befehle="2">Er landet links oben, Blick zum Polster.</m-e11-ende></figcaption></figure>
-    </div>
-    <div class="e11-prog-zeile"><span class="e11-bl">Schritt 3:</span><m-programm raetsel="e11-b3" gr="6" nummern="nein"></m-programm></div>
-    <div class="e11-auf">
-      <figure><m-e11-aufstellung feld="7" raetsel="e11-b3"></m-e11-aufstellung><figcaption><b>A:</b> Kuscheltier links oben. <m-e11-ende raetsel="e11-b3" ende="2,2,unten" befehle="6">Zuckerl rechts unten. 6 Befehle, Blick nach unten.</m-e11-ende></figcaption></figure>
-      <figure><m-e11-aufstellung feld="7" raetsel="e11-b4"></m-e11-aufstellung><figcaption><b>B:</b> kein Kuscheltier. <m-e11-ende raetsel="e11-b4" ende="2,0,rechts" befehle="5">Zuckerl rechts oben. 5 Befehle, der Rand oben ist der Stein.</m-e11-ende></figcaption></figure>
-      <figure><m-e11-aufstellung feld="7" raetsel="e11-b5"></m-e11-aufstellung><figcaption><b>C:</b> Kuscheltier rechts oben. <m-e11-ende raetsel="e11-b5" ende="1,1,unten" befehle="6">Zuckerl in der Mitte. 6 Befehle, Blick nach unten.</m-e11-ende></figcaption></figure>
-    </div>
-    <p>Wer will, legt danach selbst eine Aufstellung und sagt vorher, wo der Drache landet. Achtung, Kobold: Liegt das Kuscheltier im Feld <b>Mitte links</b>, dreht sich der Drache gleich am Anfang, läuft die untere Reihe entlang, dreht sich am Rand nach unten und <m-e11-ende raetsel="e11-b11" stoss="5">stößt beim 5. Befehl an</m-e11-ende>. Nach dem Drehen schaut er nicht noch einmal, bevor er vor geht.</p>
-  </div>
 
   <h3>Beispielsätze</h3>
   <div class="sag">
@@ -280,6 +267,24 @@
     <p class="du">(<a class="blattref" href="#blatt-11-2"></a>, Aufgabe 1) „Wie viele Karten hat dieses Programm? Und wie viele Befehle macht der Drache?“</p>
     <p class="sie">„Vier Karten … und der Drache macht viel mehr, acht!“</p>
     <p class="dann">Super beobachtet: 4 Karten, aber 5-mal vor und 3-mal rechts drehen. Zählt sie die Wörter wenn und dann mit: „Liegen die beim Zauber-Kasten auch als Karte da? Nein, die Wörter sind nur der Rahmen, wie die lila Streifen.“</p>
+  </div>
+
+  <div class="kasten tipp e11-mini darf-brechen e11-bricht" data-titel="Die Aufstellungen am Boden-Gitter (Schritt 2 und 3)">
+    <div class="e11-auf-block">
+      <p>Das Boden-Gitter von oben gesehen, der Polster ist oben. Grau ist das Kuscheltier (der Stein), rot der Weg, der blasse Drache steht am Ende. Startfeld immer links unten, Nase zum Polster.</p>
+      <div class="e11-prog-zeile"><span class="e11-bl">Schritt 2:</span><m-programm raetsel="e11-b1" gr="6" nummern="nein"></m-programm></div>
+      <div class="e11-auf">
+        <figure><m-e11-aufstellung feld="7" raetsel="e11-b1"></m-e11-aufstellung><figcaption><b>1:</b> Kuscheltier links oben. <m-e11-ende raetsel="e11-b1" ende="1,1,rechts" befehle="3">Der Drache landet in der Mitte, Blick nach rechts.</m-e11-ende></figcaption></figure>
+        <figure><m-e11-aufstellung feld="7" raetsel="e11-b2"></m-e11-aufstellung><figcaption><b>2:</b> kein Kuscheltier. <m-e11-ende raetsel="e11-b2" ende="0,0,oben" befehle="2">Er landet links oben, Blick zum Polster.</m-e11-ende></figcaption></figure>
+      </div>
+      <div class="e11-prog-zeile"><span class="e11-bl">Schritt 3:</span><m-programm raetsel="e11-b3" gr="6" nummern="nein"></m-programm></div>
+      <div class="e11-auf">
+        <figure><m-e11-aufstellung feld="7" raetsel="e11-b3"></m-e11-aufstellung><figcaption><b>A:</b> Kuscheltier links oben. <m-e11-ende raetsel="e11-b3" ende="2,2,unten" befehle="6">Zuckerl rechts unten. 6 Befehle, Blick nach unten.</m-e11-ende></figcaption></figure>
+        <figure><m-e11-aufstellung feld="7" raetsel="e11-b4"></m-e11-aufstellung><figcaption><b>B:</b> kein Kuscheltier. <m-e11-ende raetsel="e11-b4" ende="2,0,rechts" befehle="5">Zuckerl rechts oben. 5 Befehle, der Rand oben ist der Stein.</m-e11-ende></figcaption></figure>
+        <figure><m-e11-aufstellung feld="7" raetsel="e11-b5"></m-e11-aufstellung><figcaption><b>C:</b> Kuscheltier rechts oben. <m-e11-ende raetsel="e11-b5" ende="1,1,unten" befehle="6">Zuckerl in der Mitte. 6 Befehle, Blick nach unten.</m-e11-ende></figcaption></figure>
+      </div>
+    </div>
+    <p>Wer will, legt danach selbst eine Aufstellung und sagt vorher, wo der Drache landet. Achtung, Kobold: Liegt das Kuscheltier im Feld <b>Mitte links</b>, dreht sich der Drache gleich am Anfang, läuft die untere Reihe entlang, dreht sich am Rand nach unten und <m-e11-ende raetsel="e11-b11" stoss="5">stößt beim 5. Befehl an</m-e11-ende>. Nach dem Drehen schaut er nicht noch einmal, bevor er vor geht.</p>
   </div>
 
   <h2>Spiele, Bewegung und Basteln</h2>
@@ -312,10 +317,10 @@
   </div>
 
   <div class="kasten bewegung darf-brechen e11-bricht" data-titel="Drache mit Regel am Boden-Gitter">
-    <p>Das ist der Kern von Schritt 2 und 3 (Bilder im Kasten unter dem Ablauf). {{KIND}} ist der Drache, ein Kuscheltier ist der Stein, das Programm liegt aus Karten neben dem Gitter. Weitere Ideen, wenn noch Zeit und Lust da sind:</p>
+    <p>Das ist der Kern von Schritt 2 und 3 (Bilder im Kasten nach den Beispielsätzen). {{KIND}} ist der Drache, ein Kuscheltier ist der Stein, das Programm liegt aus Karten neben dem Gitter. Weitere Ideen, wenn noch Zeit und Lust da sind:</p>
     <ul>
       <li><b>Wer legt den Stein?</b> Mit dem Programm aus Schritt 3. {{KIND}} legt das Kuscheltier, du legst das Zuckerl dorthin, wo der Drache deiner Meinung nach landet. Stimmt es, bekommst du einen Muggelstein, sonst sie. Dann tauscht ihr.</li>
-      <li><b>Zwei Kuscheltiere:</b> Mit 2 Steinen gibt es noch mehr Aufstellungen. Klappt das Programm „4-mal: [wenn Stein: rechts drehen], vor“ immer? (Nein, siehe Kobold im Kasten unter dem Ablauf: Wenn nach dem Drehen schon wieder ein Stein vor der Nase ist, stößt der Drache an.)</li>
+      <li><b>Zwei Kuscheltiere:</b> Mit 2 Steinen gibt es noch mehr Aufstellungen. Klappt das Programm „4-mal: [wenn Stein: rechts drehen], vor“ immer? (Nein, siehe Kobold im Kasten nach den Beispielsätzen: Wenn nach dem Drehen schon wieder ein Stein vor der Nase ist, stößt der Drache an.)</li>
       <li><b>Rand-Lava:</b> Hinter dem Malerkrepp ist Lava. Am Rand liegen unsichtbare Steine. Das hilft, den Rand als Stein zu sehen.</li>
     </ul>
   </div>
