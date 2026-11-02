@@ -35,6 +35,9 @@
   .e08-brett-reihe { display: flex; align-items: flex-start; gap: 5mm; }
   .e08-rechts { flex: 1; align-self: stretch; display: flex; flex-direction: column; justify-content: space-between; gap: 4mm; }
   .e08-rechts .knobel p { font-size: 15pt; line-height: 1.22; margin-bottom: 1.6mm; }
+  /* Lösung der Knobel-Ecke als Stichwort in der letzten Zeile neben der Frage (macht die Miniatur nicht höher);
+     die ganze Erklärung mit beiden Bildern steht im Kasten „Lösung“ der Anleitung */
+  .loesungsmodus .e08-rechts .knobel .lsg-nur { display: inline; white-space: nowrap; }
   .e08-rechts .qr-box { flex-direction: column; align-items: flex-start; gap: 1.5mm; }
   .e08-hinweis { margin: 0; }
   .e08-karte { position: relative; border: 0.5mm dashed var(--grau); border-radius: 2mm; display: grid; grid-template-columns: 1fr 1fr; margin-top: 2mm; }
@@ -493,8 +496,7 @@
         <p>Jede Zeile hat diesen Code:</p>
         <p><m-e8-code code="2w 2s 2w" klein></m-e8-code></p>
         <p>Leg das Bild!</p>
-        <p>Und wenn jede Spalte diesen Code hat?</p>
-        <p class="lsg-nur">Ein Strich quer.</p>
+        <p>Und wenn jede Spalte diesen Code hat? <span class="lsg-nur">Quer.</span></p>
       </div>
       <m-qr paket="e8"></m-qr>
     </div>
