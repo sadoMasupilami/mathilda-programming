@@ -18,7 +18,9 @@
      <m-e13-fragen raetsel="e13-wesen" ding="drache" [l="2"]>   Feld: wie viele Fragen bis zu diesem Ding
      <m-e13-optionen raetsel="e13-frage">     Frage-Karten zum Ankreuzen (Lösung: rotes Kreuz)
      <m-e13-landet raetsel="e13-neu">         Feld (Wort): bei wem landet das neue Ding?
-     <m-e13-trennen raetsel="e13-neu" [ohne-linie]>  Schreiblinie; Lösung: Beispiele für eine neue Frage
+     <m-e13-trennen raetsel="e13-neu" [ohne-linie] [beispiele="punkte,stechen"] [kurz]>
+         Schreiblinie; Lösung: Beispiele für eine neue Frage (ohne beispiele die ersten 3 des Lösers,
+         sonst diese Fragen, jede vom Löser geprüft); kurz: nur die Fragen, ohne „(Ja: …, Nein: …)“
      <m-e13-bild name="einhorn" gr="20">      ein Bild aus web/kern/baum.js
      <m-e13-fragekarte raetsel="e13-drachen" frage="gruen">  Frage-Karte mit Ja- und Nein-Ecke (Bastelvorlage)
      <m-e13-pille seite="ja|nein">            Ja- oder Nein-Schild im Text
@@ -233,7 +235,16 @@ m-e13-baum svg, m-e13-bild svg { display: block; }
     const r = raetselVon(el, ['neu']);
     if (!r) return;
     const name = (id) => dingVon(r, id).name;
-    const bsp = r.loesung.trennen.slice(0, 3).map((t) => '„' + t.text + '“ (Ja: ' + name(t.ja) + ', Nein: ' + name(t.nein) + ')');
+    let liste = r.loesung.trennen.slice(0, 3);
+    if (el.hasAttribute('beispiele')) {
+      const ids = el.getAttribute('beispiele').split(/[\s,]+/).filter(Boolean);
+      liste = ids.map((id) => r.loesung.trennen.find((t) => t.frage === id));
+      const falsch = ids.filter((id, i) => !liste[i]);
+      if (!ids.length) return h.fehler(el, 'beispiele="" ist leer');
+      if (falsch.length) return h.fehler(el, 'beispiele: ' + falsch.join(', ') + ' trennt die beiden nicht (der Löser kennt: ' + r.loesung.trennen.map((t) => t.frage).join(', ') + ')');
+    }
+    const kurz = el.hasAttribute('kurz');
+    const bsp = liste.map((t) => '„' + t.text + '“' + (kurz ? '' : ' (Ja: ' + name(t.ja) + ', Nein: ' + name(t.nein) + ')'));
     el.innerHTML = '<div class="e13-trennen">' + (el.hasAttribute('ohne-linie') ? '' : '<div class="e13-linie"></div>') + '<span class="lsg">Mehrere Lösungen möglich, z. B. ' + h.esc(bsp.join(' oder ')) + '</span></div>';
     el.classList.add('komp', 'geprueft');
   };
