@@ -27,6 +27,8 @@ const ZIEL = path.resolve(WURZEL, arg('--ziel', '_site'));
 const WEB = path.join(WURZEL, 'web');
 const fehler = [];
 const warnungen = [];
+const MIN_FELD_PX = 36;      // Gitter-Feld auf dem kleinsten Handy (siehe pruefeHandy)
+const MAX_SPRUECHE = 2;      // Zaubersprüche pro Level (Aufruf-Tasten)
 
 // ---------------------------------------------------------------------
 // 1. Rätsel
@@ -60,7 +62,43 @@ for (const p of daten.pakete) {
     const ohneZiel = Array.isArray(l.welten) && l.welten.length ? l.welten.some((w) => !(w && w.ziel) && !l.ziel) : !l.ziel;
     if ((l.art === 'pfad' || l.art === 'kobold') && ohneZiel) fehler.push('Level ' + l.id + ': ohne Ziel nicht spielbar');
     if (l.art === 'pfad' && l.maxKarten && l.maxKarten > 12) fehler.push('Level ' + l.id + ': maxKarten höchstens 12');
+    if (l.art === 'pfad' || l.art === 'kobold') pruefeHandy(l);
   }
+}
+
+// Passt das Level auf das kleinste Handy (iPhone SE, 667 · 375 quer und 375 · 667 hoch)? Die App zeigt Gitter-Felder
+// erst ab 36 px gut (tests/web.spec.mjs prüft das in jeder Ansicht). Platz für die Gitter, gemessen in der App:
+// quer links neben Programm und Tasten (erweiterte Levels 288 · 245 px, sonst 303 · 245 px, mit zweizeiliger Meldung),
+// hoch die volle Breite 355 px (die Höhe hält web/app.js passeFeld frei). Mehrere Gitter stehen nebeneinander oder
+// untereinander (10 px Abstand), wie web/app.js ordneWelten sie legt: es zählt die beste Anordnung.
+function feldPx(welten, breite, hoehe) {
+  const n = welten.length;
+  const bw = Math.max(...welten.map((w) => w.b * 100 + 12)) / 100, bh = Math.max(...welten.map((w) => w.h * 100 + 12)) / 100;
+  let best = 0;
+  for (let c = 1; c <= n; c++) {
+    const reihen = Math.ceil(n / c);
+    best = Math.max(best, Math.min((breite - (c - 1) * 10) / (c * bw), (hoehe - (reihen - 1) * 10) / (reihen * bh)));
+  }
+  return best;
+}
+function pruefeHandy(l) {
+  const erw = l.art === 'pfad' && (l.erlaubt !== undefined || l.welten !== undefined);
+  const basis = {};
+  for (const f of ['b', 'h']) if (l[f] !== undefined) basis[f] = l[f];
+  const welten = Array.isArray(l.welten) && l.welten.length ? l.welten.map((w) => ({ ...basis, ...w })) : [basis];
+  if (welten.some((w) => !(w.b > 0 && w.h > 0))) return;
+  const quer = feldPx(welten, erw ? 288 : 303, 245);
+  const hoch = feldPx(welten, 355, Infinity);
+  const zuKlein = [];
+  if (quer < MIN_FELD_PX) zuKlein.push('quer (667 · 375) nur ' + Math.floor(quer) + ' px');
+  if (hoch < MIN_FELD_PX) zuKlein.push('hoch (375 · 667) nur ' + Math.floor(hoch) + ' px');
+  if (zuKlein.length) {
+    fehler.push('Level ' + l.id + ': Gitter-Felder auf dem kleinsten Handy ' + zuKlein.join(', ') + ' (mindestens ' + MIN_FELD_PX + ' px). ' +
+      (welten.length > 1 ? 'Kleinere Gitter: 2 Gitter höchstens 4 · 3 oder 3 · 4, 3–4 Gitter höchstens 3 · 3.' : 'Kleineres Gitter: höchstens ' + (erw ? 7 : 8) + ' Spalten und 6 Zeilen.'));
+  }
+  // Aufruf-Tasten: links ist auf dem kleinsten Handy Platz für zwei Reihen mit je 4 Tasten (web/app.js zeichneTastenErw)
+  const sprueche = Object.keys(l.sprueche || {}).length + (l.spruchFrei || []).length;
+  if (erw && sprueche > MAX_SPRUECHE) fehler.push('Level ' + l.id + ': ' + sprueche + ' Zaubersprüche, höchstens ' + MAX_SPRUECHE + ' (sonst passen die Aufruf-Tasten auf dem Handy nicht in zwei Tastenreihen)');
 }
 if (!daten.pakete.length) warnungen.push('Keine Level-Pakete gefunden – die App zeigt eine leere Startseite');
 

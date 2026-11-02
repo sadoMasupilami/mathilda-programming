@@ -54,6 +54,8 @@
   const TEMPO = Number(window.WERKSTATT_TEMPO) > 0 ? Number(window.WERKSTATT_TEMPO) : 600;
   const MAX_KARTEN = 12;   // eine Programm-Reihe am Papier
   const MAX_INNEN = WerkstattKern.MAX_INNEN;     // Befehle in einem Zauber-Kasten (Plan 7.5 Regel 9: eine Gruppe von 2–3 Befehlen)
+  const MIN_FELD = 37;     // erweiterte Levels, hoch: so groß (px) bleibt ein Gitter-Feld mindestens, wenn das Programm viel Platz braucht
+  const TASTEN_REIHE = 4;  // erweiterte Levels: so viele Tasten passen links in eine Reihe (kleinstes Handy, hoch und quer)
   const SPERRE = 350;      // ms: nach einem Wechsel der Tastenbelegung keine Tipps (Doppeltipp trifft sonst die neue Taste)
   const DREH = { oben: 0, rechts: 90, unten: 180, links: 270 };
   const NAMEN = { vor: 'vor', links: 'links drehen', rechts: 'rechts drehen' };
@@ -457,20 +459,25 @@
     if (L.art === 'ablauf') return meldung((lv.titel ? lv.titel + ': ' : '') + 'Tippe die Karten der Reihe nach an.', '', ICON.karten);
     if (L.art === 'kobold') return meldung('Ein Befehl ist falsch! Tippe ihn an und tausche ihn aus.', '', sym('kobold'));
     const zs = lv.zielSymbol || 'schatz';
+    const edel = !!(lv.edelsteine && lv.edelsteine.length);
+    // „Finde das kürzeste“ muss das Kind vorher wissen (der Stern hängt daran), auch mit Edelsteinen.
+    // Einheit 5 (Zauber-Kasten ohne "erlaubt"): dort zählt nur die Kartengrenze.
+    const kuerzeste = () => meldung(edel ? 'Sammle alle Edelsteine, dann zum ' + zielWort() + '! Finde das kürzeste Programm.' : 'Finde das kürzeste Programm zum ' + zielWort() + '!', '', sym(edel ? 'edelstein' : zs));
     if (L.erw) {
       if (L.ziel) return spruchMeldung();
       const karten = lv.maxKarten ? ' Höchstens ' + lv.maxKarten + ' Karten.' : '';
       const n = L.welten.length;
       if (n > 1) return meldung('Ein Programm für ' + (n === 2 ? 'beide' : 'alle ' + n) + ' Gitter!' + karten, '', sym(zs));
-      if (lv.edelsteine && lv.edelsteine.length) return meldung('Sammle alle Edelsteine, dann zum ' + zielWort() + '!' + karten, '', sym('edelstein'));
-      if (lv.aufgabe === 'kuerzestes') return meldung('Finde das kürzeste Programm zum ' + zielWort() + '!', '', sym(zs));
+      if (lv.aufgabe === 'kuerzestes') return kuerzeste();
+      if (edel) return meldung('Sammle alle Edelsteine, dann zum ' + zielWort() + '!' + karten, '', sym('edelstein'));
       if (karten) return meldung('Zum ' + zielWort() + ' mit höchstens ' + lv.maxKarten + ' Karten!', '', sym(zs));
       return meldung('Bring den Drachen zum ' + zielWort() + '!', '', sym(zs));
     }
     const karten = lv.zauber && lv.maxKarten ? ' Höchstens ' + lv.maxKarten + ' Karten.' : '';
-    if (lv.edelsteine && lv.edelsteine.length) return meldung('Sammle alle Edelsteine, dann zum ' + zielWort() + '!' + karten, '', sym('edelstein'));
+    if (lv.aufgabe === 'kuerzestes' && !lv.zauber) return kuerzeste();
+    if (edel) return meldung('Sammle alle Edelsteine, dann zum ' + zielWort() + '!' + karten, '', sym('edelstein'));
     if (karten) return meldung('Zum ' + zielWort() + ' mit höchstens ' + lv.maxKarten + ' Karten!', '', sym(zs));
-    if (lv.aufgabe === 'kuerzestes') return meldung('Finde das kürzeste Programm zum ' + zielWort() + '!', '', sym(zs));
+    if (lv.aufgabe === 'kuerzestes') return kuerzeste();
     return meldung('Bring den Drachen zum ' + zielWort() + '!', '', sym(zs));
   }
   function spruchMeldung() {
@@ -684,11 +691,15 @@
     return '<span class="karte befehl-' + b + (cls ? ' ' + cls : '') + '"' + (attr || '') + ' aria-label="' + NAMEN[b] + '">' + sym(b) + '</span>';
   }
   const PLATZHALTER = '<span class="karte platzhalter"></span>';
+  // Nummer und Platzhalter für die nächste Karte. Beim Laufen bleibt der Platz frei, aber unsichtbar (still):
+  // so springt das Programm beim „Los“ nicht (gleiche Breite, gleicher Umbruch, gleiche Kartengröße).
+  const naechsterPlatz = (nr, still) => '<span class="teil platz-teil' + (still ? ' still' : '') + '" aria-hidden="true"><span class="teil-nr">' + nr + '</span>' + PLATZHALTER + '</span>';
 
   // Ein Programmteil wie am Papier. Jedes Teil hat eine Adresse (data-ort) zum Aufleuchten:
   //   p3 (Teil 3 im Programm), p3.k1 (im Zauber-Kasten), p3.d0 / p3.s0 (nach „dann“ / „sonst“),
   //   p3-dann, p3-sonst (die Zweige), p3-bed (die Wenn-Karte), stern (Spruch-Reihe), stern2 (Teil 2 im Stern-Spruch) …
-  // ctx.ziel: innerster offener Kasten (bekommt den Platzhalter), ctx.platz: passt noch eine Karte?
+  // ctx.ziel: innerster offener Kasten (bekommt den Platzhalter), ctx.platz: passt noch eine Karte?,
+  // ctx.still: der Drache läuft (der Platzhalter am Ende hält nur seinen Platz)
   // teilI: Teil im Programm (für data-teil / data-innen wie früher)
   function teilHTML(t, adr, ctx, teilI, innenI) {
     const attr = ' data-ort="' + adr + '"' + (teilI !== null ? ' data-teil="' + teilI + '"' + (innenI !== null ? ' data-innen="' + innenI + '"' : '') : '');
@@ -719,7 +730,7 @@
     const mitNr = (i, inhalt) => '<span class="teil"><span class="teil-nr" aria-hidden="true">' + (i + 1) + '</span>' + inhalt + '</span>';
     let html = '';
     l.forEach((t, i) => { html += mitNr(i, teilHTML(t, wurzel + i, ctx, imProgramm ? i : null, null)); });
-    if (mitPlatz && !ctx.ziel && ctx.platz) html += mitNr(l.length, PLATZHALTER);
+    if (mitPlatz && !ctx.ziel && ctx.platz) html += naechsterPlatz(l.length + 1, ctx.still);
     return html;
   }
   // Zauberspruch als braune Spruch-Reihe: links Siegel und Name, rechts seine Teile. Einen selbst geschriebenen
@@ -740,8 +751,8 @@
     if (L.art === 'ablauf') return zeichneAblaufReihe();
     if (L.art === 'kobold') return zeichneKoboldProgramm();
     const o = ort();
-    const ctx = { ziel: o.last, platz: !L.laeuft && !L.wahl && platzFuer(1) };
-    const ohne = { ziel: null, platz: false };
+    const ctx = { ziel: o.last, platz: !L.wahl && platzFuer(1), still: L.laeuft };
+    const ohne = { ziel: null, platz: false, still: false };
     let sprueche = '';
     for (const [n, l] of Object.entries(L.sprFest || {})) sprueche += spruchReiheHTML(n, l, false, ohne);
     for (const n of L.spruchFrei || []) sprueche += spruchReiheHTML(n, L.spr[n], true, L.ziel === n ? ctx : ohne);
@@ -755,34 +766,65 @@
     }
     const zeile = '<div class="prog-zeile" aria-label="Programm">' + html + '</div>';
     if (!L.erw) { box.innerHTML = zeile + zaehler; return; }
-    box.innerHTML = '<div class="prog-inhalt">' + sprueche + zeile + zaehler + '</div>';
+    // Die Spruch-Reihen stehen nebeneinander, wenn sie Platz haben, sonst untereinander
+    box.innerHTML = '<div class="prog-inhalt">' + (sprueche ? '<div class="sprueche">' + sprueche + '</div>' : '') + zeile + zaehler + '</div>';
     passeAn();
   }
   // Erweiterte Levels: Das Programm darf in mehrere Zeilen umbrechen, muss aber ganz sichtbar bleiben.
-  // Passt es nicht in seinen Platz: zuerst eng (ohne den Namen neben dem Spruch-Siegel, kleinere Abstände), dann
-  // kleinere Karten (bis 24 px, sie sind nur Anzeige). Erst wenn das nicht reicht, blättert der Programm-Bereich
-  // (die Seite selbst nie).
+  // Passt es nicht in seinen Platz: zuerst eng (fertige Spruch-Reihen nur mit Siegel und Inhalt, ohne Name und Nummern,
+  // ihr Zauber-Kasten mit „3-mal“ neben den Karten; kleinere Abstände), dann kleinere Karten (bis 24 px, sie sind nur
+  // Anzeige). Erst wenn das nicht reicht, blättert der Programm-Bereich (die Seite selbst nie). Beim Laufen wird nur neu
+  // eingepasst, wenn „Runde n“ das Programm zu groß macht (markiere).
   function passeProgramm() {
     const box = app.querySelector('.spiel.erw .programm');
     const inhalt = box && box.querySelector('.prog-inhalt');
     if (!inhalt) return;
     box.classList.remove('eng', 'rollen');
     box.style.removeProperty('--k');
-    const cs = getComputedStyle(box);
-    let k = parseFloat(cs.getPropertyValue('--k')) || 38;
-    const zuGross = () => {
-      const h = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
-      return inhalt.getBoundingClientRect().height > h + 0.5 || inhalt.scrollWidth > inhalt.clientWidth + 0.5;
-    };
-    if (!zuGross()) return;
+    let k = parseFloat(getComputedStyle(box).getPropertyValue('--k')) || 38;
+    if (!programmZuGross()) return;
     box.classList.add('eng');
-    while (k > 24 && zuGross()) { k -= 2; box.style.setProperty('--k', k + 'px'); }
-    if (zuGross()) box.classList.add('rollen');
+    while (k > 24 && programmZuGross()) { k -= 2; box.style.setProperty('--k', k + 'px'); }
+    if (programmZuGross()) box.classList.add('rollen');
+  }
+  // Ragt das Programm (erweiterte Levels) aus seinem Platz, unten oder seitlich?
+  function programmZuGross() {
+    const box = app.querySelector('.spiel.erw .programm');
+    const inhalt = box && box.querySelector('.prog-inhalt');
+    if (!inhalt) return false;
+    const cs = getComputedStyle(box);
+    const h = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    return inhalt.getBoundingClientRect().height > h + 0.5 || inhalt.scrollWidth > inhalt.clientWidth + 0.5;
   }
   function passeAn() {
     if (!L || !L.erw) return;
+    passeFeld();
     passeProgramm();
     ordneWelten();
+  }
+  // Hoch: Wie viel Höhe das Spielfeld mindestens behält, wenn das Programm viel Platz braucht (quer stehen sie
+  // nebeneinander). Mindestens 30 % der Ansicht und so viel, dass jedes Feld MIN_FELD px groß bleibt (auch bei 6 · 6
+  // oder drei Gittern), aber nie mehr, als die Gitter bei voller Breite brauchen (ein breites, flaches Gitter
+  // lässt dem Programm den Platz, statt leeren Rand zu zeigen).
+  function passeFeld() {
+    const feld = app.querySelector('.spiel.erw .feld');
+    if (!feld || !L.welten) return;
+    if (window.matchMedia('(orientation: landscape)').matches) { feld.style.minHeight = ''; return; }
+    const spiel = feld.closest('.spiel');
+    const cs = getComputedStyle(spiel);
+    const hoehe = spiel.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    const breite = feld.getBoundingClientRect().width;
+    const n = L.welten.length, abstand = 10;
+    const bw = Math.max(...L.welten.map((w) => w.b * 100 + 12)) / 100, bh = Math.max(...L.welten.map((w) => w.h * 100 + 12)) / 100;
+    let voll = 0, noetig = 0;
+    for (let c = 1; c <= n; c++) {
+      const reihen = Math.ceil(n / c);
+      const h = (z) => reihen * bh * z + (reihen - 1) * abstand;
+      const z = (breite - (c - 1) * abstand) / (c * bw);   // Feldgröße, wenn die Gitter die ganze Breite nutzen
+      voll = Math.max(voll, h(z));
+      if (z >= MIN_FELD && (!noetig || h(MIN_FELD) < noetig)) noetig = h(MIN_FELD);
+    }
+    feld.style.minHeight = Math.ceil(Math.min(voll, Math.max(0.3 * hoehe, noetig))) + 'px';
   }
 
   function zeichneKoboldProgramm() {
@@ -824,6 +866,10 @@
         if (r) r.textContent = 'Runde ' + (z.runde + 1);
       }
     });
+    // „Runde n“ macht einen schmalen Zauber-Kasten breiter. Passt das Programm dadurch nicht mehr in seinen Platz,
+    // neu einpassen (sonst rutschen Spruch-Reihe und Kartenzähler beim Laufen aus dem Bild). Passt es noch, bleibt
+    // alles, wie es ist (kein Springen).
+    if (L.erw && programmZuGross()) passeAn();
   }
 
   // ----- Tasten -----
@@ -918,7 +964,12 @@
       const voll = !platzFuer(1);
       for (const b of K.BEFEHLE) r1 += befehlsTaste(b, lauf, voll);
       if (o.inSpruch && !c) r1 += taste('fertig', '<span>fertig</span>', { cls: 'befehl fertig spruch-fertig', daten: 'data-was="spruch"', label: K.SPRUCH_WORT[L.ziel] + ' fertig', aus: lauf });
-      if (!o.inSpruch && darf('spruch')) for (const n of spruchNamen()) r1 += taste('ruf', sym('spruch-' + n), { cls: 'befehl ruf', daten: 'data-spruch="' + n + '"', label: K.SPRUCH_WORT[n] + ' aufrufen', aus: lauf, grau: voll });
+      // Aufruf-Tasten: oben ist Platz für 4 Tasten (kleinstes Handy). Weitere kommen vorne in die untere Reihe,
+      // sonst bricht die obere Reihe in eine eigene dritte Reihe um und das Programm hat zu wenig Platz.
+      const rufTasten = !o.inSpruch && darf('spruch') ? spruchNamen().map((n) => taste('ruf', sym('spruch-' + n), { cls: 'befehl ruf', daten: 'data-spruch="' + n + '"', label: K.SPRUCH_WORT[n] + ' aufrufen', aus: lauf, grau: voll })) : [];
+      const obenFrei = Math.max(0, TASTEN_REIHE - K.BEFEHLE.length);
+      r1 += rufTasten.slice(0, obenFrei).join('');
+      r2 += rufTasten.slice(obenFrei).join('');
       if (!c) {
         if (darf('zauber') || darf('bis')) r2 += taste('zauber', darf('zauber') ? zauberIcon : sym('bis'), { cls: 'befehl zauber', label: darf('zauber') ? 'Zauber-Kasten' : 'Zauber-Kasten bis zum ' + zielWort(), aus: lauf, grau: !platzFuer(2) });
         if (darf('wenn')) r2 += taste('wenn', sym('wenn'), { cls: 'befehl wenn', label: 'Wenn-dann-Kasten', aus: lauf, grau: !platzFuer(2) });
@@ -931,8 +982,11 @@
       }
       r2 += taste('loeschen', ICON.weg, { cls: 'befehl', label: 'Letzten Befehl löschen', aus: lauf || !o.root.length });
     }
-    box.innerHTML = '<div class="tasten-erw"><div class="tasten-links">' + frage + '<div class="reihe">' + r1 + '</div>' +
-      (r2 ? '<div class="reihe">' + r2 + '</div>' : '') + '</div>' + steuer + '</div>';
+    // Eine volle Reihe (4 Tasten): Wort-Tasten wie „sonst“ und „fertig“ werden so schmal wie die anderen
+    // (sonst passen sie auf dem kleinsten Handy nicht neben Aufruf-Taste und Löschen)
+    const reihe = (r) => '<div class="reihe' + ((r.match(/<button/g) || []).length >= TASTEN_REIHE ? ' knapp' : '') + '">' + r + '</div>';
+    box.innerHTML = '<div class="tasten-erw"><div class="tasten-links">' + frage + reihe(r1) +
+      (r2 ? reihe(r2) : '') + '</div>' + steuer + '</div>';
     belegungMerken(box);
     passeAn();
   }
@@ -1008,8 +1062,13 @@
     if (L.spr[n] && !L.spr[n].length) return meldung('Dein ' + K.SPRUCH_WORT[n] + ' ist noch leer. Tippe ihn oben an und schreib ihn!', 'spruch-meldung', sym('spruch-' + n));
     zustandsMeldung();
   }
+  // Löschen geht Schritt für Schritt zurück, genau umgekehrt wie beim Eingeben (überall gleich, auch in Einheit 5):
+  // Ist der letzte Teil ein geschlossener Kasten (Zauber-Kasten, „bis zum Schatz“, Wenn-dann-Kasten), geht er wieder
+  // auf, mit den geschlossenen Kästen an seinem Ende, und nur die letzte Karte kommt weg. Im Wenn-dann-Kasten:
+  // sonst-Befehl, „sonst“, dann-Befehl. Ein leerer Kasten verschwindet beim nächsten Tipp.
   function loeschen() {
     if (!vorAenderung()) return;
+    oeffneLetzten(ort().list);
     const o = ort();
     const c = o.last;
     if (c && c.wenn) {
@@ -1018,10 +1077,22 @@
       else o.parentList.pop();
     } else if (c) {
       if (c.befehle.length) c.befehle.pop();
-      else { o.parentList.pop(); if (!L.erw) grundMeldung(); }
+      else o.parentList.pop();
     } else o.root.pop();
     zeichneProgramm(); zeichneTasten();
-    if (L.erw) zustandsMeldung();
+    if (L.erw) return zustandsMeldung();
+    const k = offenerKasten();
+    if (k) meldung(k.befehle.length ? 'Noch ein Befehl in den Zauber-Kasten? Sonst tippe auf „fertig“.' : 'Tippe die Befehle für den Zauber-Kasten an. Dann „fertig“.', 'zauber-meldung');
+    else grundMeldung();
+  }
+  // Den geschlossenen Kasten am Ende der Liste wieder öffnen, und darin den am Ende auch (bis zur letzten Karte)
+  function oeffneLetzten(l) {
+    for (;;) {
+      const t = l[l.length - 1];
+      if (!t || typeof t !== 'object' || t.spruch || t.offen) return;
+      t.offen = true;
+      if (t.wenn) { t.zweig = t.sonst.length ? 'sonst' : 'dann'; l = t[t.zweig]; } else l = t.befehle;
+    }
   }
   function zauberStart() {
     if (!vorAenderung()) return;

@@ -1010,6 +1010,12 @@
         }
         // \u2026 und die Spickzettel (Verweise aus der Einleitung)
         if (DATEN.teilBuild && /^spick-\d+$/.test(ziel)) return;
+        // \u2026 und die Urkunden (Rahmenseiten, z. B. aus Einheit 10 auf Urkunde 1)
+        const u = ziel.match(/^urkunde-(\d+)$/);
+        if (DATEN.teilBuild && u) {
+          if (!a.textContent.trim()) a.textContent = 'Urkunde ' + u[1];
+          return;
+        }
         fehler(a, 'Verweis auf unbekanntes Ziel ' + ziel);
         return;
       }

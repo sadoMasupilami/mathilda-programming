@@ -148,8 +148,51 @@ async function ansicht(page, name, info) {
     }
     return { probleme, gitter, ansicht: document.body.dataset.ansicht };
   });
+  // Erweiterte Levels: das ganze Programm (Spruch-Reihen, Kästen, Zähler) im Bild, ohne Blättern
+  if (await page.locator('.spiel.erw .prog-inhalt').count()) bericht.probleme.push(...(await page.evaluate(programmPruefung)));
   expect(bericht.probleme, 'Ansicht „' + name + '“').toEqual([]);
   return bericht;
+}
+
+// Erweiterte Levels: Alle Teile des Programms (Karten, Kästen, Spruch-Reihen, Nummern, Kartenzähler) liegen ganz im
+// sichtbaren Programm-Bereich und im Bildschirm, und der Programm-Bereich muss nicht blättern (.rollen).
+// Läuft im Browser (page.evaluate), darum ohne Bezüge nach außen.
+function programmPruefung() {
+  const p = document.querySelector('.programm');
+  if (!p) return ['kein Programm-Bereich'];
+  const box = p.getBoundingClientRect();
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const raus = [];
+  if (p.classList.contains('rollen')) raus.push('Programm-Bereich muss blättern (.rollen)');
+  for (const el of p.querySelectorAll('.karte, .kasten-w, .kasten-z, .spruch-reihe, .zaehler, .teil-nr')) {
+    if (el.closest('.still')) continue;              // Platzhalter beim Laufen: unsichtbar, hält nur den Platz
+    const q = el.getBoundingClientRect();
+    if (!q.width && !q.height) continue;             // ausgeblendet (eng: keine Nummern in Spruch-Reihen)
+    if (q.top < box.top - 0.5 || q.bottom > box.bottom + 0.5 || q.left < box.left - 0.5 || q.right > box.right + 0.5 ||
+      q.top < -0.5 || q.bottom > vh + 0.5 || q.left < -0.5 || q.right > vw + 0.5) {
+      raus.push('Programm-Teil außerhalb des Bildes: ' + String(el.className.baseVal ?? el.className).trim() + (el.dataset.ort ? ' ' + el.dataset.ort : ''));
+    }
+  }
+  return raus;
+}
+// „Los“ antippen und bei jedem Bild, solange der Drache läuft, programmPruefung machen (bis das Geschafft-Fenster
+// kommt oder der Lauf vorbei ist). Gibt die Probleme zurück (leer = gut); mindestens ein Bild beim Laufen wird geprüft.
+async function losMitPruefung(page) {
+  await page.evaluate('window.__pruefe = ' + programmPruefung.toString() + '; window.__lauf = { gesehen: 0, raus: [] };');
+  await tippe(page, '.tasten [data-aktion="los"]');
+  await page.waitForFunction(() => {
+    const l = window.__lauf;
+    const laeuft = !!document.querySelector('.tasten [data-aktion="los"][disabled]') && !document.querySelector('.dialog');
+    if (laeuft) {
+      l.gesehen++;
+      for (const r of window.__pruefe()) if (!l.raus.includes(r)) l.raus.push(r);
+      return false;
+    }
+    return l.gesehen > 0 || !!document.querySelector('.dialog');
+  }, null, { polling: 'raf', timeout: 60_000 });
+  const l = await page.evaluate(() => window.__lauf);
+  expect(l.gesehen, 'Programm beim Laufen geprüft').toBeGreaterThan(0);
+  return l.raus;
 }
 
 // ---------------------------------------------------------------------
@@ -298,11 +341,18 @@ async function spieleLevel(page, p, i, info, fotos) {
     await expect(page.locator('.tasten [data-aktion="weg"]')).toHaveCount(0);
     await tippe(page, '.tasten [data-befehl="' + r.befehl + '"]');
   } else {
+    // „Finde das kürzeste“ muss das Kind vorher wissen, auch mit Edelsteinen (bei mehreren Gittern: „Ein Programm für …“)
+    if (lv.aufgabe === 'kuerzestes' && (erweitert(lv) || !lv.zauber) && weltenVon(lv).length === 1) await expect(page.locator('.meldung')).toContainText('kürzeste');
     const l = loesePfad(lv);
     await gibProgrammEin(page, l.programm, l.sprueche);
     if (fotos) await ansicht(page, p.paket + '-programm', info);
+    if (erweitert(lv)) {
+      // Das ganze Programm bleibt sichtbar: nach dem Eingeben und bei jedem Bild beim Laufen (auch mit „Runde n“)
+      expect(await page.evaluate(programmPruefung), 'Programm nach dem Eingeben (' + lv.id + ')').toEqual([]);
+      expect(await losMitPruefung(page), 'Programm beim Laufen (' + lv.id + ')').toEqual([]);
+    }
   }
-  await tippe(page, '.tasten [data-aktion="los"]');
+  if (!erweitert(lv)) await tippe(page, '.tasten [data-aktion="los"]');
   await expect(page.locator('.dialog')).toBeVisible({ timeout: 20_000 });
   await expect(page.locator('.dialog h2')).toHaveText('Geschafft!');
   if (fotos) await ansicht(page, p.paket + '-geschafft', info);
@@ -911,6 +961,10 @@ test('Wiederhol-Zauber „bis zum Schatz“: Kasten, Runden, und „läuft im Kr
   await expect(page.locator('.meldung')).toContainText('so nicht.');
   await expect(page.locator('.dialog')).toHaveCount(0);
   await ansicht(page, 'im-kreis', info);
+  // Löschen öffnet den Kasten wieder und nimmt nur seine Karte weg; der leere Kasten geht beim nächsten Tipp
+  await tippe(page, '.tasten [data-aktion="loeschen"]');
+  await expect(page.locator('.programm .kasten-z.kasten-bis.offen')).toHaveCount(1);
+  await expect(page.locator('.programm .kasten-z .karte:not(.platzhalter)')).toHaveCount(0);
   await tippe(page, '.tasten [data-aktion="loeschen"]');
   await expect(page.locator('.programm .kasten-z')).toHaveCount(0);
   // Die Lösung, langsamer (neu laden): im Kasten leuchtet „Runde n“
@@ -1081,28 +1135,34 @@ test('Grenzen: Kartenzahl, höchstens 3 Befehle nach „dann“, höchstens 4 Te
 });
 
 test('Finde das kürzeste mit Kästen: der Stern erst mit der kleinsten Kartenzahl', async ({ page }, info) => {
-  const f = suche('pfad', (l) => erweitert(l) && l.aufgabe === 'kuerzestes' && l.minKarten && (l.maxKarten || 12) >= l.minKarten + 2);
-  test.skip(!f, 'kein „kürzestes“-Level mit Kästen');
+  const passt = (l) => erweitert(l) && l.aufgabe === 'kuerzestes' && l.minKarten && (l.maxKarten || 12) >= l.minKarten + 2;
+  // eines mit mehreren Gittern und eines mit einem Gitter (Meldung „kürzeste“, auch mit Edelsteinen)
+  const faelle = [suche('pfad', (l) => passt(l) && weltenVon(l).length > 1), suche('pfad', (l) => passt(l) && weltenVon(l).length === 1)].filter(Boolean);
+  test.skip(!faelle.length, 'kein „kürzestes“-Level mit Kästen');
   await schnell(page);
-  await oeffneLevel(page, f, info);
-  await expect(page.locator('.meldung')).toContainText(weltenVon(f.lv).length > 1 ? 'Ein Programm für' : 'kürzeste');
-  // die kleinste Lösung und am Ende eine Drehung hin und zurück: kommt an, braucht 2 Karten mehr
-  const l = loesePfad(f.lv);
-  const prog = l.programm.concat(['links', 'rechts']);
-  expect(lauf(f.lv, prog, l.sprueche).geschafft).toBe(true);
-  await gibProgrammEin(page, prog, l.sprueche);
-  await tippe(page, '.tasten [data-aktion="los"]');
-  await expect(page.locator('.dialog h2')).toHaveText('Fast geschafft!', { timeout: 30_000 });
-  await expect(page.locator('.dialog p')).toContainText('mit ' + f.lv.minKarten + ' Karten');
-  await ansicht(page, 'kuerzeste-karten', info);
-  await tippe(page, '.dialog [data-aktion="nochmal"]');
-  await expect(page.locator('.punkte .punkt.voll')).toHaveCount(0);
+  for (const f of faelle) {
+    await oeffneLevel(page, f, info);
+    await expect(page.locator('.meldung')).toContainText(weltenVon(f.lv).length > 1 ? 'Ein Programm für' : 'kürzeste');
+    if ((f.lv.edelsteine || []).length) await expect(page.locator('.meldung')).toContainText('Sammle alle Edelsteine');
+    // die kleinste Lösung und am Ende eine Drehung hin und zurück: kommt an, braucht 2 Karten mehr
+    const l = loesePfad(f.lv);
+    const prog = l.programm.concat(['links', 'rechts']);
+    expect(lauf(f.lv, prog, l.sprueche).geschafft).toBe(true);
+    await gibProgrammEin(page, prog, l.sprueche);
+    await tippe(page, '.tasten [data-aktion="los"]');
+    await expect(page.locator('.dialog h2')).toHaveText('Fast geschafft!', { timeout: 30_000 });
+    await expect(page.locator('.dialog p')).toContainText('mit ' + f.lv.minKarten + ' Karten');
+    await ansicht(page, 'kuerzeste-karten-' + f.lv.id, info);
+    await tippe(page, '.dialog [data-aktion="nochmal"]');
+    await expect(page.locator('.punkte .punkt.voll')).toHaveCount(0);
+  }
 });
 
 test('Langes Programm mit Spruch-Reihe bleibt ganz sichtbar (auch auf dem kleinsten Handy quer)', async ({ page }, info) => {
   const f = suche('pfad', (l) => darf(l, 'spruch') && (l.spruchFrei || []).length && ['zauber', 'wenn', 'bis'].every((x) => darf(l, x)) &&
     ['stein', 'frei'].every((c) => bedingungenVon(l).includes(c)) && (l.maxKarten || 12) >= 12);
   test.skip(!f, 'kein Level mit Zauberspruch und allen Kästen');
+  await langsam(page, 150);
   await oeffneLevel(page, f, info);
   const n = f.lv.spruchFrei[0];
   // Spruch: Wenn-dann-Kasten und Zauber-Kasten (7 Karten), Programm: Aufruf und „bis zum Schatz“ mit Wenn-dann und Aufruf (5 Karten)
@@ -1110,23 +1170,138 @@ test('Langes Programm mit Spruch-Reihe bleibt ganz sichtbar (auch auf dem kleins
   const prog = [{ spruch: n }, { bis: 'schatz', befehle: [{ wenn: 'frei', dann: ['vor'], sonst: [] }, { spruch: n }] }];
   await gibProgrammEin(page, prog, { [n]: spruch });
   await expect(page.locator('.programm .zaehler')).toContainText('12 von ' + (f.lv.maxKarten || 12) + ' Karten');
-  const r = await page.evaluate(() => {
-    const box = document.querySelector('.programm').getBoundingClientRect();
-    const vw = window.innerWidth, vh = window.innerHeight;
-    const raus = [];
-    for (const el of document.querySelectorAll('.programm .karte, .programm .kasten-w, .programm .kasten-z, .programm .spruch-reihe, .programm .zaehler, .programm .teil-nr')) {
-      const q = el.getBoundingClientRect();
-      if (q.top < box.top - 0.5 || q.bottom > box.bottom + 0.5 || q.left < box.left - 0.5 || q.right > box.right + 0.5 || q.top < 0 || q.bottom > vh || q.left < 0 || q.right > vw) raus.push(el.className + ' ' + (el.dataset.ort || ''));
-    }
-    return { raus, rollen: document.querySelector('.programm').classList.contains('rollen'), k: getComputedStyle(document.querySelector('.programm')).getPropertyValue('--k') };
-  });
-  expect(r.raus, 'Teile des Programms außerhalb des Bildes').toEqual([]);
-  expect(r.rollen, 'Programm-Bereich muss nicht blättern').toBe(false);
+  expect(await page.evaluate(programmPruefung), 'Teile des Programms außerhalb des Bildes oder Blättern').toEqual([]);
   await ansicht(page, 'langes-programm', info);
-  // Auch beim Laufen bleibt alles an seinem Platz
+  // Auch beim Laufen bleibt alles an seinem Platz (jedes Bild geprüft, auch mit „Runde n“)
   await tippe(page, '.tasten [data-aktion="los"]');
   await expect(page.locator('.programm .karte.aktiv').first()).toBeVisible({ timeout: 10_000 });
   await ansicht(page, 'langes-programm-laeuft', info);
+  await tippe(page, '.tasten [data-aktion="nochmal"]');
+  expect(await losMitPruefung(page), 'Programm beim Laufen').toEqual([]);
+});
+
+// Tastenreihen links: höchstens zwei, jede in einer Zeile (alle Tasten einer Reihe gleich hoch)
+async function tastenReihen(page) {
+  return page.evaluate(() => [...document.querySelectorAll('.tasten-links .reihe')].map((r) =>
+    new Set([...r.querySelectorAll('.taste')].map((t) => Math.round(t.getBoundingClientRect().top))).size));
+}
+test('Zwei Zaubersprüche: alle Aufruf-Tasten in zwei Tastenreihen, auch bei offenen Kästen', async ({ page }, info) => {
+  const f = suche('pfad', (l) => darf(l, 'spruch') && Object.keys(l.sprueche || {}).length + (l.spruchFrei || []).length >= 2 && darf(l, 'zauber') && darf(l, 'wenn') && (l.maxKarten || 12) >= 3);
+  test.skip(!f, 'kein Level mit zwei Zaubersprüchen und Kästen');
+  await oeffneLevel(page, f, info);
+  const namen = Object.keys(f.lv.sprueche || {}).concat(f.lv.spruchFrei || []);
+  await expect(page.locator('.tasten [data-aktion="ruf"]')).toHaveCount(namen.length);
+  expect(await tastenReihen(page), 'Tastenreihen am Anfang').toEqual([1, 1]);
+  expect(await page.evaluate(programmPruefung)).toEqual([]);
+  await ansicht(page, 'zwei-sprueche', info);
+  // Zauber-Kasten offen: Aufruf-Taste, Wenn-dann, „fertig“ und Löschen in der unteren Reihe
+  await tippe(page, '.tasten [data-aktion="zauber"]');
+  await tippe(page, '.tasten [data-aktion="zahl"][data-zahl="2"]');
+  expect(await tastenReihen(page), 'Tastenreihen im Zauber-Kasten').toEqual([1, 1]);
+  await ansicht(page, 'zwei-sprueche-kasten', info);
+  // Wenn-dann-Kasten darin offen: Aufruf-Taste, „sonst“, „fertig“ und Löschen
+  await tippe(page, '.tasten [data-aktion="wenn"]');
+  if (await page.locator('.tasten [data-aktion="bedingung"]').count()) await tippe(page, '.tasten [data-aktion="bedingung"] >> nth=0');
+  await tippe(page, '.tasten [data-aktion="ruf"][data-spruch="' + namen[namen.length - 1] + '"]');
+  expect(await tastenReihen(page), 'Tastenreihen im Wenn-dann-Kasten').toEqual([1, 1]);
+  await tippe(page, '.tasten [data-aktion="sonst"]');
+  expect(await tastenReihen(page), 'Tastenreihen bei „sonst“').toEqual([1, 1]);
+  await ansicht(page, 'zwei-sprueche-wenn', info);
+});
+
+test('Löschen öffnet einen geschlossenen Kasten wieder und nimmt nur die letzte Karte weg (überall gleich)', async ({ page }, info) => {
+  let geprueft = 0;
+  const karten = (sel) => page.locator('.programm ' + sel + ' .karte:not(.platzhalter):not(.bed)');
+  // Zauber-Kasten mit Wenn-dann-Kasten darin (beide zu): 2[wenn[…: rechts sonst vor]]
+  const f = suche('pfad', (l) => darf(l, 'zauber') && darf(l, 'wenn') && (l.maxKarten || 12) >= 4);
+  if (f) {
+    await oeffneLevel(page, f, info);
+    const c = bedingungenVon(f.lv)[0];
+    await gibProgrammEin(page, [{ wdh: 2, befehle: [{ wenn: c, dann: ['rechts'], sonst: ['vor'] }] }]);
+    await expect(page.locator('.programm .kasten-z:not(.offen) .kasten-w:not(.offen)')).toHaveCount(1);
+    if (f.lv.maxKarten) await expect(page.locator('.programm .zaehler')).toContainText('4 von ' + f.lv.maxKarten);
+    // 1. Tipp: beide Kästen gehen auf, nur „vor“ nach „sonst“ ist weg
+    await tippe(page, '.tasten [data-aktion="loeschen"]');
+    await expect(page.locator('.programm .kasten-z.offen .kasten-w.offen')).toHaveCount(1);
+    await expect(karten('.kasten-w [data-ort="p0.k0-dann"]')).toHaveCount(1);
+    await expect(karten('.kasten-w [data-ort="p0.k0-sonst"]')).toHaveCount(0);
+    await expect(page.locator('.programm .kasten-w [data-ort="p0.k0-sonst"]')).toHaveCount(1);   // man ist bei „sonst“
+    await expect(page.locator('.meldung')).toContainText('Was macht der Drache sonst?');
+    if (f.lv.maxKarten) await expect(page.locator('.programm .zaehler')).toContainText('3 von ' + f.lv.maxKarten);
+    await ansicht(page, 'loeschen-offen', info);
+    // 2. „sonst“ weg, 3. „rechts“ weg, 4. der leere Wenn-dann-Kasten, 5. der leere Zauber-Kasten
+    await tippe(page, '.tasten [data-aktion="loeschen"]');
+    await expect(page.locator('.programm .kasten-w [data-ort="p0.k0-sonst"]')).toHaveCount(0);
+    await expect(karten('.kasten-w')).toHaveCount(1);
+    await tippe(page, '.tasten [data-aktion="loeschen"]');
+    await expect(page.locator('.programm .kasten-w.offen')).toHaveCount(1);
+    await expect(karten('.kasten-w')).toHaveCount(0);
+    await tippe(page, '.tasten [data-aktion="loeschen"]');
+    await expect(page.locator('.programm .kasten-w')).toHaveCount(0);
+    await expect(page.locator('.programm .kasten-z.offen')).toHaveCount(1);
+    await tippe(page, '.tasten [data-aktion="loeschen"]');
+    await expect(page.locator('.programm .kasten-z')).toHaveCount(0);
+    await expect(page.locator('.tasten [data-aktion="loeschen"]')).toBeDisabled();
+    geprueft++;
+  }
+  // Einheit 5 (Zauber-Kasten ohne "erlaubt"): genauso
+  const z = suche('pfad', (l) => einfach(l) && l.zauber && (l.maxKarten || 12) >= 3);
+  if (z) {
+    await oeffneLevel(page, z, info);
+    await gibProgrammEin(page, [{ wdh: 3, befehle: ['vor', 'links'] }]);
+    await expect(page.locator('.programm .kasten-z:not(.offen)')).toHaveCount(1);
+    await tippe(page, '.tasten [data-aktion="loeschen"]');
+    await expect(page.locator('.programm .kasten-z.offen')).toHaveCount(1);
+    await expect(karten('.kasten-z')).toHaveCount(1);
+    await expect(page.locator('.tasten [data-aktion="fertig"]')).toHaveCount(1);
+    await expect(page.locator('.meldung')).toContainText('Zauber-Kasten');
+    await ansicht(page, 'loeschen-zauber-e5', info);
+    await tippe(page, '.tasten [data-aktion="loeschen"]');
+    await expect(karten('.kasten-z')).toHaveCount(0);
+    await expect(page.locator('.programm .kasten-z.offen')).toHaveCount(1);
+    await tippe(page, '.tasten [data-aktion="loeschen"]');
+    await expect(page.locator('.programm .kasten-z')).toHaveCount(0);
+    geprueft++;
+  }
+  test.skip(!geprueft, 'keine Levels mit Zauber-Kasten');
+});
+
+test('Beim „Los“ springt das Programm nicht: gleiche Kartengröße, gleiche Plätze, solange der Drache läuft', async ({ page }, info) => {
+  const f = suche('pfad', (l) => darf(l, 'wenn') && (l.maxKarten || 12) >= 6);
+  test.skip(!f, 'kein Level mit Wenn-dann-Kasten und 6 Karten');
+  await langsam(page, 120);
+  await oeffneLevel(page, f, info);
+  // 5 Karten ohne Zauber-Kasten (kein „Runde n“): danach ist Platz für eine Karte, der Platzhalter steht da
+  await gibProgrammEin(page, [{ wenn: bedingungenVon(f.lv)[0], dann: ['rechts', 'vor'], sonst: ['links'] }, 'vor']);
+  await expect(page.locator('.programm .karte.platzhalter')).toHaveCount(1);
+  await expect(page.locator('.programm .karte.platzhalter')).toBeVisible();
+  const lage = () => {
+    const p = document.querySelector('.programm');
+    const aus = { eng: p.classList.contains('eng'), k: getComputedStyle(p).getPropertyValue('--k').trim() };
+    for (const el of p.querySelectorAll('[data-ort], .zaehler, .platz-teil')) {
+      const r = el.getBoundingClientRect();
+      aus[el.dataset.ort || (el.classList.contains('platz-teil') ? 'platz' : 'zaehler')] = [r.left, r.top, r.width, r.height].map((x) => Math.round(x * 2) / 2).join(',');
+    }
+    return aus;
+  };
+  const vorher = await page.evaluate(lage);
+  await page.evaluate('window.__lage = ' + lage.toString() + '; window.__vorher = ' + JSON.stringify(vorher) + '; window.__sprung = { gesehen: 0, anders: [] };');
+  await tippe(page, '.tasten [data-aktion="los"]');
+  await page.waitForFunction(() => {
+    const s = window.__sprung;
+    if (document.querySelector('.tasten [data-aktion="los"][disabled]')) {
+      s.gesehen++;
+      const jetzt = window.__lage();
+      for (const [k, v] of Object.entries(window.__vorher)) if (jetzt[k] !== v && !s.anders.some((a) => a.startsWith(k + ': '))) s.anders.push(k + ': ' + v + ' → ' + jetzt[k]);
+      return false;
+    }
+    return s.gesehen > 0;
+  }, null, { polling: 'raf', timeout: 60_000 });
+  const s = await page.evaluate(() => window.__sprung);
+  expect(s.gesehen).toBeGreaterThan(0);
+  expect(s.anders, 'Programm beim Laufen verändert').toEqual([]);
+  // danach steht der Platzhalter wieder sichtbar da
+  await expect(page.locator('.programm .karte.platzhalter')).toBeVisible();
 });
 
 // ---------------------------------------------------------------------
