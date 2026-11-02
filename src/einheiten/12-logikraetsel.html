@@ -40,10 +40,14 @@
   .e12-unten { display: flex; align-items: flex-end; gap: 6mm; }
   .e12-unten > .knobel { flex: 1; }
   .e12-nowrap { white-space: nowrap; }
-  .e12-schreib { display: flex; flex-direction: column; gap: 0; }
-  .e12-schreib > div { display: flex; align-items: flex-end; gap: 2mm; height: 12mm; }
-  .e12-schreib > div > b { font-family: var(--text); font-weight: 900; font-size: 14pt; color: var(--grau); width: 5mm; }
-  .e12-schreib > div > span { flex: 1; border-bottom: 0.35mm solid var(--linie); height: 100%; }
+  /* Profi-Aufgabe 12-3: zwei lange Schreiblinien pro Hinweis, Nummer wie bei den gedruckten Hinweisen */
+  .profi > .e12-auftrag { margin: 0 0 2mm 0; }
+  .e12-schreib { list-style: none; margin: -2mm 0 0 0; padding: 0; counter-reset: e12s; }
+  .e12-schreib > li { position: relative; padding-left: 8.5mm; }
+  .e12-schreib > li::before { counter-increment: e12s; content: counter(e12s); position: absolute; left: 0; top: 4.2mm; width: 6mm; height: 6mm; border-radius: 50%;
+    border: 0.45mm solid var(--akzent); color: var(--akzent); font-family: var(--text); font-weight: 900; font-size: 10.5pt; line-height: 5.1mm; text-align: center; }
+  .e12-schreib > li > span { display: block; height: 10.5mm; border-bottom: 0.35mm solid var(--linie); }
+  .loesungsmodus .e12-schreib { display: none; }
 </style>
 
 <!-- Spickzettel: Kurzfassung der Anleitung zum Mitnehmen, höchstens zwei Seiten. Ablauf als Drehbuch (Minuten wie in der Anleitung) -->
@@ -321,7 +325,7 @@
       <li><b>Zuerst die Lösung, heimlich:</b> Sie legt fest, wer was mag, und schreibt es auf einen Zettel, der umgedreht daneben liegt. Wichtig: Jedes Ding gehört genau einem.</li>
       <li><b>Hinweise, einer nach dem anderen:</b> Nach jedem Hinweis fragt ihr: Kann man jetzt schon alles herausfinden? Ein Beispiel: Mama, Papa und {{KIND}} mögen Rot, Blau und Grün. Mit dem Hinweis „Mama mag kein Rot“ gibt es noch <m-e12-anzahl raetsel="e12-s2" l="4"></m-e12-anzahl> Lösungen. Kommt „Papa mag Grün“ dazu, gibt es genau <m-e12-anzahl raetsel="e12-s3" l="1"></m-e12-anzahl>: <m-e12-loesung raetsel="e12-s3" l="mama=blau papa=gruen du=rot"></m-e12-loesung>.</li>
       <li><b>Prüfen:</b> Jemand löst das Rätsel nur mit den Hinweisen. Muss er irgendwo raten, fehlt ein Hinweis. Findet er eine andere Lösung als die auf dem Zettel, auch. Dann schreibt {{KIND}} noch einen Hinweis dazu. So wird aus „vielleicht“ genau eine Lösung.</li>
-      <li><b>Schreiben:</b> {{KIND}} schreibt die Hinweise selbst, so gut es geht. Lange Sätze darf sie dir diktieren. Kurze Sätze mit „mag“, „mag kein“ und „oder“ reichen völlig.</li>
+      <li><b>Schreiben:</b> {{KIND}} schreibt die Hinweise selbst, so gut es geht. Für jeden Hinweis hat sie zwei lange Linien, große Buchstaben sind also kein Problem. Lange Sätze darf sie dir diktieren. Kurze Sätze mit „mag“, „mag kein“ und „oder“ reichen völlig. Braucht sie einen vierten Hinweis, kommt er auf die Rückseite.</li>
     </ol>
   </div>
 
@@ -497,18 +501,19 @@
   </div>
 
   <div class="aufg">
-    <p class="anw">Ein Hinweis ist überflüssig: Das Rätsel geht auch ohne ihn. Welcher? <span class="e12-nowrap">Hinweis <m-e12-zahl raetsel="e12-p1" was="ueberfluessig" l="2"></m-e12-zahl></span></p>
+    <p class="anw">Welcher Hinweis ist überflüssig? Es geht ohne ihn. <span class="e12-nowrap">Hinweis <m-e12-zahl raetsel="e12-p1" was="ueberfluessig" l="2"></m-e12-zahl></span></p>
   </div>
 
   <div class="profi" data-titel="Profi-Aufgabe: Ein Rätsel für deine Familie">
+    <p class="e12-auftrag">Mal 3 Leute oder Tiere und 3 Dinge. Denk dir aus, wer was mag.</p>
     <div class="e12-neben">
       <m-e12-leer n="3" feld="20"></m-e12-leer>
       <div class="e12-rechts">
-        <p class="e12-frage">Mal links 3 Leute oder Tiere, oben 3 Dinge. Denk dir aus, wer was mag. Schreib Hinweise.</p>
-        <div class="e12-schreib"><div><b>1</b><span></span></div><div><b>2</b><span></span></div><div><b>3</b><span></span></div></div>
+        <p class="e12-frage">Schreib Hinweise:</p>
+        <ol class="e12-schreib"><li><span></span><span></span></li><li><span></span><span></span></li><li><span></span><span></span></li></ol>
+        <p class="lsg-nur">Mehrere Lösungen möglich: jedes Rätsel, das ohne Raten genau eine Lösung hat.</p>
         <p class="e12-frage">Gibt es genau eine Lösung?</p>
       </div>
     </div>
-    <p class="lsg-nur">Mehrere Lösungen möglich: jedes Rätsel, das ohne Raten genau eine Lösung hat.</p>
   </div>
 </section>

@@ -124,7 +124,7 @@ m-e12-loesung, m-e12-anzahl { display: inline; }
     const stapel = !!o.stapel;            // Zeilen-Kopf: Bild über dem Wort (schmaler)
     const maxWortZ = Math.max(...wortZ.map((w) => wortBreite(w, fs)));
     const kopfB = leer ? feld + 6 : stapel ? r2(Math.max(feld, bg + 4, maxWortZ + 3)) : r2(Math.max(feld, 2.5 + bg + 2 + maxWortZ + 3));
-    const kopfH = leer ? feld + 4 : r2(2 + bg + 1.2 + fs + 1.8);
+    const kopfH = leer ? feld + 1 : r2(2 + bg + 1.2 + fs + 1.8);   // leer: flacher Kopf, Rahmen 15 · 16 mm (Platz für lange Schreiblinien auf Blatt 12-3)
     const W = r2(kopfB + n * feld), Hh = r2(kopfH + n * feld);
     const pad = 0.6;
     let s = '';
