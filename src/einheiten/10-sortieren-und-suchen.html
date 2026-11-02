@@ -36,7 +36,8 @@
   .e10-paar .aufg > m-e10-netz { align-self: center; }
   .e10-profi-reihe { display: flex; align-items: center; gap: 6mm; }
   .e10-profi-reihe > p { flex: 1; margin: 0; }
-  .e10-leitern { display: grid; grid-template-columns: auto auto auto; justify-content: start; gap: 3mm 4mm; align-items: center; }
+  .e10-leitern { display: grid; grid-template-columns: auto auto auto auto; justify-content: start; gap: 3mm 4mm; align-items: center; }
+  .e10-leitern > .e10-trenn { grid-column: 3; grid-row: 1 / 5; align-self: stretch; border-left: 0.5mm solid var(--linie); }
   .e10-leitern .e10-bis { white-space: nowrap; line-height: 1.1; }
   .e10-leitern .e10-bsp { color: var(--grau); display: block; line-height: 1; }
   .e10-leitern .e10-kopf { font-size: 14pt; color: var(--grau); text-align: center; line-height: 1; }
@@ -100,7 +101,7 @@
       <div class="sag">
         <p class="du">„Das Netz kann nicht denken. Es vergleicht immer nur zwei. Kannst du es austricksen?“</p>
         <p class="sie">„Ich stell die 8 ganz auf die kleine Seite. Das schafft es nie!“</p>
-        <p class="dann">Es schafft es. Ganz verkehrt herum (größte Zahl auf der kleinen Seite) wird an allen 6 Stellen getauscht.</p>
+        <p class="dann">Es schafft es. Stehen alle vier ganz verkehrt herum (von groß nach klein, z. B. 8, 5, 3, 1), wird sogar an allen 6 Stellen getauscht.</p>
       </div>
     </div></li>
     <li data-min="5"><div><b>Blatt „Das Sortier-Netz“.</b> <a class="blattref" href="#blatt-10-1"></a>: Finger fährt jede Bahn mit, Vergleichs-Stellen von oben nach unten. Bei Aufgabe 2 jede Vergleichs-Stelle prüfen: Steht die größere am kleinen Punkt?
@@ -231,7 +232,7 @@
   <div class="sag">
     <p class="du">„Das Netz kann nicht denken. Es vergleicht immer nur zwei. Kannst du es austricksen?“</p>
     <p class="sie">„Ich stell die 8 ganz auf die kleine Seite und die 1 ganz auf die große. Das schafft es nie!“</p>
-    <p class="dann">Es schafft es doch, und dabei wird an allen 6 Vergleichs-Stellen getauscht: Ganz verkehrt herum ist die schwerste Reihenfolge. Sag: „Das Netz ist ein Programm. Es macht immer dasselbe, und es klappt bei jeder Reihenfolge. Das Programm im Heft hat alle 24 ausprobiert.“</p>
+    <p class="dann">Es schafft es doch. Stehen alle vier ganz verkehrt herum, von groß nach klein (z. B. 8, 5, 3, 1), wird sogar an allen 6 Vergleichs-Stellen getauscht: Das ist die schwerste Reihenfolge. Sag: „Das Netz ist ein Programm. Es macht immer dasselbe, und es klappt bei jeder Reihenfolge. Das Programm im Heft hat alle 24 ausprobiert.“</p>
   </div>
   <div class="sag">
     <p class="du">„Ich denke mir eine Zahl von 1 bis 16. Du darfst nur fragen: Ist deine Zahl größer als …?“</p>
@@ -331,9 +332,9 @@
       <p class="klein"><i>Für zwischendurch: im Auto, beim Abendessen, beim Zähneputzen.</i></p>
       <p><b>Fragen zählen:</b> „Ich denke an eine Zahl von 1 bis 8. Wie viele Fragen brauchst du höchstens?“</p>
       <p><b>Doppelt so viele:</b> „Und bei 1 bis 32? Bei 1 bis 64?“</p>
-      <p><b>Kuscheltier-Reihe:</b> „Bär, Hase und Ente setzen sich in eine Reihe. Wie viele verschiedene Reihen gibt es?“</p>
+      <p><b>Kuscheltier-Tausch:</b> „Ente, Hase und Bär sitzen in einer Reihe. Richtig wäre Bär, Hase, Ente, also genau verkehrt herum. Immer nur zwei Nachbarn dürfen tauschen. Wie oft muss man wenigstens tauschen?“</p>
       <p><b>Für Profis:</b> „Mit 10 Fragen: Bis zu welcher Zahl findest du jede?“</p>
-      <p class="klein"><b>Kurz-Lösungen:</b> 3 Fragen (8, 4, 2, 1); 5 und 6 Fragen; 6 Reihen; bis 1024 (zehnmal verdoppeln), also sicher bis 1000. Mehr bei den Lösungen am Ende.</p>
+      <p class="klein"><b>Kurz-Lösungen:</b> 3 Fragen (8, 4, 2, 1); 5 und 6 Fragen; 3 Tausche; bis 1024 (zehnmal verdoppeln), also sicher bis 1000. Mehr bei den Lösungen am Ende.</p>
     </div>
   </div>
 
@@ -400,7 +401,7 @@
     <div class="kasten loesung">
       <p><b><a class="blattref" href="#blatt-10-1"></a>, Aufgabe 1:</b> Erste Vergleichs-Stelle: 7 und 2 tauschen (2, 7). Zweite: 7 und 5 tauschen (5, 7). Dritte: 2 und 5 bleiben. Am Ziel: <m-e10-wert raetsel="e10-n1" was="ende"></m-e10-wert>.</p>
       <p><b>Aufgabe 2 (Kobold):</b> die zweite Vergleichs-Stelle (Bahn 2 und 3): Dort steht die 8 am kleinen Punkt und die 3 am großen: Der Kobold hat nicht getauscht. Richtig wäre 3 und 8, dann käme am Ziel <m-e10-wert raetsel="e10-k1" was="ende"></m-e10-wert> an statt 6, 8, 3.</p>
-      <p><b>Profi:</b> Start <m-e10-wert raetsel="e10-q1" was="antwort"></m-e10-wert>, also die größte Zahl auf der kleinen Seite. Das ist die einzige Reihenfolge, bei der alle 3 Vergleichs-Stellen tauschen (geprüft).</p>
+      <p><b>Profi:</b> Start <m-e10-wert raetsel="e10-q1" was="antwort"></m-e10-wert>, also alle drei ganz verkehrt herum, von groß nach klein. Das ist die einzige Reihenfolge, bei der alle 3 Vergleichs-Stellen tauschen (geprüft).</p>
     </div>
   </div>
   <div class="kasten loesung darf-brechen e10-bricht e10-weiter">
@@ -409,7 +410,7 @@
     <p><b>Profi:</b> <m-e10-wert raetsel="e10-l4" was="leiter"></m-e10-wert>: <m-e10-wert raetsel="e10-l4" was="fragen"></m-e10-wert> Fragen. Wer bei ungeraden Zahlen die kleinere Hälfte nimmt (aus 25 wird 12, aus 3 wird 1), kommt auf 100, 50, 25, 12, 6, 3, 1, also 6: Das stimmt nur mit Glück (wenn die Antwort jedes Mal in die kleinere Hälfte führt). Höchstens heißt: auch im schlimmsten Fall.</p>
     <p><b><a class="blattref" href="#blatt-10-3"></a>, Aufgabe 1:</b> Reihe 1: 6 und 9 bleiben, 1 und 4 bleiben. Reihe 2: 9 und 1 tauschen. Reihe 3: 6 und 1 tauschen, 9 und 4 tauschen. Reihe 4: 6 und 4 tauschen. Am Ziel: <m-e10-wert raetsel="e10-n2" was="ende"></m-e10-wert>.</p>
     <p><b>Knobel-Ecke:</b> 6 Reihenfolgen: 123, 132, 213, 231, 312, 321 (die Reihenfolge der Zeilen ist egal). Alle 6 kommen im Netz von <a class="blattref" href="#blatt-10-1"></a> sortiert an.</p>
-    <p><b>Bonus-Knobelei:</b> Fragen zählen: 8, 4, 2, 1, also 3 Fragen. Doppelt so viele: bis 32 sind es 5 Fragen, bis 64 sind es 6. Kuscheltier-Reihe: 6 Reihen (wer vorne sitzt: 3 Möglichkeiten, dann noch 2 für den zweiten Platz, <span class="rechnung">3 · 2 = 6</span>). Für Profis: Zehnmal verdoppeln ergibt 1024, mit 10 Fragen findet man jede Zahl von 1 bis 1024.</p>
+    <p><b>Bonus-Knobelei:</b> Fragen zählen: 8, 4, 2, 1, also 3 Fragen. Doppelt so viele: bis 32 sind es 5 Fragen, bis 64 sind es 6. Kuscheltier-Tausch: 3 Tausche, zum Beispiel zuerst Ente und Hase (Hase, Ente, Bär), dann Ente und Bär (Hase, Bär, Ente), zuletzt Hase und Bär (Bär, Hase, Ente). Weniger geht nicht: Alle 3 Paare (Ente und Hase, Ente und Bär, Hase und Bär) sitzen verkehrt, und jeder Nachbar-Tausch bringt nur eines davon in Ordnung. Wer mag, fragt weiter: „Und wenn auch zwei tauschen dürfen, die nicht nebeneinander sitzen?“ (1 Tausch: Ente und Bär.) Für Profis: Zehnmal verdoppeln ergibt 1024, mit 10 Fragen findet man jede Zahl von 1 bis 1024.</p>
     <p><b>Bildschirm-Levels (zum Nachschauen):</b> Die Halbier-Levels haben keine feste Lösung, die App denkt sich jedes Mal eine neue Zahl. Mit genauem Halbieren braucht man bei 8, 16 und 32 immer genau 3, 4 und 5 Fragen, bei 100 je nach Zahl 6 oder 7.</p>
     <table class="tab e10-tab">
       <tr><th>Level</th><th>Was ist es?</th><th>Lösung</th></tr>
@@ -466,6 +467,7 @@
   <div class="aufg">
     <p class="anw">Jede gute Frage halbiert. Halbiere, bis nur noch 1 Zahl übrig ist. Jeder Pfeil ist eine Frage. Wie viele Fragen brauchst du höchstens?</p>
     <div class="e10-leitern">
+      <span class="e10-trenn"></span>
       <span></span><span></span><span class="e10-kopf">Fragen</span>
       <span class="e10-bis">1 bis 8<span class="e10-bsp klein">So geht’s:</span></span><m-e10-leiter raetsel="e10-l1" beispiel zahl="nein" pfeil="10"></m-e10-leiter><m-e10-zahl raetsel="e10-l1" was="fragen" zeige></m-e10-zahl>
       <span class="e10-bis">1 bis 16</span><m-e10-leiter raetsel="e10-l2" zahl="nein" pfeil="10"></m-e10-leiter><m-e10-zahl raetsel="e10-l2" was="fragen"></m-e10-zahl>
