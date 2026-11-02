@@ -9,6 +9,7 @@
 <style>
   .e05-ablauf > li { break-inside: avoid; }
   .e05-ganz > li { break-inside: auto; orphans: 2; widows: 2; }
+  .e05-ganz > li.e05-ganz-halten { break-inside: avoid; }
   .kasten.e05-bricht { -webkit-box-decoration-break: clone; box-decoration-break: clone; }
   .kasten.e05-bricht > .kasten-titel { break-after: avoid; }
   .kasten.e05-bricht > .kasten-titel + p, .kasten.e05-bricht > .kasten-titel + ul > li:first-child { break-before: avoid; break-inside: avoid; }
@@ -21,6 +22,8 @@
   .e05-loes > .kasten.loesung p { margin-bottom: 1.6mm; }
   .kasten.loesung.e05-weiter p { margin-bottom: 1.6mm; }
   .e05-tab td:first-child { width: 13%; }
+  table.tab.e05-tab { margin-bottom: 1mm; }
+  table.tab.e05-tab td { padding-top: 0.5mm; padding-bottom: 0.5mm; vertical-align: middle; }
   .e05-tab td:nth-child(3) { width: 14%; }
   /* kleine Programm-Reihen im Fließtext der Anleitung */
   .e05-mini .prog { gap: 0.8mm; vertical-align: middle; align-items: center; }
@@ -382,7 +385,7 @@
       <li><b>Wie viele Bewegungen?</b> Mit Tanz-Karten: „4-mal: klatschen, klatschen, hüpfen“. Wie oft klatscht man, wie oft hüpft man, wie viele Bewegungen sind es? Sie darf Runden mit Strichen zählen: 8-mal klatschen, 4-mal hüpfen, 12 Bewegungen. Wer schon „mal“ kennt (in der Rechen-Werkstatt kommt es später): 4 · 3 = 12.</li>
       <li><b>Rekord-Tanz:</b> Wer schafft den längsten Tanz mit genau 4 Karten? (Ein Kasten „5-mal“ mit 3 Tanz-Karten darin: 15 Bewegungen. Mehr geht mit 4 Karten nicht.) Und mit 5 Karten? (Der Kasten „5-mal“ mit 3 Tanz-Karten und eine Karte davor oder danach: 16 Bewegungen. 4 Tanz-Karten passen nicht in den Kasten, und zwei Kästen „5-mal“ mit 1 und 2 Tanz-Karten darin bringen nur 15.)</li>
       <li><b>Muster selbst erfinden:</b> Auf Kästchenpapier schreibt {{KIND}} für jede Zeile einen Zauber-Kasten, du malst das Bild nach ihrem Programm, ohne zu schauen, was sie sich gedacht hat. Stimmt dein Bild mit ihrem überein? Ideen: Zaun (Zeile 1 „4-mal: blau, leer, leer“, Zeile 2 „4-mal: blau, blau, blau“), Schachbrett (Zeile 1 „5-mal: rot, leer“, Zeile 2 „5-mal: leer, rot“), Regenbogen-Streifen (jede Zeile „4-mal“ mit einer Farbe drei Mal).</li>
-      <li><b>Fehler im Kasten:</b> Der Kobold hat die Zahl vertauscht: Du legst „4-mal: vor“, aber bis zum Kuscheltier sind es 5 Schritte. {{KIND}} findet den Fehler und tauscht die Zahlenkarte. Merke: Ein Fehler im Kasten passiert in jeder Runde, der Kobold richtet dort gleich mehrfach Unsinn an.</li>
+      <li class="e05-ganz-halten"><b>Fehler im Kasten:</b> Der Kobold hat die Zahl ausgetauscht: Du legst „4-mal: vor“, aber bis zum Kuscheltier sind es 5 Schritte. {{KIND}} findet den Fehler und tauscht die Zahlenkarte. Merke: Ein Fehler im Kasten passiert in jeder Runde, der Kobold richtet dort gleich mehrfach Unsinn an.</li>
       <li><b>Kasten im Kopf:</b> „Ich denke an einen Zauber-Kasten. Danach steht der Roboter wieder am Kreuz und schaut genau wie am Anfang. Welcher kann es sein?“ (Viele Lösungen: „4-mal: rechts drehen“, „2-mal: links drehen, links drehen“, „4-mal: vor, rechts drehen“, „4-mal: vor, vor, links drehen“ …) Wer findet einen, der wirklich läuft und nicht nur dreht?</li>
     </ol>
   </div>
@@ -396,10 +399,10 @@
 
   <h2>Bildschirm-Bonus</h2>
   <div class="kasten bildschirm darf-brechen e05-bricht">
-    <p><b>Paket 5 „Wiederhol-Zauber“.</b> Den QR-Code findest du auf <a class="blattref" href="#blatt-5-1"></a> unten rechts. Nur am Schluss, nach den Blättern, höchstens 15 Minuten. Die Einheit funktioniert auch ganz ohne Bildschirm.</p>
-    <p><b>9 Levels:</b> Drachen-Pfade mit Zauber-Kasten und <b>Kartengrenze</b>. Die App zeigt, wie viele Karten erlaubt sind, und zählt genauso wie am Papier. Level 1 bis 6 gehen mit einem Befehl im Kasten, Level 7 bis 9 brauchen eine Gruppe. Bei Level 5, 6 und 9 liegen die Steine mitten im Weg, der Drache muss einen Bogen machen. <b>Level 2 ist Aufgabe 2 von <a class="blattref" href="#blatt-5-2"></a>, Level 8 ist die Profi-Aufgabe von diesem Blatt.</b> Am besten spielt {{KIND}} sie nach dem Blatt: Dann sieht sie ihr eigenes Programm laufen.</p>
-    <p><b>So geht der Zauber-Kasten in der App:</b> Zauber-Kasten antippen, Zahl wählen (2 bis 5), die Befehle für den Kasten antippen (höchstens 3, wie am Papier), „fertig“ tippen. Dann „Los“. Der Drache läuft langsam, der laufende Befehl leuchtet auf. Die Taste mit der Karte und dem roten X löscht den letzten Befehl, „Nochmal“ stellt den Drachen zurück an den Start (das Programm bleibt). Einen Stern gibt es, sobald der Drache mit erlaubter Kartenzahl beim Schatz ankommt.</p>
-    <p><b>Wann weglegen:</b> Nach Level 9 kommt „Super! Jetzt zurück zum Papier.“ Dann ist Schluss, auch wenn noch Zeit wäre. Wer beim Tanz noch Energie hat: lieber ein Rekord-Tanz als ein weiteres Level.</p>
+    <p><b>Paket 5 „Wiederhol-Zauber“,</b> QR-Code auf <a class="blattref" href="#blatt-5-1"></a> unten rechts. Nur am Schluss, nach den Blättern, höchstens 15 Minuten; die Einheit geht auch ganz ohne Bildschirm.</p>
+    <p><b>9 Levels:</b> Drachen-Pfade mit Zauber-Kasten und <b>Kartengrenze</b>. Die App zeigt, wie viele Karten erlaubt sind, und zählt genauso wie am Papier. Ab Level 7 braucht der Kasten eine Gruppe. <b>Level 2 ist Aufgabe 2 von <a class="blattref" href="#blatt-5-2"></a>, Level 8 die Profi-Aufgabe von diesem Blatt.</b> Am besten spielt {{KIND}} sie nach dem Blatt: Dann sieht sie ihr eigenes Programm laufen.</p>
+    <p><b>So geht der Zauber-Kasten in der App:</b> Zauber-Kasten antippen, Zahl wählen (2 bis 5), die Befehle darin antippen (höchstens 3, wie am Papier), „fertig“ tippen, dann „Los“. Die Taste mit dem roten X löscht den letzten Befehl, „Nochmal“ stellt den Drachen zurück an den Start, das Programm bleibt. Einen Stern gibt es, sobald der Drache mit erlaubter Kartenzahl beim Schatz ankommt.</p>
+    <p><b>Wann weglegen:</b> Nach Level 9 kommt „Super! Jetzt zurück zum Papier.“ Dann ist Schluss, auch wenn noch Zeit wäre.</p>
   </div>
 
   <h2>Lösungen</h2>
