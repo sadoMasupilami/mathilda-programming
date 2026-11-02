@@ -24,7 +24,8 @@
      <m-e20-code raetsel="e20-verstecke" [stellen="8"] [beispiel="KASTEN"] [gr="15"]>
          Fest-Rätsel am Blatt: oben Kästchen für die Code-Buchstaben (nummeriert wie die
          Stationen), darunter Kästchen für das Versteck. Lösungsansicht: das Beispiel-Versteck
-         rot (Geheimschrift mit der Schlüssel-Zahl des Rätsels, mit web/kern/geheim.js gerechnet).
+         rot (Geheimschrift mit der Schlüssel-Zahl des Rätsels, mit web/kern/geheim.js gerechnet),
+         dazu rot „z. B.“ unter „Versteck“.
      <m-e20-verstecke raetsel="e20-verstecke" [spick]>
          Tabelle für die Vorbereitung: wie viele Stationen, Versteck, Code-Buchstaben für die
          Rückseiten der Stationen-Karten (aus dem Löser, zur Probe noch einmal gelesen).
@@ -56,6 +57,7 @@ m-e20-code, m-e20-verstecke { display: block; }
 .e20-code .e20-pfeil { display: flex; justify-content: center; line-height: 0; }
 .e20-code .e20-pfeil svg { display: block; }
 .loesungsmodus .e20-code .e20-cbox.mit-lsg { border-color: var(--rot); }
+.e20-code .e20-zb { line-height: 1.1; }
 table.e20-verstecke .e20-gt { font-family: var(--kind); font-weight: 700; letter-spacing: 0.18em; white-space: nowrap; }
 table.e20-verstecke .e20-kl { font-family: var(--kind); font-weight: 700; white-space: nowrap; }
 table.tab.e20-verstecke { break-inside: avoid; }
@@ -221,7 +223,9 @@ table.tab.e20-verstecke { break-inside: avoid; }
     for (let i = 0; i < n; i++) html += zelle(paar ? paar[1][i] : '', 'code');
     html += '<span></span>';
     for (let i = 0; i < n; i++) html += '<span class="e20-pfeil">' + PFEIL(gr * 0.45) + '</span>';
-    html += '<span class="e20-cl">Versteck</span>';
+    // Lösungsansicht: „z. B.“ rot unter „Versteck“ (das Beispiel hängt vom Versteck ab). Zweite Zeile im Feld neben
+    // den Kästchen, macht das Blatt also nicht höher; der ganze Satz steht im Lösungstext der Anleitung.
+    html += '<span class="e20-cl">Versteck' + (paar ? '<span class="lsg-nur e20-zb">z. B.</span>' : '') + '</span>';
     for (let i = 0; i < n; i++) html += zelle(paar ? paar[0][i] : '', 'klar');
     html += '</div>';
     el.innerHTML = html;
