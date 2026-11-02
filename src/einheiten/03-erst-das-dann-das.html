@@ -19,7 +19,7 @@
   .e03-bilder { display: flex; gap: 3mm; align-items: flex-end; margin: 1mm 0 2mm 0; }
   .e03-bilder > span { display: inline-flex; flex-direction: column; align-items: center; gap: 0.8mm; font-size: 8.5pt; color: var(--grau); }
   /* Blätter */
-  .e03-hinweis { margin: 0; }
+  .blatt .e03-hinweis { margin: 0; }
   .e03-mitte { display: flex; justify-content: center; }
   .e03-kobold-anw { display: flex; align-items: center; gap: 3mm; }
   .e03-unten { display: flex; gap: 6mm; align-items: flex-end; justify-content: space-between; }
@@ -411,14 +411,13 @@
 <section class="blatt" data-einheit="3" data-titel="Was kommt zuerst?" data-art="Arbeitsblatt" data-verteilt>
   <div class="aufg">
     <p class="anw">{{KIND}}, aus dem Drachen-Ei schlüpft ein Baby. Was kommt zuerst? Schreib 1, 2, 3, 4, 5 in die Kästchen.</p>
-    <m-ablauf raetsel="e3-ei" gr="25" breite="33"></m-ablauf>
+    <m-ablauf raetsel="e3-ei" gr="23" breite="33"></m-ablauf>
   </div>
 
   <div class="aufg">
     <p class="anw e03-kobold-anw"><span>Der Fehler-Kobold hat zwei Karten vertauscht! Kreise die zwei Karten ein.</span> <m-symbol name="kobold" gr="14"></m-symbol></p>
-    <m-ablauf raetsel="e3-jause" modus="falsch" reihe="teller,brot,schinken,butter,essen" tausch="3,4" gr="25" breite="33"></m-ablauf>
-    <p class="e03-hinweis" style="margin-top:3mm">Was passiert mit dem Butterbrot? Erzähl es!</p>
-    <p class="lsg-nur">Die Butter kommt oben auf den Schinken.</p>
+    <m-ablauf raetsel="e3-jause" modus="falsch" reihe="teller,brot,schinken,butter,essen" tausch="3,4" gr="23" breite="33"></m-ablauf>
+    <p class="e03-hinweis" style="margin-top:2mm">Was passiert mit dem Butterbrot? Erzähl es! <span class="lsg-nur">Die Butter kommt oben auf den Schinken.</span></p>
   </div>
 
   <div class="e03-unten">
