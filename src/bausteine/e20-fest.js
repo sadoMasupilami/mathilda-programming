@@ -9,12 +9,14 @@
          Muggelstein-Brett). weg: der rote Weg der Lösung des Lösers (pfad: Beispiel
          bzw. kürzestes Programm, lesen: das Programm, kobold: die gemeinte Reparatur).
          Auf einem Blatt ist es verboten (dort m-gitter mit mindestens 20 mm).
-     <m-e20-prog raetsel="e20-x-pfad" [teil="loesung|programm"] [gr="6"] [alle [anzahl="2"]]>
+     <m-e20-prog raetsel="e20-x-pfad" [teil="loesung|programm"] [gr="6"] [alle [anzahl="2"] [untereinander]]>
          ein Programm als kleine Programm-Reihe (Anleitung):
          loesung   pfad: Beispiel bzw. das (einzige) kürzeste Programm, mit Zauber-Kasten
                    das kürzeste mit Zauber-Kasten; lesen: das Programm; kobold: repariert
          programm  kobold: das kaputte Programm; lesen: das Programm
          alle      pfad: alle Programme mit der kleinsten Zahl (Befehle bzw. Karten), mit anzahl geprüft
+         untereinander  (nur mit alle) jedes Programm und jedes „oder“ in einer eigenen Zeile,
+                   für hohe Programme mit Zauber-Kasten oder Wenn-dann-Kasten (wird ein eigener Block)
      <m-e20-wert raetsel="e20-x-kuchen2" pfad="anzahl" [l="5"]>
          eine Zahl (oder ein Wort) aus der Lösung des Lösers im Fließtext, z. B. pfad="laenge",
          "zauber.minKarten", "erweitert.minKarten", "fragen", "anzahl", "zuordnung.oma".
@@ -41,6 +43,9 @@
 m-e20-gitter { display: inline-block; vertical-align: middle; line-height: 0; }
 m-e20-gitter svg { display: block; }
 m-e20-prog { display: inline; }
+m-e20-prog.e20-unter { display: block; margin: 1.2mm 0 1.6mm 0; }
+m-e20-prog.e20-unter > .e20-pz { display: block; }
+m-e20-prog.e20-unter > .e20-oder { display: block; margin: 0.9mm 0; line-height: 1.2; }
 m-e20-code, m-e20-verstecke { display: block; }
 .e20-code { display: grid; grid-template-columns: auto repeat(var(--n, 8), var(--gr, 15mm)); column-gap: 2mm; row-gap: 1.2mm; align-items: center; justify-content: start; }
 .e20-code .e20-cl { font-family: var(--kind); font-size: 16pt; line-height: 1.1; padding-right: 2.5mm; white-space: nowrap; }
@@ -123,6 +128,7 @@ table.tab.e20-verstecke { break-inside: avoid; }
   // <m-e20-prog raetsel [teil] [gr]>  → eine m-programm-Reihe (wird danach von programmieren.js gezeichnet)
   // ---------------------------------------------------------------------
   B['m-e20-prog'] = function (el) {
+    stil();
     const r = raetselVon(el, ['pfad', 'lesen', 'kobold']);
     if (!r) return;
     const teil = el.getAttribute('teil') || 'loesung';
@@ -146,14 +152,27 @@ table.tab.e20-verstecke { break-inside: avoid; }
       if (el.hasAttribute('anzahl') && +el.getAttribute('anzahl') !== n) return H().fehler(el, 'anzahl="' + el.getAttribute('anzahl') + '", der Löser zählt ' + n);
     }
     const gr = el.getAttribute('gr') || '6';
+    const unter = el.hasAttribute('untereinander');
+    if (unter && !el.hasAttribute('alle')) return H().fehler(el, 'untereinander nur mit alle');
     el.innerHTML = '';
+    if (unter) el.classList.add('e20-unter');
     liste.forEach((x, i) => {
-      if (i) el.appendChild(document.createTextNode(i === liste.length - 1 ? ' oder ' : ', '));
+      if (i && unter) {
+        const o = document.createElement('span');
+        o.className = 'e20-oder';
+        o.textContent = 'oder';
+        el.appendChild(o);
+      } else if (i) el.appendChild(document.createTextNode(i === liste.length - 1 ? ' oder ' : ', '));
       const p = document.createElement('m-programm');
       p.setAttribute('befehle', typeof x === 'string' ? x : K().alsText(x));
       p.setAttribute('gr', gr);
       p.setAttribute('nummern', 'nein');
-      el.appendChild(p);
+      if (unter) {
+        const z = document.createElement('span');
+        z.className = 'e20-pz';
+        z.appendChild(p);
+        el.appendChild(z);
+      } else el.appendChild(p);
     });
     el.classList.add('geprueft');
   };
