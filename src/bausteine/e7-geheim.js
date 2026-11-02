@@ -5,7 +5,7 @@
    In der Lösungsansicht stehen sie rot.
 
      <m-e7-lesen raetsel="e7-l1" [umbruch="2"] [gr="12"] [bilder="nein"]>
-         Geheimtext, darunter Kästchen zum Eintragen; optional Bilder zum Anmalen
+         Geheimtext, darunter Kästchen zum Eintragen; optional Bilder zum Einkreisen
          (Lösung: rote Buchstaben, das passende Bild rot eingekreist).
          umbruch: neue Zeile nach dem 2. Wort (mehrere: "2,4")
      <m-e7-knacken raetsel="e7-p1">     wie lesen, dazu „Schlüssel-Zahl“ zum Eintragen
