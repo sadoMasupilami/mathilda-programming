@@ -1,6 +1,6 @@
 # Denk- und Programmier-Werkstatt
 
-Ein druckbarer Guide plus eine kleine Web-App, mit dem ein Elternteil mit seiner Tochter (6 Jahre, 1. Klasse Volksschule, Österreich) logisch denken und programmieren lernt: mit Befehlen, Programmen, Fehler-Kobolden und dem Wiederhol-Zauber, dann mit Mustern, Geheimcodes, Sortieren und Suchen, Wenn-dann-Regeln, Logik, Labyrinthen, Zaubersprüchen und Strategiespielen. Fast alles läuft am Papier, mit Bewegung und Basteln. Die Web-App ist ein kurzer, freiwilliger Bildschirm-Bonus am Ende einer Einheit.
+Ein druckbarer Guide plus eine kleine Web-App, mit dem ein Elternteil mit seiner Tochter (6 Jahre, 1. Klasse Volksschule, Österreich) logisch denken und programmieren lernt: mit Befehlen, Programmen, Fehler-Kobolden und dem Wiederhol-Zauber, dann mit Mustern, Geheimcodes, Sortieren und Suchen, Wenn-dann-Regeln, Logik, Labyrinthen, Zaubersprüchen und Strategiespielen. Fast alles läuft am Papier, mit Bewegung und Basteln. Die Web-App ist ein kurzer, freiwilliger Bildschirm-Bonus am Ende einer Einheit (höchstens 15 Minuten, siehe `plan/lehrplan.md` Abschnitt 9).
 
 Stand: **alle 20 Einheiten** sind ausformuliert, in vier Blöcken: A (1–5) Befehle, Programme, Fehler; B (6–10) Muster und Geheimcodes; C (11–14) Wenn-dann und Logik; D (15–20) Strategie und Projekte. Dazu die Web-Pakete **e2–e20** (ohne e18: Einheit 1 und 18 sind bewusst ohne Bildschirm). Plan, verbindliche Begriffe und Übersicht der Pakete: `plan/lehrplan.md`.
 
