@@ -177,6 +177,8 @@ try {
   await page.goto(pathToFileURL(htmlDatei).href);
   await page.waitForFunction(() => window.__fertig === true, null, { timeout: 60000 });
   await page.evaluate(() => document.fonts.ready);
+  // Was erst mit fertigem Layout geht (Lösungs-Miniaturen, die mit den roten Texten höher als A4 werden)
+  await page.evaluate(() => window.__nachLayout && window.__nachLayout());
 
   const erg = await page.evaluate(() => window.__pruefe());
   alleFehler.push(...erg.fehler, ...konsole.map((k) => 'Browser: ' + k));

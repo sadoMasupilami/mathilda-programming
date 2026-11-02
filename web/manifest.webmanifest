@@ -1,7 +1,7 @@
 {
   "name": "Denk-Werkstatt",
   "short_name": "Werkstatt",
-  "description": "Drachen-Pfade, Ablauf-Karten, Kobold-Jagd und Wiederhol-Zauber zu den Blättern der Denk- und Programmier-Werkstatt.",
+  "description": "Rätsel und Spiele zum Antippen, passend zu den Blättern der Denk- und Programmier-Werkstatt.",
   "lang": "de-AT",
   "start_url": "./",
   "scope": "./",

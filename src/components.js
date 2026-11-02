@@ -984,6 +984,30 @@
       el.appendChild(raster);
     });
   }
+  // Nach dem Layout (build.mjs, wenn die Schriften geladen sind, und nach dem Eintragen der Seitenzahlen):
+  // Machen die roten Lösungstexte ein Blatt höher als A4, wird seine Miniatur so viel länger, statt unten
+  // abzuschneiden (overflow: hidden) oder die Fußzeile zu verdecken. Bis 3 mm passt es ins Polster über der
+  // Fußzeile. Die Prüfung (2b) meldet jede Verlängerung, damit die Einheit ihre Lösungstexte kürzt.
+  function passeMinisAn() {
+    document.querySelectorAll('.loesung-mini > .rahmen-mini > .seite').forEach((s) => {
+      const rahmen = s.parentElement;
+      if (!s.getClientRects().length) return;   // gerade nicht sichtbar (z. B. Kopiervorlagen): nichts messen, nichts ändern
+      s.style.height = '';
+      rahmen.style.height = '';
+      delete s.dataset.laengerMm;
+      const a4 = s.offsetHeight;
+      for (let runde = 0; runde < 3; runde++) {
+        const inhalt = s.querySelector(':scope > .inhalt');
+        const ueber = Math.max(inhalt ? inhalt.scrollHeight - inhalt.clientHeight : 0, s.scrollHeight - s.clientHeight);
+        if (ueber <= 3 * MM) break;
+        const h = (s.offsetHeight + ueber) / MM;
+        s.style.height = h.toFixed(2) + 'mm';
+        rahmen.style.height = 'calc(' + h.toFixed(2) + 'mm * var(--s))';
+        s.dataset.laengerMm = Math.round((s.offsetHeight - a4) / MM);
+      }
+    });
+  }
+  window.__nachLayout = passeMinisAn;
 
   // Inhaltsverzeichnis
   function baueInhalt() {
@@ -1045,6 +1069,7 @@
       s.textContent = p ? ' (S. ' + p + ')' : '';
       if (!p) fehlt.push(s.dataset.ref);
     });
+    passeMinisAn();
     return fehlt;
   };
 
@@ -1241,6 +1266,20 @@
         if (!s.querySelector('.profi, .knobel')) W(s, 'Blatt ohne Profi- oder Knobel-Ecke');
         if (!s.textContent.includes(KIND)) W(s, KIND + ' kommt auf dem Blatt nicht namentlich vor');
       }
+    });
+
+    // 2b. Lösungsansicht: Die roten Lösungstexte (lsg-nur, Erklärungen) machen ein Blatt höher. passeMinisAn()
+    //     verlängert dann die Miniatur (Warnung: Lösungstexte kürzen, damit das Blatt wieder auf A4 passt).
+    //     Liegt danach noch Inhalt auf der Fußzeile oder wird etwas abgeschnitten (overflow: hidden), ist das ein Fehler.
+    //     F und W schreiben direkt in die Listen (fehler() und warnung() verwerfen Meldungen aus .loesungsmodus).
+    document.querySelectorAll('.loesung-mini > .rahmen-mini > .seite').forEach((s) => {
+      if (getComputedStyle(s).display === 'none') return;
+      const inhalt = s.querySelector(':scope > .inhalt');
+      const ueber = inhalt ? inhalt.scrollHeight - inhalt.clientHeight : 0;
+      const weg = s.scrollHeight - s.clientHeight;
+      if (weg > 1) F(s, 'Lösungs-Miniatur schneidet unten ' + Math.round(weg / MM) + ' mm ab');
+      else if (ueber > 3 * MM) F(s, 'In der Lösungs-Miniatur liegt Inhalt auf der Fußzeile (' + Math.round(ueber / MM) + ' mm zu hoch)');
+      else if (s.dataset.laengerMm) W(s, 'Mit den Lösungen ' + s.dataset.laengerMm + ' mm höher als A4: Die Miniatur ist dafür verlängert. Rote Lösungstexte auf diesem Blatt kürzen');
     });
 
     // 3. Anleitung: nichts breiter als der Satzspiegel
