@@ -195,6 +195,8 @@
     if (p.art === 'ablauf') return ICON.karten;
     // ab Block C: das Bild des neuen Kastens (Zauberspruch, „bis zum Schatz“, Wenn-dann)
     const erl = (x) => p.levels.some((l) => Array.isArray(l.erlaubt) && l.erlaubt.includes(x));
+    // alle neuen Kästen zusammen (Großer Roboter-Parcours): der Edelstein, nicht noch einmal das Siegel der Zaubersprüche
+    if (erl('spruch') && erl('bis') && erl('wenn')) return sym('edelstein');
     if (erl('spruch')) return sym('spruch-stern');
     if (erl('bis')) return sym('bis');
     if (erl('wenn') || p.levels.some((l) => Array.isArray(l.welten))) return sym('wenn');

@@ -229,7 +229,7 @@ m-spruch { display: inline-block; vertical-align: middle; line-height: 0; }
       if (erg.boxen > 12) h.fehler(el, erg.boxen + ' Kästchen in einer Programm-Reihe (höchstens 12)');
       if (erg.boxen > 11 && !el.hasAttribute('gr')) gr = 13;
       let html = '<span class="prog" style="--gr:' + gr + 'mm">' + erg.html + '</span>';
-      if (kobold && istLoesung(el)) html += '<span class="prog-reparatur">' + h.esc(reparaturText(kobold, teile)) + '</span>';
+      if (kobold && istLoesung(el)) html += '<span class="prog-reparatur">' + h.esc(reparaturText(kobold, teile, textOpt(el, r, mitNr))) + '</span>';
       el.innerHTML = html;
       el.classList.add('komp');
       if (r) el.classList.add('geprueft');
@@ -292,18 +292,29 @@ m-spruch { display: inline-block; vertical-align: middle; line-height: 0; }
       const gleich = (kobold.gleicheStellen || [rp.stelle]);
       const oder = (l) => l.length === 1 ? String(l[0]) : l.slice(0, -1).join(', ') + ' oder ' + l[l.length - 1];
       let t;
-      if (rp.art === 'tauschen') t = 'Befehl ' + rp.stelle + ': ' + n[rp.befehl] + ' statt ' + n[teile[rp.stelle - 1]];
+      // ohne Nummern auf dem Blatt kein „Befehl 3“: die Stelle in Worten wie bei den Kästen
+      if (!mitNr) t = reparaturText(kobold, teile, textOpt(el, r, false));
+      else if (rp.art === 'tauschen') t = 'Befehl ' + rp.stelle + ': ' + n[rp.befehl] + ' statt ' + n[teile[rp.stelle - 1]];
       else if (rp.art === 'loeschen') t = 'Befehl ' + oder(gleich) + ' streichen';
       else if (rp.stelle === 1) t = 'am Anfang fehlt ' + n[rp.befehl];
       else if (rp.stelle === teile.length + 1) t = 'am Ende fehlt ' + n[rp.befehl];
       else t = 'zwischen Befehl ' + (rp.stelle - 1) + ' und ' + rp.stelle + ' fehlt ' + n[rp.befehl];
-      if (rp.art === 'einfuegen' && gleich.length > 1) t += ' (oder an einer anderen Stelle in derselben Reihe: gleiches Programm)';
+      if (mitNr && rp.art === 'einfuegen' && gleich.length > 1) t += ' (oder an einer anderen Stelle in derselben Reihe: gleiches Programm)';
       html += '<span class="prog-reparatur">' + h.esc(t) + '</span>';
     }
     el.innerHTML = html;
     el.classList.add('komp');
     if (r) el.classList.add('geprueft');
   };
+  // Für den Kobold-Lösungstext: Stehen Nummern an der Programm-Reihe und an den Spruch-Reihen desselben Rätsels?
+  function textOpt(el, r, mitNr) {
+    const bereich = el.closest('section') || document;
+    return {
+      mitNr, zielSymbol: r && r.zielSymbol,
+      spruchNr: (name) => Array.from(bereich.querySelectorAll('m-spruch')).some((s) =>
+        s.getAttribute('name') === name && (!r || s.getAttribute('raetsel') === r.id) && s.getAttribute('nummern') !== 'nein'),
+    };
+  }
   function einfuegeMarke(befehl) {
     return '<span class="platz einfuegen-marke" style="width:auto"><span class="nr" style="color:var(--rot)">+</span>' +
       '<span class="box" style="border-color:var(--rot);border-style:dashed">' + S().symbol(befehl) + '</span></span>';
@@ -373,43 +384,118 @@ m-spruch { display: inline-block; vertical-align: middle; line-height: 0; }
     return { html, boxen };
   }
 
-  // Lösungstext eines Kobold-Rätsels mit Stellen (für Mama oder Papa)
+  // Lösungstext eines Kobold-Rätsels mit Stellen (für Mama oder Papa), die Stelle in Worten:
+  //   Kästen heißen wie am Papier („im Zauber-Kasten „3-mal““, „im Kasten „bis zum Schatz““, „im Wenn-dann-Kasten“,
+  //   „im Mond-Spruch“); gibt es mehrere gleiche, mit Ordnungszahl in Lesereihenfolge („im zweiten Wenn-dann-Kasten“).
+  //   „Befehl 4“ nur, wo die Nummern auf dem Blatt stehen (Programm- oder Spruch-Reihe ohne nummern="nein"),
+  //   sonst „zweite Karte“, und das nur, wenn der Befehl in seiner Reihe nicht ohnehin eindeutig ist.
+  //   o: { mitNr, spruchNr(name) → Nummern der Spruch-Reihe sichtbar?, zielSymbol }
   const BED_WORT = { stein: 'Stein vor der Nase', frei: 'frei vor der Nase', 'stein-links': 'Stein links', 'stein-rechts': 'Stein rechts', 'frei-links': 'frei links', 'frei-rechts': 'frei rechts' };
   function befehlWort(b) {
     const n = { vor: 'vor', links: 'links drehen', rechts: 'rechts drehen' };
     return n[b] || (String(b).charAt(0) === '@' ? K().SPRUCH_WORT[String(b).slice(1)] : String(b));
   }
-  function stelleWort(stelle) {
-    const t = String(stelle).split('.');
-    let s = '';
-    if (t[0].charAt(0) === '@') s = 'im ' + K().SPRUCH_WORT[t.shift().slice(1)] + ' ';
-    s += 'Teil ' + t[0];
-    for (let i = 1; i < t.length; i++) {
-      if (t[i] === 'dann' || t[i] === 'sonst') { s += ', nach „' + t[i] + '“ Befehl ' + t[i + 1]; i++; }
-      else s += ', darin Teil ' + t[i];
-    }
-    return s;
+  const ORD = ['erst', 'zweit', 'dritt', 'viert', 'fünft', 'sechst', 'siebt', 'acht', 'neunt', 'zehnt', 'elft', 'zwölft'];
+  const ord = (i, endung) => (ORD[i] ? ORD[i] + endung : (i + 1) + '.');   // i 0-basiert: ord(1, 'en') → „zweiten“
+  const gross = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  const istKasten = (t) => !!t && typeof t === 'object' && !t.spruch;
+  const kastenArt = (t) => (t.wenn ? 'wenn' : t.bis ? 'bis' : 'mal' + t.wdh);
+  function kastenName(t, o) {
+    if (t.wenn) return 'Wenn-dann-Kasten';
+    if (t.bis) return 'Kasten „bis zum ' + ({ ziel: 'Ziel', stern: 'Stern' }[o.zielSymbol] || 'Schatz') + '“';
+    return 'Zauber-Kasten „' + t.wdh + '-mal“';
   }
-  function reparaturText(kobold, teile) {
+  // alle Kästen einer Reihe samt Inhalt, in Lesereihenfolge
+  function kaestenIn(l, aus) {
+    for (const t of l) {
+      if (!istKasten(t)) continue;
+      aus.push(t);
+      if (t.wenn) { kaestenIn(t.dann, aus); kaestenIn(t.sonst, aus); } else kaestenIn(t.befehle, aus);
+    }
+    return aus;
+  }
+  // Stelle "1.2.dann.1" / "@mond.4" → Reihe, Platz darin, Kasten und Zweig drumherum
+  function stelleFinden(b, stelle) {
+    const tt = String(stelle).split('.');
+    const spruch = tt[0].charAt(0) === '@' ? tt.shift().slice(1) : null;
+    const wurzel = spruch ? b.sprueche[spruch] : b.programm;
+    let liste = wurzel, kasten = null, zweig = null, i = 0;
+    for (let j = 0; j < tt.length; j++) {
+      i = parseInt(tt[j], 10) - 1;
+      if (j === tt.length - 1) break;
+      kasten = liste[i];
+      if (tt[j + 1] === 'dann' || tt[j + 1] === 'sonst') { zweig = tt[++j]; liste = kasten[zweig]; } else { zweig = null; liste = kasten.befehle; }
+    }
+    if (!liste || isNaN(i)) throw new Error('Stelle ' + stelle);
+    return { spruch, wurzel, liste, i, kasten, zweig };
+  }
+  // „im zweiten Wenn-dann-Kasten“ (Ordnungszahl in seiner Reihe: Programm oder Spruch, der Spruch wird davor genannt).
+  // Gibt es nur einen solchen Kasten: „im Wenn-dann-Kasten“, oder '' (nicht immerNennen, und auch sonst nirgends einer)
+  function kastenWort(kasten, ort, b, o, immerNennen) {
+    const gleich = (l) => kaestenIn(l, []).filter((t) => kastenArt(t) === kastenArt(kasten));
+    const inReihe = gleich(ort.wurzel);
+    if (inReihe.length > 1) return 'im ' + ord(inReihe.indexOf(kasten), 'en') + ' ' + kastenName(kasten, o);
+    const ueberall = [b.programm].concat(Object.values(b.sprueche)).reduce((n, l) => n + gleich(l).length, 0);
+    return immerNennen || (ueberall > 1 && !ort.spruch) ? 'im ' + kastenName(kasten, o) : '';
+  }
+  const spruchWort = (ort) => (ort.spruch ? 'im ' + K().SPRUCH_WORT[ort.spruch] : '');
+  const nrSichtbar = (ort, o) => !ort.kasten && (ort.spruch ? !!(o.spruchNr && o.spruchNr(ort.spruch)) : !!o.mitNr);
+  // Reihe, in der der Befehl liegt: „im Kasten „bis zum Schatz“ nach „dann““
+  function reiheWort(ort, b, o) {
+    return [spruchWort(ort), ort.kasten ? kastenWort(ort.kasten, ort, b, o, true) : '', ort.zweig ? 'nach „' + ort.zweig + '“' : '']
+      .filter(Boolean).join(', ').replace(/, nach „/, ' nach „');
+  }
+  // Platz eines Befehls in seiner Reihe: „Befehl 4“, „zweite Karte“ oder '' (eindeutig)
+  function platzWort(ort, o) {
+    const t = ort.liste[ort.i];
+    if (nrSichtbar(ort, o)) return (typeof t === 'string' ? 'Befehl ' : 'Karte ') + (ort.i + 1);
+    const gleich = ort.liste.filter((x) => K().teilText(x) === K().teilText(t)).length;
+    return gleich > 1 ? ord(ort.i, 'e') + ' Karte' : '';
+  }
+  // Lücke vor Platz i: „am Anfang“, „am Ende“, „zwischen Befehl 2 und 3“, „zwischen der zweiten und dritten Karte“
+  function lueckeWort(ort, o) {
+    const n = ort.liste.length, i = ort.i;
+    if (!n) return '';
+    if (i === 0) return 'am Anfang';
+    if (i >= n) return 'am Ende';
+    return nrSichtbar(ort, o) ? 'zwischen Befehl ' + i + ' und ' + (i + 1) : 'zwischen der ' + ord(i - 1, 'en') + ' und ' + ord(i, 'en') + ' Karte';
+  }
+  const mitDoppelpunkt = (vorne, rest) => (vorne ? vorne + ': ' + rest : rest);
+  function reparaturText(kobold, teile, o) {
+    o = o || {};
     const rp = kobold.reparatur;
     const oder = (l) => (l.length === 1 ? l[0] : l.slice(0, -1).join(', ') + ' oder ' + l[l.length - 1]);
-    let alt = null;
+    let b, ort;
     try {
-      const b = { programm: K().lies(kobold.programm || teile), sprueche: K().liesSprueche(kobold.sprueche) };
-      const tt = String(rp.stelle).split('.');
-      let l = tt[0].charAt(0) === '@' ? b.sprueche[tt.shift().slice(1)] : b.programm;
-      for (let i = 0; i < tt.length; i++) {
-        const x = l[parseInt(tt[i], 10) - 1];
-        if (i === tt.length - 1) { alt = x; break; }
-        if (tt[i + 1] === 'dann' || tt[i + 1] === 'sonst') { l = x[tt[i + 1]]; i++; } else l = x.befehle;
-      }
-    } catch (e) { alt = null; }
-    if (rp.art === 'tauschen') return stelleWort(rp.stelle) + ': ' + befehlWort(rp.befehl) + ' statt ' + befehlWort(alt ? K().teilText(alt) : '?');
-    if (rp.art === 'loeschen') return oder((kobold.gleicheStellen || [rp.stelle]).map(stelleWort)) + ' streichen';
-    if (rp.art === 'einfuegen') return 'Bei ' + stelleWort(rp.stelle) + ' fehlt ' + befehlWort(rp.befehl) + ((kobold.gleicheStellen || []).length > 1 ? ' (oder an einer anderen Stelle in derselben Reihe: gleiches Programm)' : '');
-    if (rp.art === 'bedingung') return stelleWort(rp.stelle) + ': Wenn-Karte „' + BED_WORT[rp.bedingung] + '“ statt „' + (alt && alt.wenn ? BED_WORT[alt.wenn] : '?') + '“';
-    if (rp.art === 'zahl') return stelleWort(rp.stelle) + ': ' + rp.wdh + '-mal statt ' + (alt && alt.wdh ? alt.wdh : '?') + '-mal';
-    return '';
+      b = { programm: K().lies(kobold.programm || teile), sprueche: K().liesSprueche(kobold.sprueche) };
+      ort = stelleFinden(b, rp.stelle);
+    } catch (e) { return ''; }
+    const alt = ort.liste[ort.i];
+    const reihe = reiheWort(ort, b, o);
+    let t = '';
+    if (rp.art === 'tauschen') {
+      t = mitDoppelpunkt([reihe, platzWort(ort, o)].filter(Boolean).join(', '), befehlWort(rp.befehl) + ' statt ' + befehlWort(alt ? K().teilText(alt) : '?'));
+    } else if (rp.art === 'loeschen') {
+      const orte = (kobold.gleicheStellen || [rp.stelle]).map((s) => stelleFinden(b, s));
+      const was = befehlWort(K().teilText(alt));
+      if (orte.length === 1) t = mitDoppelpunkt([reihe, platzWort(ort, o)].filter(Boolean).join(', '), was + ' streichen');
+      else if (orte.every((x) => x.liste === ort.liste)) {
+        t = nrSichtbar(ort, o) ? mitDoppelpunkt(reihe, 'Befehl ' + oder(orte.map((x) => x.i + 1)) + ' streichen')
+          : mitDoppelpunkt(reihe, 'einmal ' + was + ' streichen (egal, welches)');
+      } else t = oder(orte.map((x) => [reiheWort(x, b, o), platzWort(x, o)].filter(Boolean).join(', '))) + ': ' + was + ' streichen';
+    } else if (rp.art === 'einfuegen') {
+      const luecke = lueckeWort(ort, o);
+      t = (luecke ? mitDoppelpunkt(reihe, luecke + ' fehlt ') : (reihe ? reihe + ' fehlt ' : 'Es fehlt ')) + befehlWort(rp.befehl) +
+        ((kobold.gleicheStellen || []).length > 1 ? ' (oder an einer anderen Stelle in derselben Reihe: gleiches Programm)' : '');
+    } else if (rp.art === 'bedingung' || rp.art === 'zahl') {
+      // Hier ist der Kasten selbst gemeint: ihn nur nennen, wenn es mehrere gleiche gibt
+      const ortK = { spruch: ort.spruch, wurzel: ort.wurzel };
+      const kasten = alt && istKasten(alt) ? kastenWort(alt, ortK, b, o, rp.art === 'zahl' && !!ort.spruch) : '';
+      const vorne = [spruchWort(ort), kasten].filter(Boolean).join(', ');
+      if (rp.art === 'bedingung') t = mitDoppelpunkt(vorne, 'Wenn-Karte „' + BED_WORT[rp.bedingung] + '“ statt „' + (alt && alt.wenn ? BED_WORT[alt.wenn] : '?') + '“');
+      else t = (vorne || 'Zauber-Kasten') + ': ' + rp.wdh + '-mal statt ' + (alt && alt.wdh ? alt.wdh : '?') + '-mal';
+    }
+    return t ? gross(t) : '';
   }
 
   // ---------------------------------------------------------------------
