@@ -1,0 +1,149 @@
+{
+ "paket": "e7",
+ "einheit": 7,
+ "titel": "Geheimschrift der Feen",
+ "web": {
+  "titel": "Geheimschrift der Feen",
+  "art": "geheim",
+  "levels": ["e7-w1", "e7-l1", "e7-l2", "e7-w2", "e7-w3", "e7-z1", "e7-p1", "e7-w4"]
+ },
+ "raetsel": [
+  {
+   "id": "e7-l1",
+   "art": "geheim",
+   "aufgabe": "lesen",
+   "klartext": "MOND",
+   "geheimtext": "PRQG",
+   "schluessel": 3,
+   "bilder": ["baum", "mond", "sonne"]
+  },
+  {
+   "id": "e7-l2",
+   "art": "geheim",
+   "aufgabe": "lesen",
+   "klartext": "HERZ",
+   "geheimtext": "KHUC",
+   "schluessel": 3,
+   "bilder": ["haus", "krone", "herz"]
+  },
+  {
+   "id": "e7-b1",
+   "art": "geheim",
+   "aufgabe": "lesen",
+   "klartext": "DER DRACHE MAG KEKSE",
+   "geheimtext": "GHU GUDFKH PDJ NHNVH",
+   "schluessel": 3
+  },
+  {
+   "id": "e7-p1",
+   "art": "geheim",
+   "aufgabe": "knacken",
+   "klartext": "FISCH",
+   "geheimtext": "KNXHM",
+   "schluessel": 5,
+   "bereich": [1, 5],
+   "bilder": ["blume", "fisch", "apfel"]
+  },
+  {
+   "id": "e7-k1",
+   "art": "geheim",
+   "aufgabe": "kobold",
+   "klartext": "SCHATZ IM KASTEN",
+   "geheimtext": "VFKDAC LP NDVWHQ",
+   "schluessel": 3
+  },
+  {
+   "id": "e7-z1",
+   "art": "geheim",
+   "aufgabe": "zeichen",
+   "klartext": "KRONE",
+   "bilder": ["sonne", "blume", "krone"]
+  },
+  {
+   "id": "e7-n1",
+   "art": "geheim",
+   "aufgabe": "schreiben",
+   "klartext": "OMA",
+   "geheimtext": "OMA",
+   "schluessel": 26
+  },
+  {
+   "id": "e7-post",
+   "art": "geheim",
+   "aufgabe": "liste",
+   "schluessel": 3,
+   "woerter": ["POLSTER", "KASTEN", "STIEGE", "SACKERL", "SESSEL", "LADE", "SCHUH", "BETT", "TISCH", "VORHANG", "SOFA", "SCHATZ", "DU BIST SUPER"]
+  },
+  {
+   "id": "e7-x1",
+   "art": "geheim",
+   "aufgabe": "kette",
+   "klartext": "EIS",
+   "schluessel": [3, 4],
+   "geheimtext": "LPZ"
+  },
+  {
+   "id": "e7-x2",
+   "art": "geheim",
+   "aufgabe": "kette",
+   "klartext": "OMA",
+   "schluessel": [13, 13],
+   "geheimtext": "OMA"
+  },
+  {
+   "id": "e7-x3",
+   "art": "geheim",
+   "aufgabe": "knacken",
+   "klartext": "DER ESEL GEHT ZUM SEE",
+   "geheimtext": "NOB OCOV QORD JEW COO",
+   "schluessel": 10,
+   "haeufigkeit": true
+  },
+  {
+   "id": "e7-x4",
+   "art": "geheim",
+   "aufgabe": "knacken",
+   "klartext": "SONNE",
+   "geheimtext": "EAZZQ",
+   "schluessel": 12
+  },
+  {
+   "id": "e7-w1",
+   "art": "geheim",
+   "aufgabe": "lesen",
+   "klartext": "EIS",
+   "geheimtext": "FJT",
+   "schluessel": 1,
+   "bilder": ["apfel", "eis", "baum"]
+  },
+  {
+   "id": "e7-w2",
+   "art": "geheim",
+   "aufgabe": "schreiben",
+   "klartext": "BALL",
+   "geheimtext": "EDOO",
+   "schluessel": 3,
+   "bild": "ball",
+   "tasten": ["C", "D", "E", "F", "N", "O", "P"]
+  },
+  {
+   "id": "e7-w3",
+   "art": "geheim",
+   "aufgabe": "schreiben",
+   "klartext": "BAUM",
+   "geheimtext": "DCWO",
+   "schluessel": 2,
+   "bild": "baum",
+   "tasten": ["B", "C", "D", "E", "N", "O", "W", "X"]
+  },
+  {
+   "id": "e7-w4",
+   "art": "geheim",
+   "aufgabe": "knacken",
+   "klartext": "STERN",
+   "geheimtext": "CDOBX",
+   "schluessel": 10,
+   "bilder": ["mond", "sonne", "stern"]
+  }
+ ]
+}

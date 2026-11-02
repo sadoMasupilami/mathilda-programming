@@ -1,0 +1,379 @@
+{
+ "paket": "e16",
+ "einheit": 16,
+ "titel": "Labyrinth-Meisterin",
+ "web": {
+  "titel": "Labyrinth-Meisterin",
+  "art": "pfad",
+  "levels": ["e16-f1", "e16-m1", "e16-r1", "e16-g1", "e16-b1", "e16-z1", "e16-i1", "e16-d1"]
+ },
+ "raetsel": [
+  {
+   "id": "e16-m1",
+   "art": "pfad",
+   "b": 5,
+   "h": 5,
+   "start": { "x": 0, "y": 4, "blick": "oben" },
+   "ziel": { "x": 4, "y": 0 },
+   "hindernisse": [[1, 0], [1, 1], [3, 1], [4, 1], [3, 2], [1, 3], [2, 4], [3, 4], [4, 4]],
+   "aufgabe": "kuerzestes"
+  },
+  {
+   "id": "e16-la",
+   "art": "lesen",
+   "b": 4,
+   "h": 4,
+   "start": { "x": 0, "y": 3, "blick": "oben" },
+   "ziel": { "x": 3, "y": 0 },
+   "hindernisse": [[2, 0], [1, 1], [1, 2], [3, 2], [3, 3]],
+   "programm": "bis[wenn[frei-rechts: rechts] wenn[stein: links sonst vor]]"
+  },
+  {
+   "id": "e16-lb",
+   "art": "lesen",
+   "b": 4,
+   "h": 4,
+   "start": { "x": 0, "y": 3, "blick": "oben" },
+   "ziel": { "x": 3, "y": 0 },
+   "hindernisse": [[1, 0], [2, 0], [1, 1], [3, 2], [1, 3], [3, 3]],
+   "programm": "bis[wenn[frei-rechts: rechts] wenn[stein: links sonst vor]]"
+  },
+  {
+   "id": "e16-k1",
+   "art": "kobold",
+   "b": 4,
+   "h": 4,
+   "start": { "x": 0, "y": 3, "blick": "oben" },
+   "ziel": { "x": 3, "y": 0 },
+   "hindernisse": [[1, 0], [2, 0], [1, 1], [3, 2], [1, 3], [3, 3]],
+   "programm": "bis[wenn[frei-rechts: rechts] wenn[stein: rechts sonst vor]]",
+   "reparatur": { "art": "tauschen", "stelle": "1.2.dann.1", "befehl": "links" },
+   "bedingungen": ["stein", "frei", "stein-rechts", "frei-rechts"]
+  },
+  {
+   "id": "e16-b1",
+   "art": "pfad",
+   "b": 4,
+   "h": 3,
+   "start": { "x": 0, "y": 2, "blick": "oben" },
+   "welten": [
+    { "ziel": { "x": 3, "y": 0 }, "hindernisse": [[1, 0], [3, 1], [1, 2], [2, 2], [3, 2]] },
+    { "ziel": { "x": 2, "y": 0 }, "hindernisse": [[1, 0], [3, 0], [2, 2], [3, 2]] }
+   ],
+   "aufgabe": "ankommen",
+   "erlaubt": ["wenn", "bis"],
+   "bedingungen": ["stein", "frei", "stein-rechts", "frei-rechts"],
+   "maxKarten": 6,
+   "beispiel": "bis[wenn[frei-rechts: rechts] wenn[stein: links sonst vor]]"
+  },
+  {
+   "id": "e16-b1l1",
+   "art": "lesen",
+   "b": 4,
+   "h": 3,
+   "start": { "x": 0, "y": 2, "blick": "oben" },
+   "ziel": { "x": 3, "y": 0 },
+   "hindernisse": [[1, 0], [3, 1], [1, 2], [2, 2], [3, 2]],
+   "programm": "bis[wenn[frei-rechts: rechts] wenn[stein: links sonst vor]]"
+  },
+  {
+   "id": "e16-b1l2",
+   "art": "lesen",
+   "b": 4,
+   "h": 3,
+   "start": { "x": 0, "y": 2, "blick": "oben" },
+   "ziel": { "x": 2, "y": 0 },
+   "hindernisse": [[1, 0], [3, 0], [2, 2], [3, 2]],
+   "programm": "bis[wenn[frei-rechts: rechts] wenn[stein: links sonst vor]]"
+  },
+  {
+   "id": "e16-b1m1",
+   "art": "lesen",
+   "b": 4,
+   "h": 3,
+   "start": { "x": 0, "y": 2, "blick": "oben" },
+   "ziel": { "x": 3, "y": 0 },
+   "hindernisse": [[1, 0], [3, 1], [1, 2], [2, 2], [3, 2]],
+   "programm": "bis[wenn[frei-links: links] wenn[stein: rechts sonst vor]]"
+  },
+  {
+   "id": "e16-b1m2",
+   "art": "lesen",
+   "b": 4,
+   "h": 3,
+   "start": { "x": 0, "y": 2, "blick": "oben" },
+   "ziel": { "x": 2, "y": 0 },
+   "hindernisse": [[1, 0], [3, 0], [2, 2], [3, 2]],
+   "programm": "bis[wenn[frei-links: links] wenn[stein: rechts sonst vor]]"
+  },
+  {
+   "id": "e16-lf",
+   "art": "lesen",
+   "b": 5,
+   "h": 5,
+   "start": { "x": 0, "y": 4, "blick": "oben" },
+   "ziel": { "x": 2, "y": 2 },
+   "hindernisse": [],
+   "programm": "bis[wenn[frei-rechts: rechts] wenn[stein: links sonst vor]]",
+   "erwartetZuLang": true
+  },
+  {
+   "id": "e16-f1",
+   "art": "pfad",
+   "b": 4,
+   "h": 4,
+   "start": { "x": 0, "y": 3, "blick": "oben" },
+   "ziel": { "x": 3, "y": 0 },
+   "hindernisse": [[1, 1], [2, 1], [1, 3], [2, 3]],
+   "aufgabe": "kuerzestes"
+  },
+  {
+   "id": "e16-fh",
+   "art": "lesen",
+   "b": 4,
+   "h": 4,
+   "start": { "x": 0, "y": 3, "blick": "oben" },
+   "ziel": { "x": 3, "y": 0 },
+   "hindernisse": [[1, 1], [2, 1], [1, 3], [2, 3]],
+   "programm": "bis[wenn[frei-rechts: rechts] wenn[stein: links sonst vor]]"
+  },
+  {
+   "id": "e16-fl",
+   "art": "lesen",
+   "b": 4,
+   "h": 4,
+   "start": { "x": 0, "y": 3, "blick": "oben" },
+   "ziel": { "x": 3, "y": 0 },
+   "hindernisse": [[1, 1], [2, 1], [1, 3], [2, 3]],
+   "programm": "bis[wenn[frei-links: links] wenn[stein: rechts sonst vor]]"
+  },
+  {
+   "id": "e16-kf",
+   "art": "lesen",
+   "b": 4,
+   "h": 4,
+   "start": { "x": 0, "y": 3, "blick": "oben" },
+   "ziel": { "x": 3, "y": 0 },
+   "hindernisse": [[1, 1], [2, 1], [1, 3], [2, 3]],
+   "programm": "bis[wenn[frei-rechts: links] wenn[stein: links sonst vor]]",
+   "erwartetZuLang": true
+  },
+  {
+   "id": "e16-mr",
+   "art": "lesen",
+   "b": 5,
+   "h": 5,
+   "start": { "x": 0, "y": 4, "blick": "oben" },
+   "ziel": { "x": 4, "y": 0 },
+   "hindernisse": [[1, 0], [1, 1], [3, 1], [4, 1], [3, 2], [1, 3], [2, 4], [3, 4], [4, 4]],
+   "programm": "bis[wenn[frei-rechts: rechts] wenn[stein: links sonst vor]]"
+  },
+  {
+   "id": "e16-ml",
+   "art": "lesen",
+   "b": 5,
+   "h": 5,
+   "start": { "x": 0, "y": 4, "blick": "oben" },
+   "ziel": { "x": 4, "y": 0 },
+   "hindernisse": [[1, 0], [1, 1], [3, 1], [4, 1], [3, 2], [1, 3], [2, 4], [3, 4], [4, 4]],
+   "programm": "bis[wenn[frei-links: links] wenn[stein: rechts sonst vor]]"
+  },
+  {
+   "id": "e16-ih",
+   "art": "lesen",
+   "b": 4,
+   "h": 4,
+   "start": { "x": 0, "y": 3, "blick": "oben" },
+   "ziel": { "x": 2, "y": 2 },
+   "hindernisse": [[1, 1], [2, 1], [1, 2]],
+   "programm": "bis[wenn[frei-rechts: rechts] wenn[stein: links sonst vor]]",
+   "erwartetZuLang": true
+  },
+  {
+   "id": "e16-il",
+   "art": "lesen",
+   "b": 4,
+   "h": 4,
+   "start": { "x": 0, "y": 3, "blick": "oben" },
+   "ziel": { "x": 2, "y": 2 },
+   "hindernisse": [[1, 1], [2, 1], [1, 2]],
+   "programm": "bis[wenn[frei-links: links] wenn[stein: rechts sonst vor]]",
+   "erwartetZuLang": true
+  },
+  {
+   "id": "e16-lal",
+   "art": "lesen",
+   "b": 4,
+   "h": 4,
+   "start": { "x": 0, "y": 3, "blick": "oben" },
+   "ziel": { "x": 3, "y": 0 },
+   "hindernisse": [[2, 0], [1, 1], [1, 2], [3, 2], [3, 3]],
+   "programm": "bis[wenn[frei-links: links] wenn[stein: rechts sonst vor]]"
+  },
+  {
+   "id": "e16-lbl",
+   "art": "lesen",
+   "b": 4,
+   "h": 4,
+   "start": { "x": 0, "y": 3, "blick": "oben" },
+   "ziel": { "x": 3, "y": 0 },
+   "hindernisse": [[1, 0], [2, 0], [1, 1], [3, 2], [1, 3], [3, 3]],
+   "programm": "bis[wenn[frei-links: links] wenn[stein: rechts sonst vor]]"
+  },
+  {
+   "id": "e16-lbk",
+   "art": "pfad",
+   "b": 4,
+   "h": 4,
+   "start": { "x": 0, "y": 3, "blick": "oben" },
+   "ziel": { "x": 3, "y": 0 },
+   "hindernisse": [[1, 0], [2, 0], [1, 1], [3, 2], [1, 3], [3, 3]],
+   "aufgabe": "kuerzestes"
+  },
+  {
+   "id": "e16-rk",
+   "art": "lesen",
+   "b": 4,
+   "h": 4,
+   "start": { "x": 0, "y": 3, "blick": "oben" },
+   "ziel": { "x": 0, "y": 2 },
+   "hindernisse": [[2, 0], [0, 1], [1, 2], [3, 2]],
+   "programm": "bis[wenn[frei-rechts: rechts] wenn[stein: links sonst vor]]"
+  },
+  {
+   "id": "e16-gb",
+   "art": "lesen",
+   "b": 4,
+   "h": 4,
+   "start": { "x": 0, "y": 3, "blick": "oben" },
+   "ziel": { "x": 2, "y": 0 },
+   "hindernisse": [[3, 0], [1, 1], [2, 1], [3, 1], [1, 2], [2, 2], [3, 2], [1, 3], [2, 3], [3, 3]],
+   "programm": "bis[wenn[frei-rechts: rechts] wenn[stein: links sonst vor]]"
+  },
+  {
+   "id": "e16-r1",
+   "art": "pfad",
+   "b": 3,
+   "h": 3,
+   "start": { "x": 0, "y": 2, "blick": "oben" },
+   "ziel": { "x": 2, "y": 2 },
+   "hindernisse": [[1, 1], [1, 2]],
+   "aufgabe": "ankommen",
+   "erlaubt": ["bis"],
+   "maxKarten": 4,
+   "beispiel": "bis[vor vor rechts]"
+  },
+  {
+   "id": "e16-g1",
+   "art": "pfad",
+   "b": 4,
+   "h": 3,
+   "start": { "x": 0, "y": 2, "blick": "oben" },
+   "ziel": { "x": 2, "y": 2 },
+   "hindernisse": [[1, 1], [2, 1], [1, 2]],
+   "aufgabe": "ankommen",
+   "erlaubt": ["wenn", "bis"],
+   "maxKarten": 4,
+   "beispiel": "bis[wenn[stein: rechts sonst vor]]"
+  },
+  {
+   "id": "e16-z1",
+   "art": "pfad",
+   "b": 5,
+   "h": 5,
+   "start": { "x": 0, "y": 4, "blick": "oben" },
+   "ziel": { "x": 4, "y": 0 },
+   "hindernisse": [[1, 0], [1, 1], [3, 1], [4, 1], [3, 2], [1, 3], [2, 4], [3, 4], [4, 4]],
+   "aufgabe": "ankommen",
+   "erlaubt": ["zauber", "wenn", "bis"],
+   "bedingungen": ["stein", "frei", "stein-rechts", "frei-rechts"],
+   "maxKarten": 6,
+   "beispiel": "bis[wenn[frei-rechts: rechts] wenn[stein: links sonst vor]]"
+  },
+  {
+   "id": "e16-i1",
+   "art": "pfad",
+   "b": 4,
+   "h": 4,
+   "start": { "x": 0, "y": 3, "blick": "oben" },
+   "ziel": { "x": 2, "y": 2 },
+   "hindernisse": [[1, 1], [2, 1], [1, 2]],
+   "aufgabe": "ankommen",
+   "erlaubt": ["wenn", "bis"],
+   "bedingungen": ["stein", "frei", "stein-rechts", "frei-rechts"],
+   "maxKarten": 6,
+   "erzwingt": [],
+   "beispiel": "rechts vor vor links vor"
+  },
+  {
+   "id": "e16-zw",
+   "art": "lesen",
+   "b": 5,
+   "h": 5,
+   "start": { "x": 0, "y": 4, "blick": "oben" },
+   "ziel": { "x": 4, "y": 0 },
+   "hindernisse": [[1, 0], [1, 1], [3, 1], [4, 1], [3, 2], [1, 3], [2, 4], [3, 4], [4, 4]],
+   "programm": "bis[wenn[frei-rechts: rechts vor sonst links]]"
+  },
+  {
+   "id": "e16-bv",
+   "art": "lesen",
+   "b": 4,
+   "h": 3,
+   "start": { "x": 0, "y": 2, "blick": "oben" },
+   "ziel": { "x": 2, "y": 0 },
+   "hindernisse": [[1, 0], [3, 0], [2, 2], [3, 2]],
+   "programm": "bis[wenn[stein: links sonst vor] wenn[frei-rechts: rechts]]",
+   "erwartetZuLang": true
+  },
+  {
+   "id": "e16-bt",
+   "art": "lesen",
+   "b": 4,
+   "h": 3,
+   "start": { "x": 0, "y": 2, "blick": "oben" },
+   "ziel": { "x": 2, "y": 0 },
+   "hindernisse": [[1, 0], [3, 0], [2, 2], [3, 2]],
+   "programm": "bis[wenn[stein: links sonst vor rechts]]",
+   "erwartetZuLang": true
+  },
+  {
+   "id": "e16-bs",
+   "art": "lesen",
+   "b": 4,
+   "h": 3,
+   "start": { "x": 0, "y": 2, "blick": "oben" },
+   "ziel": { "x": 2, "y": 0 },
+   "hindernisse": [[1, 0], [3, 0], [2, 2], [3, 2]],
+   "programm": "bis[wenn[frei-rechts: rechts] wenn[stein: links] vor]",
+   "erwartetStoss": true
+  },
+  {
+   "id": "e16-iv",
+   "art": "lesen",
+   "b": 4,
+   "h": 4,
+   "start": { "x": 0, "y": 3, "blick": "oben" },
+   "ziel": { "x": 2, "y": 2 },
+   "hindernisse": [[1, 1], [2, 1], [1, 2]],
+   "programm": "bis[wenn[stein: links sonst vor] wenn[frei-rechts: rechts]]"
+  },
+  {
+   "id": "e16-d1",
+   "art": "pfad",
+   "b": 3,
+   "h": 3,
+   "start": { "x": 0, "y": 2, "blick": "oben" },
+   "welten": [
+    { "ziel": { "x": 1, "y": 0 }, "hindernisse": [[0, 0], [2, 0], [1, 2], [2, 2]] },
+    { "ziel": { "x": 2, "y": 0 }, "hindernisse": [[1, 0], [1, 1]] },
+    { "ziel": { "x": 1, "y": 0 }, "hindernisse": [[0, 0], [0, 1], [2, 2]] }
+   ],
+   "aufgabe": "ankommen",
+   "erlaubt": ["wenn", "bis"],
+   "bedingungen": ["stein", "frei", "stein-rechts", "frei-rechts"],
+   "maxKarten": 6,
+   "beispiel": "bis[wenn[frei-rechts: rechts] wenn[stein: links sonst vor]]"
+  }
+ ]
+}

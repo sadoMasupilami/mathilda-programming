@@ -1,0 +1,35 @@
+{
+ "paket": "e6",
+ "einheit": 6,
+ "titel": "Muster-Detektivin",
+ "web": {
+  "titel": "Muster-Detektivin",
+  "art": "muster",
+  "levels": ["e6-f1", "e6-a2", "e6-f4", "e6-k1", "e6-z1", "e6-a6", "e6-z3", "e6-a8", "e6-a9"]
+ },
+ "raetsel": [
+  { "id": "e6-f1", "art": "muster", "aufgabe": "fortsetzen", "folge": "rot blau rot blau rot blau", "weiter": 2 },
+  { "id": "e6-f2", "art": "muster", "aufgabe": "fortsetzen", "folge": "gelb gelb gruen gelb gelb gruen gelb", "weiter": 2 },
+  { "id": "e6-f3", "art": "muster", "aufgabe": "fortsetzen", "folge": "blau rot rot gelb blau rot rot gelb blau", "weiter": 3 },
+  { "id": "e6-f4", "art": "muster", "aufgabe": "fortsetzen", "folge": "klatschen stampfen stampfen klatschen stampfen stampfen klatschen", "weiter": 2 },
+  { "id": "e6-f5", "art": "muster", "aufgabe": "fortsetzen", "folge": "gelb blau blau rot gelb ? blau ? gelb blau blau rot gelb blau", "weiter": 0 },
+
+  { "id": "e6-k1", "art": "muster", "aufgabe": "kobold", "folge": "rot blau rot blau blau blau rot blau rot blau", "stelle": 5, "richtig": "rot" },
+  { "id": "e6-k2", "art": "muster", "aufgabe": "kobold", "folge": "gelb gruen gruen gelb gruen gruen gelb gelb gruen gelb gruen", "stelle": 8, "richtig": "gruen" },
+  { "id": "e6-k3", "art": "muster", "aufgabe": "kobold", "folge": "klatschen klatschen stampfen klatschen klatschen stampfen klatschen stampfen stampfen", "stelle": 8, "richtig": "klatschen" },
+  { "id": "e6-k4", "art": "muster", "aufgabe": "kobold", "folge": "kreis-blau quadrat-gelb dreieck-blau kreis-gelb quadrat-blau dreieck-gelb kreis-blau dreieck-gelb dreieck-blau kreis-gelb quadrat-blau dreieck-gelb kreis-blau quadrat-gelb", "stelle": 8, "richtig": "quadrat-gelb" },
+
+  { "id": "e6-z1", "art": "muster", "aufgabe": "zauber", "folge": "rot blau blau rot blau blau rot blau blau" },
+  { "id": "e6-z2", "art": "muster", "aufgabe": "zauber", "folge": "gelb gruen gelb gruen gelb gruen gelb gruen gelb gruen" },
+  { "id": "e6-z3", "art": "muster", "aufgabe": "zauber", "folge": "klatschen klatschen schnipsen klatschen klatschen schnipsen klatschen klatschen schnipsen klatschen klatschen schnipsen" },
+  { "id": "e6-l1", "art": "muster", "aufgabe": "lesen", "programm": "3[gruen rot rot]" },
+  { "id": "e6-g1", "art": "muster", "aufgabe": "wachsend", "kopf": "rot", "wachs": "blau", "runden": 3, "weiter": 5 },
+
+  { "id": "e6-s1", "art": "muster", "aufgabe": "kuerzester", "folge": "rot blau blau rot blau blau rot blau blau rot blau blau rot blau blau rot blau blau", "mehrereLoesungen": true },
+
+  { "id": "e6-a2", "art": "muster", "aufgabe": "fortsetzen", "folge": "rot gelb gelb rot gelb gelb rot", "weiter": 3 },
+  { "id": "e6-a6", "art": "muster", "aufgabe": "kobold", "folge": "blau gelb rot blau gelb rot blau rot rot blau gelb", "stelle": 8, "richtig": "gelb" },
+  { "id": "e6-a8", "art": "muster", "aufgabe": "fortsetzen", "folge": "gruen blau blau gelb gruen ? blau gelb gruen blau blau gelb", "weiter": 2 },
+  { "id": "e6-a9", "art": "muster", "aufgabe": "fortsetzen", "folge": "kreis-blau quadrat-gelb dreieck-blau kreis-gelb quadrat-blau dreieck-gelb kreis-blau quadrat-gelb dreieck-blau kreis-gelb quadrat-blau dreieck-gelb", "weiter": 2 }
+ ]
+}

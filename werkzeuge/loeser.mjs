@@ -6,6 +6,12 @@
 //   mitZauber(welt, maxKarten)   alle Programme mit Wiederhol-Zauber bis maxKarten Karten durchprobieren
 //   koboldPruefen(welt, prog, r) kaputtes Programm + gemeinte Reparatur prüfen, alle anderen Reparaturen finden
 //   ablaufZaehlen(karten, regeln) alle gültigen Reihenfolgen der Ablauf-Karten zählen
+//
+// Erweiterte Befehle (plan/lehrplan.md 7.8: Wenn-dann-Kasten, „bis zum Schatz“, Zaubersprüche):
+//   mitRegeln(welten, maxKarten, erlaubt, opt)   kleinste Kartenzahl und Anzahl der kürzesten Programme,
+//                                optional für mehrere Welten zugleich („ein Programm für alle“)
+//   koboldErweitert(welten, prog, sprueche, r, opt)  Kobold-Programme mit Kästen und Sprüchen (Stellen wie "3.dann.1")
+//   gleichesVerhalten(welten, a, b, opt)          machen zwei Programme in jeder Welt genau dasselbe?
 
 import '../web/kern/ausfuehrer.js';
 
@@ -260,4 +266,512 @@ export function ablaufZaehlen(ids, regeln, opt = {}) {
   };
   weiter();
   return { anzahl, loesungen };
+}
+
+// =====================================================================
+// Erweiterte Befehle (plan/lehrplan.md 7.8)
+// =====================================================================
+export const STANDARD_BEDINGUNGEN = ['stein', 'frei'];
+export const NEUE_KAESTEN = ['wenn', 'bis', 'spruch'];
+export const ERLAUBT_NAMEN = ['zauber', 'wenn', 'bis', 'spruch'];
+const SPIEGEL = { stein: 'frei', frei: 'stein', 'stein-links': 'frei-links', 'frei-links': 'stein-links', 'stein-rechts': 'frei-rechts', 'frei-rechts': 'stein-rechts' };
+const WEITER = 0, HALT = 1, BIS_ENDE = 2;
+
+class ZuGross extends Error {}
+
+// Eine Welt als Tabellen: Zustand s = (y · b + x) · 4 + Blickrichtung
+function baueWelt(weltDaten) {
+  const W = K.welt(weltDaten);
+  if (!W.ziel) throw new Error('Kein Ziel im Gitter');
+  const { b, h } = W;
+  const N = b * h * 4;
+  const vor = new Int32Array(N), links = new Int32Array(N), rechts = new Int32Array(N);
+  const bed = {};
+  for (const name of K.BEDINGUNGEN) bed[name] = new Uint8Array(N);
+  for (let y = 0; y < h; y++) for (let x = 0; x < b; x++) for (let r = 0; r < 4; r++) {
+    const s = (y * b + x) * 4 + r;
+    const n = K.schritt(W, { x, y, r }, 'vor');
+    vor[s] = n.stoss ? -1 : (n.y * b + n.x) * 4 + r;
+    links[s] = (y * b + x) * 4 + (r + 3) % 4;
+    rechts[s] = (y * b + x) * 4 + (r + 1) % 4;
+    for (const name of K.BEDINGUNGEN) bed[name][s] = K.bedingung(W, { x, y, r }, name) ? 1 : 0;
+  }
+  const gem = new Int32Array(b * h);
+  W.edelsteine.forEach((k, i) => { const [x, y] = k.split(',').map(Number); gem[y * b + x] = 1 << i; });
+  return {
+    daten: weltDaten, b, h, vor, links, rechts, bed, gem, voll: (1 << W.edelsteine.length) - 1,
+    ziel: W.ziel.y * b + W.ziel.x, start: (W.start.y * b + W.start.x) * 4 + W.start.r,
+  };
+}
+
+// Übersetzte Programmteile: 0 vor, 1 links, 2 rechts, { t: 'r', name } Aufruf,
+// { t: 'w', c, dann, sonst } Wenn-dann, { t: 'z', n, inhalt } Zauber-Kasten, { t: 'b', inhalt } bis zum Schatz
+function uebersetze(t) {
+  if (typeof t === 'string') return K.BEFEHLE.indexOf(t);
+  if (t.spruch) return { t: 'r', name: t.spruch };
+  if (t.wenn) return { t: 'w', c: t.wenn, dann: t.dann.map(uebersetze), sonst: t.sonst.map(uebersetze) };
+  if (t.bis) return { t: 'b', inhalt: t.befehle.map(uebersetze) };
+  return { t: 'z', n: t.wdh, inhalt: t.befehle.map(uebersetze) };
+}
+function knotenText(k) {
+  if (typeof k === 'number') return K.BEFEHLE[k];
+  if (k.t === 'r') return '@' + k.name;
+  if (k.t === 'w') return 'wenn[' + k.c + ': ' + k.dann.map(knotenText).join(' ') + (k.sonst.length ? ' sonst ' + k.sonst.map(knotenText).join(' ') : '') + ']';
+  return (k.t === 'b' ? 'bis' : k.n) + '[' + k.inhalt.map(knotenText).join(' ') + ']';
+}
+function knotenKarten(k) {
+  if (typeof k === 'number' || k.t === 'r') return 1;
+  if (k.t === 'w') return 1 + k.dann.length + k.sonst.length;
+  return 1 + k.inhalt.reduce((s, x) => s + knotenKarten(x), 0);
+}
+function ruft(k) {
+  if (typeof k === 'number') return false;
+  if (k.t === 'r') return true;
+  if (k.t === 'w') return k.dann.some(ruft) || k.sonst.some(ruft);
+  return k.inhalt.some(ruft);
+}
+
+// Schnelle Ausführung (gleiche Regeln wie K.ausfuehren, ohne Anzeige-Daten).
+// C = { s, m (Edelsteine), n (ausgeführte Befehle), bis (Tiefe), f (0 gut, 1 Stoß, 2 zu lang) }
+function laeufer(zaehle) {
+  const MAXS = K.MAX_SCHRITTE;
+  function lauf(Wc, C, k, sp) {
+    if (typeof k === 'number') {
+      if (C.n >= MAXS) { C.f = 2; return HALT; }
+      let s2;
+      if (k === 0) { s2 = Wc.vor[C.s]; if (s2 < 0) { C.f = 1; return HALT; } }
+      else s2 = k === 1 ? Wc.links[C.s] : Wc.rechts[C.s];
+      C.s = s2; C.n++;
+      zaehle();
+      const pos = s2 >> 2;
+      C.m |= Wc.gem[pos];
+      return C.bis > 0 && pos === Wc.ziel ? BIS_ENDE : WEITER;
+    }
+    switch (k.t) {
+      case 'r': return liste(Wc, C, sp[k.name], sp);
+      case 'w': return liste(Wc, C, Wc.bed[k.c][C.s] ? k.dann : k.sonst, sp);
+      case 'z':
+        for (let i = 0; i < k.n; i++) { const e = liste(Wc, C, k.inhalt, sp); if (e) return e; }
+        return WEITER;
+      default: {   // 'b': bis zum Schatz
+        if ((C.s >> 2) === Wc.ziel) return WEITER;
+        C.bis++;
+        let e;
+        for (;;) {
+          const n0 = C.n;
+          e = liste(Wc, C, k.inhalt, sp);
+          if (e) break;
+          if (C.n === n0) { C.f = 2; e = HALT; break; }
+        }
+        C.bis--;
+        if (e === BIS_ENDE) return C.bis > 0 ? BIS_ENDE : WEITER;
+        return e;
+      }
+    }
+  }
+  function liste(Wc, C, l, sp) {
+    for (let i = 0; i < l.length; i++) { const e = lauf(Wc, C, l[i], sp); if (e) return e; }
+    return WEITER;
+  }
+  return lauf;
+}
+
+// Alle Folgen der Länge n aus einer Liste
+function folgen(atome, n) {
+  let aus = [[]];
+  for (let i = 0; i < n; i++) { const neu = []; for (const f of aus) for (const a of atome) neu.push(f.concat([a])); aus = neu; }
+  return aus;
+}
+const gleichAtom = (a, b) => (typeof a === 'number' ? a === b : typeof b !== 'number' && a.t === 'r' && b.t === 'r' && a.name === b.name);
+
+// Wenn-dann-Kästen mit genau `kosten` Karten. Gespiegelte Paare (wenn[stein: A sonst B] macht genau dasselbe
+// wie wenn[frei: B sonst A]) werden einmal gebaut und doppelt gezählt (mult). wenn[c: X sonst X] mit einem
+// Befehl ist nie das kürzeste (X allein spart 2 Karten) und fällt weg.
+function wennListe(kosten, zweigAtome, bed) {
+  const aus = [];
+  for (let d = 1; d <= K.MAX_DANN; d++) {
+    const s = kosten - 1 - d;
+    if (s < 0 || s > K.MAX_SONST) continue;
+    const dannL = folgen(zweigAtome, d), sonstL = folgen(zweigAtome, s);
+    for (const c of bed) {
+      let mult = 1;
+      if (s > 0 && bed.includes(SPIEGEL[c])) { if (c.indexOf('frei') === 0) continue; mult = 2; }
+      for (const dann of dannL) for (const sonst of sonstL) {
+        if (d === 1 && s === 1 && gleichAtom(dann[0], sonst[0])) continue;
+        aus.push({ k: { t: 'w', c, dann, sonst }, mult });
+      }
+    }
+  }
+  return aus;
+}
+
+// Bausteine nach Kartenzahl für eine Umgebung (Programm oder Zauberspruch)
+function baukasten(darf, bed, rufe, imSpruch, mehrereWelten) {
+  const cache = new Map();
+  const befehle = [0, 1, 2].map((k) => ({ k, mult: 1 }));
+  const aufrufe = imSpruch ? [] : rufe.map((name) => ({ k: { t: 'r', name }, mult: 1 }));
+  const zweigAtome = [0, 1, 2].concat(imSpruch ? [] : rufe.map((name) => ({ t: 'r', name })));
+  const wennNach = (k) => {
+    if (!darf.has('wenn') || k < 2) return [];
+    const key = 'w' + k;
+    if (!cache.has(key)) cache.set(key, wennListe(k, zweigAtome, bed));
+    return cache.get(key);
+  };
+  // Inhalt eines Zauber-Kastens: 1 bis 3 Teile (Befehle, Aufrufe, Wenn-dann), zusammen genau `kosten` Karten
+  const atomeNach = (k) => (k === 1 ? befehle.concat(aufrufe) : wennNach(k));
+  function inhalte(kosten, cb) {
+    const folge = [];
+    const rek = (rest, mult) => {
+      if (rest === 0) { if (folge.length) cb(folge.slice(), mult); return; }
+      if (folge.length >= K.MAX_INNEN) return;
+      for (let c = 1; c <= rest; c++) for (const a of atomeNach(c)) { folge.push(a.k); rek(rest - c, mult * a.mult); folge.pop(); }
+    };
+    rek(kosten, 1);
+  }
+  // Ein Teil (im Programm bzw. im Spruch) mit genau k Karten
+  function teile(k, cb) {
+    if (k === 1) { for (const a of befehle.concat(aufrufe)) cb(a.k, 1); }
+    // Ein Wenn-dann-Kasten außerhalb eines Zauber-Kastens wird im Programm genau einmal ausgeführt:
+    // Bei einer Welt ist dann der gewählte Zweig allein immer kürzer. Im Spruch kann er öfter drankommen.
+    if (k >= 2 && (imSpruch || mehrereWelten)) for (const a of wennNach(k)) cb(a.k, a.mult);
+    if (k >= 2 && darf.has('zauber')) inhalte(k - 1, (inh, mult) => { for (let n = K.WDH_MIN; n <= K.WDH_MAX; n++) cb({ t: 'z', n, inhalt: inh }, mult); });
+    if (k >= 2 && darf.has('bis')) inhalte(k - 1, (inh, mult) => cb({ t: 'b', inhalt: inh }, mult));
+  }
+  return { teile };
+}
+
+// Zaubersprüche mit genau `kosten` Karten Inhalt (1 bis 4 Teile; ein einzelner Befehl ist nie sinnvoll)
+function spruchKoerper(kasten, kosten, cb) {
+  const folge = [];
+  const rek = (rest, mult) => {
+    if (rest === 0) {
+      if (folge.length && !(folge.length === 1 && typeof folge[0] === 'number')) cb(folge.slice(), mult);
+      return;
+    }
+    if (folge.length >= K.MAX_SPRUCH) return;
+    for (let c = 1; c <= rest; c++) kasten.teile(c, (t, m) => { folge.push(t); rek(rest - c, mult * m); folge.pop(); });
+  };
+  rek(kosten, 1);
+}
+
+// ---------------------------------------------------------------------
+// mitRegeln: kleinste Kartenzahl, mit der der Drache in allen Welten ankommt
+//   welten:    eine Welt oder eine Liste (ein Programm muss in allen geschafft sein)
+//   erlaubt:   Liste aus 'zauber', 'wenn', 'bis', 'spruch' (Befehle gehen immer)
+//   opt.bedingungen: erlaubte Bedingungen (Standard stein, frei)
+//   opt.sprueche:    vorgegebene Sprüche { stern: '…' } (zählen nicht als Karten)
+//   opt.spruchFrei:  ['stern'] Spruch, den das Kind selbst schreibt (zählt: 1 Karte + Inhalt); höchstens einer
+//   opt.maxArbeit:   Rechen-Grenze (Standard 30 Millionen Schritte); darüber vollstaendig: false
+// Ergebnis: { vollstaendig, erreichbar, minKarten, anzahlMin, kuerzeste: [{ programm, sprueche }], arbeit, grund }
+//   Gezählt wird jede Kartenfolge (auch gespiegelte Wenn-Karten: wenn[stein: A sonst B] und wenn[frei: B sonst A]
+//   sind zwei Lösungen). Programme mit mehr als 60 ausgeführten Befehlen zählen nicht.
+// Verfahren: Breitensuche nach Kartenzahl über die Zustände (Feld, Blick, Edelsteine, Befehlszähler je Welt);
+// gleiche Zustände mit gleicher Kartenzahl werden zusammengelegt (nur gezählt). Beschnitten wird:
+// Stoß, mehr als 60 Befehle, Wenn-dann außerhalb eines Kastens bei einer Welt, wenn[c: X sonst X],
+// Sprüche aus einem einzigen Befehl, Sprüche, die nie aufgerufen werden.
+// ---------------------------------------------------------------------
+export function mitRegeln(welten, maxKarten, erlaubt = [], opt = {}) {
+  const liste = (Array.isArray(welten) ? welten : [welten]).map(baueWelt);
+  const darf = new Set(erlaubt);
+  for (const e of darf) if (!ERLAUBT_NAMEN.includes(e)) throw new Error('Unbekannt in erlaubt: „' + e + '“ (' + ERLAUBT_NAMEN.join(', ') + ')');
+  const bed = darf.has('wenn') ? (opt.bedingungen || STANDARD_BEDINGUNGEN) : [];
+  const fest = darf.has('spruch') ? K.liesSprueche(opt.sprueche || {}) : {};
+  const frei = darf.has('spruch') ? (opt.spruchFrei || []) : [];
+  const maxListe = opt.maxListe ?? 20;
+  const maxArbeit = opt.maxArbeit ?? 30e6;
+  let arbeit = 0;
+  const zaehle = () => { if (++arbeit > maxArbeit) throw new ZuGross(); };
+  const lauf = laeufer(zaehle);
+  if (frei.length > 1) return { vollstaendig: false, erreichbar: null, grund: 'mehr als ein freier Zauberspruch', arbeit };
+  const spFest = {};
+  for (const [n, l] of Object.entries(fest)) spFest[n] = l.map(uebersetze);
+  const nW = liste.length;
+  const C = { s: 0, m: 0, n: 0, bis: 0, f: 0 };
+  // Was ein Teil macht, hängt nur von Feld und Blick (s) ab: neues s, eingesammelte Edelsteine (g),
+  // Zahl der Befehle (n) oder ein Fehler (Stoß, läuft im Kreis: n = -1). Die Edelsteine vorher und die
+  // Befehle vorher ändern daran nichts (nur die 60-Grenze: vorher + n). Darum rechnet die Suche jeden
+  // Teil je Welt und s höchstens einmal (Stempel gen) und schlägt für alle Knoten mit diesem s nach.
+  const memo = liste.map((w) => ({ gen: new Float64Array(w.vor.length), s: new Int32Array(w.vor.length), g: new Int32Array(w.vor.length), n: new Int32Array(w.vor.length) }));
+  let gen = 0;
+
+  // Ein Durchlauf der Breitensuche mit festen Sprüchen sp; startKosten = Karten für den freien Spruch
+  function suche(sp, rufe, startKosten, grenze, mussRufen) {
+    const kasten = baukasten(darf, bed, rufe, false, nW > 1);
+    const st0 = new Int32Array(nW * 3);
+    liste.forEach((w, i) => { st0[3 * i] = w.start; });
+    const schicht = new Map();
+    schicht.set(startKosten, new Map([['0', { st: st0, ruf: 0, anz: 1, vor: [] }]]));
+    for (let t = startKosten + 1; t <= grenze; t++) {
+      const neu = new Map();
+      for (let c = t - 1; c >= startKosten; c--) {
+        const alt = schicht.get(c);
+        if (!alt || !alt.size) continue;
+        const knoten = Array.from(alt.values());
+        kasten.teile(t - c, (teil, mult) => {
+          const r = mussRufen && ruft(teil) ? 1 : 0;
+          gen++;
+          for (const kn of knoten) {
+            const st = new Int32Array(nW * 3);
+            let ok = true;
+            for (let w = 0; w < nW && ok; w++) {
+              const M = memo[w], s0 = kn.st[3 * w];
+              if (M.gen[s0] !== gen) {
+                M.gen[s0] = gen;
+                C.s = s0; C.m = 0; C.n = 0; C.bis = 0; C.f = 0;
+                lauf(liste[w], C, teil, sp);
+                if (C.f) M.n[s0] = -1;
+                else { M.s[s0] = C.s; M.g[s0] = C.m; M.n[s0] = C.n; }
+              }
+              const dn = M.n[s0], n1 = kn.st[3 * w + 2] + dn;
+              if (dn < 0 || n1 > K.MAX_SCHRITTE) ok = false;
+              else { st[3 * w] = M.s[s0]; st[3 * w + 1] = kn.st[3 * w + 1] | M.g[s0]; st[3 * w + 2] = n1; }
+            }
+            zaehle();
+            if (!ok) continue;
+            const ru = kn.ruf | r;
+            const key = st.join(',') + '|' + ru;
+            let z = neu.get(key);
+            if (!z) { z = { st, ruf: ru, anz: 0, vor: [] }; neu.set(key, z); }
+            z.anz += kn.anz * mult;
+            z.vor.push([kn, teil, mult]);
+          }
+        });
+      }
+      schicht.set(t, neu);
+      const loes = [];
+      for (const z of neu.values()) {
+        if (mussRufen && !z.ruf) continue;
+        let da = true;
+        for (let w = 0; w < nW && da; w++) da = (z.st[3 * w] >> 2) === liste[w].ziel && z.st[3 * w + 1] === liste[w].voll;
+        if (da) loes.push(z);
+      }
+      if (loes.length) {
+        // Programme zurückverfolgen (höchstens maxListe)
+        const progs = [];
+        const rueck = (z, suffix) => {
+          if (progs.length >= maxListe) return;
+          if (!z.vor.length) { progs.push(suffix.slice().reverse().map(knotenText).join(' ')); return; }
+          for (const [v, teil] of z.vor) { suffix.push(teil); rueck(v, suffix); suffix.pop(); if (progs.length >= maxListe) return; }
+        };
+        for (const z of loes) rueck(z, []);
+        return { min: t, anzahl: loes.reduce((s, z) => s + z.anz, 0), programme: progs };
+      }
+    }
+    return null;
+  }
+
+  try {
+    const grenze = maxKarten;
+    let best = null;
+    let anzahl = 0;
+    let kuerzeste = [];
+    const nimm = (r, spText) => {
+      if (!r) return;
+      if (best === null || r.min < best) { best = r.min; anzahl = 0; kuerzeste = []; }
+      if (r.min === best) {
+        anzahl += r.anzahl;
+        for (const p of r.programme) if (kuerzeste.length < maxListe) kuerzeste.push({ programm: p, sprueche: spText });
+      }
+    };
+    // ohne den freien Spruch
+    nimm(suche(spFest, Object.keys(spFest), 0, grenze, false), {});
+    // mit dem freien Spruch: jeder mögliche Inhalt, aufsteigend nach Karten
+    if (frei.length) {
+      const name = frei[0];
+      const kastenSp = baukasten(darf, bed, [], true, true);
+      for (let kosten = 2; ; kosten++) {
+        const obergrenze = best === null ? grenze : Math.min(grenze, best);
+        if (1 + kosten + 1 > obergrenze) break;
+        spruchKoerper(kastenSp, kosten, (koerper, mult) => {
+          const ob = best === null ? grenze : Math.min(grenze, best);
+          if (1 + kosten + 1 > ob) return;
+          const sp = Object.assign({}, spFest, { [name]: koerper });
+          const r = suche(sp, Object.keys(spFest).concat([name]), 1 + kosten, ob, true);
+          // Gespiegelte Wenn-Karten im Spruch (wenn[stein: A sonst B] = wenn[frei: B sonst A]) sind eigene Sprüche
+          // mit genau denselben Programmen: mitzählen (mult), auch wenn nur eine Fassung gebaut wird
+          if (r) r.anzahl *= mult;
+          nimm(r, { [name]: koerper.map(knotenText).join(' ') });
+        });
+      }
+    }
+    if (best === null) return { vollstaendig: true, erreichbar: false, maxKarten, arbeit };
+    // Gegenprobe mit dem Ausführer
+    for (const p of kuerzeste) {
+      const sp = Object.assign({}, opt.sprueche || {}, p.sprueche);
+      for (const w of liste) {
+        if (!K.ausfuehren(w.daten, p.programm, { sprueche: sp }).geschafft) throw new Error('Löser und Ausführer sind sich nicht einig bei ' + p.programm);
+      }
+      if (K.karten(p.programm, p.sprueche) !== best) throw new Error('Kartenzahl stimmt nicht bei ' + p.programm);
+    }
+    return { vollstaendig: true, erreichbar: true, minKarten: best, anzahlMin: anzahl, kuerzeste, maxKarten, arbeit };
+  } catch (e) {
+    if (e instanceof ZuGross) return { vollstaendig: false, erreichbar: null, grund: 'Suche zu groß (über ' + maxArbeit + ' Schritte)', arbeit };
+    throw e;
+  }
+}
+
+// Machen zwei Programme in jeder Welt genau dasselbe (gleiche Befehle, gleicher Stoß, gleiches Ende)?
+export function gleichesVerhalten(welten, a, b, opt = {}) {
+  for (const w of Array.isArray(welten) ? welten : [welten]) {
+    const ea = K.ausfuehren(w, a, { sprueche: opt.spruecheA || opt.sprueche });
+    const eb = K.ausfuehren(w, b, { sprueche: opt.spruecheB || opt.sprueche });
+    const fa = ea.schritte.map((s) => s.befehl).join(' '), fb = eb.schritte.map((s) => s.befehl).join(' ');
+    if (fa !== fb || !!ea.stoss !== !!eb.stoss || ea.zuLang !== eb.zuLang) return { gleich: false, a: fa, b: fb };
+  }
+  return { gleich: true };
+}
+
+// ---------------------------------------------------------------------
+// Kobold-Programme mit Kästen und Zaubersprüchen
+// Stellen (1-basiert): "3" = Teil 3 im Programm, "3.2" = 2. Teil im Zauber-Kasten 3,
+//   "3.dann.1" / "3.sonst.1" = im Wenn-dann-Kasten 3, "3.2.sonst.1", "@stern.2" = 2. Teil im Stern-Spruch.
+// Reparaturen: { art: 'tauschen', stelle, befehl }   (befehl: vor, links, rechts oder @stern …)
+//              { art: 'loeschen', stelle }            (ein Befehl oder Aufruf fällt weg)
+//              { art: 'einfuegen', stelle, befehl }   (danach steht der neue Befehl an der Stelle)
+//              { art: 'bedingung', stelle, bedingung } (andere Wenn-Karte)
+//              { art: 'zahl', stelle, wdh }            (anderes „n-mal“)
+// ---------------------------------------------------------------------
+function baumVon(programm, sprueche) {
+  return { programm: K.lies(programm), sprueche: K.liesSprueche(sprueche || {}) };
+}
+function baumKopie(b) { return JSON.parse(JSON.stringify(b)); }
+export function baumText(b) {
+  return { programm: b.programm.map(K.teilText).join(' '), sprueche: Object.fromEntries(Object.entries(b.sprueche).map(([n, l]) => [n, l.map(K.teilText).join(' ')])) };
+}
+const baumSchluessel = (b) => JSON.stringify(baumText(b));
+
+export function stelleFinden(baum, stelle) {
+  const text = String(stelle).trim();
+  const teile = text.split('.');
+  let spruch = null;
+  if (teile[0].charAt(0) === '@') spruch = teile.shift().slice(1);
+  let l = spruch ? baum.sprueche[spruch] : baum.programm;
+  if (!l) throw new Error('Stelle „' + text + '“: den Spruch gibt es nicht');
+  let ort = spruch ? 'spruch' : 'programm';
+  if (!teile.length) throw new Error('Stelle „' + text + '“: Nummer fehlt');
+  let i = null;
+  for (let j = 0; j < teile.length; j++) {
+    if (!/^\d+$/.test(teile[j])) throw new Error('Stelle „' + text + '“: „' + teile[j] + '“ ist keine Nummer');
+    i = parseInt(teile[j], 10) - 1;
+    if (j === teile.length - 1) break;
+    const t = l[i];
+    if (!t || typeof t !== 'object' || t.spruch) throw new Error('Stelle „' + text + '“: an ' + teile.slice(0, j + 1).join('.') + ' steht kein Kasten');
+    if (teile[j + 1] === 'dann' || teile[j + 1] === 'sonst') {
+      if (!t.wenn) throw new Error('Stelle „' + text + '“: ' + teile.slice(0, j + 1).join('.') + ' ist kein Wenn-dann-Kasten');
+      l = t[teile[j + 1]];
+      ort = teile[j + 1];
+      j++;
+      if (j === teile.length - 1) throw new Error('Stelle „' + text + '“: nach „' + teile[j] + '“ fehlt die Nummer');
+    } else {
+      if (!t.befehle) throw new Error('Stelle „' + text + '“: ' + teile.slice(0, j + 1).join('.') + ' ist kein Zauber-Kasten');
+      l = t.befehle;
+      ort = 'kasten';
+    }
+  }
+  return { liste: l, i, ort, imSpruch: !!spruch };
+}
+const alsTeil = (b) => (String(b).charAt(0) === '@' ? { spruch: String(b).slice(1) } : b);
+const istBlatt = (t) => typeof t === 'string' || !!(t && t.spruch);
+
+export function wendeReparaturAnBaum(baum, r) {
+  const b = baumKopie(baum);
+  const o = stelleFinden(b, r.stelle);
+  if (r.art !== 'einfuegen' && (o.i < 0 || o.i >= o.liste.length)) throw new Error('Stelle ' + r.stelle + ' gibt es nicht');
+  const t = o.liste[o.i];
+  if (r.art === 'tauschen') {
+    if (!istBlatt(t)) throw new Error('Stelle ' + r.stelle + ': tauschen geht nur bei Befehlen und Aufrufen');
+    if (K.teilText(t) === String(r.befehl)) throw new Error('Tauschen gegen denselben Befehl');
+    o.liste[o.i] = alsTeil(r.befehl);
+  } else if (r.art === 'loeschen') {
+    if (!istBlatt(t)) throw new Error('Stelle ' + r.stelle + ': streichen geht nur bei Befehlen und Aufrufen');
+    o.liste.splice(o.i, 1);
+  } else if (r.art === 'einfuegen') {
+    if (o.i < 0 || o.i > o.liste.length) throw new Error('Stelle ' + r.stelle + ' gibt es nicht');
+    o.liste.splice(o.i, 0, alsTeil(r.befehl));
+  } else if (r.art === 'bedingung') {
+    if (!t || !t.wenn) throw new Error('Stelle ' + r.stelle + ' ist kein Wenn-dann-Kasten');
+    if (t.wenn === r.bedingung) throw new Error('Tauschen gegen dieselbe Wenn-Karte');
+    t.wenn = r.bedingung;
+  } else if (r.art === 'zahl') {
+    if (!t || t.wdh === undefined) throw new Error('Stelle ' + r.stelle + ' ist kein Zauber-Kasten mit Zahl');
+    if (t.wdh === r.wdh) throw new Error('Tauschen gegen dieselbe Zahl');
+    t.wdh = r.wdh;
+  } else throw new Error('Unbekannte Reparatur ' + r.art);
+  // gültig nach den Regeln? (Größen der Kästen, Verschachtelung)
+  return baumVon(b.programm, b.sprueche);
+}
+
+function alleOrte(baum) {
+  const elemente = [], luecken = [];
+  const geh = (l, praefix, ort, imSpruch) => {
+    l.forEach((t, i) => {
+      const st = praefix + (i + 1);
+      elemente.push({ stelle: st, t, ort, imSpruch });
+      if (t && t.wenn) { geh(t.dann, st + '.dann.', 'zweig', imSpruch); geh(t.sonst, st + '.sonst.', 'zweig', imSpruch); }
+      else if (t && t.befehle) geh(t.befehle, st + '.', 'kasten', imSpruch);
+    });
+    for (let i = 0; i <= l.length; i++) luecken.push({ stelle: praefix + (i + 1), ort, imSpruch });
+  };
+  geh(baum.programm, '', 'programm', false);
+  for (const [n, l] of Object.entries(baum.sprueche)) geh(l, '@' + n + '.', 'spruch', true);
+  return { elemente, luecken };
+}
+
+export function alleReparaturenBaum(baum, opt = {}) {
+  const bed = opt.bedingungen || K.BEDINGUNGEN;
+  const rufe = (opt.rufe || Object.keys(baum.sprueche)).map((n) => '@' + n);
+  const { elemente, luecken } = alleOrte(baum);
+  const aus = [];
+  for (const e of elemente) {
+    const t = e.t;
+    if (istBlatt(t)) {
+      const jetzt = K.teilText(t);
+      for (const b of K.BEFEHLE.concat(e.imSpruch ? [] : rufe)) if (b !== jetzt) aus.push({ art: 'tauschen', stelle: e.stelle, befehl: b });
+      aus.push({ art: 'loeschen', stelle: e.stelle });
+    } else if (t.wenn) {
+      for (const c of bed) if (c !== t.wenn) aus.push({ art: 'bedingung', stelle: e.stelle, bedingung: c });
+    } else if (t.wdh !== undefined) {
+      for (let n = K.WDH_MIN; n <= K.WDH_MAX; n++) if (n !== t.wdh) aus.push({ art: 'zahl', stelle: e.stelle, wdh: n });
+    }
+  }
+  for (const l of luecken) for (const b of K.BEFEHLE.concat(l.imSpruch ? [] : rufe)) aus.push({ art: 'einfuegen', stelle: l.stelle, befehl: b });
+  return aus;
+}
+
+// Kobold-Programm mit Kästen/Sprüchen prüfen: kaputt kommt (in mindestens einer Welt) nicht an,
+// die gemeinte Reparatur in allen; dazu alle anderen Ein-Karten-Reparaturen, die auch ankommen.
+export function koboldErweitert(welten, programm, sprueche, reparatur, opt = {}) {
+  const ws = Array.isArray(welten) ? welten : [welten];
+  const baum = baumVon(programm, sprueche);
+  const geschafft = (b) => ws.every((w) => K.ausfuehren(w, b.programm, { sprueche: b.sprueche }).geschafft);
+  if (geschafft(baum)) throw new Error('Das Kobold-Programm kommt ohne Reparatur an');
+  const gemeint = wendeReparaturAnBaum(baum, reparatur);
+  if (!geschafft(gemeint)) throw new Error('Die gemeinte Reparatur kommt nicht an: ' + baumText(gemeint).programm);
+  const gesehen = new Set([baumSchluessel(gemeint), baumSchluessel(baum)]);
+  const auch = [];
+  for (const r of alleReparaturenBaum(baum, opt)) {
+    let neu;
+    try { neu = wendeReparaturAnBaum(baum, r); } catch (e) { continue; }
+    const s = baumSchluessel(neu);
+    if (gesehen.has(s)) continue;
+    gesehen.add(s);
+    if (geschafft(neu)) auch.push({ reparatur: r, ...baumText(neu) });
+  }
+  // Stellen, deren Streichen bzw. Einfügen dasselbe Programm ergibt (z. B. in „vor vor vor“)
+  const gleicheStellen = [];
+  const ziel = baumSchluessel(gemeint);
+  if (reparatur.art === 'loeschen' || reparatur.art === 'einfuegen') {
+    const { elemente, luecken } = alleOrte(baum);
+    for (const e of reparatur.art === 'loeschen' ? elemente : luecken) {
+      let neu;
+      try { neu = wendeReparaturAnBaum(baum, { ...reparatur, stelle: e.stelle }); } catch (x) { continue; }
+      if (baumSchluessel(neu) === ziel) gleicheStellen.push(e.stelle);
+    }
+  }
+  const kaputt = K.ausfuehren(ws[0], baum.programm, { sprueche: baum.sprueche });
+  return {
+    kaputt, kaputtWelten: ws.map((w) => K.ausfuehren(w, baum.programm, { sprueche: baum.sprueche }).geschafft),
+    gemeint: baumText(gemeint), auch,
+    gleicheStellen: gleicheStellen.length ? gleicheStellen : [String(reparatur.stelle)],
+  };
 }

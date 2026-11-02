@@ -1,0 +1,181 @@
+/* =====================================================================
+   Spiel „kaestchen“ (Einheit 8): Bilder aus Kästchen
+   Hoch:  Kopf / Gitter / Code / Meldung / Tasten
+   Quer:  links Kopf und Gitter (beim Code bauen und beim Kobold auch die Meldung),
+          rechts Code und Tasten (beim Malen oben die Meldung)
+   Das Gitter sieht aus wie Kästchenpapier: Die Kästchen liegen dicht nebeneinander und passen
+   sich dem Platz an (Container-Einheiten), sind aber mindestens 36 px groß (Test).
+   Tasten mindestens 48 px mit 8 px Abstand.
+   ===================================================================== */
+.art-kaestchen .feld { container-type: size; }
+.art-kaestchen .programm { order: 3; min-height: 0; justify-content: flex-start; }
+.art-kaestchen .meldung { order: 4; }
+.art-kaestchen .tasten { order: 5; }
+.art-kaestchen .meldung.hinweis { color: var(--tinte); }
+/* Code bauen und Kobold: viele Tasten nebeneinander, darum 48 px (das Mindestmaß) */
+.art-kaestchen { --t: 48px; --abst: 8px; gap: 6px; }
+
+/* ----- Gitter (Kästchenpapier) ----- */
+.kaestchen-brett {
+  --nrb: 26px;     /* Spalte mit den Zeilennummern */
+  --nrh: 0px;      /* Zeile mit den Spaltennummern (Code Spalte für Spalte) */
+  --rest: 0px;     /* rechts: Platz für „+1“, wenn eine Zeile zu lang ist (nur Kobold) */
+  --lin: 2px;      /* Linie zwischen den Kästchen */
+  --rand: 3px;     /* Rand um das Gitter */
+  --zmax: 62px;
+  --z: min(
+    calc((100cqw - var(--nrb) - var(--rest) - 2 * var(--rand) - (var(--b) - 1) * var(--lin)) / var(--b)),
+    calc((100cqh - var(--nrh) - 2 * var(--rand) - 2px - (var(--h) - 1) * var(--lin)) / var(--h)),
+    var(--zmax));
+  display: flex; align-items: flex-start;
+  padding-right: var(--rest);
+}
+.kaestchen-brett.kaestchen-kobold { --rest: 12px; }
+.kaestchen-nrs {
+  flex: none; width: var(--nrb);
+  display: grid; grid-template-rows: repeat(var(--h), var(--z)); row-gap: var(--lin);
+  padding-top: var(--rand);
+}
+.kaestchen-nr { display: flex; align-items: center; justify-content: flex-start; }
+/* Zauber-Kasten für Zeilen: lila Klammer neben den Nummern der Zeilen, die er malt */
+.kaestchen-brett.kaestchen-mit-klammer { --nrb: 33px; }
+.kaestchen-nrs { position: relative; }
+.kaestchen-klammer {
+  position: absolute; right: 2px; width: 7px;
+  top: calc(var(--rand) + var(--von) * (var(--z) + var(--lin)) + 3px);
+  height: calc(var(--n) * (var(--z) + var(--lin)) - var(--lin) - 6px);
+  border: 3px solid var(--zauber); border-right: none; border-radius: 6px 0 0 6px;
+}
+.kaestchen-nr i {
+  font-style: normal; font-weight: 700; color: var(--grau);
+  font-size: min(0.95rem, calc(var(--z) * 0.48)); line-height: 1;
+  width: min(23px, calc(var(--z) * 0.66)); height: min(23px, calc(var(--z) * 0.66)); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+.kaestchen-nr.kaestchen-jetzt i { background: var(--gold); color: var(--tinte); }
+.kaestchen-nr.kaestchen-markiert i { background: #fff; color: #b5510c; box-shadow: 0 0 0 2.5px #e8731a; }
+.kaestchen-spalten { --nrb: 0px; --nrh: 26px; flex-direction: column; }
+.kaestchen-spalten .kaestchen-nrs {
+  width: auto; height: var(--nrh); padding: 0 0 0 var(--rand);
+  grid-template-rows: none; grid-template-columns: repeat(var(--b), var(--z)); column-gap: var(--lin);
+}
+.kaestchen-spalten .kaestchen-nr { justify-content: center; }
+
+.kaestchen-gitter {
+  position: relative; flex: none;
+  display: grid;
+  grid-template-columns: repeat(var(--b), var(--z));
+  grid-template-rows: repeat(var(--h), var(--z));
+  gap: var(--lin);
+  border: var(--rand) solid var(--tinte); border-radius: 3px;
+  background: #9ba0b6;   /* die Linien des Kästchenpapiers */
+}
+.kaestchen-k { display: block; background: #fff; cursor: pointer; }
+.kaestchen-malen .kaestchen-k:active { box-shadow: inset 0 0 0 3px var(--gold); }
+/* Kobold-Probe: hier malt der Code nichts (die Zeile ist zu kurz) */
+.kaestchen-k.kaestchen-leer { background: repeating-linear-gradient(135deg, #fbf3e4 0 5px, #ead9b8 5px 8px); }
+.kaestchen-schreiben .kaestchen-k, .kaestchen-kobold .kaestchen-k { cursor: default; }
+
+/* Rahmen um die Zeile, um die es gerade geht (gold), und um Zeilen mit einem Hinweis (orange) */
+.kaestchen-rahmen, .kaestchen-schau {
+  position: absolute; pointer-events: none; z-index: 1;
+  left: calc(-1 * var(--rand) - 4px); right: calc(-1 * var(--rand) - 4px);
+  top: calc(var(--r) * (var(--z) + var(--lin)) - 4px);
+  height: calc(var(--z) + 8px);
+  border: 4px solid var(--gold); border-radius: 8px;
+}
+.kaestchen-schau { border: 4px dashed #e8731a; }
+.kaestchen-rahmen.kaestchen-spalte, .kaestchen-schau.kaestchen-spalte {
+  top: calc(-1 * var(--rand) - 4px); bottom: calc(-1 * var(--rand) - 4px); height: auto; right: auto;
+  left: calc(var(--r) * (var(--z) + var(--lin)) - 4px); width: calc(var(--z) + 8px);
+}
+/* Zeile zu lang: „+1“ am rechten Rand */
+.kaestchen-ueber {
+  position: absolute; z-index: 2; pointer-events: none;
+  top: calc(var(--r) * (var(--z) + var(--lin)) + 3px);
+  right: calc(-1 * var(--rand) - var(--rest) - 2px);
+  height: calc(var(--z) - 6px); min-width: calc(var(--z) * 0.72); padding: 0 3px;
+  display: flex; align-items: center; justify-content: center;
+  background: #fde7ec; color: #8f1d3b; border: 2.5px dashed var(--rot); border-radius: 8px;
+  font-weight: 700; font-size: calc(var(--z) * 0.42); line-height: 1;
+}
+.kaestchen-geschafft .kaestchen-gitter { box-shadow: 0 0 0 5px var(--gold); }
+
+/* ----- Code (wie am Blatt: Zahl und kleines Farb-Kästchen) ----- */
+.kaestchen-code { --cz: 22px; display: flex; flex-direction: column; gap: 2px; width: max-content; max-width: 100%; }
+.kaestchen-code-titel { font-size: 0.85rem; color: var(--grau); text-align: center; }
+.kaestchen-cz {
+  display: flex; align-items: center; gap: 5px;
+  min-height: calc(var(--cz) + 5px); padding: 0 8px 0 0;
+  border: 2.5px solid transparent; border-radius: 10px; cursor: pointer;
+}
+.kaestchen-cz.kaestchen-jetzt { border-color: var(--gold); background: var(--gold-hell); }
+.kaestchen-cz.kaestchen-markiert { border-color: #e8731a; border-style: dashed; background: #fff4ea; }
+.kaestchen-cnr { min-width: 2.1em; text-align: center; font-weight: 700; color: var(--grau); font-size: calc(var(--cz) * 0.6); flex: none; white-space: nowrap; }
+.kaestchen-czk .kaestchen-cnr { font-size: calc(var(--cz) * 0.52); }
+.kaestchen-teile { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; row-gap: 3px; }
+.kaestchen-t {
+  display: inline-flex; align-items: center; gap: 3px;
+  height: var(--cz); padding: 0 4px 0 5px;
+  border: 1.5px solid #c9ccdc; border-radius: 6px; background: #fff; line-height: 1;
+}
+.kaestchen-t b { font-size: calc(var(--cz) * 0.7); font-weight: 700; min-width: 0.6em; text-align: center; }
+.kaestchen-q { width: calc(var(--cz) * 0.55); height: calc(var(--cz) * 0.55); display: inline-flex; flex: none; }
+.kaestchen-q svg { width: 100%; height: 100%; }
+.kaestchen-t.kaestchen-nurzahl { padding: 0 6px; }
+.kaestchen-kz {
+  display: inline-flex; align-items: center; gap: 4px;
+  border: 2.5px solid var(--zauber); background: var(--zauber-hell); border-radius: 8px; padding: 1px 4px;
+}
+.kaestchen-kz-zeilen { flex-wrap: wrap; }
+.kaestchen-mal { color: var(--zauber); font-size: calc(var(--cz) * 0.62); white-space: nowrap; line-height: 1; }
+.kaestchen-strich { color: var(--zauber); font-weight: 700; }
+.kaestchen-t.kaestchen-platz { width: calc(var(--cz) * 1.45); border: 2px dashed #b7b1a6; background: transparent; }
+.kaestchen-t.kaestchen-platz.kaestchen-dran { border-color: #c79500; background: #fff; }
+
+/* ----- Tasten ----- */
+.kaestchen-reihe { flex-wrap: wrap; }
+.taste .kaestchen-q { width: calc(var(--t) * 0.34); height: calc(var(--t) * 0.34); }
+.taste .kaestchen-q svg { width: 100%; height: 100%; }
+.taste.kaestchen-fertig svg { width: calc(var(--t) * 0.46); height: calc(var(--t) * 0.46); }
+/* Farbe wählen (Malen mit mehreren Farben) */
+.taste.kaestchen-stift svg { width: 70%; height: 70%; }
+.taste.kaestchen-an { border-color: #c79500; background: var(--gold-hell); box-shadow: 0 0 0 4px var(--gold); }
+.taste.kaestchen-an:active { transform: none; }
+/* Teil-Tasten: Zahl und Farbe auf einer Taste, wie im Code */
+.taste.kaestchen-tt, .taste.kaestchen-zt { width: var(--t); height: var(--t); padding: 0; gap: 2px; }
+.kaestchen-tz { font-size: calc(var(--t) * 0.42); line-height: 1; }
+.taste.kaestchen-mt { flex-direction: column; gap: 0; border-color: var(--zauber); background: var(--zauber-hell); color: var(--zauber); }
+.taste.kaestchen-mt.kaestchen-an { border-color: #c79500; background: var(--gold-hell); }
+.kaestchen-malklein { font-size: calc(var(--t) * 0.24); line-height: 1; }
+.kaestchen-kz-tasten {
+  display: inline-flex; align-items: center; gap: var(--abst);
+  padding: 3px; margin: -3px 0; border-radius: 12px;
+  background: var(--zauber-hell); box-shadow: inset 0 0 0 2.5px var(--zauber);
+}
+.kaestchen-malfest { color: var(--zauber); font-weight: 700; padding: 0 4px; font-size: 1rem; }
+.taste.kaestchen-pm svg { width: 60%; height: 60%; }
+/* Kobold: die ausgewählte Code-Zeile öffnet sich, ihre Zahlen sind Tasten */
+.kaestchen-cz.kaestchen-offen { padding: 4px 6px 4px 0; cursor: default; }
+.kaestchen-offen .kaestchen-teile { gap: var(--abst); }
+
+/* ----- Paket-Bild ----- */
+svg.kaestchen-icon { width: 100%; height: 100%; }
+
+/* ----- Quer: Gitter links, Code und Tasten rechts ----- */
+@media (orientation: landscape) {
+  .art-kaestchen .spalte-rechts { flex: 0 0 clamp(272px, 42%, 560px); justify-content: center; gap: 10px; }
+  .art-kaestchen[data-k-aufgabe="schreiben"] .spalte-rechts { flex-basis: clamp(330px, 48%, 600px); }
+  .art-kaestchen .spiel .programm, .art-kaestchen .programm { flex: 0 1 auto; justify-content: center; }
+  .art-kaestchen[data-k-aufgabe="malen"] .meldung, .art-kaestchen[data-k-aufgabe="kobold"] .meldung { order: 0; }
+  .kaestchen-code { --cz: 26px; }
+}
+/* Tablet: alles größer */
+@media (min-width: 700px) and (min-height: 700px) {
+  .art-kaestchen { --t: 64px; --abst: 12px; gap: 10px; }
+  .kaestchen-brett { --nrb: 38px; --zmax: 84px; --lin: 2.5px; --rand: 4px; }
+  .kaestchen-brett.kaestchen-mit-klammer { --nrb: 46px; }
+  .kaestchen-brett.kaestchen-kobold { --rest: 16px; }
+  .kaestchen-nr i { width: min(32px, calc(var(--z) * 0.6)); height: min(32px, calc(var(--z) * 0.6)); font-size: 1.05rem; }
+  .kaestchen-code { --cz: 36px; gap: 4px; }
+}

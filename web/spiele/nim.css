@@ -1,0 +1,129 @@
+/* =====================================================================
+   Spiel „nim“ (Einheit 15): Strategiespiele gegen den Roboter
+   Hoch:  Kopf / Tisch mit Steinen (oder Zahlen-Weg) / Meldung / Du – Roboter / Tasten
+   Quer:  links Kopf und Tisch (ganze Höhe), rechts Meldung, Du – Roboter, Tasten
+   Die Steine passen sich dem Platz an (Container-Einheiten), bleiben aber
+   mindestens 48 px groß, mit 8 px Abstand. Kein Blinken: nur Ringe und Farben.
+   ===================================================================== */
+.art-nim .feld { container-type: size; }
+.art-nim .programm { min-height: 0; }
+.art-nim .meldung.hinweis { color: var(--tinte); }
+.nim-bild { width: 100%; height: 100%; display: block; }
+
+/* ----- Tisch mit Steinen ----- */
+.nim-tisch {
+  --g: 8px;        /* Abstand zwischen Steinen (mindestens 8) */
+  --pp: 10px;      /* Rand im Teller */
+  --tg: 18px;      /* Abstand zwischen zwei Haufen */
+  --rand: 14px;    /* Platz für die Zahl am Teller */
+  --max: 92px;
+  --c: max(48px, min(
+    calc((100cqw - 2 * var(--rand) - 2 * var(--pp) - (var(--sp) - 1) * var(--g)) / var(--sp)),
+    calc((100cqh - 2 * var(--rand) - var(--tp) * 2 * var(--pp) - (var(--tp) - 1) * var(--tg) - (var(--ze) - var(--tp)) * var(--g)) / var(--ze)),
+    var(--max)));
+  width: 100%; height: 100%;
+  padding: var(--rand);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--tg);
+  border-radius: 22px;
+  transition: background-color 300ms ease, box-shadow 300ms ease;
+}
+.nim-teller {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--spt), var(--c));
+  grid-auto-rows: var(--c);
+  gap: var(--g);
+  padding: var(--pp);
+  border-radius: calc(var(--c) * 0.5 + var(--pp));
+  background: #f3efe6;
+  box-shadow: inset 0 0 0 3px #e4dccb;
+}
+.nim-zwei .nim-teller.nim-teller-an { box-shadow: inset 0 0 0 3px var(--gold); background: #fbf6e6; }
+/* So viele Steine liegen noch (für die Wenn-dann-Regel: „Wenn noch 7 Steine liegen …“) */
+.nim-zahl {
+  position: absolute; top: -12px; left: -12px; z-index: 2;
+  min-width: 32px; height: 32px; padding: 0 7px; border-radius: 16px;
+  background: var(--akzent); color: #fff; font-weight: 700; font-size: 1.05rem; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 0 3px var(--papier);
+}
+.nim-stein {
+  width: var(--c); height: var(--c); padding: 0;
+  border: 0; border-radius: 50%; background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: box-shadow 200ms ease, background-color 200ms ease;
+}
+.nim-stein svg { width: 100%; height: 100%; pointer-events: none; }
+.nim-stein:disabled { cursor: default; opacity: 1; }
+.nim-stein:focus-visible { outline: 4px solid var(--gold); outline-offset: 2px; }
+/* Deine Wahl: gelber Ring. Die Wahl des Roboters: blauer Ring. */
+.nim-stein.nim-gewaehlt { background: var(--gold-hell); box-shadow: 0 0 0 5px var(--gold); }
+.nim-stein.nim-robo { background: #e3ecfc; box-shadow: 0 0 0 5px #2b6fd6; }
+/* Platz eines genommenen Steins: gestrichelt (gelb: du, blau: Roboter) */
+.nim-loch { width: var(--c); height: var(--c); border-radius: 50%; border: 3px dashed #c9c3b5; }
+.nim-loch-du { border-color: #e0b84a; }
+.nim-loch-roboter { border-color: #8fb0ee; }
+
+/* ----- Zahlen-Weg (Wer sagt 20?) ----- */
+.nim-weg {
+  width: 100%; height: 100%; padding: 6px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 20px;
+  transition: background-color 300ms ease, box-shadow 300ms ease;
+}
+.nim-weg svg { width: 100%; height: 100%; }
+
+/* Gewonnen: der Tisch wird golden (ruhig, kein Blinken) */
+.nim-tisch.nim-geschafft, .nim-weg.nim-geschafft { background: var(--gold-hell); box-shadow: inset 0 0 0 4px var(--gold); }
+
+/* ----- Du – Roboter: wer ist dran? ----- */
+.nim-spieler { display: flex; gap: 14px; justify-content: center; }
+.nim-wer {
+  display: flex; align-items: center; gap: 8px;
+  min-height: 46px; padding: 3px 16px 3px 5px;
+  border: 3px solid var(--linie); border-radius: 999px; background: #fff;
+  color: var(--grau); font-weight: 700; font-size: 1rem; line-height: 1;
+}
+.nim-gesicht { width: 36px; height: 36px; flex: none; }
+.nim-wer:not(.nim-dran):not(.nim-sieger) .nim-gesicht { opacity: 0.5; }
+.nim-wer-du.nim-dran, .nim-wer-du.nim-sieger { border-color: #e0a000; background: var(--gold-hell); color: var(--tinte); }
+.nim-wer-rob.nim-dran { border-color: #2b6fd6; background: #e3ecfc; color: var(--tinte); }
+
+/* ----- Tipp, wenn der Roboter gewonnen hat ----- */
+.nim-tipp {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 14px 8px 8px; border-radius: 16px;
+  background: var(--gold-hell); border: 3px solid var(--gold);
+  font-size: 1rem; line-height: 1.25; max-width: 34em;
+}
+.nim-tipp-bild { width: 42px; height: 42px; flex: none; }
+
+/* ----- Tasten: wie viele Steine / welche Zahlen ----- */
+.taste.nim-anzahl { width: calc(var(--t) * 1.25); height: calc(var(--t) * 1.2); padding: 0; flex-direction: column; gap: 3px; }
+.nim-n { font-size: 1.45rem; line-height: 1; }
+.taste .nim-mini { width: calc(var(--k) * var(--t) * 0.2); height: calc(var(--t) * 0.2); }
+.taste.nim-sag { min-width: calc(var(--t) * 1.5); height: calc(var(--t) * 1.1); font-size: 1.35rem; padding: 0 16px; }
+.taste.nim-anzahl.nim-gewaehlt, .taste.nim-sag.nim-gewaehlt { border-color: #c79500; background: var(--gold-hell); box-shadow: 0 0 0 4px var(--gold); }
+.taste.nim-anzahl[aria-disabled="true"] { opacity: 0.4; }
+.nim-wahl { flex-wrap: nowrap; }
+
+/* ----- Quer: Tisch links (ganze Höhe), Meldung und Tasten rechts ----- */
+@media (orientation: landscape) {
+  .art-nim .spalte-rechts { flex: 0 0 clamp(280px, 44%, 520px); justify-content: center; gap: 12px; }
+  .art-nim .programm { flex: none; }
+}
+@media (orientation: landscape) and (max-height: 500px) {
+  .nim-wer { min-height: 44px; }
+  .nim-gesicht { width: 34px; height: 34px; }
+  .nim-tipp { font-size: 0.92rem; padding: 6px 10px 6px 6px; }
+  .nim-tipp-bild { width: 36px; height: 36px; }
+}
+/* Große Geräte: größere Steine, mehr Luft */
+@media (min-width: 700px) and (min-height: 700px) {
+  .nim-tisch { --g: 14px; --pp: 14px; --tg: 26px; --rand: 18px; --max: 128px; }
+  .nim-zahl { min-width: 40px; height: 40px; border-radius: 20px; font-size: 1.2rem; top: -15px; left: -15px; }
+  .nim-wer { min-height: 60px; padding: 4px 22px 4px 6px; gap: 10px; }
+  .nim-gesicht { width: 48px; height: 48px; }
+  .nim-tipp-bild { width: 52px; height: 52px; }
+}

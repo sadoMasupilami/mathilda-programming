@@ -1,0 +1,64 @@
+{
+  "paket": "e14",
+  "einheit": 14,
+  "titel": "Formen-Quadrate",
+  "web": {
+    "titel": "Formen-Quadrate",
+    "art": "formen",
+    "levels": ["e14-a1", "e14-a2", "e14-p1", "e14-a3", "e14-w1", "e14-k1", "e14-w2", "e14-w3", "e14-w4"]
+  },
+  "raetsel": [
+    { "id": "e14-a1", "art": "formen", "titel": "Erstes Formen-Quadrat", "n": 3, "logik": 1,
+      "vorgabe": ["K.Q", "DQ.", ".KD"] },
+    { "id": "e14-a2", "art": "formen", "titel": "Reihe und Spalte", "n": 3, "logik": 2,
+      "vorgabe": [".Q.", "KD.", ".K."] },
+    { "id": "e14-a3", "art": "formen", "titel": "Jetzt mit Stern", "n": 4, "logik": 1,
+      "vorgabe": ["KD.S", ".SK.", "S.DK", ".K.Q"] },
+    { "id": "e14-p1", "art": "formen", "titel": "Nur zwei Formen", "n": 3, "logik": 2,
+      "vorgabe": [".D.", "...", "K.."] },
+
+    { "id": "e14-b1", "art": "formen", "titel": "Sieben Formen", "n": 4, "logik": 2,
+      "vorgabe": ["KD..", "..Q.", ".SK.", ".QD."] },
+    { "id": "e14-k1", "art": "formen", "aufgabe": "kobold", "titel": "Der Kobold war da", "n": 4,
+      "vorgabe": ["DSQK", "KQKD", "SKDQ", "QDKS"], "kobold": [2, 1], "richtig": "S" },
+    { "id": "e14-e3", "art": "formen", "titel": "Beispiel: zwei Formen reichen", "n": 3, "logik": 2,
+      "vorgabe": ["K..", "..D", "..."] },
+
+    { "id": "e14-kq3", "art": "formen", "titel": "Karten-Quadrat am Boden, 3 Karten weg (Herz = Kreis, Pik = Dreieck, Karo = Quadrat)", "n": 3, "logik": 1,
+      "vorgabe": ["KD.", "DQ.", "QK."] },
+    { "id": "e14-kq6", "art": "formen", "titel": "Karten-Quadrat am Boden, 6 Karten weg", "n": 3, "logik": 2,
+      "vorgabe": ["KD.", "...", "Q.."] },
+    { "id": "e14-kqk", "art": "formen", "aufgabe": "kobold", "titel": "Karten-Quadrat am Boden, Kobold: Herz statt Karo in der Mitte", "n": 3,
+      "vorgabe": ["KDQ", "DKK", "QKD"], "kobold": [1, 1], "richtig": "Q" },
+
+    { "id": "e14-c1", "art": "formen", "titel": "Mit Schrägen", "n": 4, "diagonale": true, "logik": 2,
+      "vorgabe": ["QK..", "....", "K.D.", "...."] },
+    { "id": "e14-c2", "art": "formen", "titel": "Farben und Formen", "n": 3, "farben": ["rot", "blau", "gelb"], "logik": 2, "getrennt": true,
+      "vorgabe": ["K:rot D:blau .", ". . .", ". K:gelb ."] },
+    { "id": "e14-c3", "art": "formen", "titel": "Nur vier Formen", "n": 4, "logik": 2,
+      "vorgabe": ["Q...", "...D", "....", "..DS"] },
+
+    { "id": "e14-w1", "art": "formen", "titel": "Sieben Formen", "n": 4, "logik": 2,
+      "vorgabe": ["QK..", "...D", "SD.K", "...Q"] },
+    { "id": "e14-w2", "art": "formen", "titel": "Sechs Formen", "n": 4, "logik": 2,
+      "vorgabe": ["S...", "...D", "..SK", ".DQ."] },
+    { "id": "e14-w3", "art": "formen", "titel": "Nur fünf Formen", "n": 4, "logik": 2,
+      "vorgabe": ["D...", ".Q..", "..S.", "..DQ"] },
+    { "id": "e14-w4", "art": "formen", "titel": "Blau und Gelb", "n": 4, "diagonale": true, "logik": 2,
+      "vorgabe": ["...Q", ".QS.", "....", "K..D"] },
+
+    { "id": "e14-s16", "art": "formen", "titel": "Die große Karten-Knobelei", "n": 4, "farben": ["rot", "blau", "gelb", "gruen"],
+      "vorgabe": ["K:rot D:blau Q:gelb S:gruen", "D:gelb . . .", "Q:gruen . . .", ". . . ."] },
+
+    { "id": "e14-m2", "art": "formen", "aufgabe": "mindestens", "n": 2, "erwartet": 1, "quadrate": 2 },
+    { "id": "e14-m3", "art": "formen", "aufgabe": "mindestens", "n": 3, "erwartet": 2, "quadrate": 12 },
+    { "id": "e14-m4", "art": "formen", "aufgabe": "mindestens", "n": 4, "erwartet": 4, "quadrate": 576 },
+    { "id": "e14-z3s", "art": "formen", "aufgabe": "zaehlen", "n": 3, "diagonale": true, "erwartet": 0 },
+    { "id": "e14-z4s", "art": "formen", "aufgabe": "zaehlen", "n": 4, "diagonale": true, "erwartet": 48 },
+    { "id": "e14-z9", "art": "formen", "aufgabe": "zaehlen", "n": 3, "farben": ["rot", "blau", "gelb"], "erwartet": 72 },
+    { "id": "e14-z16", "art": "formen", "aufgabe": "zaehlen", "n": 4, "farben": ["rot", "blau", "gelb", "gruen"], "erwartet": 6912 },
+    { "id": "e14-d3", "art": "formen", "aufgabe": "duell", "n": 3, "gewinnt": "erste", "immer": true },
+    { "id": "e14-d3s", "art": "formen", "aufgabe": "duell", "n": 3, "stein": true, "gewinnt": "zweite", "zufallErste": 44 },
+    { "id": "e14-d4", "art": "formen", "aufgabe": "duell", "n": 4, "gewinnt": "zweite" }
+  ]
+}

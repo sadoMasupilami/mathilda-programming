@@ -1,0 +1,156 @@
+/* =====================================================================
+   Spiel-Plugin „suche“ (Einheit 10 „Sortieren und Suchen“), siehe web/spiele/suche.js
+   Hoch: Feld oben (Türme, Sortier-Netz, Zahlen), darunter Meldung, Anzeige und Tasten.
+   Quer: Feld links über die ganze Höhe, rechts Anzeige, Meldung und Tasten.
+   Die Größen im Feld (--w, --h, --zw, --zh, --c, --g) rechnet suche.js aus dem Platz aus.
+   Farben: Türkis wie das Sortier-Netz am Blatt (Block B), Ja golden, Nein blau.
+   ===================================================================== */
+.art-suche .programm { min-height: 0; }
+.art-suche .feld { overflow: hidden; }
+.art-suche .meldung.hinweis { color: var(--tinte); }
+.suche-feld { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+
+/* ----- Nachbarn tauschen: Karten auf der Linie vom kleinen zum großen Punkt ----- */
+.suche-reihe-block { display: flex; flex-direction: column; align-items: stretch; flex: none; }
+.suche-reihe {
+  display: flex; gap: var(--g); align-items: flex-end; justify-content: center;
+  padding: 0 calc(var(--p) + var(--g) * 0.5);
+}
+.suche-karte {
+  position: relative; flex: none;
+  width: var(--w); height: var(--h);
+  margin: 0; padding: 0; border: 0; border-radius: 8px; background: transparent;
+  color: inherit; font: inherit; cursor: pointer;
+  transition: transform 0.2s ease-out;
+}
+.suche-karte > svg { display: block; width: 100%; height: 100%; }
+.suche-karte:disabled { opacity: 1; cursor: default; }
+.suche-karte:focus-visible { outline: 4px solid var(--gold); outline-offset: 3px; }
+/* Die goldene Karte hebt sich ein wenig (ruhig, ohne Blinken) */
+.suche-karte.suche-gewaehlt { transform: translateY(-10px); }
+.suche-boden { display: flex; align-items: center; height: var(--boden); }
+.suche-boden i { display: block; flex: none; background: #0f8f87; }
+.suche-p-klein { width: 12px; height: 12px; border-radius: 50%; margin-left: calc(var(--p) * 0.5 - 6px); }
+.suche-linie { flex: 1 1 auto !important; height: 4px; border-radius: 2px; margin: 0 -3px; }
+.suche-p-gross { width: 24px; height: 24px; border-radius: 50%; margin-right: calc(var(--p) * 0.5 - 12px); }
+
+.suche-zaehler { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 1.05rem; }
+.suche-zaehler b { font-size: 1.3em; }
+.suche-zaehler-bild { width: 34px; height: 34px; flex: none; }
+.suche-zaehler-bild svg { width: 100%; height: 100%; }
+
+/* ----- Sortier-Netz ----- */
+.suche-netz-bild { width: 100%; height: 100%; }
+.suche-netz-bild > svg { display: block; width: 100%; height: 100%; }
+.suche-vergleich { display: flex; align-items: center; justify-content: center; gap: 6px 14px; flex-wrap: wrap; max-width: 100%; }
+.suche-vergleich-text { font-weight: 700; font-size: 1.05rem; line-height: 1.1; text-align: center; }
+.suche-vergleich-text small { display: block; font-weight: 400; font-size: 0.85em; color: var(--grau); }
+.suche-vergleich-bild { display: block; height: var(--vh, 62px); width: calc(var(--vh, 62px) * var(--vr, 1.9)); max-width: 100%; flex: none; }
+/* Am Ziel stehen alle Zahlen in einer Reihe: etwas kleiner */
+.suche-vergleich-bild.suche-ziel-bild { --vh: 46px; }
+.taste.suche-wahl {
+  flex-direction: column; gap: 2px;
+  min-width: calc(var(--t) * 1.9); min-height: calc(var(--t) * 1.2);
+  padding: 4px 10px; line-height: 1.05;
+}
+.taste.suche-wahl svg { width: calc(var(--t) * 0.58); height: calc(var(--t) * 0.58); }
+
+/* ----- Halbier-Suche: Zahlen 1 bis N ----- */
+.suche-zahlen {
+  display: grid; flex: none;
+  grid-template-columns: repeat(var(--c), var(--zw));
+  grid-auto-rows: var(--zh);
+  gap: var(--g);
+}
+.suche-zahl {
+  width: 100%; height: 100%; margin: 0; padding: 0;
+  border: 3px solid var(--tinte); border-radius: 12px; background: #fff; color: var(--tinte);
+  font: inherit; font-weight: 700; font-size: calc(var(--zh) * 0.44); line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 3px 0 rgba(31, 35, 64, 0.18);
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+button.suche-zahl { cursor: pointer; }
+button.suche-zahl:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 rgba(31, 35, 64, 0.18); }
+button.suche-zahl:disabled { opacity: 1; cursor: default; }
+button.suche-zahl:focus-visible { outline: 4px solid var(--gold); outline-offset: 2px; }
+/* Hunderter-Tafel (bis 100): nur zum Anschauen, getippt wird mit den Ziffern-Tasten */
+.suche-tafel .suche-zahl { border-width: 1.5px; border-radius: 4px; box-shadow: none; font-size: calc(var(--zh) * 0.5); font-weight: 700; }
+/* Durchgestrichen: grau mit einem Strich */
+.suche-zahl.suche-weg {
+  background-color: #e4e6ee; color: #9a9fb4; border-color: #c3c6d6; box-shadow: none;
+  background-image: linear-gradient(to top right, transparent calc(50% - 1.5px), #a9adc0 calc(50% - 1.5px), #a9adc0 calc(50% + 1.5px), transparent calc(50% + 1.5px));
+}
+/* Vorschau der Frage: blau bleibt bei Nein, golden bei Ja */
+.suche-zahl.suche-nein { background-color: #e9eefc; border-color: #3d5ccc; }
+.suche-zahl.suche-ja { background-color: #fff4cc; border-color: #c79500; }
+.suche-zahl.suche-gewaehlt { box-shadow: 0 0 0 4px #3d5ccc; z-index: 1; }
+.suche-tafel .suche-zahl.suche-gewaehlt { box-shadow: 0 0 0 3px #3d5ccc; }
+.suche-zahl.suche-gefunden { background-color: #f2b705; border-color: #c79500; color: var(--tinte); }
+
+/* Frage und Antwort, darunter die Fragen als Muggelsteine */
+.suche-frage { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; row-gap: 6px; }
+.suche-blase {
+  border: 3px solid var(--tinte); border-radius: 16px; background: #fff;
+  padding: 3px 12px; font-size: 1.1rem; line-height: 1.25; white-space: nowrap;
+}
+.suche-x { font-size: 1.3em; }
+.suche-x.suche-leer { color: #b9bdd3; }
+.suche-drache { width: 40px; height: 40px; flex: none; }
+.suche-drache svg { width: 100%; height: 100%; }
+.suche-antwort { min-width: 3.6em; text-align: center; font-weight: 700; }
+.suche-antwort.suche-ja { background: #fff4cc; border-color: #c79500; }
+.suche-antwort.suche-nein { background: #e9eefc; border-color: #3d5ccc; }
+.suche-antwort.suche-still { color: #b9bdd3; border-color: #c3c6d6; border-style: dashed; }
+.suche-antwort.suche-aus { visibility: hidden; }
+.suche-steine { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 6px; color: var(--grau); font-size: 0.95rem; }
+.suche-steine-reihe { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; }
+.suche-steine-reihe i { display: block; width: 15px; height: 15px; border-radius: 50%; border: 2px dashed #9a9fb4; }
+.suche-steine-reihe i.voll { background: #0f8f87; border: 2px solid #0a6d67; }
+.suche-steine-reihe i.mehr { background: #9a9fb4; border: 2px solid #6b6f86; }
+.suche-steine-reihe i.grenze { margin-left: 8px; }
+.meldung.suche-meldung-ja { background: #fff4cc; }
+.meldung.suche-meldung-nein { background: #e9eefc; }
+
+/* Ziffern-Tasten (bis 100) */
+.taste.suche-ziffer { font-size: 1.45rem; }
+.art-suche .tasten .reihe.suche-ziffern { flex-wrap: nowrap; }
+
+/* ----- Quer: Feld links über die ganze Höhe, rechts Anzeige, Meldung und Tasten ----- */
+@media (orientation: landscape) {
+  .spiel.art-suche {
+    --rechts: clamp(250px, 38vw, 440px);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--rechts);
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
+    grid-template-areas: "kopf programm" "feld programm" "feld meldung" "feld tasten";
+    column-gap: 16px; row-gap: 10px;
+  }
+  .art-suche .spalte-links, .art-suche .spalte-rechts { display: contents; }
+  .art-suche .kopf { grid-area: kopf; }
+  .art-suche .feld { grid-area: feld; min-height: 0; }
+  .art-suche .programm { grid-area: programm; align-self: center; }
+  .art-suche .meldung { grid-area: meldung; }
+  .art-suche .tasten { grid-area: tasten; }
+  /* Das Geschafft-Fenster liegt über der rechten Spalte: Feld und Ergebnis bleiben zu sehen */
+  .art-suche .dialog { width: min(100%, calc(var(--rechts) - 6px)); }
+}
+/* Kleine Handys quer: rechts gerade so breit wie nötig, damit links 32 Zahlen-Tasten Platz haben */
+@media (orientation: landscape) and (max-height: 500px) {
+  .spiel.art-suche.suche-raten { --rechts: 236px; }
+  .spiel.art-suche.suche-tasta { --rechts: 316px; }
+  .suche-blase { font-size: 1rem; padding: 2px 10px; }
+  .suche-drache { width: 34px; height: 34px; }
+  .suche-vergleich-bild { --vh: 60px; }
+}
+@media (min-width: 700px) and (min-height: 700px) {
+  .suche-blase { font-size: 1.25rem; }
+  .suche-drache { width: 56px; height: 56px; }
+  .suche-vergleich-bild { --vh: 84px; }
+  .suche-vergleich-bild.suche-ziel-bild { --vh: 60px; }
+  .suche-steine-reihe i { width: 20px; height: 20px; }
+  .suche-zaehler-bild { width: 44px; height: 44px; }
+  .suche-p-klein { width: 16px; height: 16px; margin-left: calc(var(--p) * 0.5 - 8px); }
+  .suche-p-gross { width: 32px; height: 32px; margin-right: calc(var(--p) * 0.5 - 16px); }
+  .suche-linie { height: 6px; }
+}

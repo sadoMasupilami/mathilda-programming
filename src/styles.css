@@ -389,7 +389,11 @@ svg .bogen { fill: none; stroke: var(--akzent); stroke-width: 0.6; }
 /* ---------------------------------------------------------------------
    Anleitung für Mama/Papa
    --------------------------------------------------------------------- */
-.anleitung h1, .anleitung h2, .anleitung h3, .anleitung h4 { font-family: var(--text); line-height: 1.15; break-after: avoid; }
+/* Die allgemeinen Regeln für Überschriften, Absätze und Listen der Anleitung gelten nicht in den
+   Lösungs-Miniaturen (.rahmen-mini): Dort sollen die Blätter genau wie das Original aussehen.
+   :where(…) hält die Spezifität gleich (0,1,1), damit Regeln der Einheiten weiter greifen. */
+.anleitung h1:where(:not(.rahmen-mini *)), .anleitung h2:where(:not(.rahmen-mini *)),
+.anleitung h3:where(:not(.rahmen-mini *)), .anleitung h4:where(:not(.rahmen-mini *)) { font-family: var(--text); line-height: 1.15; break-after: avoid; }
 .einheit-kopf {
   display: flex;
   gap: 5mm;
@@ -418,7 +422,7 @@ svg .bogen { fill: none; stroke: var(--akzent); stroke-width: 0.6; }
 .einheit-kopf h1 { margin: 0; font-size: 24pt; font-weight: 900; color: var(--tinte); }
 .einheit-kopf .unter { font-size: 10pt; color: var(--grau); margin-top: 1mm; }
 
-.anleitung h2 {
+.anleitung h2:where(:not(.rahmen-mini *)) {
   font-size: 14pt;
   font-weight: 900;
   color: var(--akzent);
@@ -427,11 +431,11 @@ svg .bogen { fill: none; stroke: var(--akzent); stroke-width: 0.6; }
   align-items: center;
   gap: 2mm;
 }
-.anleitung h3 { font-size: 11.5pt; font-weight: 800; margin: 4mm 0 1.5mm 0; }
-.anleitung h4 { font-size: 10.5pt; font-weight: 800; margin: 3mm 0 1mm 0; }
-.anleitung p { margin: 0 0 2mm 0; }
-.anleitung ul, .anleitung ol { margin: 0 0 2mm 0; padding-left: 6mm; }
-.anleitung li { margin-bottom: 1mm; }
+.anleitung h3:where(:not(.rahmen-mini *)) { font-size: 11.5pt; font-weight: 800; margin: 4mm 0 1.5mm 0; }
+.anleitung h4:where(:not(.rahmen-mini *)) { font-size: 10.5pt; font-weight: 800; margin: 3mm 0 1mm 0; }
+.anleitung p:where(:not(.rahmen-mini *)) { margin: 0 0 2mm 0; }
+.anleitung ul:where(:not(.rahmen-mini *)), .anleitung ol:where(:not(.rahmen-mini *)) { margin: 0 0 2mm 0; padding-left: 6mm; }
+.anleitung li:where(:not(.rahmen-mini *)) { margin-bottom: 1mm; }
 
 /* Kästen */
 .kasten {
@@ -705,6 +709,9 @@ table.tab.darf-brechen tr { break-inside: avoid; }
 .spick-block.schwerer { background: #fff6dc; border-color: var(--gold); }
 .spick-block.schluss { border: 0.6mm solid var(--akzent); }
 .spick-block > * + h2 { margin-top: 2mm; }
+/* Zwei Kästen direkt untereinander (nicht im zweispaltigen .spick-zwei): derselbe Abstand wie nach .spick-zwei.
+   Nur direkte Kinder, sonst rutscht die rechte Spalte in .spick-zwei nach unten; ein eigener margin-bottom fällt damit zusammen. */
+.spick > .spick-block + .spick-block { margin-top: 2.5mm; }
 /* Abhak-Kästchen (gezeichnet, kein Schriftzeichen) */
 .spick ul.check { list-style: none; padding-left: 0; }
 .spick ul.check > li { position: relative; padding-left: 5mm; }

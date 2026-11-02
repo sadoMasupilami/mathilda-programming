@@ -1,0 +1,34 @@
+{
+ "paket": "e9",
+ "einheit": 9,
+ "titel": "Nur Ja oder Nein",
+ "web": {
+  "titel": "Nur Ja oder Nein",
+  "art": "janein",
+  "levels": ["e9-w1", "e9-l2", "e9-a2", "e9-w2", "e9-b1", "e9-w3", "e9-k1", "e9-w4", "e9-w5"]
+ },
+ "raetsel": [
+  { "id": "e9-alle", "art": "janein", "aufgabe": "lesen", "ja": [16, 8, 4, 2, 1] },
+  { "id": "e9-null", "art": "janein", "aufgabe": "lesen", "ja": [] },
+
+  { "id": "e9-l1", "art": "janein", "aufgabe": "lesen", "ja": [4, 2] },
+  { "id": "e9-l2", "art": "janein", "aufgabe": "lesen", "ja": [8, 4, 1], "wahl": [12, 13, 15] },
+  { "id": "e9-l3", "art": "janein", "aufgabe": "lesen", "ja": [16, 8, 2] },
+  { "id": "e9-a1", "art": "janein", "aufgabe": "legen", "zahl": 10 },
+  { "id": "e9-a2", "art": "janein", "aufgabe": "legen", "zahl": 21 },
+  { "id": "e9-groesste6", "art": "janein", "aufgabe": "lesen", "anzahl": 6, "ja": [32, 16, 8, 4, 2, 1] },
+
+  { "id": "e9-f1", "art": "janein", "aufgabe": "lesen", "aussehen": "finger", "ja": [2, 1] },
+  { "id": "e9-f2", "art": "janein", "aufgabe": "lesen", "aussehen": "finger", "ja": [16, 1] },
+  { "id": "e9-b1", "art": "janein", "aufgabe": "lesen", "aussehen": "lampen", "ja": [16, 8, 1], "wahl": [24, 25, 27] },
+  { "id": "e9-k1", "art": "janein", "aufgabe": "kobold", "zahl": 19, "ja": [16, 4, 2, 1] },
+  { "id": "e9-n1", "art": "janein", "aufgabe": "lesen", "aussehen": "ziffern", "ja": [16, 4, 2] },
+  { "id": "e9-n2", "art": "janein", "aufgabe": "legen", "aussehen": "ziffern", "zahl": 11 },
+
+  { "id": "e9-w1", "art": "janein", "aufgabe": "legen", "zahl": 5 },
+  { "id": "e9-w2", "art": "janein", "aufgabe": "legen", "aussehen": "lampen", "zahl": 9 },
+  { "id": "e9-w3", "art": "janein", "aufgabe": "legen", "aussehen": "finger", "zahl": 11 },
+  { "id": "e9-w4", "art": "janein", "aufgabe": "kobold", "zahl": 26, "ja": [16, 8] },
+  { "id": "e9-w5", "art": "janein", "aufgabe": "legen", "anzahl": 6, "zahl": 40 }
+ ]
+}

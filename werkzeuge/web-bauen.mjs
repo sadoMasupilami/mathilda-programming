@@ -27,6 +27,8 @@ const ZIEL = path.resolve(WURZEL, arg('--ziel', '_site'));
 const WEB = path.join(WURZEL, 'web');
 const fehler = [];
 const warnungen = [];
+const MIN_FELD_PX = 36;      // Gitter-Feld auf dem kleinsten Handy (siehe pruefeHandy)
+const MAX_SPRUECHE = 2;      // Zaubersprüche pro Level (Aufruf-Tasten)
 
 // ---------------------------------------------------------------------
 // 1. Rätsel
@@ -40,16 +42,63 @@ if (erg.fehler.length) {
 const daten = webDaten(erg);
 // Die App bewertet nur nach dem Ergebnis: gemeinte Reparatur, Beispiel- und Lösungsprogramme gehören nicht in die Daten
 for (const p of daten.pakete) for (const l of p.levels) { delete l.reparatur; delete l.beispiel; delete l.loesung; }
-const SPIELBAR = ['pfad', 'kobold', 'ablauf'];
+// Spielbar sind die eingebauten Arten und jede Art mit einem Spiel-Plugin web/spiele/<art>.js
+// (meldet sich mit window.WerkstattSpiele['<art>'] = { … } an, siehe Kopf von web/app.js).
+// Ein Paket mit Levels verschiedener Arten hat web.art "gemischt".
+const SPIELE_ORDNER = path.join(WEB, 'spiele');
+const SPIEL_PLUGINS = fs.existsSync(SPIELE_ORDNER) ? fs.readdirSync(SPIELE_ORDNER).filter((d) => d.endsWith('.js')).map((d) => d.slice(0, -3)).sort() : [];
+const SPIELBAR = ['pfad', 'kobold', 'ablauf'].concat(SPIEL_PLUGINS);
 for (const p of daten.pakete) {
-  if (!SPIELBAR.includes(p.art)) fehler.push('Paket ' + p.paket + ': web.art „' + p.art + '“ kann die App nicht (' + SPIELBAR.join(', ') + ')');
+  if (!SPIELBAR.includes(p.art) && p.art !== 'gemischt') fehler.push('Paket ' + p.paket + ': web.art „' + p.art + '“ kann die App nicht (' + SPIELBAR.join(', ') + ', gemischt)');
+  if (p.art !== 'gemischt' && p.levels.some((l) => l.art !== p.art && !(p.art === 'pfad' && l.art === 'pfad'))) {
+    const andere = [...new Set(p.levels.map((l) => l.art).filter((a) => a !== p.art))];
+    if (andere.length) fehler.push('Paket ' + p.paket + ': Levels der Art ' + andere.join(', ') + ' in einem Paket der Art „' + p.art + '“ (dann web.art "gemischt")');
+  }
   if (p.levels.length < 1) fehler.push('Paket ' + p.paket + ': keine Levels');
   if (p.levels.length < 5 || p.levels.length > 9) warnungen.push('Paket ' + p.paket + ' hat ' + p.levels.length + ' Levels (geplant 5–9)');
   for (const l of p.levels) {
     if (!SPIELBAR.includes(l.art)) fehler.push('Level ' + l.id + ': art „' + l.art + '“ ist in der App nicht spielbar (' + SPIELBAR.join(', ') + ')');
-    if ((l.art === 'pfad' || l.art === 'kobold') && !l.ziel) fehler.push('Level ' + l.id + ': ohne Ziel nicht spielbar');
+    // mehrere Gitter ("welten"): jedes braucht ein Ziel (eigenes oder das gemeinsame des Levels)
+    const ohneZiel = Array.isArray(l.welten) && l.welten.length ? l.welten.some((w) => !(w && w.ziel) && !l.ziel) : !l.ziel;
+    if ((l.art === 'pfad' || l.art === 'kobold') && ohneZiel) fehler.push('Level ' + l.id + ': ohne Ziel nicht spielbar');
     if (l.art === 'pfad' && l.maxKarten && l.maxKarten > 12) fehler.push('Level ' + l.id + ': maxKarten höchstens 12');
+    if (l.art === 'pfad' || l.art === 'kobold') pruefeHandy(l);
   }
+}
+
+// Passt das Level auf das kleinste Handy (iPhone SE, 667 · 375 quer und 375 · 667 hoch)? Die App zeigt Gitter-Felder
+// erst ab 36 px gut (tests/web.spec.mjs prüft das in jeder Ansicht). Platz für die Gitter, gemessen in der App:
+// quer links neben Programm und Tasten (erweiterte Levels 288 · 245 px, sonst 303 · 245 px, mit zweizeiliger Meldung),
+// hoch die volle Breite 355 px (die Höhe hält web/app.js passeFeld frei). Mehrere Gitter stehen nebeneinander oder
+// untereinander (10 px Abstand), wie web/app.js ordneWelten sie legt: es zählt die beste Anordnung.
+function feldPx(welten, breite, hoehe) {
+  const n = welten.length;
+  const bw = Math.max(...welten.map((w) => w.b * 100 + 12)) / 100, bh = Math.max(...welten.map((w) => w.h * 100 + 12)) / 100;
+  let best = 0;
+  for (let c = 1; c <= n; c++) {
+    const reihen = Math.ceil(n / c);
+    best = Math.max(best, Math.min((breite - (c - 1) * 10) / (c * bw), (hoehe - (reihen - 1) * 10) / (reihen * bh)));
+  }
+  return best;
+}
+function pruefeHandy(l) {
+  const erw = l.art === 'pfad' && (l.erlaubt !== undefined || l.welten !== undefined);
+  const basis = {};
+  for (const f of ['b', 'h']) if (l[f] !== undefined) basis[f] = l[f];
+  const welten = Array.isArray(l.welten) && l.welten.length ? l.welten.map((w) => ({ ...basis, ...w })) : [basis];
+  if (welten.some((w) => !(w.b > 0 && w.h > 0))) return;
+  const quer = feldPx(welten, erw ? 288 : 303, 245);
+  const hoch = feldPx(welten, 355, Infinity);
+  const zuKlein = [];
+  if (quer < MIN_FELD_PX) zuKlein.push('quer (667 · 375) nur ' + Math.floor(quer) + ' px');
+  if (hoch < MIN_FELD_PX) zuKlein.push('hoch (375 · 667) nur ' + Math.floor(hoch) + ' px');
+  if (zuKlein.length) {
+    fehler.push('Level ' + l.id + ': Gitter-Felder auf dem kleinsten Handy ' + zuKlein.join(', ') + ' (mindestens ' + MIN_FELD_PX + ' px). ' +
+      (welten.length > 1 ? 'Kleinere Gitter: 2 Gitter höchstens 4 · 3 oder 3 · 4, 3–4 Gitter höchstens 3 · 3.' : 'Kleineres Gitter: höchstens ' + (erw ? 7 : 8) + ' Spalten und 6 Zeilen.'));
+  }
+  // Aufruf-Tasten: links ist auf dem kleinsten Handy Platz für zwei Reihen mit je 4 Tasten (web/app.js zeichneTastenErw)
+  const sprueche = Object.keys(l.sprueche || {}).length + (l.spruchFrei || []).length;
+  if (erw && sprueche > MAX_SPRUECHE) fehler.push('Level ' + l.id + ': ' + sprueche + ' Zaubersprüche, höchstens ' + MAX_SPRUECHE + ' (sonst passen die Aufruf-Tasten auf dem Handy nicht in zwei Tastenreihen)');
 }
 if (!daten.pakete.length) warnungen.push('Keine Level-Pakete gefunden – die App zeigt eine leere Startseite');
 
@@ -76,6 +125,14 @@ const indexPfad = path.join(ZIEL, 'index.html');
 let index = fs.readFileSync(indexPfad, 'utf8');
 const mitBildern = fs.existsSync(path.join(ZIEL, 'kern', 'bilder.js'));
 index = index.replace('<!-- BILDER -->', mitBildern ? '<script src="kern/bilder.js"></script>' : '');
+// Weitere Kern-Dateien (gemeinsam mit dem Löser, z. B. kern/geheim.js) und die Spiel-Plugins einbinden
+const KERN_FEST = ['ausfuehrer.js', 'symbole.js', 'bilder.js'];
+const kernExtra = fs.readdirSync(path.join(ZIEL, 'kern')).filter((d) => d.endsWith('.js') && !KERN_FEST.includes(d)).sort();
+index = index.replace('<!-- KERN -->', kernExtra.map((d) => '<script src="kern/' + d + '"></script>').join('\n'));
+index = index.replace('<!-- SPIELE -->', SPIEL_PLUGINS.map((a) => '<script src="spiele/' + a + '.js"></script>').join('\n'));
+index = index.replace('<!-- SPIELE-CSS -->', SPIEL_PLUGINS.filter((a) => fs.existsSync(path.join(ZIEL, 'spiele', a + '.css')))
+  .map((a) => '<link rel="stylesheet" href="spiele/' + a + '.css">').join('\n'));
+for (const ph of ['<!-- KERN -->', '<!-- SPIELE -->', '<!-- SPIELE-CSS -->']) if (!fs.readFileSync(path.join(WEB, 'index.html'), 'utf8').includes(ph)) fehler.push('web/index.html: Platzhalter ' + ph + ' fehlt');
 fs.writeFileSync(indexPfad, index);
 
 function alleDateien(ordner, basis = ordner) {
@@ -127,6 +184,8 @@ const ohneKommentare = (t) => t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/
 const texte = [];
 texte.push(['index.html', ohneKommentare(fs.readFileSync(path.join(ZIEL, 'index.html'), 'utf8'))]);
 texte.push(['app.js', ohneKommentare(fs.readFileSync(path.join(ZIEL, 'app.js'), 'utf8'))]);
+for (const a of SPIEL_PLUGINS) texte.push(['spiele/' + a + '.js', ohneKommentare(fs.readFileSync(path.join(ZIEL, 'spiele', a + '.js'), 'utf8'))]);
+for (const d of kernExtra) texte.push(['kern/' + d, ohneKommentare(fs.readFileSync(path.join(ZIEL, 'kern', d), 'utf8'))]);
 (function sammle(x, wo) {
   if (typeof x === 'string') texte.push([wo, x]);
   else if (Array.isArray(x)) x.forEach((y) => sammle(y, wo));

@@ -1,0 +1,108 @@
+/* =====================================================================
+   Spiel „formen“ (Einheit 14): Formen-Quadrate
+   Hoch:  Kopf / Brett / Meldung / Formen-Tasten / Nochmal und Los
+   Quer:  oben der Kopf, links das Brett, rechts Meldung und Tasten
+   Die Felder passen sich dem Platz an (Container-Einheiten), bleiben aber
+   mindestens 48 px groß, mit 8 px Abstand (wie Spielkarten auf einem Brett).
+   ===================================================================== */
+.art-formen .feld { container-type: size; }
+.art-formen .programm { display: none; }
+.art-formen .meldung { min-height: calc(2.4em + 10px); }
+.art-formen .meldung.hinweis { color: var(--tinte); }
+.art-formen .meldung.formen-neu { background: #e3edfc; }
+
+/* ----- Brett ----- */
+.formen-brett {
+  --g: 8px;
+  --p: 9px;
+  --max: 140px;
+  --c: max(48px, min(
+    calc((100cqw - 2 * var(--p) - (var(--n) - 1) * var(--g)) / var(--n)),
+    calc((100cqh - 2 * var(--p) - (var(--n) - 1) * var(--g)) / var(--n)),
+    var(--max)));
+  display: grid;
+  grid-template-columns: repeat(var(--n), var(--c));
+  grid-template-rows: repeat(var(--n), var(--c));
+  gap: var(--g);
+  padding: var(--p);
+  border-radius: 20px;
+  background: #ece6d6;
+  box-shadow: inset 0 0 0 3px #d9d3c4;
+  position: relative;
+}
+.formen-brett.formen-geschafft { background: var(--gold-hell); box-shadow: inset 0 0 0 4px var(--gold); }
+
+.formen-zelle {
+  position: relative;
+  width: 100%; height: 100%; min-width: 48px; min-height: 48px; padding: 0;
+  border: 3px solid var(--tinte); border-radius: 14px; background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.formen-zelle svg { width: 74%; height: 74%; pointer-events: none; }
+.formen-zelle:focus-visible { outline: 4px solid var(--gold); outline-offset: 2px; }
+/* Frei: wie eine Karte zum Antippen (mit Schatten). Vorgegeben: flach, liegt fest. */
+.formen-zelle.formen-frei { box-shadow: 0 3px 0 rgba(31, 35, 64, 0.2); }
+.formen-zelle.formen-frei:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(31, 35, 64, 0.2); }
+.formen-zelle.formen-fest { background: #f6f2e8; border-color: #8f8a7c; cursor: default; }
+.formen-zelle.formen-schraege0 { background: #c9defc; }
+.formen-zelle.formen-schraege1 { background: #ffe7a3; }
+.formen-zelle.formen-schraege0.formen-schraege1 { background: linear-gradient(135deg, #c9defc 50%, #ffe7a3 50%); }
+/* Kobold: das getauschte Feld */
+.formen-zelle.formen-anders { background: var(--akzent-hell); border-color: var(--akzent); }
+/* Ausgewählt: dicker gelber Rand außen (im Abstand zwischen den Feldern) */
+.formen-zelle.formen-gewaehlt, .formen-zelle.formen-gewaehlt:active { border-color: #c79500; box-shadow: 0 0 0 5px var(--gold); transform: none; z-index: 2; }
+.formen-frage { font-size: calc(var(--c) * 0.5); font-weight: 700; color: #a39d8f; line-height: 1; }
+
+/* Hinweise nach „Los“ */
+.formen-band {
+  pointer-events: none; z-index: 3;
+  margin: -7px; border: 4px solid var(--akzent); border-radius: 18px;
+  background: rgba(196, 95, 18, 0.07);
+}
+.formen-zelle.formen-doppelt { border-color: var(--akzent); border-width: 5px; background: var(--akzent-hell); }
+.formen-zelle.formen-leer { border-style: dashed; border-color: var(--akzent); }
+/* Geschafft: Kobold gefunden */
+.formen-zelle.formen-kobold { border-color: var(--akzent); }
+.formen-koboldbild {
+  position: absolute; top: -12px; right: -12px; width: 34px; height: 34px; z-index: 4;
+  background: #fff; border-radius: 50%; box-shadow: 0 0 0 2.5px var(--akzent);
+}
+.formen-koboldbild svg { width: 100%; height: 100%; }
+
+/* ----- Tasten: die Formen zum Wählen ----- */
+.taste.formen-wahl, .taste.formen-leeren { width: calc(var(--t) * 1.1); height: calc(var(--t) * 1.1); }
+.taste.formen-wahl svg { width: 76%; height: 76%; }
+.taste.formen-leeren svg { width: 72%; height: 72%; }
+.taste.formen-wahl.formen-an { border-color: #c79500; background: var(--gold-hell); box-shadow: 0 0 0 4px var(--gold); }
+.taste.formen-wahl[aria-disabled="true"], .taste.formen-leeren[aria-disabled="true"] { opacity: 0.4; }
+.formen-wahl-reihe { flex-wrap: nowrap; }
+
+.formen-icon { width: 100%; height: 100%; }
+
+/* ----- Quer: Kopf oben, Brett links, Meldung und Tasten rechts ----- */
+@media (orientation: landscape) {
+  .spiel.art-formen {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) clamp(312px, 44%, 520px);
+    grid-template-rows: auto minmax(0, 1fr) auto auto minmax(0, 1fr);
+    grid-template-areas: "kopf kopf" "feld ." "feld meldung" "feld tasten" "feld .";
+    column-gap: 14px; row-gap: 10px;
+  }
+  .art-formen .spalte-links, .art-formen .spalte-rechts { display: contents; }
+  .art-formen .kopf { grid-area: kopf; }
+  .art-formen .feld { grid-area: feld; }
+  .art-formen .meldung { grid-area: meldung; }
+  .art-formen .tasten { grid-area: tasten; }
+}
+@media (orientation: landscape) and (max-height: 500px) {
+  .art-formen .meldung { min-height: calc(2.4em + 8px); }
+  .taste.formen-wahl, .taste.formen-leeren { width: var(--t); height: var(--t); }
+  .formen-brett { --p: 7px; }
+}
+/* Große Geräte: mehr Luft zwischen den Feldern */
+@media (min-width: 700px) and (min-height: 700px) {
+  .formen-brett { --g: 12px; --p: 12px; --max: 200px; border-radius: 24px; }
+  .formen-zelle { border-radius: 18px; }
+  .formen-band { margin: -9px; border-radius: 22px; }
+}

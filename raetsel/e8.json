@@ -1,0 +1,312 @@
+{
+ "paket": "e8",
+ "einheit": 8,
+ "titel": "Bilder aus Kästchen",
+ "web": {
+  "titel": "Bilder aus Kästchen",
+  "art": "kaestchen",
+  "levels": ["e8-w1", "e8-a1", "e8-w2", "e8-a2", "e8-k1", "e8-p1", "e8-w3", "e8-w4"]
+ },
+ "raetsel": [
+  {
+   "id": "e8-d1",
+   "art": "kaestchen",
+   "aufgabe": "malen",
+   "titel": "Smiley",
+   "b": 6,
+   "h": 6,
+   "code": ["6w", "1w 1s 2w 1s 1w", "1w 1s 2w 1s 1w", "6w", "1s 4w 1s", "1w 4s 1w"],
+   "bild": ["......", ".#..#.", ".#..#.", "......", "#....#", ".####."]
+  },
+  {
+   "id": "e8-d2",
+   "art": "kaestchen",
+   "aufgabe": "malen",
+   "titel": "Segelboot",
+   "b": 6,
+   "h": 6,
+   "code": ["2w 1s 3w", "2w 2s 2w", "2w 3s 1w", "2w 1s 3w", "6s", "1w 4s 1w"],
+   "bild": ["..#...", "..##..", "..###.", "..#...", "######", ".####."]
+  },
+  {
+   "id": "e8-d3",
+   "art": "kaestchen",
+   "aufgabe": "malen",
+   "titel": "Fisch",
+   "b": 6,
+   "h": 6,
+   "code": ["6w", "1w 3s 1w 1s", "1s 1w 4s", "6s", "1w 3s 1w 1s", "6w"],
+   "bild": ["......", ".###.#", "#.####", "######", ".###.#", "......"]
+  },
+  {
+   "id": "e8-d4",
+   "art": "kaestchen",
+   "aufgabe": "malen",
+   "titel": "Rakete",
+   "b": 6,
+   "h": 6,
+   "code": ["2w 2s 2w", "1w 4s 1w", "1w 1s 2w 1s 1w", "1w 4s 1w", "1w 4s 1w", "2s 2w 2s"],
+   "bild": ["..##..", ".####.", ".#..#.", ".####.", ".####.", "##..##"]
+  },
+  {
+   "id": "e8-a1",
+   "art": "kaestchen",
+   "aufgabe": "malen",
+   "titel": "Hase",
+   "b": 7,
+   "h": 7,
+   "farben": ["w", "s"],
+   "code": ["1w 1s 3w 1s 1w", "1w 1s 3w 1s 1w", "1w 5s 1w", "2s 1w 1s 1w 2s", "7s", "3s 1w 3s", "1w 5s 1w"],
+   "bild": [".#...#.", ".#...#.", ".#####.", "##.#.##", "#######", "###.###", ".#####."],
+   "zahlen": 25
+  },
+  {
+   "id": "e8-a2",
+   "art": "kaestchen",
+   "aufgabe": "schreiben",
+   "titel": "Haus",
+   "farben": ["w", "s"],
+   "bild": ["..##..", ".####.", "######", "#....#", "#.##.#"],
+   "code": ["2w 2s 2w", "1w 4s 1w", "6s", "1s 4w 1s", "1s 1w 2s 1w 1s"]
+  },
+  {
+   "id": "e8-p1",
+   "art": "kaestchen",
+   "aufgabe": "malen",
+   "titel": "Fliegenpilz",
+   "b": 6,
+   "h": 5,
+   "farben": ["w", "r", "n"],
+   "code": ["1w 4r 1w", "1r 1w 2r 1w 1r", "6r", "2w 2n 2w", "2w 2n 2w"],
+   "bild": [".rrrr.", "r.rr.r", "rrrrrr", "..nn..", "..nn.."]
+  },
+  {
+   "id": "e8-k1",
+   "art": "kaestchen",
+   "aufgabe": "kobold",
+   "titel": "Herz",
+   "bild": [".##..##.", "########", "########", ".######.", "..####..", "...##..."],
+   "code": ["1w 2s 2w 2s 1w", "8s", "8s", "1w 6s 1w", "1w 4s 3w", "3w 2s 3w"],
+   "zeile": 5,
+   "fehler": "bild",
+   "spiegel": true,
+   "verschoben": true
+  },
+  {
+   "id": "e8-z1",
+   "art": "kaestchen",
+   "aufgabe": "kuerzer",
+   "titel": "Turm",
+   "bild": ["#.#.#", "#####", ".###.", ".###.", ".###.", ".#.#."],
+   "zeilen": [3, 5],
+   "kurz": ["3{1w 3s 1w}"],
+   "kuerzest": true
+  },
+  {
+   "id": "e8-q1",
+   "art": "kaestchen",
+   "aufgabe": "zaehlen",
+   "titel": "Gartenzaun",
+   "bild": ["#.#.#", "#.#.#", "#.#.#"],
+   "erwartet": {
+    "zeilen": 15,
+    "spalten": 5
+   }
+  },
+  {
+   "id": "e8-q2",
+   "art": "kaestchen",
+   "aufgabe": "malen",
+   "titel": "Strich von oben nach unten",
+   "b": 6,
+   "h": 6,
+   "code": ["2w 2s 2w", "2w 2s 2w", "2w 2s 2w", "2w 2s 2w", "2w 2s 2w", "2w 2s 2w"],
+   "bild": ["..##..", "..##..", "..##..", "..##..", "..##..", "..##.."]
+  },
+  {
+   "id": "e8-q3",
+   "art": "kaestchen",
+   "aufgabe": "malen",
+   "titel": "Strich von links nach rechts",
+   "b": 6,
+   "h": 6,
+   "richtung": "spalten",
+   "code": ["2w 2s 2w", "2w 2s 2w", "2w 2s 2w", "2w 2s 2w", "2w 2s 2w", "2w 2s 2w"],
+   "bild": ["......", "......", "######", "######", "......", "......"]
+  },
+  {
+   "id": "e8-w1",
+   "art": "kaestchen",
+   "aufgabe": "malen",
+   "titel": "Herz",
+   "b": 5,
+   "h": 5,
+   "code": ["1w 1s 1w 1s 1w", "5s", "5s", "1w 3s 1w", "2w 1s 2w"],
+   "bild": [".#.#.", "#####", "#####", ".###.", "..#.."]
+  },
+  {
+   "id": "e8-w2",
+   "art": "kaestchen",
+   "aufgabe": "schreiben",
+   "titel": "Tanne",
+   "bild": ["..#..", ".###.", "#####", "..#.."],
+   "code": ["2w 1s 2w", "1w 3s 1w", "5s", "2w 1s 2w"]
+  },
+  {
+   "id": "e8-w3",
+   "art": "kaestchen",
+   "aufgabe": "malen",
+   "titel": "Schloss",
+   "b": 7,
+   "h": 7,
+   "code": ["3[1s 1w] 1s", "7s", "3[1s 1w] 1s", "7s", "3{2s 3w 2s}"],
+   "bild": ["#.#.#.#", "#######", "#.#.#.#", "#######", "##...##", "##...##", "##...##"],
+   "zahlen": 14
+  },
+  {
+   "id": "e8-w4",
+   "art": "kaestchen",
+   "aufgabe": "kobold",
+   "titel": "Gartenzaun",
+   "bild": [".#.#.#.", "#######", ".#.#.#.", "#######", ".#.#.#."],
+   "code": ["3[1w 1s] 1w", "7s", "2[1w 1s] 1w", "7s", "3[1w 1s] 1w"],
+   "zeile": 3,
+   "fehler": "summe"
+  },
+  {
+   "id": "e8-s1",
+   "art": "kaestchen",
+   "aufgabe": "malen",
+   "titel": "Marienkäfer",
+   "b": 10,
+   "h": 10,
+   "farben": ["w", "s", "r"],
+   "code": ["4w 2s 4w", "3w 4s 3w", "1w 3r 2s 3r 1w", "2r 1s 1r 2s 1r 1s 2r", "1r 2s 1r 2s 1r 2s 1r", "4r 2s 4r", "1r 1s 2r 2s 2r 1s 1r", "1w 3r 2s 3r 1w", "2w 2r 2s 2r 2w", "4w 2s 4w"],
+   "bild": ["....##....", "...####...", ".rrr##rrr.", "rr#r##r#rr", "r##r##r##r", "rrrr##rrrr", "r#rr##rr#r", ".rrr##rrr.", "..rr##rr..", "....##...."]
+  },
+  {
+   "id": "e8-s2",
+   "art": "kaestchen",
+   "aufgabe": "kuerzer",
+   "titel": "Schachbrett",
+   "bild": ["#.#.#.", ".#.#.#", "#.#.#.", ".#.#.#", "#.#.#.", ".#.#.#"],
+   "kurz": ["3[1s 1w]", "3[1w 1s]", "3[1s 1w]", "3[1w 1s]", "3[1s 1w]", "3[1w 1s]"]
+  },
+  {
+   "id": "e8-s3",
+   "art": "kaestchen",
+   "aufgabe": "kuerzer",
+   "titel": "Schachbrett mit Gruppe",
+   "bild": ["#.#.#.", ".#.#.#", "#.#.#.", ".#.#.#", "#.#.#.", ".#.#.#"],
+   "kurz": ["3{1s 1w 1s 1w 1s 1w / 1w 1s 1w 1s 1w 1s}"],
+   "kuerzest": true
+  },
+  {
+   "id": "e8-s4",
+   "art": "kaestchen",
+   "aufgabe": "kuerzer",
+   "titel": "Turm ganz kurz",
+   "bild": ["#.#.#", "#####", ".###.", ".###.", ".###.", ".#.#."],
+   "kurz": ["2[1s 1w] 1s", "5s", "3{1w 3s 1w}", "2[1w 1s] 1w"],
+   "kuerzest": true
+  },
+  {
+   "id": "e8-s5",
+   "art": "kaestchen",
+   "aufgabe": "kobold",
+   "titel": "Herz mit Rechen-Kobold",
+   "bild": [".##..##.", "########", "########", ".######.", "..####..", "...##..."],
+   "code": ["1w 2s 2w 2s 1w", "8s", "8s", "1w 7s 1w", "2w 4s 2w", "3w 2s 3w"],
+   "zeile": 4,
+   "fehler": "summe"
+  },
+  {
+   "id": "e8-s6",
+   "art": "kaestchen",
+   "aufgabe": "malen",
+   "titel": "Smiley in nur Zahlen",
+   "b": 6,
+   "h": 6,
+   "format": "zahlen",
+   "code": ["6", "1 1 2 1 1", "1 1 2 1 1", "6", "0 1 4 1", "1 4 1"],
+   "bild": ["......", ".#..#.", ".#..#.", "......", "#....#", ".####."]
+  },
+  {
+   "id": "e8-s7",
+   "art": "kaestchen",
+   "aufgabe": "schreiben",
+   "titel": "Segelboot gespiegelt",
+   "bild": ["...#..", "..##..", ".###..", "...#..", "######", ".####."]
+  },
+  {
+   "id": "e8-s8",
+   "art": "kaestchen",
+   "aufgabe": "kuerzer",
+   "titel": "Leiter",
+   "bild": ["#...#", "#####", "#...#", "#####", "#...#", "#####", "#...#"],
+   "kurz": ["3{1s 3w 1s / 5s}", "1s 3w 1s"],
+   "kuerzest": true
+  },
+  {
+   "id": "e8-b1",
+   "art": "kaestchen",
+   "aufgabe": "malen",
+   "titel": "Ball",
+   "b": 4,
+   "h": 4,
+   "code": ["1w 2s 1w", "4s", "4s", "1w 2s 1w"],
+   "bild": [".##.", "####", "####", ".##."]
+  },
+  {
+   "id": "e8-b2",
+   "art": "kaestchen",
+   "aufgabe": "malen",
+   "titel": "Strich",
+   "b": 5,
+   "h": 5,
+   "code": ["2w 1s 2w", "2w 1s 2w", "2w 1s 2w", "2w 1s 2w", "2w 1s 2w"],
+   "bild": ["..#..", "..#..", "..#..", "..#..", "..#.."]
+  },
+  {
+   "id": "e8-b3",
+   "art": "kaestchen",
+   "aufgabe": "malen",
+   "titel": "Profi-Zeile",
+   "b": 9,
+   "h": 1,
+   "code": ["3[1s 2w]"],
+   "bild": ["#..#..#.."]
+  },
+  {
+   "id": "e8-s9",
+   "art": "kaestchen",
+   "aufgabe": "malen",
+   "titel": "Haus in nur Zahlen",
+   "b": 6,
+   "h": 5,
+   "format": "zahlen",
+   "code": ["2 2 2", "1 4 1", "0 6", "0 1 4 1", "0 1 1 2 1 1"],
+   "bild": ["..##..", ".####.", "######", "#....#", "#.##.#"]
+  },
+  {
+   "id": "e8-s10",
+   "art": "kaestchen",
+   "aufgabe": "malen",
+   "titel": "Code im Kopf",
+   "b": 3,
+   "h": 3,
+   "code": ["3{1w 1s 1w}"],
+   "bild": [".#.", ".#.", ".#."],
+   "zahlen": 4
+  },
+  {
+   "id": "e8-s11",
+   "art": "kaestchen",
+   "aufgabe": "kuerzer",
+   "titel": "Marienkäfer Zeile 5",
+   "bild": ["r##r##r##r"],
+   "kurz": ["1r 3[2s 1r]"],
+   "kuerzest": true
+  }
+ ]
+}

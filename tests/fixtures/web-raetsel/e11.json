@@ -1,0 +1,13 @@
+{
+  "paket": "e11",
+  "einheit": 11,
+  "titel": "Wenn-dann-Regeln (Test)",
+  "web": {"titel": "Wenn-dann-Regeln", "art": "pfad", "levels": ["t11-1", "t11-2", "t11-3", "t11-4", "t11-5"]},
+  "raetsel": [
+    {"id": "t11-1", "art": "pfad", "aufgabe": "ankommen", "b": 3, "h": 3, "start": {"x": 1, "y": 2, "blick": "oben"}, "welten": [{"ziel": {"x": 1, "y": 0}}, {"ziel": {"x": 2, "y": 0}, "hindernisse": [[1, 0]]}], "erlaubt": ["wenn"], "maxKarten": 6, "beispiel": "vor wenn[stein: rechts vor links] vor"},
+    {"id": "t11-2", "art": "pfad", "aufgabe": "ankommen", "b": 3, "h": 3, "start": {"x": 1, "y": 2, "blick": "oben"}, "welten": [{"ziel": {"x": 2, "y": 2}, "hindernisse": [[1, 1]]}, {"ziel": {"x": 0, "y": 2}}], "erlaubt": ["wenn"], "maxKarten": 4, "beispiel": "wenn[stein: rechts sonst links] vor"},
+    {"id": "t11-3", "art": "pfad", "aufgabe": "ankommen", "b": 3, "h": 3, "start": {"x": 1, "y": 2, "blick": "oben"}, "welten": [{"ziel": {"x": 1, "y": 0}}, {"ziel": {"x": 2, "y": 0}, "hindernisse": [[1, 1]]}, {"ziel": {"x": 0, "y": 0}, "hindernisse": [[1, 1], [2, 2]]}], "erlaubt": ["wenn"], "bedingungen": ["stein", "frei", "stein-rechts", "frei-rechts"], "maxKarten": 10, "beispiel": "wenn[stein-rechts: links vor rechts] wenn[stein: rechts vor links] vor vor"},
+    {"id": "t11-4", "art": "pfad", "aufgabe": "kuerzestes", "b": 3, "h": 3, "start": {"x": 1, "y": 2, "blick": "oben"}, "welten": [{"ziel": {"x": 1, "y": 0}}, {"ziel": {"x": 2, "y": 0}, "hindernisse": [[1, 0]]}], "erlaubt": ["wenn"], "maxKarten": 8, "beispiel": "vor wenn[stein: rechts vor links] vor"},
+    {"id": "t11-5", "art": "pfad", "aufgabe": "ankommen", "b": 5, "h": 2, "start": {"x": 0, "y": 1, "blick": "rechts"}, "erlaubt": ["zauber", "wenn"], "maxKarten": 3, "beispiel": "4[wenn[frei: vor]]", "welten": [{"ziel": {"x": 3, "y": 1}, "hindernisse": [[4, 1]]}, {"ziel": {"x": 4, "y": 1}}]}
+  ]
+}
