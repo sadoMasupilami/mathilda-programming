@@ -41,6 +41,7 @@
   .e05-mzeile { display: flex; align-items: center; gap: 2mm; }
   .e05-mnr { font-family: var(--text); font-weight: 800; font-size: 14pt; color: var(--grau); width: 4mm; text-align: center; }
   .e05-mbild svg { display: block; }
+  .e05-mbild > .lsg-nur { margin: 2.5mm 0 0 7mm; line-height: 1.3; }   /* Lösungsansicht: rechts unter den Kästchen, neben den Muster-Programmen */
   .e05-finden { display: flex; flex-direction: column; align-items: flex-start; gap: 3mm; line-height: 1.3; }
 
   /* Blätter */
@@ -454,8 +455,9 @@
 
   <div class="aufg">
     <p class="anw">Mal das Muster-Bild. Jede Zeile hat einen Zauber-Kasten. Weiß bleibt leer. Was siehst du?</p>
-    <m-e5-muster art="malen" gr="9" zeilen="4[rot leer leer]; 4[rot rot leer]; 4[gruen gruen gruen]"></m-e5-muster>
-    <p class="lsg-nur">Z. B. ein Drachen-Rücken mit 4 roten Zacken. Jede passende Idee gilt.</p>
+    <m-e5-muster art="malen" gr="9" zeilen="4[rot leer leer]; 4[rot rot leer]; 4[gruen gruen gruen]">
+      <p class="lsg-nur">Z. B. ein Drachen-Rücken mit 4 roten Zacken. Jede passende Idee gilt.</p>
+    </m-e5-muster>
   </div>
 
   <div class="e05-profi-reihe">
