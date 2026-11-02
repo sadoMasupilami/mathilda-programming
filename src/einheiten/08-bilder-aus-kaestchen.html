@@ -13,7 +13,8 @@
   .e08-legende { display: flex; flex-wrap: wrap; align-items: center; gap: 1.5mm 6mm; margin: 0 0 3mm 10mm; font-size: 14pt; }
   .e08-legende > span { display: inline-flex; align-items: center; gap: 2mm; white-space: nowrap; }
   .e08-was { display: flex; flex-direction: column; gap: 2mm; align-self: center; font-size: 16pt; }
-  .e08-was .feld.text { min-width: 28mm; }
+  /* Antwortfelder: auch in der Lösungs-Miniatur gilt diese Breite (schlägt .anleitung .loesung-mini .feld.text) */
+  .e08-was .feld.text, .anleitung .loesung-mini .e08-was .feld.text { min-width: 28mm; width: 100%; margin: 0; }
   .e08-rep { display: flex; flex-wrap: wrap; align-items: center; gap: 2mm 8mm; margin-top: 3mm; }
   .e08-rep > span { display: inline-flex; align-items: center; gap: 2.5mm; }
   .e08-z1 { display: flex; align-items: flex-start; gap: 7mm; }
@@ -25,7 +26,10 @@
   .e08-knobel-zaun { display: flex; align-items: center; gap: 6mm; }
   .e08-fragen { display: flex; flex-direction: column; gap: 2.5mm; font-size: 15pt; line-height: 1.2; }
   .e08-fragen > span { display: flex; align-items: center; gap: 2.5mm; }
-  .e08-pilz { display: flex; align-items: flex-start; gap: 6mm; }
+  .e08-pilz { display: flex; align-items: flex-start; gap: 3mm; }
+  /* Profi: die Spalte rechts nimmt nur den Platz, der neben Code und Gitter frei ist */
+  .e08-pilz .e08-was { flex: 1 1 0; min-width: 0; }
+  .e08-pilz .e08-was .feld.text, .anleitung .loesung-mini .e08-pilz .e08-was .feld.text { min-width: 0; }
 
   /* Blatt 8-3: Muggelstein-Brett und Kästchen-Karte */
   .e08-brett-reihe { display: flex; align-items: flex-start; gap: 5mm; }
@@ -72,7 +76,7 @@
     <div class="spick-block vorher">
       <h2>Vorher, ohne {{KIND}} <small>· etwa 10 Min</small></h2>
       <ul class="check">
-        <li><a class="blattref" href="#blatt-8-1"></a>, <a class="blattref" href="#blatt-8-2"></a> und <a class="blattref" href="#blatt-8-3"></a> drucken, gern in Farbe. <span class="min">2 Min</span></li>
+        <li><a class="blattref" href="#blatt-8-1"></a>, <a class="blattref" href="#blatt-8-2"></a> und <a class="blattref" href="#blatt-8-3"></a> drucken, Blatt 8-1 am besten in Farbe (Profi: Rot und Braun). Ohne Farbdrucker dort im Code die grauen Farb-Kästchen in Zeile 1 bis 3 rot, in Zeile 4 und 5 braun nachmalen. <span class="min">2 Min</span></li>
         <li>Auf Kästchenpapier 4 Quadrate aus 6 · 6 Kästchen umranden, links daneben die Zeilen 1 bis 6. <span class="min">5 Min</span></li>
         <li>20 Muggelsteine in eine Schüssel, ein großes Buch als Sichtschutz. <span class="min">1 Min</span></li>
         <li>Die Bilder zum Diktieren in der Anleitung anschauen. <span class="min">2 Min</span></li>
@@ -193,7 +197,7 @@
   <div class="kasten material darf-brechen e08-bricht">
     <p><b>Vorher, ohne {{KIND}} (etwa 10 Minuten):</b></p>
     <ul>
-      <li><b>Drucken (2 Minuten):</b> <a class="blattref" href="#blatt-8-1"></a> und <a class="blattref" href="#blatt-8-2"></a> (Arbeitsblätter) und <a class="blattref" href="#blatt-8-3"></a> (Spielplan mit Muggelstein-Brett und Kästchen-Karte). Farbe ist schön (Profi-Aufgabe, lila Zauber-Kasten), aber nicht nötig.</li>
+      <li><b>Drucken (2 Minuten):</b> <a class="blattref" href="#blatt-8-1"></a> und <a class="blattref" href="#blatt-8-2"></a> (Arbeitsblätter) und <a class="blattref" href="#blatt-8-3"></a> (Spielplan mit Muggelstein-Brett und Kästchen-Karte). Blatt 8-1 am besten in Farbe drucken: Die Profi-Aufgabe braucht Rot und Braun, und im Schwarz-Weiß-Druck werden beide gleich grau. Ohne Farbdrucker: im Code der Profi-Aufgabe die grauen Farb-Kästchen in Zeile 1 bis 3 rot und in Zeile 4 und 5 braun nachmalen. Die anderen Blätter gehen auch in Schwarz-Weiß.</li>
       <li><b>Diktier-Felder (5 Minuten):</b> Auf Kästchenpapier (Rechenheft) mit dem Bleistift 4 Quadrate aus je 6 · 6 Kästchen umranden und links daneben die Zahlen 1 bis 6 schreiben. Darauf malt beim Code-Diktat, wer gerade Maler ist.</li>
       <li><b>Muggelsteine (1 Minute):</b> 20 Stück (oder ein paar mehr) in eine Schüssel. Keine Muggelsteine im Haus? Knöpfe, Zuckerl, Nudeln oder Legosteine gehen genauso. Ein großes Buch oder ein aufgestellter Ordner ist der Sichtschutz.</li>
       <li><b>Bilder zum Diktieren (2 Minuten):</b> Schau dir den Kasten „Bilder zum Diktieren“ unter dem Ablauf an. Der Smiley ist für den Anfang, die anderen drei für das Code-Diktat. Die Lösungsbilder stehen gleich daneben, {{KIND}} soll sie vorher nicht sehen.</li>
@@ -387,7 +391,7 @@
       <p><b><a class="blattref" href="#blatt-8-1"></a>, Aufgabe 1:</b> ein Hase mit zwei langen Ohren. Augen und Nase bleiben weiß. Jede Zeile ist 7 Kästchen breit.</p>
       <p><b>Aufgabe 2 (Haus):</b> der Code steht rot im verkleinerten Blatt. Zeile für Zeile:</p>
       <m-e8-mini raetsel="e8-a2" ohne-titel zelle="3"></m-e8-mini>
-      <p><b>Profi:</b> ein Fliegenpilz, roter Hut mit zwei weißen Punkten, brauner Stiel.</p>
+      <p><b>Profi:</b> ein Pilz (Fliegenpilz): roter Hut mit zwei weißen Punkten, brauner Stiel. Ins Feld passt „Pilz“, das reicht.</p>
       <p><b><a class="blattref" href="#blatt-8-3"></a>, Knobel-Ecke:</b> Jede Zeile „2 weiß, 2 schwarz, 2 weiß“ ergibt einen Strich von oben nach unten (Spalte 3 und 4). Hat jede Spalte diesen Code, liegt der Strich quer (Zeile 3 und 4). Beide Male 12 Steine.</p>
       <p class="e08-zwei-bilder"><m-e8-bild raetsel="e8-q2" nur-bild zelle="3"></m-e8-bild><m-e8-bild raetsel="e8-q3" nur-bild zelle="3"></m-e8-bild></p>
       <p><b>Kästchen-Karte:</b> eigenes Bild, mehrere Lösungen möglich. Die Probe macht die Kobold-Probe: Jede Zeile ergibt zusammen 6.</p>
@@ -435,7 +439,7 @@
   <div class="profi" data-titel="Profi-Aufgabe: Zwei Farben">
     <div class="e08-pilz">
       <m-e8-bild raetsel="e8-p1"></m-e8-bild>
-      <div class="e08-was"><span>Mal mit Rot und Braun.</span><span>Was wächst im Wald?</span><m-feld l="Fliegenpilz" art="text"></m-feld></div>
+      <div class="e08-was"><span>Mal mit Rot und Braun.</span><span>Was wächst im Wald?</span><m-feld l="Pilz" art="text"></m-feld></div>
     </div>
   </div>
 </section>
