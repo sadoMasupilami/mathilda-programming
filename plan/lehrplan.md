@@ -4,7 +4,7 @@ Langfristiger Plan für 20 Einheiten plus Extras. Er ist ein **Vorschlag** und w
 
 - **Für wen:** {{KIND}}, 6 Jahre, 1. Klasse Volksschule (Österreich). Sie liest kurze Sätze selbst, zählt bis 100, rechnet mit kleinen Zahlen und ist schnell. Ziel ist **Fordern**, nicht Aufholen. Links und rechts sind noch unklar und werden in Einheit 1 eingeschätzt.
 - **Wie:** zu zweit ({{KIND}} und Mama oder Papa), 20–30 Minuten gemeinsame Zeit, 2- bis 3-mal pro Woche. Vorbereitung ohne {{KIND}} steht getrennt mit Minuten. Fast alles am Papier, mit Bewegung und Basteln.
-- **Bildschirm:** höchstens 5–10 Minuten pro Einheit, am Schluss, als Bonus. Jede Einheit funktioniert komplett ohne Bildschirm. Einheit 1 und Einheit 18 haben absichtlich keinen.
+- **Bildschirm:** höchstens 15 Minuten pro Einheit, am Schluss, als Bonus. Ein ganzes Paket (derzeit 6–9 Levels) dauert etwa 10–15 Minuten; aufhören geht nach jedem Level (Abschnitt 9). Jede Einheit funktioniert komplett ohne Bildschirm. Einheit 1 und Einheit 18 haben absichtlich keinen. **Abweichung vom Auftrag:** AUFTRAG.md Abschnitt 2 nennt höchstens 5–10 Minuten. Mit den größeren Paketen (seit Ende Oktober 2026 bis zu 9 Levels) gilt im ganzen Heft höchstens 15 Minuten. Das bestätigt der Auftraggeber mit der Rückmeldung zu Block A; bleibt es bei 10 Minuten, gilt Abschnitt 10 („Bildschirm zu viel“).
 - **Wie es sich anfühlen soll:** Spaß, Neugier, Bewegung, Basteln. Fantasie-Flair in einzelnen Aufgaben (ein Drache sucht den Schatz, ein Fehler-Kobold versteckt Fehler, eine Fee schreibt Geheimbriefe), aber **keine durchgehende Geschichte**.
 - **Belohnung:** Sammelpass (ein Feld pro Einheit, Stempel oder Sticker, 1–3 Sterne „Wie hat's dir gefallen?“), Urkunden nach Einheit 10 („Drachen-Programmiererin“) und nach Einheit 20 („Code-Meisterin“). Sterne in der Web-App zählen nur als Extra, der Sammelpass am Papier zählt.
 
@@ -42,7 +42,7 @@ Der Ablauf ist **flexibel** und richtet sich nach dem Thema. Jede Einheit hat ab
 | Leichter machen / Schwerer machen | „Schwerer“ ist wichtiger und ausführlicher, ein vollwertiger Hauptteil |
 | Bonus-Knobelei | ohne Papier (Auto, Abendessen), mit Kurz-Lösung |
 | Was hat das mit echtem Programmieren zu tun? | kurzer Hintergrund, hier werden die Fachwörter erklärt |
-| Bildschirm-Bonus | Paket, welche Levels, wann das Gerät wieder weggelegt wird (Einheit 1: „heute kein Bildschirm“) |
+| Bildschirm-Bonus | Paket, welche Levels, „höchstens 15 Minuten“ (Abschnitt 9), wann das Gerät wieder weggelegt wird (Einheit 1: „heute kein Bildschirm“) |
 | Lösungen | alle Blätter verkleinert mit roten Lösungen, dazu Lösungen der Knobeleien |
 
 **{{KIND}}s Blätter:** 1–3 pro Einheit (Arbeitsblatt, Spielplan, Karten, Bastelvorlage). Jedes Blatt passt auf genau eine A4-Seite, ist luftig, hat oben den Stern „Geschafft?“ (automatisch), große Schrift (mindestens 14 pt, meist 16–22 pt), Gitterfelder mindestens 20 mm und unten eine Profi-Aufgabe (Krone) oder Knobel-Ecke (Eule). {{KIND}} wird mit „du“ und mit Namen angesprochen. Auf einem Blatt jeder Einheit mit Bildschirm-Bonus steht der QR-Code zum Paket (`<m-qr paket="eN">`, nur für Mama oder Papa).
@@ -71,7 +71,7 @@ Die Blockgrenzen sind im Code fest (`src/components.js`, `blockVon`: 1–5 A, 6�
 
 ### 3.2 Bildschirm-Bonus (Web-App)
 
-Ein Level-Paket pro Einheit ab E2 (E1, E18 ohne; E20 mischt die Spiele aller Einheiten), 5–9 Levels, 10–15 Minuten, ohne Schlüsselwort (alle Pakete sind offen). Mindestens 2 Levels sind genau Rätsel von den Blättern. Die Levels stehen in derselben Datei `raetsel/eN.json` wie die Rätsel der Blätter (`"web": { "titel", "art", "levels": […] }`). Bewertet wird nach dem Ergebnis mit demselben Ausführer (`web/kern/ausfuehrer.js`; bei den Rätselarten ab Block B mit demselben Kern `web/kern/<art>.js` wie der Löser), nie durch Vergleich mit einer gespeicherten Lösung. Am Paket-Ende: „Super! Jetzt zurück zum Papier.“
+Ein Level-Paket pro Einheit ab E2 (E1, E18 ohne; E20 mischt die Spiele aller Einheiten), 5–9 Levels (derzeit 6–9; ein ganzes Paket dauert etwa 10–15 Minuten, Grenze höchstens 15 Minuten, Abschnitt 9), ohne Schlüsselwort (alle Pakete sind offen). Mindestens 2 Levels sind genau Rätsel von den Blättern. Die Levels stehen in derselben Datei `raetsel/eN.json` wie die Rätsel der Blätter (`"web": { "titel", "art", "levels": […] }`). Bewertet wird nach dem Ergebnis mit demselben Ausführer (`web/kern/ausfuehrer.js`; bei den Rätselarten ab Block B mit demselben Kern `web/kern/<art>.js` wie der Löser), nie durch Vergleich mit einer gespeicherten Lösung. Am Paket-Ende: „Super! Jetzt zurück zum Papier.“
 
 ### 3.3 Querverweise zur Rechen-Werkstatt
 
@@ -427,7 +427,7 @@ Einheit 11, 16, 17 und 19 bringen (bis auf `zweidrachen`) keine neue Art mit, so
 
 - Kein Schlüsselwort: Alle Pakete sind offen. Der QR-Code auf dem Blatt führt direkt zum Paket.
 - Die Startseite zeigt die Blöcke wie im Heft (A–D, `web/app.js`, `zeigeStart`), ein Tipp auf einen Block seine Pakete. Einheit 1 und 18 haben kein Paket, alle anderen stehen in dieser Tabelle.
-- Jedes Paket hat 5–9 Levels (10–15 Minuten), danach ein klares Ende: „Super! Jetzt zurück zum Papier.“
+- Jedes Paket hat 5–9 Levels (derzeit 6–9; ein ganzes Paket dauert etwa 10–15 Minuten, die Grenze ist höchstens 15 Minuten, Abschnitt 9), danach ein klares Ende: „Super! Jetzt zurück zum Papier.“
 - Bei Drachen-Pfaden liegen Steine nicht nur am Rand, sondern auch mitten im Weg (direkt vor der Nase, Mauer mit Lücke, Slalom).
 - Die Adresse ist `<pagesBasis>#eN` (`werkstatt.json`, lokal überschreibbar in `kind.json`). Die volle Adresse steht nie im Text der Blätter oder der Anleitung, nur im QR-Code.
 
@@ -491,7 +491,9 @@ Gilt für Blätter, Löser und App gleich (`web/kern/ausfuehrer.js`, umgesetzt u
 
 ## 9. Bildschirm-Regeln (für alle Einheiten)
 
-- Höchstens 10–15 Minuten, **am Schluss**, optional. Die Einheit ist ohne Bildschirm vollständig.
+- Höchstens 15 Minuten, **am Schluss**, optional. Die Einheit ist ohne Bildschirm vollständig. (Der Auftrag nannte 5–10 Minuten; warum es 15 sind, steht ganz oben unter „Bildschirm“.)
+- Ein ganzes Paket dauert etwa 10–15 Minuten. Früher aufhören geht immer, nach jedem Level: Die Sterne bleiben auf dem Gerät, und „Los geht’s“ beginnt beim nächsten Mal beim ersten Level ohne Stern. Wer kürzer spielen will, sagt vorher an, wie viele Levels es heute sind („Heute drei Levels“), damit das Ende genauso klar ist wie beim Ende-Bildschirm.
+- In jeder Anleitung steht die Grenze überall gleich, als **„höchstens 15 Minuten“**: im Ablauf-Schritt, im Spickzettel und im Kasten „Bildschirm-Bonus“ (Leitfaden Abschnitt 2). Eine Schätzung der Dauer darf dazu („das Paket dauert meist 10 Minuten“), eine zweite Grenze nicht. Hat ein Paket viele lange Levels (zum Beispiel e16), sagt der Kasten, nach welchem Level man gut aufhört.
 - Mama oder Papa scannt den QR-Code (oder öffnet die Adresse), das Paket geht direkt auf.
 - In der Anleitung steht, welche Levels passen und wann das Gerät wieder weggelegt wird: spätestens beim Ende-Bildschirm „Super! Jetzt zurück zum Papier.“
 - Die App ist ruhig: keine Werbung, keine Zeitlimits, kein Fehlerton, kein Leben-Verlieren, keine blinkenden Belohnungen, kein endloses „noch ein Level“.
@@ -513,7 +515,7 @@ Der Rückmeldebogen (`src/rahmen/90-rueckmeldebogen.html`, hinten im PDF) fragt 
 | Dauer unter 20 Minuten | mehr Spiel-Varianten, Profi-Aufgabe als eigener Ablauf-Schritt |
 | Anleitung „zu lang“ / „mehr Details“ | Beispielsätze und Stolpersteine kürzen bzw. ausbauen; Lösungen immer vollständig lassen |
 | Blätter „zu viele Aufgaben“ / „mehr“ | 2 statt 3 Aufgaben pro Blatt bzw. ein drittes Blatt |
-| Bildschirm „zu viel“ oder „Konnte sie gut aufhören?“ = nein | Pakete auf 5 Levels kürzen, Bildschirm nur jede zweite Einheit, Gerät von Anfang an mit „Wir spielen bis zum Ende-Bildschirm“ ankündigen |
+| Bildschirm „zu viel“ oder „Konnte sie gut aufhören?“ = nein, oder der Auftraggeber bleibt bei 10 Minuten | Grenze auf höchstens 10 Minuten wie im Auftrag zurücknehmen (Abschnitt 9, Einleitung und alle Kästen „Bildschirm-Bonus“: dort steht dann, nach welchem Level Schluss ist), Pakete auf 5 Levels kürzen, Bildschirm nur jede zweite Einheit, Gerät von Anfang an mit „Wir spielen bis zum Ende-Bildschirm“ ankündigen |
 | Bildschirm „zu wenig“ | ein zusätzliches Übungs-Paket für das Wochenende (bleibt optional) |
 | Gerätetest: etwas hakt (iPhone, iPad, Android) | Fehler in der Web-App beheben, bevor Paket e6 kommt; Hinweise in der Einleitung (Abschnitt Web-App) ergänzen |
 | Links und rechts „noch schwer“ | in jeder Einheit 2 Minuten Roboter-Aufwärmen, Blick nach unten weiter nur im Schwerer-Teil, Extra X9 (absolute Pfeile) **nicht** einschieben |
