@@ -31,8 +31,8 @@
   .e15-loes > .kasten.loesung p, .kasten.loesung.e15-weiter p { margin-bottom: 1.6mm; }
   table.tab.e15-ltab { font-size: 9pt; line-height: 1.3; }
   table.tab.e15-ltab td, table.tab.e15-ltab th { padding-top: 0.8mm; padding-bottom: 0.8mm; }
-  .e15-ltab td:first-child { width: 8%; }
-  .e15-ltab td:nth-child(2) { width: 37%; }
+  .e15-ltab td:first-child { width: 7.5%; }
+  .e15-ltab td:nth-child(2) { width: 32%; }
 
   /* Blätter */
   .e15-regelbox { display: flex; align-items: center; gap: 5mm; border: 0.7mm solid var(--akzent); background: var(--akzent-hell); border-radius: 4mm; padding: 3mm 5mm; }
@@ -46,13 +46,17 @@
   .blatt .raster.s4.e15-stellungen { gap: 3mm; align-items: stretch; }
   .e15-kobold { display: flex; align-items: center; gap: 6mm; }
   .e15-kobold m-symbol { flex: none; }
-  .e15-kobold .e15-regeln { gap: 2mm; }
+  .e15-kobold .e15-regeln { gap: 1.5mm; }
   .e15-turnier { border-collapse: collapse; font-size: 14pt; line-height: 1.1; width: 100%; table-layout: fixed; }
   .e15-turnier th, .e15-turnier td { border: 0.45mm solid var(--tinte); padding: 0.9mm 1.5mm; text-align: center; vertical-align: middle; }
   .e15-turnier th { font-weight: 700; background: var(--akzent-hell); }
   .e15-turnier th:first-child, .e15-turnier td:first-child { text-align: left; width: 40mm; white-space: nowrap; }
   .e15-turnier td.e15-leer { height: 9.5mm; }
-  .e15-turnier .e15-spiel { font-size: 14pt; line-height: 1.05; display: flex; flex-direction: column; align-items: center; gap: 0.5mm; }
+  .e15-turnier tr:nth-child(2) td:not(:first-child) { line-height: 1.05; }
+  .e15-turnier-box { position: relative; }
+  /* Lösungsansicht: der Hinweis steht in den leeren Zeilen statt darunter (keine zusätzliche Höhe) */
+  .loesungsmodus p.lsg-nur.e15-turnier-lsg { position: absolute; left: 40mm; right: 0; bottom: 0; height: 19mm; margin: 0; display: flex; align-items: center; justify-content: center; font-size: 16pt; }
+  .e15-turnier-lsg > span { background: white; padding: 0.5mm 2.5mm; border-radius: 1.5mm; }
   .e15-punkte { display: flex; align-items: center; gap: 3mm; margin-top: 2mm; font-size: 16pt; line-height: 1.1; }
   .e15-punkte .e15-strichfeld { flex: 1; height: 9mm; border: 0.45mm solid var(--tinte); border-radius: 2mm; background: white; }
   .e15-knobel-reihe { display: flex; align-items: center; gap: 4mm; flex-wrap: wrap; }
@@ -63,7 +67,8 @@
   .e15-karte-kopf { display: flex; align-items: center; gap: 2mm; font-family: var(--text); font-weight: 900; font-size: 11pt; color: var(--akzent); }
   .e15-karte-titel { font-family: var(--kind); font-weight: 700; font-size: 17pt; line-height: 1.1; }
   .e15-karte-zeile { font-family: var(--kind); font-size: 13pt; line-height: 1.15; }
-  .e15-karte .e15-zahlen { gap: 1.8mm; }
+  .e15-karte .e15-zahlen { gap: 2mm 1.8mm; }
+  .e15-karte .e15-kreis { font-size: 16pt; }
   .e15-karte-klein { font-family: var(--kind); font-size: 12pt; line-height: 1.15; color: var(--grau); }
 </style>
 
@@ -351,7 +356,7 @@
 
   <div class="kasten basteln" data-titel="Strategie-Karte">
     <ol>
-      <li>Unten auf <a class="blattref" href="#blatt-15-3"></a> sind zwei Strategie-Karten: „Wer sagt 20?“ und „Steine-Spiel“. {{KIND}} schreibt die Gewinnzahlen in die Kreise, sobald sie sie gefunden hat (in Schritt 4). Erst dann ausschneiden, die Kobold-Aufgabe und die Turnier-Tabelle bleiben am Rest des Blatts.</li>
+      <li>Unten auf <a class="blattref" href="#blatt-15-3"></a> sind zwei Strategie-Karten: „Wer sagt 20?“ und „Steine-Spiel“. {{KIND}} schreibt die Gewinnzahlen in die runden Felder, sobald sie sie gefunden hat (in Schritt 4). Erst dann ausschneiden, die Kobold-Aufgabe und die Turnier-Tabelle bleiben am Rest des Blatts.</li>
       <li>Die Karten kommen zur Werkzeugkiste (Befehlskarten, Drachen-Figur, Zauber-Kasten). Beim Spielen darf die Karte am Anfang offen daneben liegen. Später spielt sie ohne Karte: Dann ist die Strategie im Kopf.</li>
       <li><b>Extra:</b> bemalen, auf Karton kleben, mit Tixo überziehen. Auf die Rückseite darf sie eine eigene Spielregel erfinden (Schwerer-Teil, Punkt 10).</li>
     </ol>
@@ -440,7 +445,7 @@
     <p><b><a class="blattref" href="#blatt-15-3"></a>, Aufgabe 1 (Kobold):</b> Die dritte Regel ist falsch. Bei 11 Steinen muss man 2 nehmen, dann liegen 9. Nimmt man nur 1, liegen 10, und der andere nimmt 1 und lässt 9 liegen. Die anderen Regeln stimmen: Bei 2 nimmt man beide, bei 10 bleiben 9, bei 13 bleiben 12.</p>
     <p><b>Strategie-Karten:</b> Wer sagt 20?: <m-e15-text raetsel="e15-g20" was="gz"></m-e15-text>. Steine-Spiel: <m-e15-text raetsel="e15-g12" was="gz"></m-e15-text>. <b>Turnier-Tabelle:</b> keine falsche Lösung, sie hält fest, wie ihr gespielt habt. <b>Knobel-Ecke (Wer sagt 10?):</b> Die Gewinnzahlen sind <m-e15-text raetsel="e15-g10" was="gzab"></m-e15-text>. Wer anfängt, sagt „1“ und gewinnt.</p>
     <p><b>Bonus-Knobelei:</b> Wer sagt 10?: „1“, dann 4, 7 und 10. Zuckerl-Teller: 1 nehmen, dann liegen 6. Wer sagt 15?: Die Gewinnzahlen sind <m-e15-stimmt spiel="zaehlen 15 1-2" gz>3, 6, 9, 12 und 15</m-e15-stimmt>, wer anfängt, verliert, also nein. Für Profis: Gewinnzahlen 4, 8, 12, 16 und 20, wer anfängt, kommt höchstens bis 3, also nein.</p>
-    <p><b>Bildschirm-Levels (zum Nachschauen):</b> In jedem Level gewinnt {{KIND}} sicher, wenn sie immer eine Gewinnzahl macht (bei zwei Haufen: gleich große Haufen; vom Spielbaum geprüft). Der Roboter nimmt jeden Gewinnzug, den er bekommt.</p>
+    <p><b>Bildschirm-Levels (zum Nachschauen):</b> In jedem Level gewinnt {{KIND}} sicher, wenn sie immer eine Gewinnzahl macht (bei zwei Haufen: gleich große Haufen; vom Spielbaum geprüft).</p>
     <table class="tab darf-brechen e15-ltab">
       <tr><th>Level</th><th>Spiel</th><th>Gewinnzahlen und erster Zug</th></tr>
       <tr><td>1</td><td>Steine-Spiel, 4 Steine</td><td><m-e15-text raetsel="e15-w4" was="gz"></m-e15-text>; erster Zug: <m-e15-text raetsel="e15-w4" was="zug"></m-e15-text> (z. B. <m-e15-text raetsel="e15-w4" was="partie"></m-e15-text>)</td></tr>
@@ -450,7 +455,7 @@
       <tr><td>5</td><td>Wer sagt 30? (Roboter fängt an)</td><td>immer 3 weiter: <m-e15-stimmt spiel="zaehlen 30 1-2" gz="teil">3, 6, 9 … bis 30</m-e15-stimmt></td></tr>
       <tr><td>6</td><td>1, 2 oder 3 nehmen, 9 Steine</td><td><m-e15-text raetsel="e15-w9" was="gz"></m-e15-text>; erster Zug: <m-e15-text raetsel="e15-w9" was="zug"></m-e15-text></td></tr>
       <tr><td>7</td><td>Kobold-Stein, 8 Steine</td><td><m-e15-text raetsel="e15-wv" was="gz"></m-e15-text> liegen lassen; erster Zug: <m-e15-text raetsel="e15-wv" was="zug"></m-e15-text></td></tr>
-      <tr><td>8</td><td>Zwei Haufen, 3 und 5 Steine</td><td>erster Zug: <m-e15-text raetsel="e15-wh" was="zug"></m-e15-text>, dann liegen 3 und 3; danach alles nachmachen</td></tr>
+      <tr><td>8</td><td>Zwei Haufen, 3 und 5 Steine</td><td>erster Zug: <m-e15-text raetsel="e15-wh" was="zug"></m-e15-text> (<m-e15-stimmt spiel="steine beliebig" haufen="3,3" gewinner="andere">3 und 3</m-e15-stimmt>), dann nachmachen</td></tr>
     </table>
   </div>
 </section>
@@ -544,35 +549,31 @@
 
   <div class="aufg ohne-nr">
     <p class="anw"><b>Turnier:</b> Wer fängt an? Wer gewinnt? Schreib „ich“ oder „du“ hinein. Mach für jeden Punkt einen Strich.</p>
-    <table class="e15-turnier">
-      <tr><th>Runde</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr>
-      <tr><td>Spiel</td>
-        <td><span class="e15-spiel"><m-e15-steine n="10" gr="3.2" pro="5" versatz="1"></m-e15-steine>10 Steine</span></td>
-        <td><span class="e15-spiel"><m-e15-steine n="10" gr="3.2" pro="5" versatz="2"></m-e15-steine>10 Steine</span></td>
-        <td><span class="e15-spiel">Wer sagt 20?</span></td>
-        <td><span class="e15-spiel">Wer sagt 20?</span></td>
-        <td><span class="e15-spiel"><m-e15-steine n="12" gr="2.8" pro="6" versatz="3"></m-e15-steine>12 Steine</span></td>
-        <td><span class="e15-spiel"><m-e15-steine n="12" gr="2.8" pro="6" versatz="4"></m-e15-steine>12 Steine</span></td></tr>
-      <tr><td>Wer fängt an?</td><td class="e15-leer"></td><td class="e15-leer"></td><td class="e15-leer"></td><td class="e15-leer"></td><td class="e15-leer"></td><td class="e15-leer"></td></tr>
-      <tr><td>Wer gewinnt?</td><td class="e15-leer"></td><td class="e15-leer"></td><td class="e15-leer"></td><td class="e15-leer"></td><td class="e15-leer"></td><td class="e15-leer"></td></tr>
-    </table>
+    <div class="e15-turnier-box">
+      <table class="e15-turnier">
+        <tr><th>Runde</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr>
+        <tr><td>Spiel</td><td>10 Steine</td><td>10 Steine</td><td>Wer sagt 20?</td><td>Wer sagt 20?</td><td>12 Steine</td><td>12 Steine</td></tr>
+        <tr><td>Wer fängt an?</td><td class="e15-leer"></td><td class="e15-leer"></td><td class="e15-leer"></td><td class="e15-leer"></td><td class="e15-leer"></td><td class="e15-leer"></td></tr>
+        <tr><td>Wer gewinnt?</td><td class="e15-leer"></td><td class="e15-leer"></td><td class="e15-leer"></td><td class="e15-leer"></td><td class="e15-leer"></td><td class="e15-leer"></td></tr>
+      </table>
+      <p class="lsg-nur e15-turnier-lsg"><span>Hier gibt es keine falsche Lösung.</span></p>
+    </div>
     <div class="e15-punkte"><b>Punkte:</b><span>ich</span><span class="e15-strichfeld"></span><span>du</span><span class="e15-strichfeld"></span></div>
-    <p class="lsg-nur">Hier gibt es keine falsche Lösung.</p>
   </div>
 
-  <m-karten spalten="2" zeilen="1" hoehe="54" breite="180">
+  <m-karten spalten="2" zeilen="1" hoehe="62" breite="180">
     <div><div class="e15-karte">
       <div class="e15-karte-kopf"><m-symbol name="drache" gr="7" blick="rechts"></m-symbol>Meine Strategie-Karte</div>
       <div class="e15-karte-titel">Wer sagt 20?</div>
       <div class="e15-karte-zeile">Meine Gewinnzahlen:</div>
-      <m-e15-zahlen raetsel="e15-g20" ordnung="auf" form="kreis" gr="10"></m-e15-zahlen>
+      <m-e15-zahlen raetsel="e15-g20" ordnung="auf" form="kreis" gr="11" breite="18.5" pro="4"></m-e15-zahlen>
       <div class="e15-karte-klein">Wer anfängt, sagt „1, 2“.</div>
     </div></div>
     <div><div class="e15-karte">
       <div class="e15-karte-kopf"><m-symbol name="drache" gr="7" blick="rechts"></m-symbol>Meine Strategie-Karte</div>
       <div class="e15-karte-titel">Steine-Spiel (1 oder 2)</div>
       <div class="e15-karte-zeile">So viele Steine lasse ich liegen:</div>
-      <m-e15-zahlen raetsel="e15-g12" form="kreis" gr="10"></m-e15-zahlen>
+      <m-e15-zahlen raetsel="e15-g12" form="kreis" gr="11" breite="18.5" pro="4"></m-e15-zahlen>
       <div class="e15-karte-klein">Liegt schon eine Gewinnzahl? Nimm 1 und warte.</div>
     </div></div>
   </m-karten>
