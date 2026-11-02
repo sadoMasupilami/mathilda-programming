@@ -27,7 +27,7 @@
   .e09-tab th, .e09-tab td { text-align: left; vertical-align: middle; }
   .e09-tab th:first-child, .e09-tab td:first-child { width: 11%; text-align: center; }
   .e09-tab td:nth-child(2) { width: 30%; }
-  .anleitung .e09-tab .e09-rechn-text { font-size: 10pt; white-space: normal; }
+  .anleitung .e09-tab .e09-rechn-text { font-size: 10pt; white-space: normal; line-height: 1.3; }
   .e09-tab m-e9-loesung .e09-zeile { flex-wrap: wrap; row-gap: 1mm; }
   .e09-liste-box { font-size: 10pt; }
   .e09-liste-box m-e9-liste { font-family: var(--kind); }
@@ -180,7 +180,7 @@
     <ul>
       <li><b>So sehen sie aus:</b> fünf Karten mit 1, 2, 4, 8 und 16 Punkten. Jede Karte hat <b>doppelt so viele</b> Punkte wie ihre rechte Nachbarin, die Punkte stehen in Vierergruppen. Die Karten liegen immer in derselben Reihenfolge, die größte links: <m-e9-zeige ja="16 8 4 2 1" gr="6"></m-e9-zeige></li>
       <li><b>Ja oder Nein:</b> Jede Karte hat ihren festen Platz. Sie ist entweder <b>da</b> (Punkte oben, Ja) oder <b>umgedreht</b> (leere Rückseite, Nein). Verschoben wird nie, nur umgedreht. Weil man umgedreht nicht mehr sieht, welche Karte es ist, gibt es die Karten-Leiste aus Malerkrepp.</li>
-      <li><b>Die Zahl:</b> alle Punkte, die man sieht, zusammen. <m-e9-zeige ja="16 4 2" zahl="22" gr="5.5" rechnung></m-e9-zeige> Alle umgedreht ist 0, alle da ist 31.</li>
+      <li><b>Die Zahl:</b> alle Punkte, die man sieht, zusammen. <m-e9-zeige ja="16 4 2" zahl="22" gr="5.5" rechnung></m-e9-zeige>. Alle umgedreht ist 0, alle da ist 31.</li>
       <li><b>Genau eine Schreibweise:</b> Jede Zahl von 0 bis 31 hat genau eine Ja/Nein-Schreibweise. Man findet sie mit <b>größte Karte zuerst</b>: „Passt die 16 noch hinein? Ja, dann umdrehen und weiter mit dem Rest.“</li>
       <li><b>Viele Kleider, eine Idee:</b> Finger oben oder unten, Lampe an oder aus, im Schwerer-Teil Ziffer 1 oder 0. Immer gilt: Ja zählt, Nein zählt nicht.</li>
     </ul>
@@ -238,7 +238,7 @@
     <p class="du">(<a class="blattref" href="#blatt-9-3"></a>, Kobold) „Die Fee wollte 19 legen. Was liegt da wirklich?“</p>
     <p class="sie">„Sechzehn und vier und zwei und eins. Das sind … 23. Zu viel!“</p>
     <p class="du">„Um wie viel zu viel?“</p>
-    <p class="sie">„Um 4! Die 4er-Karte muss weg. Der Kobold hat sie umgedreht!“</p>
+    <p class="sie">„Um 4! Die 4er-Karte muss weg. Der Kobold hat sie falsch gedreht!“</p>
     <p class="dann">Sie darf auch anders suchen: 19 selbst legen (16, 2, 1) und mit dem Blatt vergleichen. Beides ist eine gute Kobold-Jagd.</p>
   </div>
 
@@ -254,7 +254,7 @@
         <ul>
           <li>Richtig und zuerst „Ja!“ gerufen: 2 Muggelsteine.</li>
           <li>Richtig, aber als Zweiter: 1 Muggelstein. Liegt nur noch einer in der Mitte, bekommt ihn, wer zuerst richtig war.</li>
-          <li>Falsch gelegt: kein Muggelstein. Gemeinsam schauen, welche Karte der Kobold umgedreht hat.</li>
+          <li>Falsch gelegt: kein Muggelstein. Gemeinsam schauen, welche Karte der Kobold falsch gedreht hat.</li>
         </ul>
       </li>
       <li><b>Deine Sonderregel:</b> Du sagst beim Legen jede Karte laut, von links nach rechts: „Sechzehn: nein. Acht: ja. Vier: nein …“ So bist du etwas langsamer, und {{KIND}} hört, wie „größte Karte zuerst“ geht. Ist sie sehr schnell, darf sie auch laut sagen, oder du legst nur mit einer Hand.</li>
@@ -384,8 +384,8 @@
   <h2>Bildschirm-Bonus</h2>
   <div class="kasten bildschirm darf-brechen e09-bricht">
     <p><b>Paket 9 „Nur Ja oder Nein“.</b> Den QR-Code findest du auf <a class="blattref" href="#blatt-9-2"></a> unten rechts. Nur am Schluss, nach den Blättern, höchstens 15 Minuten. Die Einheit funktioniert auch ganz ohne Bildschirm.</p>
-    <p><b>9 Levels:</b> Karten legen (5), Welche Zahl? (13), Karten legen (21), Lampen anschalten (9), Welche Zahl leuchtet? (25), Finger heben (11), zweimal die Kobold-Karte finden (19 und 26) und zum Schluss ein Profi-Level mit sechs Karten (40, die 32er-Karte ist schon da). <b>Level 2 und 3 sind Aufgabe 1 und 2 von <a class="blattref" href="#blatt-9-2"></a>, Level 5 und 7 sind die Lampen und der Kobold von <a class="blattref" href="#blatt-9-3"></a>.</b> Am besten spielt {{KIND}} sie nach den Blättern, dann erkennt sie ihre Aufgaben wieder.</p>
-    <p><b>Legen (Level 1, 3, 4, 6 und 9):</b> Oben steht die Zahl. Am Anfang sind alle Karten umgedreht, alle Lampen aus, die Hand ist eine Faust: 0. Ein Tipp dreht eine Karte um, schaltet eine Lampe an oder aus, hebt einen Finger oder klappt ihn ein. Unter den Karten liegt eine Karten-Leiste wie am Tisch, über den Fingern stehen die Punkte. Ist sie fertig, tippt sie auf „Los“: Die App zählt langsam zusammen, die gezählte Karte leuchtet golden, und darunter wächst die Rechnung bis <span class="rechnung">16 + 4 + 1 = 21</span>. Stimmt die Zahl, gibt es den Stern. Sonst sagt die App freundlich zum Beispiel „Das ist 24. Zu viel!“, und sie ändert weiter. „Nochmal“ dreht alles wieder um.</p>
+    <p><b>9 Levels:</b> Karten legen (5), Welche Zahl? (13), Karten legen (21), Lampen anschalten (9), Welche Zahl leuchtet? (25), Finger heben (11), zweimal die Kobold-Karte finden (19 und 26) und zum Schluss ein Profi-Level mit sechs Karten (40, die 32er-Karte ist schon dabei). <b>Level 2 und 3 sind Aufgabe 1 und 2 von <a class="blattref" href="#blatt-9-2"></a>, Level 5 und 7 sind die Lampen und der Kobold von <a class="blattref" href="#blatt-9-3"></a>.</b> Am besten spielt {{KIND}} sie nach den Blättern, dann erkennt sie ihre Aufgaben wieder.</p>
+    <p><b>Legen (Level 1, 3, 4, 6 und 9):</b> Oben steht die Zahl. Am Anfang sind alle Karten umgedreht, alle Lampen aus, die Hand ist eine Faust: 0. Ein Tipp dreht eine Karte um, schaltet eine Lampe an oder aus, hebt einen Finger oder klappt ihn ein. Unter den Karten liegt eine Karten-Leiste wie am Tisch, über den Fingern stehen ihre Zahlen 16, 8, 4, 2, 1, wie bei der Hand „So zählen die Finger“ auf <a class="blattref" href="#blatt-9-3"></a>. Ist sie fertig, tippt sie auf „Los“: Die App zählt langsam zusammen, die gezählte Karte leuchtet golden, und darunter wächst die Rechnung bis <span class="rechnung">16 + 4 + 1 = 21</span>. Stimmt die Zahl, gibt es den Stern. Sonst sagt die App freundlich zum Beispiel „Das ist 24. Zu viel!“, und sie ändert weiter. „Nochmal“ dreht alles wieder um.</p>
     <p><b>Welche Zahl? (Level 2 und 5):</b> Die Karten (Lampen) liegen schon. Sie tippt eine von drei Zahlen an. Stimmt sie, zählt die App zur Probe zusammen, und es gibt den Stern. Sonst heißt es zum Beispiel „12 ist zu wenig. Zähl die Punkte nochmal!“. Die richtige Zahl verrät die App nicht.</p>
     <p><b>Kobold (Level 7 und 8):</b> Oben steht „Das soll 19 sein!“. Sie tippt die Karte an, die falsch liegt, und die dreht sich um. Es dreht sich immer nur eine Karte: Tippt sie eine andere an, liegt die erste wieder wie vorher. Dann „Los“: Die App zählt zusammen. Stimmt die Zahl, ist der Kobold erwischt. Sonst kommt zum Beispiel „Das ist 31, nicht 19. Such den Kobold nochmal!“.</p>
     <p><b>Sterne und Ruhe:</b> Jedes geschaffte Level bekommt einen Stern, egal nach wie vielen Versuchen. Kein Ton, keine Zeitgrenze, nichts blinkt. Die App zählt langsam, etwa eine Karte pro Sekunde, und die Rechnung bleibt danach stehen. So kann {{KIND}} mitzählen und in Ruhe nachrechnen. Das lohnt sich: Sie übt nebenbei das Zusammenzählen von der größten Karte aus.</p>
@@ -405,7 +405,7 @@
   <div class="kasten loesung darf-brechen e09-bricht e09-weiter">
     <p><b><a class="blattref" href="#blatt-9-3"></a>, Aufgabe 1:</b> Zeigefinger und Daumen: <span class="rechnung">2 + 1 = 3</span>. Kleiner Finger und Daumen (die „Telefon-Hand“): <span class="rechnung">16 + 1 = 17</span>.</p>
     <p><b>Aufgabe 2:</b> Die Lampen 16, 8 und 1 leuchten: <span class="rechnung">16 + 8 + 1 = 25</span>.</p>
-    <p><b>Aufgabe 3:</b> Der Kobold hat die <b>4er-Karte</b> umgedreht, sie muss weg. Gelegt ist <span class="rechnung">16 + 4 + 2 + 1 = 23</span>, das sind 4 zu viel. Richtig ist <span class="rechnung">16 + 2 + 1 = 19</span>. Genau diese eine Karte ist falsch (vom Löser geprüft).</p>
+    <p><b>Aufgabe 3:</b> Der Kobold hat die <b>4er-Karte</b> falsch gedreht: Sie ist da, muss aber weg (Nein). Gelegt ist <span class="rechnung">16 + 4 + 2 + 1 = 23</span>, das sind 4 zu viel. Richtig ist <span class="rechnung">16 + 2 + 1 = 19</span>. Genau diese eine Karte ist falsch (vom Löser geprüft).</p>
     <p><b>Profi:</b> 10110 ist <span class="rechnung">16 + 4 + 2 = 22</span>. Die 11 schreibt man 01011 (<span class="rechnung">8 + 2 + 1 = 11</span>), auch 1011 ohne die Null vorne ist richtig.</p>
     <p><b>Bonus-Knobelei:</b> Zwei Karten: <span class="rechnung">8 + 2 = 10</span>. Welche Karten: <span class="rechnung">4 + 2 + 1 = 7</span>; für die 16 nur die 16er-Karte. Alle da: 31. Detektivin: die 1er-Karte. Ist sie da, ist die Zahl ungerade, ist sie weg, ist die Zahl gerade (alle anderen Karten haben gerade Punktzahlen). Für Profis: 24, denn <span class="rechnung">16 + 8 = 24</span>. Mit zwei Karten über 20 geht nur das: <span class="rechnung">16 + 4 = 20</span> ist nicht größer als 20, und ohne die 16er-Karte schaffen zwei Karten höchstens <span class="rechnung">8 + 4 = 12</span>.</p>
     <p><b>Bildschirm-Levels (zum Nachschauen):</b> Jede Zahl hat genau eine Ja/Nein-Schreibweise (vom Löser geprüft), es gibt also immer genau eine Lösung. Die App kennt die Lösungen nicht: Sie zählt die Punkte der Ja-Karten zusammen und vergleicht mit der Zahl.</p>
@@ -513,7 +513,7 @@
   </div>
 
   <div class="aufg">
-    <p class="anw">Der Fehler-Kobold hat bei der Fee eine Karte umgedreht. Kreise die falsche Karte ein.</p>
+    <p class="anw">Der Fehler-Kobold hat bei der Fee eine Karte falsch gedreht. Kreise sie ein.</p>
     <div class="e09-einzug"><m-e9-zahl raetsel="e9-k1" gr="16"></m-e9-zahl></div>
   </div>
 
