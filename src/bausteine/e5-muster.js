@@ -4,6 +4,8 @@
          Muster-Bild auf echten 1-cm-Kästchen: links die Muster-Programme
          (Zauber-Kasten mit Farbkästchen), rechts die leeren Kästchen.
          Die Lösung (das fertige Bild) rechnet der Baustein selbst aus.
+         Ein Kind-Element <p class="lsg-nur">…</p> (z. B. „Was siehst du?“) kommt rechts unter die
+         Kästchen, in den freien Platz neben den Muster-Programmen (nur in der Lösungsansicht sichtbar).
      <m-e5-muster art="finden" programm="3[blau gelb gelb]">
          Fertig gemaltes Muster; darunter ein leerer Zauber-Kasten.
          Lösung: Zahl und Farben im Kasten.
@@ -110,8 +112,10 @@
         zeilen.forEach((z, i) => { if (z.length !== soll) throw new Error('Zeile ' + (i + 1) + ' malt ' + z.length + ' Kästchen, erwartet ' + soll); });
         if (soll > 16) throw new Error('Höchstens 16 Kästchen in einer Zeile (16 cm)');
         const nr = progs.length > 1;
+        // rote Lösungstexte unter das Bild statt unter die ganze Aufgabe: dort ist Platz
+        const deutung = Array.from(el.querySelectorAll(':scope > .lsg-nur')).map((x) => x.outerHTML).join('');
         const links = progs.map((p, i) => '<div class="e05-mzeile">' + (nr ? '<span class="e05-mnr">' + (i + 1) + '</span>' : '') + programmHTML(p, gr, false) + '</div>').join('');
-        el.innerHTML = '<div class="e05-muster"><div class="e05-mprogs">' + links + '</div><div class="e05-mbild">' + kaestchenSVG(zeilen, L, nr) + '</div></div>';
+        el.innerHTML = '<div class="e05-muster"><div class="e05-mprogs">' + links + '</div><div class="e05-mbild">' + kaestchenSVG(zeilen, L, nr) + deutung + '</div></div>';
         el.dataset.loesung = zeilen.map((z) => z.join(' ')).join(' | ');
       } else if (art === 'finden') {
         const p = liesMuster(el.getAttribute('programm'));
