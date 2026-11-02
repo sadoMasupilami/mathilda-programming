@@ -36,9 +36,12 @@
   .e20-mini .prog .kasten-z .mal { font-size: 8.5pt; }
   .e20-mini .prog .kasten-z .innen { gap: 0.8mm; }
   .e20-versteck-kasten { margin: 2mm 0 3mm 0; }
+  .e20-versteck-kasten > m-e20-verstecke { margin: 0 0 2.5mm 0; }
+  /* Spickzettel: kein Schritt wird mitten im Satz auf die nächste Seite getrennt */
+  ol.spick-ablauf.e20-spick-ablauf > li { break-inside: avoid; }
 
-  /* Blatt 20-1: Fest-Pass */
-  .e20-intro { margin: 0; }
+  /* Blatt 20-1: Fest-Pass (.blatt davor, damit auch in der Lösungsansicht kein Absatz-Rand dazukommt) */
+  .blatt .e20-intro { margin: 0; }
   .e20-pass { display: grid; grid-template-columns: 1fr 1fr; gap: 3.5mm 4mm; }
   .e20-feld { border: 0.7mm solid var(--akzent); border-radius: 4mm; background: white; padding: 2.4mm 3mm;
     display: flex; align-items: center; gap: 2.5mm; }
@@ -55,7 +58,7 @@
   .e20-rueck { display: flex; align-items: center; justify-content: space-between; gap: 6mm; flex-wrap: wrap; }
   .e20-rueck > span { display: inline-flex; align-items: center; gap: 2.5mm; }
   .e20-sterne { display: inline-flex; gap: 2mm; }
-  .e20-versteck-zeile { margin: 0; display: flex; align-items: flex-end; gap: 2mm; }
+  .blatt .e20-versteck-zeile { margin: 0; display: flex; align-items: flex-end; gap: 2mm; }
   .e20-wortlinie { flex: 1; min-width: 0; height: 9mm; }
   .loesungsmodus .e20-lsg-inline { display: inline; margin-left: 2mm; }
   .e20-linien { display: flex; flex-direction: column; gap: 1mm; margin-top: 1mm; }
@@ -130,7 +133,7 @@
   </div>
 
   <h2>Gemeinsam</h2>
-  <ol class="spick-ablauf">
+  <ol class="spick-ablauf e20-spick-ablauf">
     <li data-min="2"><div><b>Fest-Eröffnung.</b> Fest-Pass überreichen, Tusch auf dem Tisch trommeln, die Fest-Regeln erklären.
       <div class="spick-spiel"><h3>Fest-Regeln</h3>
         <ul>
@@ -241,7 +244,7 @@
   <div class="e20-versteck-kasten">
     <p><b>Die Verstecke.</b> Die Code-Buchstaben sind die Geheimschrift des Verstecks mit der <b>Schlüssel-Zahl 5</b> (so steht es im Fest-Rätsel). Alle Wörter sind mit derselben Rechnung wie das Geheimschrift-Rad nachgeprüft. Die Zahl der Stationen ist die Zahl der Buchstaben:</p>
     <m-e20-verstecke raetsel="e20-verstecke" spick></m-e20-verstecke>
-    <p class="klein">Andere Wörter gehen auch: Jeden Buchstaben auf dem Rad 5 Plätze weiterschieben (Schlüssel-Zahl 5), wie in Einheit 7. Nur A bis Z, ohne Umlaute.</p>
+    <p class="klein">Eigenes Versteck: jeden Buchstaben am Rad 5 Plätze weiterschieben (Einheit 7), ohne Umlaute.</p>
   </div>
 
   <h2>Ablauf Schritt für Schritt</h2>
@@ -332,7 +335,7 @@
     <tr><td><b class="e20-stname">Halbier-Suche</b> <span class="e20-einh">(Einheit 10)</span><br>Du denkst dir eine Zahl von 1 bis 32. {{KIND}} fragt nur „Ist deine Zahl größer als …?“. Schafft sie es mit höchstens 5 Fragen?</td>
       <td>Mit Fragen genau in der Mitte reichen immer <m-e20-wert raetsel="e20-x-halbier" pfad="fragen" l="5"></m-e20-wert> Fragen (32, 16, 8, 4, 2, 1). Erste Frage: größer als 16?</td>
       <td>Von 1 bis 64: <m-e20-wert raetsel="e20-x-halbier2" pfad="fragen" l="6"></m-e20-wert> Fragen. Eine Frage mehr für doppelt so viele Zahlen.</td></tr>
-    <tr><td><b class="e20-stname">Wenn-dann-Regel</b> <span class="e20-einh">(wie in Einheit 11)</span><br>Ein Programm für beide Gitter! Erst links aufbauen und laufen, dann Stein und Schatz umlegen wie rechts und dasselbe Programm noch einmal. Den Wenn-dann-Kasten zeichnet ihr auf einen Zettel, wie in Einheit 11.<br><m-e20-gitter raetsel="e20-x-wenn" welt="1"></m-e20-gitter> <m-e20-gitter raetsel="e20-x-wenn" welt="2"></m-e20-gitter></td>
+    <tr><td><b class="e20-stname">Wenn-dann-Regel</b> <span class="e20-einh">(wie in Einheit 11)</span><br>Ein Programm für beide Gitter! Erst links aufbauen und laufen, dann Stein und Schatz umlegen wie rechts und dasselbe Programm noch einmal. Den Wenn-dann-Kasten legt ihr mit den Wenn-Karten und Wort-Karten von <a class="blattref" href="#blatt-11-3"></a>.<br><m-e20-gitter raetsel="e20-x-wenn" welt="1"></m-e20-gitter> <m-e20-gitter raetsel="e20-x-wenn" welt="2"></m-e20-gitter></td>
       <td><m-e20-prog raetsel="e20-x-wenn" gr="5.5"></m-e20-prog><br>(6 Karten, das einzige mit 6 Karten). Links ist vorne frei, der Drache geht noch einmal vor, rechts liegt dort ein Stein.</td>
       <td>Regel-Spiel ohne Papier: „Wenn ich klatsche, hüpfst du. Sonst stehst du still.“ Dann erfindet {{KIND}} eine Regel für dich, mit sonst.</td></tr>
     <tr><td><b class="e20-stname">Logikgitter</b> <span class="e20-einh">(Einheit 12)</span><br>Fest-Jause: Oma, Opa und du. Kuchen, Eis und Apfel, jeder mag genau eines. Hinweise: <m-e12-hinweise raetsel="e20-x-logik" gr="4.5"></m-e12-hinweise> Ein 3 · 3-Gitter auf einen Zettel zeichnen.</td>
@@ -351,8 +354,8 @@
       <td>Das Spiel hört nie auf: Es steht nicht da, wer gewinnt. Repariert: „Wer zuerst 3 Sterne hat, gewinnt.“</td>
       <td>„Wer jünger ist, darf zweimal würfeln.“ Kobold: unfair. {{KIND}} macht die Regel fair (zum Beispiel: beide würfeln einmal).</td></tr>
     <tr><td><b class="e20-stname">Parcours mit allem</b> <span class="e20-einh">(wie in Einheit 19)</span><br>Boden-Gitter 4 · 4, Kuscheltiere als Steine. Nur 4 Karten, mit Zauber-Kasten und Wenn-dann-Kasten!<br><m-e20-gitter raetsel="e20-w-parcours"></m-e20-gitter></td>
-      <td><m-e20-prog raetsel="e20-w-parcours" alle anzahl="2" gr="6"></m-e20-prog>: je 4 Karten. Der Wenn-dann-Kasten darf vor oder nach dem vor stehen.</td>
-      <td>Geht es ohne Wenn-dann? Ja, aber mit <m-e20-wert raetsel="e20-x-parcours-z" pfad="zauber.minKarten" l="5"></m-e20-wert> Karten: <m-e20-prog raetsel="e20-x-parcours-z" alle anzahl="2" gr="4.5"></m-e20-prog>.</td></tr>
+      <td>Zwei Programme mit je 4 Karten:<m-e20-prog raetsel="e20-w-parcours" alle anzahl="2" gr="6" untereinander></m-e20-prog>Der Wenn-dann-Kasten darf vor oder nach dem vor stehen.</td>
+      <td>Geht es ohne Wenn-dann? Ja, aber mit <m-e20-wert raetsel="e20-x-parcours-z" pfad="zauber.minKarten" l="5"></m-e20-wert> Karten, auf zwei Arten:<m-e20-prog raetsel="e20-x-parcours-z" alle anzahl="2" gr="4.5" untereinander></m-e20-prog></td></tr>
   </tbody>
   </table>
 
@@ -480,7 +483,7 @@
     <p><b><a class="blattref" href="#blatt-20-1"></a>:</b> Stempel und Code-Buchstaben hängen vom Versteck ab (Tabelle oben), zum Beispiel für den Kasten P, F, X, Y, J, S in den Feldern 1 bis 6. Lieblings-Station, Sterne und die eigene Station sind frei.</p>
     <p><b><a class="blattref" href="#blatt-20-2"></a>:</b> Die Lösungen der sechs Stationen stehen in der Tabelle „Die Fest-Runde“. <b>Knobel-Ecke:</b> nein. Mit 9 Steinen verliert, wer anfängt, wenn die andere Person den Plan kennt. Die Gewinnzahlen sind <m-e15-text raetsel="e20-steine9" was="gz"></m-e15-text>, und wer bei 9 Steinen dran ist, kann keine Gewinnzahl liegen lassen. Also lässt {{KIND}} dich anfangen und lässt dann immer 6 und 3 Steine liegen.</p>
     <p><b><a class="blattref" href="#blatt-20-3"></a>, Aufgabe 1:</b> 4 + 1 = 5. <b>Aufgabe 2:</b> je nach Versteck, zum Beispiel P F X Y J S wird mit Schlüssel-Zahl 5 zu KASTEN. <b>Profi:</b> „DU KANNST ALLES“ mit Schlüssel-Zahl 3. Nur diese Zahl ergibt echte Wörter (vom Löser mit allen Zahlen von 1 bis 25 geprüft).</p>
-    <p><b>Bildschirm-Levels (zum Nachschauen):</b> Level 2: Lampen 16 und 4 an. Level 4: KRONE. Level 7: die Krone der Extra-Station Kästchen-Wimpel. Level 9: <m-e20-prog raetsel="e20-w-parcours" alle anzahl="2" gr="6"></m-e20-prog> (beide mit 4 Karten). Die anderen wie die Stationen.</p>
+    <p><b>Bildschirm-Levels (zum Nachschauen):</b> Level 2: Lampen 16 und 4 an. Level 4: KRONE. Level 7: die Krone der Extra-Station Kästchen-Wimpel. Level 1, 3, 5, 6 und 8 wie die Stationen. Level 9 geht mit 4 Karten auf zwei Arten:<m-e20-prog raetsel="e20-w-parcours" alle anzahl="2" gr="6" untereinander></m-e20-prog></p>
   </div>
 </section>
 
@@ -508,7 +511,6 @@
     <div class="e20-feld"><span class="e20-nr">8</span><span class="e20-mitte"><span class="e20-stat">Station:<span class="e20-strich"></span></span>
       <span class="e20-zeile"><span class="e20-box"></span><span class="e20-krone"><m-bild name="krone" gr="10"></m-bild></span></span></span><span class="e20-stempel"></span></div>
   </div>
-  <p class="lsg-nur">Stationen, Stempel und Code-Buchstaben hängen von eurem Fest ab, z. B. für das Versteck Kasten: P F X Y J S.</p>
 
   <p class="e20-versteck-zeile">Mein Code-Wort, das Versteck: <span class="linie e20-wortlinie"></span><span class="lsg-nur e20-lsg-inline">z. B. KASTEN</span></p>
 
