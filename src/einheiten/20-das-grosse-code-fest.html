@@ -89,8 +89,10 @@
   /* Blatt 20-3: Fest-Rätsel */
   .e20-schatz { display: flex; align-items: center; gap: 4mm; }
   .e20-schatz > .anw { margin: 0; }
-  .e20-unten { display: flex; align-items: flex-end; gap: 5mm; }
+  .e20-unten { display: flex; align-items: flex-end; gap: 5mm; position: relative; }
   .e20-unten > .profi { flex: 1; }
+  /* Lösungsansicht: Lösung zu Aufgabe 3 im freien Platz über dem QR-Code (außerhalb des Flusses: das Blatt wird nicht höher) */
+  .loesungsmodus .e20-lsg-schatz { position: absolute; top: 0; right: 0; width: 62mm; margin: 0; line-height: 1.25; }
 </style>
 
 <!-- Spickzettel: Kurzfassung der Anleitung zum Mitnehmen, höchstens zwei Seiten. Ablauf als Drehbuch (Minuten wie in der Anleitung) -->
@@ -478,11 +480,11 @@
   </div>
 
   <h2>Lösungen</h2>
-  <m-loesungen einheit="20"></m-loesungen>
+  <m-loesungen einheit="20" skala="0.39"></m-loesungen>
   <div class="kasten loesung darf-brechen e20-bricht e20-mini">
     <p><b><a class="blattref" href="#blatt-20-1"></a>:</b> Stempel und Code-Buchstaben hängen vom Versteck ab (Tabelle oben), zum Beispiel für den Kasten P, F, X, Y, J, S in den Feldern 1 bis 6. Lieblings-Station, Sterne und die eigene Station sind frei.</p>
     <p><b><a class="blattref" href="#blatt-20-2"></a>:</b> Die Lösungen der sechs Stationen stehen in der Tabelle „Die Fest-Runde“. <b>Knobel-Ecke:</b> nein. Mit 9 Steinen verliert, wer anfängt, wenn die andere Person den Plan kennt. Die Gewinnzahlen sind <m-e15-text raetsel="e20-steine9" was="gz"></m-e15-text>, und wer bei 9 Steinen dran ist, kann keine Gewinnzahl liegen lassen. Also lässt {{KIND}} dich anfangen und lässt dann immer 6 und 3 Steine liegen.</p>
-    <p><b><a class="blattref" href="#blatt-20-3"></a>, Aufgabe 1:</b> 4 + 1 = 5. <b>Aufgabe 2:</b> je nach Versteck, zum Beispiel P F X Y J S wird mit Schlüssel-Zahl 5 zu KASTEN. <b>Profi:</b> „DU KANNST ALLES“ mit Schlüssel-Zahl 3. Nur diese Zahl ergibt echte Wörter (vom Löser mit allen Zahlen von 1 bis 25 geprüft).</p>
+    <p><b><a class="blattref" href="#blatt-20-3"></a>, Aufgabe 1:</b> 4 + 1 = 5. <b>Aufgabe 2:</b> je nach Versteck, zum Beispiel P F X Y J S wird mit Schlüssel-Zahl 5 zu KASTEN. <b>Aufgabe 3:</b> Der Schatz (Urkunde 2) liegt in diesem Versteck, zum Beispiel im Kasten. <b>Profi:</b> „DU KANNST ALLES“ mit Schlüssel-Zahl 3. Nur diese Zahl ergibt echte Wörter (vom Löser mit allen Zahlen von 1 bis 25 geprüft).</p>
     <p><b>Bildschirm-Levels (zum Nachschauen):</b> Level 2: Lampen 16 und 4 an. Level 4: KRONE. Level 7: die Krone der Extra-Station Kästchen-Wimpel. Level 1, 3, 5, 6 und 8 wie die Stationen. Level 9 geht mit 4 Karten auf zwei Arten:<m-e20-prog raetsel="e20-w-parcours" alle anzahl="2" gr="6" untereinander></m-e20-prog></p>
   </div>
 </section>
@@ -583,7 +585,6 @@
   <div class="aufg">
     <p class="anw">Stell dein Geheimschrift-Rad auf die Schlüssel-Zahl. Schreib oben deine Code-Buchstaben hinein. Lies jeden mit dem Rad und schreib ihn darunter.</p>
     <m-e20-code raetsel="e20-verstecke" stellen="8" beispiel="KASTEN" gr="14"></m-e20-code>
-    <p class="lsg-nur">Je nach Versteck, z. B. P F X Y J S wird zu KASTEN.</p>
   </div>
 
   <div class="aufg">
@@ -591,6 +592,7 @@
   </div>
 
   <div class="e20-unten">
+    <p class="lsg-nur e20-lsg-schatz">Der Schatz liegt<br>im Versteck,<br>z. B. im Kasten.</p>
     <div class="profi" data-titel="Profi-Aufgabe: Ein Brief der Fee">
       <p>Die Fee hat dir geschrieben. Ihre Schlüssel-Zahl ist 1, 2, 3 oder 4. Knack den Brief!</p>
       <m-e7-knacken raetsel="e20-fee" umbruch="2" gr="11"></m-e7-knacken>
