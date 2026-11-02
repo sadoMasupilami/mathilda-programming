@@ -1,0 +1,13 @@
+{
+  "paket": "e19",
+  "einheit": 19,
+  "titel": "Großer Parcours (Test)",
+  "web": {"titel": "Großer Parcours", "art": "pfad", "levels": ["t19-1", "t19-2", "t19-3", "t19-4", "t19-5"]},
+  "raetsel": [
+    {"id": "t19-1", "art": "pfad", "aufgabe": "ankommen", "b": 6, "h": 2, "start": {"x": 0, "y": 1, "blick": "oben"}, "ziel": {"x": 5, "y": 1}, "edelsteine": [[1, 0], [2, 1], [4, 0]], "erlaubt": ["zauber", "wenn", "bis", "spruch"], "sprueche": {"stern": "vor rechts vor rechts", "mond": "vor links vor links"}, "maxKarten": 3, "erzwingt": ["bis", "spruch"], "beispiel": "bis[@stern @mond]"},
+    {"id": "t19-2", "art": "pfad", "aufgabe": "ankommen", "b": 6, "h": 4, "start": {"x": 0, "y": 3, "blick": "oben"}, "ziel": {"x": 5, "y": 3}, "edelsteine": [[1, 1], [2, 2], [4, 1]], "erlaubt": ["zauber", "wenn", "bis", "spruch"], "sprueche": {"stern": "3[vor] rechts vor rechts", "mond": "3[vor] links vor links"}, "maxKarten": 3, "erzwingt": ["bis", "spruch"], "beispiel": "bis[@stern @mond]"},
+    {"id": "t19-3", "art": "pfad", "aufgabe": "ankommen", "b": 6, "h": 6, "start": {"x": 3, "y": 5, "blick": "links"}, "ziel": {"x": 5, "y": 0}, "hindernisse": [[3, 2], [1, 2], [1, 1], [5, 3], [4, 2], [0, 3]], "edelsteine": [[0, 4], [2, 1]], "erlaubt": ["zauber", "wenn", "bis", "spruch"], "sprueche": {"stern": "vor vor vor rechts", "mond": "rechts vor links"}, "maxKarten": 5, "beispiel": "@stern bis[wenn[stein: @mond sonst vor]]"},
+    {"id": "t19-4", "art": "pfad", "aufgabe": "ankommen", "b": 6, "h": 5, "start": {"x": 0, "y": 4, "blick": "oben"}, "ziel": {"x": 5, "y": 4}, "hindernisse": [[1, 1], [3, 3], [4, 2]], "edelsteine": [[1, 3], [3, 1], [5, 1]], "erlaubt": ["zauber", "wenn", "bis", "spruch"], "sprueche": {"stern": "vor rechts vor links"}, "maxKarten": 6, "erzwingt": ["spruch"], "beispiel": "4[@stern] bis[wenn[stein: rechts sonst vor]]"},
+    {"id": "t19-5", "art": "pfad", "aufgabe": "kuerzestes", "b": 4, "h": 4, "start": {"x": 1, "y": 3, "blick": "oben"}, "ziel": {"x": 3, "y": 1}, "hindernisse": [[3, 3], [1, 0]], "edelsteine": [[0, 1]], "erlaubt": ["zauber", "wenn", "bis", "spruch"], "bedingungen": ["stein"], "sprueche": {"stern": "vor vor rechts"}, "maxKarten": 7, "erzwingt": [], "beispiel": "@stern 4[rechts vor] @stern"}
+  ]
+}
