@@ -5,9 +5,11 @@
 
      <m-e15-steine n="7" [gr="9"] [pro="5"] [versatz="0"]>
          Muggelsteine als Bild (Reihen zu 5), gr = Durchmesser in mm
-     <m-e15-stellung raetsel="e15-s1" [gr="7"] [pro="5"]>
+     <m-e15-stellung raetsel="e15-s1" [gr="7"] [pro="5"] [erklaerung]>
          „Wer gewinnt hier?“: Wer ist dran, Steine, ankreuzen Du / Drache.
-         Lösung: Kreuz beim Gewinner, darunter der Gewinnzug („nimm 1“).
+         Lösung: rotes Kreuz beim Gewinner. Mit erklaerung zusätzlich der Gewinnzug als roter Satz unter
+         den Kästchen („Nimm 1, dann bleiben 3.“); das macht die Karte in der Lösungsansicht etwa 18 mm
+         höher, darum steht die Erklärung auf Blatt 15-2 im Lösungstext der Anleitung.
      <m-e15-weg raetsel="e15-g20" [feld="22"] [pro="7"] [gold="20"]>
          Zahlen-Weg 0 … 20 für „Wer sagt 20?“ (Start mit Drache, Schatz am Ende).
          gold: Felder schon gelb (Beispiel). Lösung: rote Ringe um alle Gewinnzahlen.
@@ -123,19 +125,22 @@ table.e15-zt td { text-align: center; }
     const n = l.haufen[0];
     const gr = parseFloat(el.getAttribute('gr') || '7');
     const dran = l.dran === 'du' ? '<span><b>Du</b> bist dran.</span>' : drache(8) + '<span><b>Der Drache</b> ist dran.</span>';
+    // Rote Erklärung unter den Kästchen nur mit erklaerung (sonst reicht das Kreuz, siehe Kopf)
     let lsg = '';
-    if (l.dran === 'du' && l.gewinner === 'du') lsg = l.zugText ? l.zugText.replace(/^nimm/, 'Nimm') + ', dann bleiben ' + l.nachher[0] + '.' : '';
-    else if (l.dran === 'du') lsg = 'Der Drache nimmt dann den Rest.';
-    else lsg = l.zugText ? 'Der Drache: ' + l.zugText + '.' : '';
-    if (l.dran === 'andere' && l.gewinner === 'du') {
-      // welche Gewinnzahl bleibt nach dem Drachen-Zug und dem eigenen Zug? (aus dem Spielbaum)
-      const v = N().lies(l.spiel);
-      const ziele = new Set();
-      for (const z of N().zuege(v, l.haufen)) {
-        const x = N().nach(l.haufen, z);
-        for (const y of N().gewinnZuege(v, x)) ziele.add(N().nach(x, y)[0]);
+    if (el.hasAttribute('erklaerung')) {
+      if (l.dran === 'du' && l.gewinner === 'du') lsg = l.zugText ? l.zugText.replace(/^nimm/, 'Nimm') + ', dann bleiben ' + l.nachher[0] + '.' : '';
+      else if (l.dran === 'du') lsg = 'Der Drache nimmt dann den Rest.';
+      else if (l.gewinner === 'andere') lsg = l.zugText ? 'Der Drache: ' + l.zugText + '.' : '';
+      else {
+        // welche Gewinnzahl bleibt nach dem Drachen-Zug und dem eigenen Zug? (aus dem Spielbaum)
+        const v = N().lies(l.spiel);
+        const ziele = new Set();
+        for (const z of N().zuege(v, l.haufen)) {
+          const x = N().nach(l.haufen, z);
+          for (const y of N().gewinnZuege(v, x)) ziele.add(N().nach(x, y)[0]);
+        }
+        lsg = 'Du lässt dann ' + Array.from(ziele).sort((a, b) => a - b).join(' oder ') + ' liegen.';
       }
-      lsg = 'Du lässt dann ' + Array.from(ziele).sort((a, b) => a - b).join(' oder ') + ' liegen.';
     }
     el.innerHTML = '<div class="e15-st"><div class="e15-st-dran">' + dran + '</div>' +
       '<div class="e15-st-steine">' + N().steineSVG(n, { gr, proReihe: parseInt(el.getAttribute('pro') || '5', 10), versatz: n }) + '</div>' +
