@@ -79,6 +79,11 @@
   .e16-legende .e16-leg-wort { margin-right: 4mm; color: var(--tinte); }
   .e16-mein { display: flex; align-items: flex-start; gap: 7mm; }
   .e16-mein-text p { margin: 0 0 3mm 0; }
+  /* Lösungsansicht von Blatt 16-2: Das Blatt ist voll. Statt des langen roten Satzes unter dem Kobold-Programm
+     steht die Lösung kurz rechts neben dem Titel (dort ist Platz); die falsche Karte kreist der Baustein selbst ein.
+     Der ganze Satz steht bei den Lösungen in der Anleitung. */
+  .loesungsmodus .e16-kobold .prog-reparatur { display: none; }
+  .loesungsmodus .e16-kobold > .lsg-nur.e16-richtig { position: absolute; top: 2.9mm; right: 4mm; margin: 0; font-size: 16pt; line-height: 7.9mm; white-space: nowrap; }
 </style>
 
 <!-- Spickzettel: Kurzfassung der Anleitung zum Mitnehmen, höchstens zwei Seiten. Ablauf als Drehbuch (Minuten wie in der Anleitung) -->
@@ -504,9 +509,10 @@
     <p class="e16-frage">Kürzester Weg? <span class="e16-ab">A</span><m-e16-janein raetsel="e16-la"></m-e16-janein> <span class="e16-ab">B</span><m-e16-janein raetsel="e16-lb"></m-e16-janein></p>
   </div>
 
-  <div class="profi" data-titel="Kobold-Jagd: Die Regel läuft im Kreis">
+  <div class="profi e16-kobold" data-titel="Kobold-Jagd: Die Regel läuft im Kreis">
     <p>Der Kobold hat eine Karte ausgetauscht. Jetzt läuft der Drache in B hin und her. Kreise die falsche Karte ein!</p>
     <m-programm raetsel="e16-k1" gr="12" nummern="nein"></m-programm>
+    <p class="lsg-nur e16-richtig">Richtig: links drehen</p>
   </div>
 </section>
 
@@ -531,7 +537,7 @@
         <p>Bau dein eigenes Labyrinth! Mal Steine grau an und zeichne einen Schatz ein.</p>
         <p>Findet die Hand-Regel den Schatz?</p>
         <p>Schaffst du eines, in dem der Drache im Kreis läuft?</p>
-        <p class="lsg-nur">Mehrere Lösungen möglich. Im Kreis: Schatz neben einer Insel oder mitten auf einem freien Platz.</p>
+        <p class="lsg-nur">Mehrere Lösungen möglich. Kreis: Schatz neben einer Insel.</p>
       </div>
     </div>
   </div>
