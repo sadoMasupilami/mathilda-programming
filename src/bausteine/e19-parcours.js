@@ -13,7 +13,7 @@
          Eine Zahl aus der Lösung: als Antwortfeld (Blatt) oder mit text als Zahl im Fließtext.
          l="…" prüft die Zahl (der Text in der Anleitung kann so nicht unbemerkt falsch werden).
          was="feld": das Feld des Zusammenstoßes in Worten („in der obersten Reihe, 3. Feld von links“).
-     <m-e19-janein raetsel="e19-z3">   „ja / nein“: Stoßen die Drachen zusammen? Lösung rot eingekreist.
+     <m-e19-janein raetsel="e19-z3">   „ja / nein“ mit Kästchen: Stoßen die Drachen zusammen? Lösung rot angekreuzt.
      <m-e19-takte raetsel="e19-z1">    Tabelle Takt für Takt: was jeder Drache macht, Zusammenstoß rot.
      <m-e19-rekord karten="6" spruch="ja|nein" [l="50"]>
          Das längste Programm mit so vielen Karten (Befehle zählen wie Bewegungen beim Tanz):
@@ -234,8 +234,10 @@
     const r = raetsel(el, ['zweidrachen']);
     if (!r) return;
     const ja = !!r.loesung.stoss;
-    const kreis = (an) => '<span class="e19-jn' + (an ? ' e19-jn-lsg' : '') + '">';
-    el.innerHTML = '<span class="e19-janein">' + kreis(ja) + 'ja</span>' + kreis(!ja) + 'nein</span></span>';
+    // Kästchen zum Ankreuzen wie in Einheit 6 (m-e6-janein), die Lösung mit rotem Kreuz
+    const KREUZ = '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M18 18 L82 82 M82 18 L18 82" fill="none" stroke="' + ROT + '" stroke-width="16" stroke-linecap="round"/></svg>';
+    const wahl = (an, wort) => '<span class="e19-jn' + (an ? ' e19-jn-lsg' : '') + '"><span class="e19-kreuz">' + KREUZ + '</span>' + wort + '</span>';
+    el.innerHTML = '<span class="e19-janein">' + wahl(ja, 'ja') + wahl(!ja, 'nein') + '</span>';
     el.dataset.loesung = ja ? 'ja' : 'nein';
     el.classList.add('komp', 'geprueft');
   };
