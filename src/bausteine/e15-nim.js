@@ -11,8 +11,10 @@
      <m-e15-weg raetsel="e15-g20" [feld="22"] [pro="7"] [gold="20"]>
          Zahlen-Weg 0 … 20 für „Wer sagt 20?“ (Start mit Drache, Schatz am Ende).
          gold: Felder schon gelb (Beispiel). Lösung: rote Ringe um alle Gewinnzahlen.
-     <m-e15-zahlen raetsel="e15-g20" [vorgabe="20,17"] [ordnung="ab|auf"] [form="kasten|kreis"] [gr]>
+     <m-e15-zahlen raetsel="e15-g20" [vorgabe="20,17"] [ordnung="ab|auf"] [form="kasten|kreis"] [gr] [breite] [pro]>
          Kästchen für die Gewinnzahlen (vorgegebene schon eingetragen). Lösung: rote Zahlen.
+         form="kreis": gr = Höhe in mm, breite = Breite in mm (Standard gr; breiter → längliches Feld mit
+         runden Enden, Platz für zwei Ziffern), pro = so viele Felder pro Reihe (sonst fließend)
      <m-e15-antwort raetsel="…" was="erster|kleinste|nimm|anfangen">
          ein Antwortfeld: erste Gewinnzahl beim Anfangen, kleinste Gewinnzahl, Gewinnzug (nimm),
          „Willst du anfangen?“ (ja / nein zum Ankreuzen)
@@ -62,7 +64,8 @@ m-e15-steine svg, m-e15-weg svg, m-e15-baum svg, m-e15-stellung svg { display: b
 .e15-zahlen .feld.e15-vorgabe { border-color: var(--grau); background-image: none; }
 m-e15-zugtabelle { display: block; }
 table.e15-zt td { text-align: center; }
-.e15-kreis { display: inline-flex; align-items: center; justify-content: center; width: var(--gr, 11mm); height: var(--gr, 11mm); border-radius: 50%; border: 0.55mm solid var(--tinte); background: white; font-family: var(--kind); font-size: 15pt; line-height: 1; }
+.e15-zahlen.e15-pro { display: grid; justify-content: start; }
+.e15-kreis { display: inline-flex; align-items: center; justify-content: center; width: var(--br, var(--gr, 11mm)); height: var(--gr, 11mm); border-radius: calc(var(--gr, 11mm) / 2); border: 0.55mm solid var(--tinte); background: white; font-family: var(--kind); font-size: 15pt; line-height: 1; }
 .e15-kreis.e15-vorgabe { background: var(--gold-hell); border-color: var(--gold); font-weight: 700; }
 .e15-janein { display: inline-flex; align-items: center; gap: 4mm; font-size: 16pt; line-height: 1; }
 .e15-janein > span { display: inline-flex; align-items: center; gap: 1.5mm; }
@@ -75,7 +78,7 @@ table.e15-zt td { text-align: center; }
 .e15-strich { display: none; }
 .loesungsmodus .e15-strich { display: block; position: absolute; left: -1mm; right: -1mm; top: 50%; height: 0; border-top: 0.9mm solid var(--rot); transform: rotate(-1.2deg); }
 .e15-richtig { display: none; }
-.loesungsmodus .e15-richtig { display: inline; color: var(--rot); font-weight: 700; }
+.loesungsmodus .e15-richtig { display: block; position: absolute; left: calc(100% + 3mm); top: 50%; transform: translateY(-50%); white-space: nowrap; color: var(--rot); font-weight: 700; font-size: 13pt; line-height: 1.1; }
 `;
   function stil() {
     if (document.getElementById('e15-stil')) return;
@@ -173,13 +176,21 @@ table.e15-zt td { text-align: center; }
     const vorgabe = zahlenListe(el.getAttribute('vorgabe'));
     for (const x of vorgabe) if (!gz.includes(x)) h.fehler(el, 'vorgabe: ' + x + ' ist keine Gewinnzahl');
     const form = el.getAttribute('form') || 'kasten';
+    if (form !== 'kasten' && form !== 'kreis') return h.fehler(el, 'form: kasten oder kreis');
     const gr = parseFloat(el.getAttribute('gr') || '11');
+    const breite = parseFloat(el.getAttribute('breite') || String(gr));
+    if (!(breite >= gr)) return h.fehler(el, 'breite muss mindestens gr sein');
+    // Zweistellige Zahlen brauchen Platz für zwei Ziffern (wie zwei 1-cm-Kästchen, etwas enger)
+    if (form === 'kreis' && breite < 17 && gz.some((x) => x >= 10)) h.fehler(el, 'Zweistellige Gewinnzahl im Kreis mit ' + breite + ' mm: breite="18" (oder mehr) setzen');
+    const pro = el.hasAttribute('pro') ? parseInt(el.getAttribute('pro'), 10) : 0;
+    if (el.hasAttribute('pro') && (!(pro >= 1) || form !== 'kreis')) return h.fehler(el, 'pro nur bei form="kreis", mindestens 1');
     const teile = gz.map((x) => {
       const da = vorgabe.includes(x);
-      if (form === 'kreis') return '<span class="e15-kreis' + (da ? ' e15-vorgabe' : '') + '" style="--gr:' + gr + 'mm">' + (da ? x : '<span class="lsg">' + x + '</span>') + '</span>';
+      if (form === 'kreis') return '<span class="e15-kreis' + (da ? ' e15-vorgabe' : '') + '" style="--gr:' + gr + 'mm;--br:' + breite + 'mm">' + (da ? x : '<span class="lsg">' + x + '</span>') + '</span>';
       return da ? '<span class="feld e15-vorgabe">' + x + '</span>' : h.feldHTML(String(x), '');
     });
-    el.innerHTML = '<span class="e15-zahlen">' + teile.join(form === 'kreis' ? '' : '<span class="e15-komma">,</span>') + '</span>';
+    el.innerHTML = '<span class="e15-zahlen' + (pro ? ' e15-pro" style="grid-template-columns:repeat(' + pro + ',max-content)' : '') + '">' +
+      teile.join(form === 'kreis' ? '' : '<span class="e15-komma">,</span>') + '</span>';
     el.classList.add('komp', 'geprueft');
   };
 
@@ -228,7 +239,7 @@ table.e15-zt td { text-align: center; }
       const wenn = '<span>Wenn noch</span><span class="e15-n">' + g.wenn + '</span><span>' + (g.wenn === 1 ? 'Stein liegt,' : 'Steine liegen,') + '</span>';
       if (modus === 'kobold') {
         return '<div class="e15-regel">' + wenn + '<span>dann nimm</span><span class="e15-punkt"><span class="e15-n e15-dann">' + g.dann + '</span>.</span>' +
-          (g.kobold ? '<span class="e15-strich"></span><span class="e15-richtig">Richtig: nimm ' + g.richtig.join(' oder ') + '.</span>' : '') + '</div>';
+          (g.kobold ? '<span class="e15-strich"></span><span class="e15-richtig">Richtig:<br>nimm ' + g.richtig.join(' oder ') + '.</span>' : '') + '</div>';
       }
       const dann = g.vorgabe ? '<span class="e15-n e15-dann">' + g.dann + '</span>' : h.feldHTML(String(g.dann), 'k');
       return '<div class="e15-regel' + (g.vorgabe ? ' e15-vorgabe-text' : '') + '">' + wenn + '<span>dann nimm</span><span class="e15-punkt">' + dann + '.</span></div>';
