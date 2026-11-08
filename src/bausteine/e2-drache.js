@@ -15,7 +15,8 @@
     const gr = parseFloat(el.getAttribute('gr') || '70');
     if (!(gr >= 30 && gr <= 150)) return H.fehler(el, 'gr (mm) zwischen 30 und 150');
     const F = S.FARBE;
-    let inhalt = S.inhalt('drache');
+    // Die gezeichnete Fassung (Konturen zum Anmalen), nicht das erzeugte Bild aus web/kern/erzeugt.js
+    let inhalt = S.gezeichnet('drache');
     // Alle Füllfarben weiß, außer der orangen rechten Pfote und den dunklen Augen/Nasenlöchern
     for (const f of [F.drache, F.dracheDunkel, F.bauch, F.gold]) inhalt = inhalt.split('fill="' + f + '"').join('fill="white"');
     // Der Bauch hat im Original keine Linie: zum Anmalen gestrichelt nachziehen

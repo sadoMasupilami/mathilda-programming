@@ -126,7 +126,7 @@ let index = fs.readFileSync(indexPfad, 'utf8');
 const mitBildern = fs.existsSync(path.join(ZIEL, 'kern', 'bilder.js'));
 index = index.replace('<!-- BILDER -->', mitBildern ? '<script src="kern/bilder.js"></script>' : '');
 // Weitere Kern-Dateien (gemeinsam mit dem Löser, z. B. kern/geheim.js) und die Spiel-Plugins einbinden
-const KERN_FEST = ['ausfuehrer.js', 'symbole.js', 'bilder.js'];
+const KERN_FEST = ['erzeugt.js', 'ausfuehrer.js', 'symbole.js', 'bilder.js'];
 const kernExtra = fs.readdirSync(path.join(ZIEL, 'kern')).filter((d) => d.endsWith('.js') && !KERN_FEST.includes(d)).sort();
 index = index.replace('<!-- KERN -->', kernExtra.map((d) => '<script src="kern/' + d + '"></script>').join('\n'));
 index = index.replace('<!-- SPIELE -->', SPIEL_PLUGINS.map((a) => '<script src="spiele/' + a + '.js"></script>').join('\n'));

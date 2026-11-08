@@ -279,10 +279,15 @@
     }
     return o;
   }
+  // Erzeugte Bilder (web/kern/erzeugt.js) statt der Zeichnungen, wo es sie gibt. Drachenkinder heißen dort
+  // immer drachenkind-<farbe>[-fluegel][-krone] (in dieser Reihenfolge).
+  const ERZ = g.WerkstattErzeugt || {};
+  const erzeugt = (id) => ERZ[id] ? '<image href="' + ERZ[id] + '" x="0" y="0" width="100" height="100"/>' : null;
+  for (const n of Object.keys(BILDER)) if (ERZ[n]) BILDER[n] = erzeugt(n);
   function inhalt(name) {
     if (Object.prototype.hasOwnProperty.call(BILDER, name)) return BILDER[name];
     const o = drachenkindTeile(name);
-    if (o) return drache(o);
+    if (o) return erzeugt('drachenkind-' + o.farbe + (o.fluegel ? '-fluegel' : '') + (o.krone ? '-krone' : '')) || drache(o);
     throw new Error('Unbekanntes Bild „' + name + '“. Es gibt: ' + namen().join(', ') + ', drachenkind-gruen|blau[-fluegel][-krone]');
   }
   function hat(name) {

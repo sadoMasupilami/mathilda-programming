@@ -206,11 +206,11 @@
   }
 
   const BILDER = {
-    drache: { wort: 'Drache', svg: DRACHE, muetze: { x: 50, y: 26, w: 40, r: 0 } },
-    einhorn: { wort: 'Einhorn', svg: EINHORN, muetze: { x: 68, y: 28, w: 32, r: 24 } },
-    katze: { wort: 'Katze', svg: KATZE, muetze: { x: 50, y: 26, w: 38, r: -8 } },
-    hase: { wort: 'Hase', svg: HASE, muetze: { x: 50, y: 35, w: 30, r: 0 } },
-    eule: { wort: 'Eule', svg: EULE, muetze: { x: 50, y: 19, w: 38, r: 0 } },
+    drache: { wort: 'Drache', svg: DRACHE, muetze: { x: 50, y: 26, w: 40, r: 0 }, muetzeErzeugt: { x: 50, y: 19, w: 36, r: 0 } },
+    einhorn: { wort: 'Einhorn', svg: EINHORN, muetze: { x: 68, y: 28, w: 32, r: 24 }, muetzeErzeugt: { x: 76, y: 18, w: 24, r: 14 } },
+    katze: { wort: 'Katze', svg: KATZE, muetze: { x: 50, y: 26, w: 38, r: -8 }, muetzeErzeugt: { x: 47, y: 19, w: 38, r: -6 } },
+    hase: { wort: 'Hase', svg: HASE, muetze: { x: 50, y: 35, w: 30, r: 0 }, muetzeErzeugt: { x: 49, y: 32, w: 28, r: 0 } },
+    eule: { wort: 'Eule', svg: EULE, muetze: { x: 50, y: 19, w: 38, r: 0 }, muetzeErzeugt: { x: 50, y: 19, w: 40, r: 0 } },
     apfel: { wort: 'Apfel', svg: APFEL },
     eis: { wort: 'Eis', svg: EIS },
     kuchen: { wort: 'Kuchen', svg: KUCHEN },
@@ -221,6 +221,17 @@
     'muetze-gelb': { wort: 'gelbe Mütze', kurz: 'gelb', svg: muetze(F.gelb), istMuetze: true },
     'muetze-gruen': { wort: 'grüne Mütze', kurz: 'grün', svg: muetze(F.gruen), istMuetze: true },
   };
+
+  // Erzeugte Bilder (web/kern/erzeugt.js) statt der Zeichnungen, wo es sie gibt (Mützen bleiben gezeichnet).
+  // Der Drache ist das grüne Drachenkind mit Flügeln aus Einheit 13. muetzeErzeugt: Lage der Mütze auf dem erzeugten Bild.
+  const ERZ = g.WerkstattErzeugt || {};
+  const ERZ_NAME = { drache: 'drachenkind-gruen-fluegel' };
+  for (const [n, b] of Object.entries(BILDER)) {
+    const id = ERZ_NAME[n] || n;
+    if (b.istMuetze || !ERZ[id]) continue;
+    b.svg = '<image href="' + ERZ[id] + '" x="0" y="0" width="100" height="100"/>';
+    if (b.muetzeErzeugt) b.muetze = b.muetzeErzeugt;
+  }
 
   const hat = (name) => Object.prototype.hasOwnProperty.call(BILDER, name);
   // Wort zu einem Namen: eigenes Wort (woerter) vor dem Bild-Katalog, sonst der Name selbst

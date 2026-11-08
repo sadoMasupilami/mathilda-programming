@@ -255,6 +255,10 @@
     schneehut: BODEN + FLOCKEN + schneemann(KUGEL_GROSS + KUGEL_MITTEL + KUGEL_KOPF + '<g transform="translate(0 2)">' + HUT + '</g>'),
   };
 
+  // Erzeugte Bilder (web/kern/erzeugt.js, gleicher Name) statt der Zeichnungen, wo es sie gibt
+  const ERZ = g.WerkstattErzeugt || {};
+  for (const n of Object.keys(BILDER)) if (ERZ[n]) BILDER[n] = '<image href="' + ERZ[n] + '" x="0" y="0" width="100" height="100"/>';
+
   // Ein Bild als eigenständiges <svg>. groesse: z. B. '22mm' oder '64' (px); ohne Angabe 100 %
   function bild(name, groesse, extra) {
     if (!BILDER[name]) throw new Error('Unbekanntes Bild „' + name + '“. Es gibt: ' + Object.keys(BILDER).join(', '));

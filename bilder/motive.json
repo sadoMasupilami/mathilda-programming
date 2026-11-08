@@ -1,0 +1,75 @@
+{
+  "_erklaerung": [
+    "Beschreibung jedes erzeugten Bildes für werkzeuge/bilder-erzeugen.mjs, aufbereitet von werkzeuge/bilder-verarbeiten.sh.",
+    "Ein Eintrag ist ein Text oder { text, vorlage, gruppe }: vorlage sind Bilder (ids), die vorher fertig sein müssen und als Referenz mitgehen (gleiche Figur, gleiche Lage).",
+    "Bilder derselben gruppe werden gemeinsam zugeschnitten (gleicher Ausschnitt, gleiche Größe), damit man in einer Bildfolge sieht, was dazukommt. Wo Codex die Größe nicht hält, geht die Kette rückwärts: das fertige Bild zuerst, die früheren Stufen nehmen etwas weg (Schneemann).",
+    "Die Farben der Drachen passen zur App (grün #7cc96b, Hörnchen und Zacken gold). Beim Gitter-Drachen ist die rechte Vorderpfote orange wie die Taste rechts drehen.",
+    "Drachenkinder (Einheit 13): grün oder blau, mit oder ohne Flügel, mit oder ohne Krone. Sonst müssen alle acht genau gleich aussehen."
+  ],
+  "motive": {
+    "drache-oben": "a friendly green (#7cc96b) baby dragon seen exactly from above (top-down bird's-eye view, like a game piece on a board), head and snout pointing straight up to the top edge of the canvas, two dark green wings spread to the left and right, short tail pointing straight down, four short legs visible at the sides; small golden horns and a row of golden spikes along the back; its front paw on the right side of the image is clearly bright orange, the other three paws are green; two friendly eyes on top of the head",
+    "schatz": "a closed wooden treasure chest with a rounded lid, two golden bands and a golden lock in the front, a small golden sparkle at the top right corner, front view",
+    "edelstein": "a single sparkling light blue cut diamond gemstone, classic brilliant shape with flat top and pointed bottom, front view",
+    "stein": "a single big rounded grey boulder rock, slightly wider than high, a few soft cracks, front view",
+    "kobold": "a cheeky but friendly little goblin, the 'error goblin': light green skin, big pointed ears, a magenta pointed cap with a small golden bell on the tip, a magenta tunic, a mischievous grin, standing, whole body, front view; not scary",
+
+    "teller": { "text": "an empty round white plate, seen slightly from above, nothing on it", "gruppe": "jause" },
+    "brot": { "text": "the same plate with one plain slice of toast bread lying on it (golden brown crust, pale inside)", "vorlage": ["teller"], "gruppe": "jause" },
+    "butter": { "text": "the same plate and bread slice, now evenly spread with yellow butter; a butter knife rests at the top right edge", "vorlage": ["brot"], "gruppe": "jause" },
+    "schinken": { "text": "the same buttered bread slice on the plate, now with one pink slice of ham on top (no knife)", "vorlage": ["butter"], "gruppe": "jause" },
+    "gurke": { "text": "the same buttered bread slice on the plate, now with three round slices of cucumber on top (no knife, no ham)", "vorlage": ["butter"], "gruppe": "jause" },
+    "kaese": { "text": "the same buttered bread slice on the plate, now with one square slice of yellow cheese with holes on top (no knife, no ham)", "vorlage": ["butter"], "gruppe": "jause" },
+    "essen": { "text": "the same ham bread on the plate, but a big round bite has been taken out of the top right corner of the bread, a few crumbs next to it", "vorlage": ["schinken"], "gruppe": "jause" },
+
+    "zahnpasta": "a blue toothbrush lying horizontally, a red and white toothpaste tube above it squeezing a white blob of toothpaste onto the bristles",
+    "putzen": { "text": "a friendly child with short brown hair (head and shoulders only, front view) brushing their teeth with a blue toothbrush, a little white foam at the mouth, happy eyes", "gruppe": "zaehne" },
+    "ausspucken": { "text": "the same child (same hair, same face) leaning over a small white washbasin with a tap, spitting a little white foam into the basin", "vorlage": ["putzen"], "gruppe": "zaehne" },
+    "ausspuelen": { "text": "the same child (same hair, same face, head and shoulders) drinking water from a green cup to rinse the mouth", "vorlage": ["putzen"], "gruppe": "zaehne" },
+
+    "unterhose": "a pair of light blue children's underpants with small white dots, flat lay, front view",
+    "hose": "a pair of blue jeans trousers for a child, flat lay, front view, full length",
+    "socken": "a pair of white children's socks with red stripes at the top, side by side, flat lay",
+    "schuhe": "a pair of purple children's sneakers with white soles and white laces, side view, one slightly behind the other",
+    "pullover": "a pink long-sleeved children's sweater with a white heart on the front, flat lay, front view",
+
+    "ei": { "text": "a large pale green dragon egg with darker green spots, standing upright in a round brown twig nest, front view", "gruppe": "ei" },
+    "eiwackelt": { "text": "the same egg in the same nest, tilted to the left as if it is wobbling, with three small curved motion lines on each side", "vorlage": ["ei"], "gruppe": "ei" },
+    "eirisse": { "text": "the same egg in the same nest, upright, now with a few zigzag cracks across the shell and small motion lines around it", "vorlage": ["eiwackelt"], "gruppe": "ei" },
+    "schluepfen": { "text": "the same nest; the egg has cracked open: the head of the small green baby dragon from the second reference peeks out of the lower half of the shell, the top half of the shell sits on its head like a little hat", "vorlage": ["eirisse", "drachenkind-gruen"], "gruppe": "ei" },
+    "drachenbaby": { "text": "the same nest, now empty with only broken egg shell pieces in it, placed small at the bottom; the small green baby dragon with wings from the second reference flies happily above it, side view", "vorlage": ["schluepfen", "drachenkind-gruen-fluegel"], "gruppe": "ei" },
+
+    "schneehut": { "text": "a snowman made of three snowballs (big bottom ball, medium middle ball, small head) standing on a small flat patch of snow: coal eyes, a carrot nose, coal buttons, two stick arms, and a small black top hat with a red band", "gruppe": "schnee" },
+    "schneedrei": { "text": "exactly the same snowman, same size and position on the canvas, but without the hat; everything else unchanged", "vorlage": ["schneehut"], "gruppe": "schnee" },
+    "schneezwei": { "text": "the same scene with only the two lower snowballs left: the big bottom ball and the medium ball on top, exactly the same size and position on the canvas as in the reference; no head, no face, no arms, no buttons, no hat", "vorlage": ["schneedrei"], "gruppe": "schnee" },
+    "schneekugel": { "text": "the same scene with only the big bottom snowball left on the snow patch, exactly the same size and position on the canvas as in the reference; nothing else", "vorlage": ["schneezwei"], "gruppe": "schnee" },
+
+    "drachenkind-gruen": { "text": "a cute small green (#7cc96b) baby dragon standing upright on two legs, front view, light green belly with soft stripes, small golden horns, short tail curling to the right, happy face; no wings, no crown", "gruppe": "drachenkind" },
+    "drachenkind-blau": { "text": "exactly the same baby dragon as the reference, same pose, same size, but light blue (#7fb2f0) instead of green; no wings, no crown", "vorlage": ["drachenkind-gruen"], "gruppe": "drachenkind" },
+    "drachenkind-gruen-fluegel": { "text": "exactly the same green baby dragon as the reference, same pose, same size, but with two dark green bat-like wings spread at its back; no crown", "vorlage": ["drachenkind-gruen"], "gruppe": "drachenkind" },
+    "drachenkind-blau-fluegel": { "text": "exactly the same baby dragon as the reference, same pose, same size, light blue (#7fb2f0) instead of green, with two dark blue bat-like wings spread at its back; no crown", "vorlage": ["drachenkind-gruen"], "gruppe": "drachenkind" },
+    "drachenkind-gruen-krone": { "text": "exactly the same green baby dragon as the reference, same pose, same size, wearing a small golden crown on its head; no wings", "vorlage": ["drachenkind-gruen"], "gruppe": "drachenkind" },
+    "drachenkind-blau-krone": { "text": "exactly the same baby dragon as the reference, same pose, same size, light blue (#7fb2f0) instead of green, wearing a small golden crown on its head; no wings", "vorlage": ["drachenkind-gruen"], "gruppe": "drachenkind" },
+    "drachenkind-gruen-fluegel-krone": { "text": "exactly the same green baby dragon as the reference, same pose, same size, with two dark green bat-like wings spread at its back and a small golden crown on its head", "vorlage": ["drachenkind-gruen"], "gruppe": "drachenkind" },
+    "drachenkind-blau-fluegel-krone": { "text": "exactly the same baby dragon as the reference, same pose, same size, light blue (#7fb2f0) instead of green, with two dark blue bat-like wings spread at its back and a small golden crown on its head", "vorlage": ["drachenkind-gruen"], "gruppe": "drachenkind" },
+
+    "drache": "a friendly green dragon with dark green wings, standing on its hind legs, side view facing right, breathing a small orange and yellow flame from its mouth to the right; golden horns and back spikes",
+    "einhorn": "a whole friendly white unicorn with a lilac mane and tail and a golden spiral horn, standing on four legs, side view facing right; no wings",
+    "fluegelpferd": { "text": "a whole friendly cream-coloured winged horse (pegasus) with a brown mane and tail and two white feathered wings, standing on four legs, side view facing right, same pose and size as the reference; no horn", "vorlage": ["einhorn"] },
+    "fee": "a small friendly fairy girl with blonde hair, a pink dress, light blue translucent wings and a magic wand with a golden star, whole body, front view, floating",
+    "meerjungfrau": "a cute plush toy mermaid sitting upright: a soft stuffed fabric doll with red yarn hair, a round friendly face, a lilac long-sleeved shirt and a turquoise fish tail with fins, whole toy visible, front view",
+    "eule": "a whole friendly brown owl with big round eyes and a small beak, sitting, front view",
+    "ente": "a whole friendly yellow duckling with an orange beak and orange feet, standing, side view facing right",
+    "fisch": "a whole friendly orange fish with fins and a forked tail, side view facing left",
+    "frosch": "a whole friendly green frog sitting, front view, big eyes on top of its head, smiling",
+    "katze": "a whole friendly orange tabby cat sitting, front view, tail curled beside it",
+    "hase": "a whole friendly light grey and white rabbit sitting upright, front view, two long upright ears",
+    "biene": "a whole friendly bee with yellow and black stripes and two small translucent wings, flying, side view facing left",
+    "schnecke": "a whole friendly snail with a brown spiral shell and two feelers, crawling, side view facing right",
+    "marienkaefer": "a whole friendly ladybird with a red shell with black dots and a black head, seen from above",
+
+    "apfel": "a shiny red apple with a short stem and one green leaf",
+    "eis": "an ice cream cone with one pink scoop of strawberry ice cream and a cherry on top",
+    "kuchen": "a round cake with pink icing, cream filling and a cherry on top, side view",
+    "karotte": "a single orange carrot with green leaves, lying diagonally"
+  }
+}

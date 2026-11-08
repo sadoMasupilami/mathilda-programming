@@ -103,8 +103,8 @@ fs.mkdirSync(OUT, { recursive: true });
 const stilDatei = 'styles-' + name + '.css';
 fs.writeFileSync(path.join(OUT, stilDatei), setzeName(fs.readFileSync(path.join(SRC, 'styles.css'), 'utf8')).replace(/url\("fonts\//g, 'url("../src/fonts/'));
 const bausteine = fs.readdirSync(path.join(SRC, 'bausteine')).filter((d) => d.endsWith('.js')).sort();
-// Kern: zuerst Ausführer, Symbole, Bilder, dann alle weiteren Kern-Dateien (web/kern/*.js, z. B. geheim.js)
-const ERSTE = ['ausfuehrer.js', 'symbole.js', 'bilder.js'];
+// Kern: zuerst die erzeugten Bilder, dann Ausführer, Symbole, Bilder, dann alle weiteren Kern-Dateien (web/kern/*.js, z. B. geheim.js)
+const ERSTE = ['erzeugt.js', 'ausfuehrer.js', 'symbole.js', 'bilder.js'];
 const kernDateien = ERSTE.filter((d) => fs.existsSync(path.join(WURZEL, 'web', 'kern', d)))
   .concat(fs.readdirSync(path.join(WURZEL, 'web', 'kern')).filter((d) => d.endsWith('.js') && !ERSTE.includes(d)).sort());
 const daten = { raetsel: raetsel.raetsel, pakete: raetsel.pakete, qr, kind: KIND, titel: werkstatt.titel, stand: werkstatt.stand, teilBuild: !!nur };

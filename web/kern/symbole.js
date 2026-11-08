@@ -40,6 +40,11 @@
 
   const T = FARBE.tinte;
   const strich = (w) => ' stroke="' + T + '" stroke-width="' + (w || 4) + '" stroke-linejoin="round" stroke-linecap="round"';
+  // Erzeugte Bilder (web/kern/erzeugt.js): ein <image> im Feld 0–100, sonst die eigene Zeichnung
+  const ERZ = g.WerkstattErzeugt || {};
+  const erzeugt = (id, gezeichnet, x, y, w) => ERZ[id]
+    ? '<image href="' + ERZ[id] + '" x="' + (x || 0) + '" y="' + (y || 0) + '" width="' + (w || 100) + '" height="' + (w || 100) + '"/>'
+    : gezeichnet;
 
   function sternPfad(cx, cy, R, r, n) {
     n = n || 5; r = r || R * 0.45;
@@ -66,7 +71,7 @@
   // ---------------------------------------------------------------------
   // Drache von oben, Nase nach oben (Blickrichtung). Rechte Pfote orange.
   // ---------------------------------------------------------------------
-  const DRACHE =
+  const DRACHE_GEZEICHNET =
     // Schwanz
     '<path d="M50 70 C50 84 42 90 34 92 L30 98 L26 90 C36 86 40 80 40 70 Z" fill="' + FARBE.drache + '"' + strich(3) + '/>' +
     // Flügel
@@ -97,7 +102,7 @@
   // ---------------------------------------------------------------------
   // Gegenstände im Gitter
   // ---------------------------------------------------------------------
-  const SCHATZ =
+  const SCHATZ_GEZEICHNET =
     '<path d="M14 46 L86 46 L86 86 L14 86 Z" fill="' + FARBE.holz + '"' + strich(4) + '/>' +
     '<path d="M14 46 C14 20 86 20 86 46 Z" fill="' + FARBE.holzHell + '"' + strich(4) + '/>' +
     '<path d="M14 58 L86 58" fill="none"' + strich(3) + '/>' +
@@ -113,13 +118,13 @@
     '<path d="M28 12 L84 12 L84 52 L28 52 Z" fill="white"' + strich(4) + '/>' +
     '<path d="M28 12 H42 V26 H28 Z M56 12 H70 V26 H56 Z M42 26 H56 V40 H42 Z M70 26 H84 V40 H70 Z M28 40 H42 V52 H28 Z M56 40 H70 V52 H56 Z" fill="' + T + '"/>' +
     '<ellipse cx="28" cy="92" rx="12" ry="4" fill="' + FARBE.steinDunkel + '"/>';
-  const HINDERNIS =
+  const HINDERNIS_GEZEICHNET =
     '<path d="M10 82 C6 64 16 44 30 38 C36 22 58 16 70 28 C86 30 96 52 90 70 C92 80 86 88 74 88 L22 88 C14 88 10 86 10 82 Z" fill="' + FARBE.stein + '"' + strich(4) + '/>' +
     '<path d="M30 52 C36 48 42 50 44 56 M60 40 C66 40 70 44 70 50 M56 70 C62 66 70 68 72 74" fill="none" stroke="' + FARBE.steinDunkel + '" stroke-width="3.5" stroke-linecap="round"/>';
-  const EDELSTEIN =
+  const EDELSTEIN_GEZEICHNET =
     '<path d="M14 38 L30 16 H70 L86 38 L50 88 Z" fill="#8fd3ff"' + strich(4) + '/>' +
     '<path d="M14 38 H86 M30 16 L40 38 L50 16 L60 38 L70 16 M40 38 L50 88 L60 38" fill="none"' + strich(2.5) + '/>';
-  const KOBOLD =
+  const KOBOLD_GEZEICHNET =
     '<path d="M22 40 L4 26 L26 32 Z M78 40 L96 26 L74 32 Z" fill="#9ad16b"' + strich(3) + '/>' +
     '<ellipse cx="50" cy="66" rx="24" ry="22" fill="#c25a9e"' + strich(3.5) + '/>' +
     '<circle cx="50" cy="42" r="24" fill="#9ad16b"' + strich(3.5) + '/>' +
@@ -129,6 +134,14 @@
     '<circle cx="42" cy="43" r="2.3" fill="' + T + '"/><circle cx="58" cy="43" r="2.3" fill="' + T + '"/>' +
     '<path d="M40 54 C46 60 54 60 60 54" fill="none"' + strich(3) + '/>' +
     '<path d="M46 56 L48 60 L50 56" fill="white"' + strich(1.5) + '/>';
+  // Erzeugte Bilder statt der Zeichnungen. Beim Drachen bleibt der Blick-Pfeil vor der Nase gezeichnet.
+  const DRACHE = ERZ['drache-oben'] ? erzeugt('drache-oben', '', 4, 8, 92) + '<path d="M50 0 L57 8 L43 8 Z" fill="' + T + '"/>' : DRACHE_GEZEICHNET;
+  const SCHATZ = erzeugt('schatz', SCHATZ_GEZEICHNET);
+  const HINDERNIS = erzeugt('stein', HINDERNIS_GEZEICHNET);
+  const EDELSTEIN = erzeugt('edelstein', EDELSTEIN_GEZEICHNET);
+  const KOBOLD = erzeugt('kobold', KOBOLD_GEZEICHNET);
+  // Die eigenen Zeichnungen bleiben abrufbar, z. B. für die Ausmal-Vorlage (src/bausteine/e2-drache.js)
+  const GEZEICHNET = { drache: DRACHE_GEZEICHNET, schatz: SCHATZ_GEZEICHNET, hindernis: HINDERNIS_GEZEICHNET, edelstein: EDELSTEIN_GEZEICHNET, kobold: KOBOLD_GEZEICHNET };
   const HAKEN = '<path d="M14 54 L38 78 L86 24" fill="none" stroke="' + FARBE.links + '" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>';
 
   // ---------------------------------------------------------------------
@@ -207,6 +220,8 @@
   }
   // Nur der Inhalt (für eigene <g>-Gruppen)
   function inhalt(name) { return SYMBOLE[name]; }
+  // Die eigene Zeichnung (Vektor, Konturen), auch wenn es ein erzeugtes Bild gibt
+  function gezeichnet(name) { return GEZEICHNET[name] || SYMBOLE[name]; }
 
   // ---------------------------------------------------------------------
   // Gitter: ein Feld = 100 Einheiten. Gibt ein vollständiges <svg> zurück.
@@ -269,5 +284,5 @@
     return s;
   }
 
-  g.WerkstattSymbole = { FARBE, NAMEN, SYMBOLE, symbol, inhalt, gitter, figur, sternPfad, bedingungSymbol, spruchSymbol };
+  g.WerkstattSymbole = { FARBE, NAMEN, SYMBOLE, symbol, inhalt, gezeichnet, gitter, figur, sternPfad, bedingungSymbol, spruchSymbol };
 })(typeof globalThis !== 'undefined' ? globalThis : this);
