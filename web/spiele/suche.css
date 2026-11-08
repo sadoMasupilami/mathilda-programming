@@ -71,7 +71,7 @@
   transition: background-color 0.3s, color 0.3s, border-color 0.3s;
 }
 button.suche-zahl { cursor: pointer; }
-button.suche-zahl:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 rgba(31, 35, 64, 0.18); }
+button.suche-zahl:active:not(:disabled):not([aria-disabled="true"]) { transform: translateY(2px); box-shadow: 0 1px 0 rgba(31, 35, 64, 0.18); }
 button.suche-zahl:disabled { opacity: 1; cursor: default; }
 button.suche-zahl:focus-visible { outline: 4px solid var(--gold); outline-offset: 2px; }
 /* Hunderter-Tafel (bis 100): nur zum Anschauen, getippt wird mit den Ziffern-Tasten */

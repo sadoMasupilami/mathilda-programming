@@ -1569,7 +1569,7 @@
         const wer = a + ':' + (b.dataset.id || b.dataset.i || '');
         if (letzterUmschalter && letzterUmschalter.wer === wer && jetzt - letzterUmschalter.zeit < SPERRE) return;
         letzterUmschalter = { wer, zeit: jetzt };
-      }
+      } else letzterUmschalter = null;   // dazwischen eine andere Taste (z. B. „Los“): der nächste Tipp ist kein Doppeltipp
     }
     switch (a) {
       case 'heim': return geh('#');

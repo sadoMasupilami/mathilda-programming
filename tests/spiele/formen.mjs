@@ -32,7 +32,8 @@ function zuSetzen(lv) {
 }
 async function setze(page, h, liste) {
   for (const s of liste) {
-    await h.tippe(page, zelle(s.x, s.y));
+    // Ein schon ausgewähltes Feld (z. B. nach „Feld leer machen“) nicht nochmal antippen: das hebt die Auswahl auf
+    if (!(await page.locator(zelle(s.x, s.y) + '.formen-gewaehlt').count())) await h.tippe(page, zelle(s.x, s.y));
     await h.tippe(page, formTaste(s.f));
   }
 }
