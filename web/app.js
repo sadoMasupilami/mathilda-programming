@@ -547,7 +547,10 @@
         const vb = /viewBox="([^"]+)"/.exec(b)[1];
         html += '<div class="gitter-box" data-welt="' + wi + '"><div class="gitter-basis"></div>' +
           '<svg class="drache-ebene" xmlns="http://www.w3.org/2000/svg" viewBox="' + vb + '" aria-hidden="true">' + (L.erw ? '<g class="blick-feld"></g>' : '') +
-          '<g class="d-pos"><g class="d-dreh"><g transform="translate(-42 -42) scale(0.84)">' + S.inhalt('drache') + '</g></g></g></svg>' +
+          '<g class="d-pos"><g class="d-dreh"><g class="d-wackel"><g transform="translate(-42 -42) scale(0.84)">' + S.inhalt('drache') + '</g></g>' +
+          // „Bumm“ vor der Nase (Stoß an Rand oder Stein), dreht mit dem Drachen mit
+          '<path class="d-bumm" d="' + S.sternPfad(0, -50, 19, 8, 8) + '" fill="#ffd23f" stroke="#e8590c" stroke-width="3" stroke-linejoin="round"/>' +
+          '</g></g></svg>' +
           (mehr ? '<span class="welt-nr" aria-hidden="true">' + (wi + 1) + '</span>' : '') + '</div>';
       });
       feld.innerHTML = mehr ? '<div class="welten" data-n="' + basis.length + '">' + html + '</div>' : html;
@@ -600,7 +603,25 @@
     if (sofort) { void ebene.getBoundingClientRect(); ebene.classList.remove('sofort'); }
     st.drache = { x: z.x, y: z.y, blick: z.blick };
   }
+  // Fehler am Drachen zeigen: "stoss" (rumpelt nach vorne gegen Rand oder Stein, „Bumm“ vor der Nase, federt zurück),
+  // "schwindlig" (läuft im Kreis), "umschauen" (nicht am Ziel, Edelsteine fehlen). Nur CSS-Animationen (app.css).
+  const FEHLER_BEWEGUNG = ['d-stoss', 'd-schwindlig', 'd-umschauen'];
+  function dracheZeigt(wi, art) {
+    const ebene = app.querySelectorAll('.drache-ebene')[wi || 0];
+    if (!ebene) return;
+    const w = ebene.querySelector('.d-wackel'), b = ebene.querySelector('.d-bumm');
+    w.classList.remove(...FEHLER_BEWEGUNG);
+    if (b) b.classList.remove('an');
+    void w.getBoundingClientRect();   // Animation neu starten, auch beim zweiten Mal hintereinander
+    w.classList.add('d-' + art);
+    if (art === 'stoss' && b) b.classList.add('an');
+  }
+  function dracheRuhig() {
+    app.querySelectorAll('.drache-ebene .d-wackel').forEach((w) => w.classList.remove(...FEHLER_BEWEGUNG));
+    app.querySelectorAll('.drache-ebene .d-bumm').forEach((b) => b.classList.remove('an'));
+  }
   function dracheZurueck() {
+    dracheRuhig();
     L.wz = L.welten.map((w) => ({ winkel: DREH[(w.start && w.start.blick) || 'oben'] || 0, gesammelt: [], stossFeld: null, drache: null }));
     L.ergebnis = null;
     const spiel = app.querySelector('.spiel');
@@ -1311,6 +1332,7 @@
       L.ergebnis = 'stoss';
       st.stossFeld = { x: st.drache.x, y: st.drache.y };
       zeichneFeld();
+      dracheZeigt(wi, 'stoss');
       zeichneProgramm(); zeichneTasten();
       markiere(e.stoss.pfad, 'stoss');
       meldung('Hier hat der Kobold zugeschlagen!', 'stoss', sym('kobold'));
@@ -1319,6 +1341,7 @@
     zeichneProgramm(); zeichneTasten();
     if (e.geschafft) { L.ergebnis = 'geschafft'; return geschafft(prog); }
     L.ergebnis = 'nicht';
+    dracheZeigt(wi, e.zuLang ? 'schwindlig' : 'umschauen');
     if (e.zuLang) meldung('Der Drache läuft im Kreis. Er findet ' + zielMitArtikel() + ' so nicht.', 'hinweis', sym('drache'));
     else {
       const fehlen = (L.welten[wi].edelsteine || []).length - e.gesammelt;

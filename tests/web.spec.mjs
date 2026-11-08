@@ -455,6 +455,9 @@ test('Drache läuft Schritt für Schritt, Kobold-Stoß', async ({ page }, info) 
     await ansicht(page, 'drache-laeuft', info);
   }
   await expect(page.locator('.meldung.stoss')).toContainText('Hier hat der Kobold zugeschlagen!', { timeout: 15_000 });
+  // Der Drache rumpelt gegen das Hindernis, vor der Nase „Bumm“
+  await expect(page.locator('.drache-ebene .d-wackel.d-stoss')).toHaveCount(1);
+  await expect(page.locator('.drache-ebene .d-bumm.an')).toHaveCount(1);
   await expect(page.locator('.programm .karte.stoss')).toHaveCount(1);
   await expect(page.locator('.programm .karte[data-teil="' + e.stoss.teil + '"]')).toHaveClass(/stoss/);
   await ansicht(page, 'kobold-stoss', info);
@@ -595,6 +598,7 @@ test('Meldungen: Edelsteine fehlen, noch nicht beim Schatz', async ({ page }, in
   await gibProgrammEin(page, ['links']);
   await tippe(page, '.tasten [data-aktion="los"]');
   await expect(page.locator('.meldung')).toContainText('noch nicht beim', { timeout: 15_000 });
+  await expect(page.locator('.drache-ebene .d-wackel.d-umschauen')).toHaveCount(1);   // schaut sich suchend um
   await ansicht(page, 'noch-nicht-da', info);
 });
 
@@ -1022,6 +1026,7 @@ test('Wiederhol-Zauber „bis zum Schatz“: Kasten, Runden, und „läuft im Kr
   expect(e.zuLang).toBe(true);
   await tippe(page, '.tasten [data-aktion="los"]');
   await expect(page.locator('.meldung')).toContainText('Der Drache läuft im Kreis. Er findet', { timeout: 30_000 });
+  await expect(page.locator('.drache-ebene .d-wackel.d-schwindlig')).toHaveCount(1);
   await expect(page.locator('.meldung')).toContainText('so nicht.');
   await expect(page.locator('.dialog')).toHaveCount(0);
   await ansicht(page, 'im-kreis', info);
