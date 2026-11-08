@@ -297,10 +297,10 @@
     // Schloss
     const sy = 3 * (f + rg);
     o += '<rect x="0.4" y="' + (sy + 0.4) + '" width="' + (f - 0.8) + '" height="' + (f - 0.8) + '" rx="4" fill="#fff4cc" stroke="' + T + '" stroke-width="0.6"/>';
-    o += gruppe(H().bildSVG('schloss', 100).replace(/^<svg[^>]*>|<\/svg>$/g, ''), 3, sy + 1.2, f - 6);
+    o += gruppe(H().bildSVG('schloss', 100).replace('width="100mm" height="100mm"', 'width="100" height="100"'), 3, sy + 1.2, f - 6);
     // Platz links in der Mitte: eine Wolke und der Drache (zum Anmalen)
     o += gruppe(BILD.wolke(), 0, f + rg - 1, f);
-    o += gruppe(H().bildSVG('drache', 100).replace(/^<svg[^>]*>|<\/svg>$/g, ''), 1, 2 * (f + rg) - 2, f - 2);
+    o += gruppe(H().bildSVG('drache', 100).replace('width="100mm" height="100mm"', 'width="100" height="100"'), 1, 2 * (f + rg) - 2, f - 2);
     // Felder
     for (let n = 1; n <= 20; n++) {
       const [x, y] = feldOrt(n, f, g, rg);

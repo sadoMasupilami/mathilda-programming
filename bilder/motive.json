@@ -1,5 +1,6 @@
 {
   "_erklaerung": [
+    "umriss: Bilder, die es zusätzlich als Linienzeichnung zum Anmalen gibt (Heft-Bilder <m-bild>). Die meisten stammen aus der Rechen-Werkstatt, damit beide Hefte gleich aussehen. Linienbilder: bilder/roh/linie/.",
     "Beschreibung jedes erzeugten Bildes für werkzeuge/bilder-erzeugen.mjs, aufbereitet von werkzeuge/bilder-verarbeiten.sh.",
     "Ein Eintrag ist ein Text oder { text, vorlage, gruppe }: vorlage sind Bilder (ids), die vorher fertig sein müssen und als Referenz mitgehen (gleiche Figur, gleiche Lage).",
     "Bilder derselben gruppe werden gemeinsam zugeschnitten (gleicher Ausschnitt, gleiche Größe), damit man in einer Bildfolge sieht, was dazukommt. Wo Codex die Größe nicht hält, geht die Kette rückwärts: das fertige Bild zuerst, die früheren Stufen nehmen etwas weg (Schneemann).",
@@ -70,6 +71,35 @@
     "apfel": "a shiny red apple with a short stem and one green leaf",
     "eis": "an ice cream cone with one pink scoop of strawberry ice cream and a cherry on top",
     "kuchen": "a round cake with pink icing, cream filling and a cherry on top, side view",
-    "karotte": "a single orange carrot with green leaves, lying diagonally"
-  }
+    "karotte": "a single orange carrot with green leaves, lying diagonally",
+
+    "krone": "a golden royal crown with five points, a small round jewel on each point and a red jewel in the front band, front view",
+    "mond": "a golden yellow crescent moon, opening to the right, with two tiny sparkles next to it; no face",
+    "schloss": "a small fairy-tale castle with two round towers with pointed purple roofs and little flags, a big arched wooden door in the middle, light stone walls, front view",
+    "trank": "a round glass potion bottle with a cork, filled with bright purple magic potion with a few bubbles, front view",
+    "zauberhut": "a tall pointed wizard hat in dark blue with a wide brim and golden stars on it, front view",
+    "zauberstab": "a magic wand: a dark wooden stick with a golden star on the top end and a few sparkles around the star, lying diagonally from bottom left to top right",
+    "stern": "a single golden yellow five-pointed star with softly rounded points, front view",
+    "medaille": "a golden medal: a round gold disc with an embossed star in the middle, hanging from a short red ribbon at the top, front view",
+    "zielscheibe": "a round archery target with red and white rings and a small arrow stuck in the centre, front view",
+    "wuerfel": "a single white game die with rounded corners, slightly turned so the front and top faces are visible, three dark dots on the front face",
+    "schere": "a pair of children's craft scissors with rounded tips and round orange plastic handles, slightly open, lying diagonally",
+    "rakete": "a small red and white toy rocket with a round blue window and three fins, pointing straight up, a small orange flame at the bottom",
+    "huepfen": "a cheerful little girl with a ponytail in mid-jump, hopping forward to the right, arms swinging up, knees bent, whole body, side view",
+    "gluehbirne": "a glowing yellow light bulb with a silver screw base, front view, a few short light rays around it",
+    "feder": "a single soft light blue feather, lying diagonally from bottom left to top right",
+    "achtung": "a triangular warning sign with rounded corners, yellow with a red border and a dark exclamation mark in the middle (the exclamation mark is the only symbol allowed)",
+    "lupe": "a magnifying glass with a round golden frame, light blue shiny glass and a red handle, lying diagonally with the handle at the bottom right",
+    "haken": "a big friendly green check mark with rounded ends",
+    "karten": "two playing cards fanned out, slightly overlapping and tilted, white with rounded corners and a red diamond shape in the middle of the front card; no letters, no numbers",
+    "kreide": "a single thick stick of yellow sidewalk chalk, lying diagonally, one end slightly worn down",
+    "roboter": "a small friendly toy robot with a rounded silver-blue body, a square head with big round eyes and a smile, a short antenna with a red ball on top, two little arms, standing, front view",
+    "tablet": "a tablet computer with a dark blue rounded frame, lying slightly tilted, the screen showing a simple colourful grid with a small green arrow; no letters, no numbers",
+    "zielfahne": "a black and white checkered finish flag waving to the right on a short wooden pole, front view",
+    "muetze-rot": { "text": "a knitted pointed winter hat in red, seen from the front: a wide white ribbed brim at the bottom, the red cone above bending slightly to the right, a big fluffy white pompom on the tip; just the hat, nobody wearing it", "gruppe": "muetze" },
+    "muetze-blau": { "text": "the same knitted hat, exactly the same shape, size and position, but blue instead of red", "vorlage": ["muetze-rot"], "gruppe": "muetze" },
+    "muetze-gelb": { "text": "the same knitted hat, exactly the same shape, size and position, but yellow instead of red", "vorlage": ["muetze-rot"], "gruppe": "muetze" },
+    "muetze-gruen": { "text": "the same knitted hat, exactly the same shape, size and position, but green instead of red", "vorlage": ["muetze-rot"], "gruppe": "muetze" }
+  },
+  "umriss": ["drachenkind-gruen-fluegel", "einhorn", "fee", "eule", "edelstein", "krone", "mond", "schloss", "trank", "zauberhut", "zauberstab", "stern", "medaille", "zielscheibe", "wuerfel", "schere", "rakete", "huepfen", "gluehbirne", "feder", "achtung", "ei", "lupe", "haken", "karten", "kreide", "roboter", "tablet"]
 }

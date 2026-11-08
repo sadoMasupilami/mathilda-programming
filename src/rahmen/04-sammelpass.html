@@ -40,7 +40,7 @@
     <span><i style="background: var(--block-b)"></i>Muster und Geheimcodes</span>
     <span><i style="background: var(--block-c)"></i>Wenn-dann und Logik</span>
     <span><i style="background: var(--block-d)"></i>Strategie und Projekte</span>
-    <span><m-bild name="medaille" gr="4.5"></m-bild>Urkunde!</span>
+    <span><m-bild name="medaille" gr="4.5" farbe="ja"></m-bild>Urkunde!</span>
   </div>
   <div class="fuss"><span>{{KIND}}s Denk-Werkstatt</span><span class="seitenzahl" data-ref="sammelpass"></span><span>Sammelpass</span></div>
 </section>
@@ -60,7 +60,7 @@
     g.innerHTML = einheiten.map((t, i) => {
       const n = i + 1;
       return '<div class="f" data-block="' + block(n) + '"><div class="t"><span>' + t.split('|').join('<br>') + '</span></div>' +
-        (n === 10 || n === 20 ? '<span class="urk"><m-bild name="medaille" gr="7"></m-bild></span>' : '') +
+        (n === 10 || n === 20 ? '<span class="urk"><m-bild name="medaille" gr="7" farbe="ja"></m-bild></span>' : '') +
         '<div class="stempel"></div><div class="unten"><span class="nr">' + n + '</span><div class="sterne"><m-stern gr="8"></m-stern><m-stern gr="8"></m-stern><m-stern gr="8"></m-stern></div></div></div>';
     }).join('');
   })();

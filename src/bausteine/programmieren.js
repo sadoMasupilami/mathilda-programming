@@ -583,7 +583,7 @@ m-spruch { display: inline-block; vertical-align: middle; line-height: 0; }
   // ---------------------------------------------------------------------
   B['m-linksrechts'] = function (el) {
     const k = H().KIND;
-    el.innerHTML = '<div class="kasten tipp"><div class="kasten-titel">' + H().bildSVG('lupe', 6) + '<span>Hilfen für links und rechts (in jeder Gitter-Einheit gleich)</span></div><ul>' +
+    el.innerHTML = '<div class="kasten tipp"><div class="kasten-titel">' + H().bildSVG('lupe', 6, true) + '<span>Hilfen für links und rechts (in jeder Gitter-Einheit gleich)</span></div><ul>' +
       '<li><b>Hinter den Roboter stellen:</b> ' + k + ' stellt sich hinter den Roboter (oder hinter den Drachen am Boden) und schaut in dieselbe Richtung. Dann ist sein Links auch ihr Links.</li>' +
       '<li><b>Rechte Hand markieren:</b> ein Gummiringerl oder Sticker auf ' + k + 's rechter Hand. Die Drachen-Figur hat eine orange rechte Pfote, und der Befehl „rechts drehen“ ist auch orange.</li>' +
       '<li><b>Blatt drehen erlaubt:</b> Am Papier darf ' + k + ' das Blatt drehen, bis die Nase des Drachen nach oben zeigt. Oder sie dreht die ausgeschnittene Drachen-Figur bei jedem Drehbefehl mit.</li>' +

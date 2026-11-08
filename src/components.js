@@ -755,13 +755,23 @@
       '<path' + S + ' d="M30 74 V90 H44 V74 M56 74 V90 H70 V74"/><path' + SL + ' d="M22 46 H12 M78 46 H88"/>',
   };
   window.__bilder = BILDER;
-  function bildSVG(name, gr) {
+  // Erzeugte Bilder statt der Zeichnungen: Linienzeichnung zum Anmalen (von build.mjs als window.__umriss) oder,
+  // mit farbe, das Farbbild aus web/kern/erzeugt.js. Gibt es keins, gilt die eigene Zeichnung aus BILDER.
+  const UMRISS = window.__umriss || {};
+  const FARBE_ERZ = window.WerkstattErzeugt || {};
+  const ERZ_ID = { drache: 'drachenkind-gruen-fluegel', ziel: 'zielscheibe' };
+  function bildSVG(name, gr, farbe) {
+    const id = ERZ_ID[name] || name;
+    const masse = 'width="' + gr + 'mm" height="' + gr + 'mm"';
+    if (farbe && FARBE_ERZ[id]) return '<svg xmlns="http://www.w3.org/2000/svg" ' + masse + ' viewBox="0 0 100 100"><image href="' + FARBE_ERZ[id] + '" width="100" height="100"/></svg>';
+    if (UMRISS[id]) return UMRISS[id].replace('<svg ', '<svg ' + masse + ' ');
     if (!BILDER[name]) return null;
-    return '<svg xmlns="http://www.w3.org/2000/svg" width="' + gr + 'mm" height="' + gr + 'mm" viewBox="0 0 100 100">' + BILDER[name] + '</svg>';
+    return '<svg xmlns="http://www.w3.org/2000/svg" ' + masse + ' viewBox="0 0 100 100">' + BILDER[name] + '</svg>';
   }
+  // <m-bild name="krone" gr="14" [farbe="ja"]>
   function mBild(el) {
     const name = attr(el, 'name', '');
-    const s = bildSVG(name, parseFloat(attr(el, 'gr', '20')));
+    const s = bildSVG(name, parseFloat(attr(el, 'gr', '20')), attr(el, 'farbe', '') === 'ja');
     if (!s) return fehler(el, 'Unbekanntes Bild „' + name + '“. Es gibt: ' + Object.keys(BILDER).join(', '));
     el.innerHTML = s;
     el.classList.add('komp');
@@ -877,7 +887,7 @@
       const t = document.createElement('div');
       t.className = 'kasten-titel';
       const dt = k.dataset.titel;
-      t.innerHTML = bildSVG(bild, 6) + '<span>' + esc(dt ? (typ && ['spiel', 'bewegung', 'basteln'].includes(typ) ? titel + ': ' + dt : dt) : titel) + '</span>';
+      t.innerHTML = bildSVG(bild, 6, true) + '<span>' + esc(dt ? (typ && ['spiel', 'bewegung', 'basteln'].includes(typ) ? titel + ': ' + dt : dt) : titel) + '</span>';
       k.insertBefore(t, k.firstChild);
     });
   }

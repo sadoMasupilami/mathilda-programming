@@ -111,9 +111,9 @@
     '<rect x="42" y="50" width="16" height="18" rx="3" fill="' + FARBE.gold + '"' + strich(3) + '/>' +
     '<circle cx="50" cy="58" r="2.5" fill="' + T + '"/>' +
     '<path d="' + sternPfad(80, 18, 8, 3.2, 4) + '" fill="' + FARBE.gold + '"' + strich(1.5) + '/>';
-  const STERN = '<path d="' + sternPfad(50, 53, 44, 19) + '" fill="' + FARBE.gold + '"' + strich(4) + '/>';
+  const STERN_GEZEICHNET = '<path d="' + sternPfad(50, 53, 44, 19) + '" fill="' + FARBE.gold + '"' + strich(4) + '/>';
   const STERN_LEER = '<path d="' + sternPfad(50, 53, 44, 19) + '" fill="white" stroke="' + FARBE.gold + '" stroke-width="5" stroke-linejoin="round"/>';
-  const ZIEL =
+  const ZIEL_GEZEICHNET =
     '<path d="M28 92 L28 10" fill="none"' + strich(5) + '/>' +
     '<path d="M28 12 L84 12 L84 52 L28 52 Z" fill="white"' + strich(4) + '/>' +
     '<path d="M28 12 H42 V26 H28 Z M56 12 H70 V26 H56 Z M42 26 H56 V40 H42 Z M70 26 H84 V40 H70 Z M28 40 H42 V52 H28 Z M56 40 H70 V52 H56 Z" fill="' + T + '"/>' +
@@ -137,11 +137,13 @@
   // Erzeugte Bilder statt der Zeichnungen. Beim Drachen bleibt der Blick-Pfeil vor der Nase gezeichnet.
   const DRACHE = ERZ['drache-oben'] ? erzeugt('drache-oben', '', 4, 8, 92) + '<path d="M50 0 L57 8 L43 8 Z" fill="' + T + '"/>' : DRACHE_GEZEICHNET;
   const SCHATZ = erzeugt('schatz', SCHATZ_GEZEICHNET);
+  const STERN = erzeugt('stern', STERN_GEZEICHNET);
+  const ZIEL = erzeugt('zielfahne', ZIEL_GEZEICHNET);
   const HINDERNIS = erzeugt('stein', HINDERNIS_GEZEICHNET);
   const EDELSTEIN = erzeugt('edelstein', EDELSTEIN_GEZEICHNET);
   const KOBOLD = erzeugt('kobold', KOBOLD_GEZEICHNET);
   // Die eigenen Zeichnungen bleiben abrufbar, z. B. für die Ausmal-Vorlage (src/bausteine/e2-drache.js)
-  const GEZEICHNET = { drache: DRACHE_GEZEICHNET, schatz: SCHATZ_GEZEICHNET, hindernis: HINDERNIS_GEZEICHNET, edelstein: EDELSTEIN_GEZEICHNET, kobold: KOBOLD_GEZEICHNET };
+  const GEZEICHNET = { drache: DRACHE_GEZEICHNET, schatz: SCHATZ_GEZEICHNET, hindernis: HINDERNIS_GEZEICHNET, edelstein: EDELSTEIN_GEZEICHNET, kobold: KOBOLD_GEZEICHNET, stern: STERN_GEZEICHNET, ziel: ZIEL_GEZEICHNET };
   const HAKEN = '<path d="M14 54 L38 78 L86 24" fill="none" stroke="' + FARBE.links + '" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>';
 
   // ---------------------------------------------------------------------

@@ -222,14 +222,17 @@
     'muetze-gruen': { wort: 'grüne Mütze', kurz: 'grün', svg: muetze(F.gruen), istMuetze: true },
   };
 
-  // Erzeugte Bilder (web/kern/erzeugt.js) statt der Zeichnungen, wo es sie gibt (Mützen bleiben gezeichnet).
+  // Erzeugte Bilder (web/kern/erzeugt.js) statt der Zeichnungen, wo es sie gibt.
   // Der Drache ist das grüne Drachenkind mit Flügeln aus Einheit 13. muetzeErzeugt: Lage der Mütze auf dem erzeugten Bild.
   const ERZ = g.WerkstattErzeugt || {};
   const ERZ_NAME = { drache: 'drachenkind-gruen-fluegel' };
   for (const [n, b] of Object.entries(BILDER)) {
     const id = ERZ_NAME[n] || n;
-    if (b.istMuetze || !ERZ[id]) continue;
-    b.svg = '<image href="' + ERZ[id] + '" x="0" y="0" width="100" height="100"/>';
+    if (!ERZ[id]) continue;
+    const bildEl = '<image href="' + ERZ[id] + '" x="0" y="0" width="100" height="100"/>';
+    // Erzeugte Mütze: Krempe 87 breit, Mitte x 49.4, Unterkante y 95.9. Auf die Maße der Zeichnung gebracht
+    // (Krempe 76 breit, Mitte x 50, Unterkante y 92), damit muetze/muetzeErzeugt der Tiere weiter passen.
+    b.svg = b.istMuetze ? '<g transform="translate(50 92) scale(' + (76 / 87).toFixed(3) + ') translate(-49.4 -95.9)">' + bildEl + '</g>' : bildEl;
     if (b.muetzeErzeugt) b.muetze = b.muetzeErzeugt;
   }
 

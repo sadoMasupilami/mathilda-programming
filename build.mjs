@@ -107,6 +107,10 @@ const bausteine = fs.readdirSync(path.join(SRC, 'bausteine')).filter((d) => d.en
 const ERSTE = ['erzeugt.js', 'ausfuehrer.js', 'symbole.js', 'bilder.js'];
 const kernDateien = ERSTE.filter((d) => fs.existsSync(path.join(WURZEL, 'web', 'kern', d)))
   .concat(fs.readdirSync(path.join(WURZEL, 'web', 'kern')).filter((d) => d.endsWith('.js') && !ERSTE.includes(d)).sort());
+// Linienzeichnungen zum Anmalen für die Heft-Bilder <m-bild> (werkzeuge/bilder-verarbeiten.mjs)
+const UMRISS = path.join(WURZEL, 'bilder', 'erzeugt', 'umriss');
+const umriss = {};
+if (fs.existsSync(UMRISS)) for (const d of fs.readdirSync(UMRISS)) if (d.endsWith('.svg')) umriss[d.slice(0, -4)] = fs.readFileSync(path.join(UMRISS, d), 'utf8').trim();
 const daten = { raetsel: raetsel.raetsel, pakete: raetsel.pakete, qr, kind: KIND, titel: werkstatt.titel, stand: werkstatt.stand, teilBuild: !!nur };
 const html =
   '<!doctype html>\n<html lang="de-AT">\n<head>\n<meta charset="utf-8">\n<title>' + KIND + 's ' + werkstatt.titel + '</title>\n' +
@@ -114,6 +118,7 @@ const html =
   '<script>window.__WERKSTATT = ' + JSON.stringify(daten).replace(/</g, '\\u003c') + ';</script>\n' +
   kernDateien.map((d) => '<script src="../web/kern/' + d + '"></script>\n').join('') +
   bausteine.map((d) => '<script src="../src/bausteine/' + d + '"></script>\n').join('') +
+  '<script>window.__umriss = ' + JSON.stringify(umriss).replace(/</g, '\\u003c') + ';</script>\n' +
   '<script src="../src/components.js"></script>\n</head>\n<body>\n' +
   teile.map((t) => '<!-- ===== ' + t + ' ===== -->\n' + setzeName(fs.readFileSync(path.join(SRC, t), 'utf8'))).join('\n') +
   '\n</body>\n</html>\n';
