@@ -52,6 +52,10 @@
   const blockVon = (n) => BLOECKE.find((x) => n >= x.von && n <= x.bis) || BLOECKE[0];
   // Tempo des Drachen (ms pro Befehl). Tests dürfen es über window.WERKSTATT_TEMPO verkürzen.
   const TEMPO = Number(window.WERKSTATT_TEMPO) > 0 ? Number(window.WERKSTATT_TEMPO) : 600;
+  // Gitter drehen (siehe gedreht): zufällig, außer window.WERKSTATT_DREHEN ist false (aus) oder 0–3 (fest, für Tests)
+  const DREHEN = window.WERKSTATT_DREHEN;
+  // Nach so vielen Fehlversuchen bietet die App „Lösung zeigen“ an
+  const HILFE_NACH = 3;
   const MAX_KARTEN = 12;   // eine Programm-Reihe am Papier
   const MAX_INNEN = WerkstattKern.MAX_INNEN;     // Befehle in einem Zauber-Kasten (Plan 7.5 Regel 9: eine Gruppe von 2–3 Befehlen)
   const MIN_FELD = 37;     // erweiterte Levels, hoch: so groß (px) bleibt ein Gitter-Feld mindestens, wenn das Programm viel Platz braucht
@@ -365,6 +369,30 @@
     if (!Array.isArray(l.welten) || !l.welten.length) return [weltVon(l)];
     return l.welten.map((w) => Object.assign(weltVon(l), weltVon(w || {})));
   }
+  // Das ganze Gitter um d Vierteldrehungen im Uhrzeigersinn gedreht: Der Drache startet dann nicht immer unten mit
+  // Blick nach oben. Alle Befehle und Wenn-Karten sind relativ zum Drachen (vor, links, rechts, Stein vorne/links/rechts),
+  // deshalb bleibt jedes Level genau gleich lösbar: dieselben Programme, dieselbe kürzeste Länge.
+  const BLICKE = ['oben', 'rechts', 'unten', 'links'];
+  function gedreht(w, d) {
+    for (let k = 0; k < d; k++) {
+      const h = w.h;
+      const f = (x, y) => [h - 1 - y, x];
+      const feld = (o) => { const [x, y] = f(o.x, o.y); return Object.assign({}, o, { x, y }); };
+      const n = Object.assign({}, w, { b: w.h, h: w.b });
+      if (w.start) n.start = Object.assign(feld(w.start), { blick: BLICKE[(BLICKE.indexOf(w.start.blick || 'oben') + 1) % 4] });
+      if (w.ziel) n.ziel = feld(w.ziel);
+      if (w.hindernisse) n.hindernisse = w.hindernisse.map(([x, y]) => f(x, y));
+      if (w.edelsteine) n.edelsteine = w.edelsteine.map(([x, y]) => f(x, y));
+      w = n;
+    }
+    return w;
+  }
+  function drehungFuer(i) {
+    if (DREHEN === false) return 0;
+    if (Number.isInteger(DREHEN)) return ((DREHEN % 4) + 4) % 4;
+    return i > 0 ? Math.floor(Math.random() * 4) : 0;   // das erste Level eines Pakets bleibt wie am Papier
+  }
+
   // Pfad-Level mit erweiterten Befehlen (plan/lehrplan.md 7.8): "erlaubt" (zauber, wenn, bis, spruch) und/oder "welten".
   // Sie bekommen die Tasten für Wenn-dann-Kasten, „bis zum Schatz“ und Zaubersprüche (Klasse .erw).
   const istErweitert = (l) => l.art === 'pfad' && (l.erlaubt !== undefined || l.welten !== undefined);
@@ -425,6 +453,9 @@
     if (art === 'ablauf') starteAblauf();
     else {
       L.welten = weltenVon(lv);
+      // Ab dem zweiten Level eines Pakets zufällig gedreht (bleibt beim „Nochmal“ gleich)
+      L.drehung = drehungFuer(i);
+      if (L.drehung) L.welten = L.welten.map((w) => gedreht(w, L.drehung));
       L.welten.forEach((w) => K.welt(w));   // ein kaputtes Gitter fällt sofort auf
       // Was das Kind benutzen darf. Einheit 5: "zauber": true; ab Block C: "erlaubt"
       L.erlaubt = erw ? (lv.erlaubt || []).slice() : lv.zauber ? ['zauber'] : [];
@@ -1283,15 +1314,36 @@
       zeichneProgramm(); zeichneTasten();
       markiere(e.stoss.pfad, 'stoss');
       meldung('Hier hat der Kobold zugeschlagen!', 'stoss', sym('kobold'));
-      return;
+      return fehlversuch();
     }
     zeichneProgramm(); zeichneTasten();
     if (e.geschafft) { L.ergebnis = 'geschafft'; return geschafft(prog); }
     L.ergebnis = 'nicht';
-    if (e.zuLang) return meldung('Der Drache läuft im Kreis. Er findet ' + zielMitArtikel() + ' so nicht.', 'hinweis', sym('drache'));
-    const fehlen = (L.welten[wi].edelsteine || []).length - e.gesammelt;
-    if (e.amZiel && fehlen > 0) meldung(mehr ? im + 'fehlen noch Edelsteine.' : 'Fast! Es fehlen noch Edelsteine.', 'hinweis', sym('edelstein'));
-    else meldung(mehr ? im + 'ist der Drache noch nicht beim ' + zielWort() + '.' : 'Der Drache ist noch nicht beim ' + zielWort() + '. Probier es nochmal!', 'hinweis', sym(L.lv.zielSymbol || 'schatz'));
+    if (e.zuLang) meldung('Der Drache läuft im Kreis. Er findet ' + zielMitArtikel() + ' so nicht.', 'hinweis', sym('drache'));
+    else {
+      const fehlen = (L.welten[wi].edelsteine || []).length - e.gesammelt;
+      if (e.amZiel && fehlen > 0) meldung(mehr ? im + 'fehlen noch Edelsteine.' : 'Fast! Es fehlen noch Edelsteine.', 'hinweis', sym('edelstein'));
+      else meldung(mehr ? im + 'ist der Drache noch nicht beim ' + zielWort() + '.' : 'Der Drache ist noch nicht beim ' + zielWort() + '. Probier es nochmal!', 'hinweis', sym(L.lv.zielSymbol || 'schatz'));
+    }
+    fehlversuch();
+  }
+  // Nach HILFE_NACH Fehlversuchen: Knopf „Lösung zeigen“ unter der Meldung (nur Pfad-Levels mit "hilfe")
+  function fehlversuch() {
+    L.fehl = (L.fehl || 0) + 1;
+    if (L.art !== 'pfad' || !L.lv.hilfe || L.fehl < HILFE_NACH) return;
+    const m = app.querySelector('.meldung');
+    if (m && !m.querySelector('[data-aktion="hilfe"]')) m.insertAdjacentHTML('beforeend', taste('hilfe', '<span>Lösung zeigen</span>', { cls: 'hilfe-knopf', label: 'Lösung zeigen' }));
+  }
+  // „Lösung zeigen“: ein kürzestes Programm (vom Löser) kommt ins Programm, der Drache zurück an den Start.
+  // Damit geschafft gibt es keinen Stern (geschafft: L.mitHilfe).
+  function zeigeHilfe() {
+    if (L.laeuft || !L.lv.hilfe) return;
+    stoppe();
+    L.prog = K.lies(L.lv.hilfe);
+    L.wahl = null; L.auswahl = null; L.ziel = null;
+    L.mitHilfe = true;
+    dracheZurueck(); zeichneProgramm(); zeichneTasten();
+    meldung('So kommt der Drache ans Ziel. Schau genau hin und tippe auf „Los“!', 'hinweis', sym('drache'));
   }
 
   // ----- Geschafft -----
@@ -1305,16 +1357,23 @@
       const karten = K.karten(prog, freieSprueche());
       if (lv.minKarten && karten > lv.minKarten) {
         if (lv.aufgabe === 'kuerzestes') { stern = false; zusatz = 'Der Drache ist da! Aber es geht kürzer: mit ' + lv.minKarten + ' Karten.'; }
-        else zusatz = 'Profi-Frage: Geht es auch mit ' + lv.minKarten + ' Karten?';
+        else zusatz = 'Super! Es geht aber noch kürzer: mit ' + lv.minKarten + ' Karten. Schaffst du das auch?';
       }
     } else if (L.art === 'pfad') {
+      // Bei jedem Pfad-Level sagen, wenn es kürzer geht. Den Stern kostet das nur bei „Finde das kürzeste“.
       const karten = K.karten(prog);
+      const min = lv.zauber ? lv.minKarten : lv.kuerzeste;
+      const was = lv.zauber ? ' Karten' : ' Befehlen';
       if (lv.aufgabe === 'kuerzestes' && !lv.zauber && lv.kuerzeste && karten > lv.kuerzeste) {
         stern = false;
         zusatz = 'Der Drache ist da! Aber es geht kürzer: mit ' + lv.kuerzeste + ' Befehlen.';
-      } else if (lv.zauber && lv.minKarten && karten > lv.minKarten) {
-        zusatz = 'Profi-Frage: Geht es auch mit ' + lv.minKarten + ' Karten?';
+      } else if (min && karten > min) {
+        zusatz = 'Super! Es geht aber noch kürzer: mit ' + min + was + '. Schaffst du das auch?';
       }
+    }
+    if (L.mitHilfe) {
+      stern = false;
+      zusatz = 'Mit Hilfe geschafft! Spiel das Level später nochmal allein, dann bekommst du den Stern.';
     }
     geschafftDialog(stern, zusatz);
   }
@@ -1568,6 +1627,7 @@
         dracheZurueck(); zeichneProgramm(); zeichneTasten(); grundMeldung();
         return;
       case 'los': return los();
+      case 'hilfe': return zeigeHilfe();
       case 'nochmal': {
         // im Level und im Geschafft-Fenster gleich: Drache zurück an den Start, das Programm bleibt
         // (Ablauf-Karten: alle Karten zurück)

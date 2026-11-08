@@ -387,7 +387,8 @@ export function webDaten(erg) {
           for (const f of ['loesung', 'paket'].concat(pl.geheim || [])) delete aus[f];
           return aus;
         }
-        // keine Lösungen in die App: sie bewertet nur nach dem Ergebnis
+        // keine Lösungen in die App: sie bewertet nur nach dem Ergebnis. Ausnahme bei Pfad-Levels: "hilfe", ein kürzestes
+        // Programm für „Lösung zeigen“ (nach drei Fehlversuchen; ohne Stern). Nicht bei selbst zu schreibenden Zaubersprüchen.
         const { loesung, paket, reparatur, beispiel, beispielSprueche, ...rest } = r;
         void paket; void reparatur; void beispiel; void beispielSprueche;
         if (r.art === 'ablauf') delete rest.loesung;
@@ -398,6 +399,12 @@ export function webDaten(erg) {
           if (loesung.zauber) l.minKarten = loesung.zauber.minKarten;
           // erweitert: kleinste Kartenzahl nur, wenn der Löser sie bewiesen hat (für „Geht es auch mit … Karten?“)
           if (loesung.erweitert && loesung.erweitert.vollstaendig && loesung.erweitert.minKarten) l.minKarten = loesung.erweitert.minKarten;
+          const ew = loesung.erweitert;
+          if (ew) {
+            const k = (ew.kuerzeste || [])[0];
+            if (k && !(r.spruchFrei || []).length && !Object.keys(k.sprueche || {}).length) l.hilfe = k.programm;
+          } else if (loesung.zauber && loesung.zauber.kuerzeste.length) l.hilfe = loesung.zauber.kuerzeste[0];
+          else if (loesung.programme && loesung.programme.length) l.hilfe = loesung.programme[0].join(' ');
         }
         return { ...rest, ...l };
       }),

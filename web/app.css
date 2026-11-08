@@ -338,6 +338,8 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
 .meldung.stoss { background: #fde7ec; color: #8f1d3b; font-weight: 700; }
 .meldung.gut { background: var(--gold-hell); font-weight: 700; }
 .meldung.hinweis { background: var(--akzent-hell); color: var(--tinte); }
+/* „Lösung zeigen“ nach drei Fehlversuchen: kleiner Knopf rechts in der Meldung */
+.meldung .hilfe-knopf { margin-left: auto; flex: none; min-height: 48px; min-width: 0; padding: 0 12px; font-size: 0.9rem; border-width: 2px; border-radius: 12px; background: #fff; }
 .meldung.zauber-meldung { background: var(--zauber-hell); color: #4b2a9a; }
 
 .programm { flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: calc(var(--k) * 2 + 8px); }

@@ -11,7 +11,7 @@ Stand: **alle 20 Einheiten** sind ausformuliert, in vier Blöcken: A (1–5) Bef
 | `out/denk-werkstatt.pdf` | alles: Titel, Inhalt, Einleitung, Hallo-Seite, Sammelpass, Einheiten (Spickzettel + Anleitung + Blätter + Lösungen), Urkunden, Rückmeldebogen, Gerätetest-Checkliste |
 | `out/kopiervorlagen.pdf` | nur die Seiten des Kindes: Deckblatt, Hallo-Seite, Sammelpass, alle Blätter, Urkunden |
 | `out/spickzettel.pdf` | höchstens zwei Seiten pro Einheit zum Mitnehmen beim Durchführen (beidseitig drucken): Vorbereitung zum Abhaken, Ablauf als Drehbuch mit Minuten, Spielregeln in Kürze und Sätzen zum Sagen, Hilfen, „Zum Schluss nicht vergessen“ |
-| Web-App (`web/`, gebaut nach `_site/`) | 18 Level-Pakete (e2–e20 ohne e18, je 6–9 Levels) für Handy und Tablet; die Startseite zeigt die Blöcke A–D, ein Tipp auf einen Block seine Pakete; offline-fähig, über GitHub Pages veröffentlicht |
+| Web-App (`web/`, gebaut nach `_site/`) | 18 Level-Pakete (e2–e20 ohne e18, je 6–9 Levels) für Handy und Tablet; die Startseite zeigt die Blöcke A–D, ein Tipp auf einen Block seine Pakete; offline-fähig, über GitHub Pages veröffentlicht. Drachen-Pfade: ab Level 2 eines Pakets ist das Gitter zufällig gedreht (der Drache startet nicht immer unten), nach dem Ziel sagt die App, wenn es kürzer geht, und nach drei Fehlversuchen bietet sie „Lösung zeigen“ an (dann ohne Stern) |
 
 Drucken in **Originalgröße (100 %)**, damit die Gitterfelder mindestens 2 cm groß sind.
 

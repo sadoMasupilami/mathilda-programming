@@ -54,7 +54,12 @@ test.beforeEach(async ({ page, context }) => {
   });
   page.on('console', (m) => { if (m.type() === 'error') konsole.push(m.text()); });
   page.on('pageerror', (e) => konsole.push('pageerror: ' + e.message));
+  // Die App dreht Gitter zufällig (ab Level 2). Für gleiche Fotos und Abläufe aus; eigene Tests drehen fest.
+  await page.addInitScript(() => { if (window.WERKSTATT_DREHEN === undefined) window.WERKSTATT_DREHEN = false; });
 });
+async function drehe(page, d) {
+  await page.addInitScript((x) => { window.WERKSTATT_DREHEN = x; }, d);
+}
 test.afterEach(async () => {
   expect(fremd, 'Anfragen an fremde Hosts').toEqual([]);
   expect(konsole, 'Fehler in der Konsole').toEqual([]);
@@ -500,6 +505,65 @@ test('Fast geschafft: angekommen, aber nicht das kürzeste Programm', async ({ p
   await tippe(page, '.dialog [data-aktion="nochmal"]');
   await expect(page.locator('.dialog')).toHaveCount(0);
   await expect(page.locator('.programm .karte:not(.platzhalter)')).toHaveCount(prog.length);
+  await expect(page.locator('.punkte .punkt.voll')).toHaveCount(0);
+});
+
+test('Gedrehtes Gitter: Drache startet in anderer Richtung, dieselbe Lösung kommt an', async ({ page }, info) => {
+  const f = suche('pfad', (l) => einfach(l) && !l.zauber && l.start && (l.start.blick || 'oben') === 'oben' && l.hindernisse && l.hindernisse.length);
+  test.skip(!f, 'kein passendes Pfad-Level');
+  const prog = kuerzeste(weltVon(f.lv)).programme[0];
+  await drehe(page, 1);
+  await schnell(page);
+  await oeffneLevel(page, f, info);
+  // eine Vierteldrehung im Uhrzeigersinn: Blick nach rechts, Breite und Höhe getauscht
+  await expect(page.locator('.drache-ebene .d-dreh').first()).toHaveAttribute('transform', 'rotate(90)');
+  await ansicht(page, 'gedreht', info);
+  await gibProgrammEin(page, prog);
+  await tippe(page, '.tasten [data-aktion="los"]');
+  await expect(page.locator('.dialog h2')).toHaveText('Geschafft!', { timeout: 15_000 });
+});
+
+test('Es geht kürzer: Hinweis auch ohne „Finde das kürzeste“, Stern bleibt', async ({ page }, info) => {
+  let f = null, prog = null;
+  for (const p of DATEN.pakete) {
+    p.levels.forEach((l, i) => {
+      if (f || !einfach(l) || l.zauber || l.aufgabe === 'kuerzestes') return;
+      const k = kuerzeste(weltVon(l)).laenge;
+      const g = finde(l, (e, x) => e.geschafft && x.length > k, Math.min(l.maxBefehle || 12, k + 3));
+      if (g) { f = { p, i, lv: l }; prog = g; }
+    });
+  }
+  test.skip(!f, 'kein Level mit längerem Programm');
+  await schnell(page);
+  await oeffneLevel(page, f, info);
+  await gibProgrammEin(page, prog);
+  await tippe(page, '.tasten [data-aktion="los"]');
+  await expect(page.locator('.dialog h2')).toHaveText('Geschafft!', { timeout: 15_000 });
+  await expect(page.locator('.dialog p')).toContainText('noch kürzer: mit ' + kuerzeste(weltVon(f.lv)).laenge + ' Befehlen');
+  await ansicht(page, 'geht-kuerzer', info);
+});
+
+test('Lösung zeigen: nach drei Fehlversuchen, mit Hilfe kein Stern', async ({ page }, info) => {
+  const f = suche('pfad', (l) => einfach(l) && !l.zauber && !!l.hilfe);
+  test.skip(!f, 'kein Pfad-Level mit Hilfe');
+  // ein Programm, das nicht ankommt (aber auch nicht anstößt oder im Kreis läuft)
+  const falsch = finde(f.lv, (e) => !e.geschafft && !e.stoss && !e.zuLang && !e.amZiel, 3);
+  await schnell(page);
+  await oeffneLevel(page, f, info);
+  await gibProgrammEin(page, falsch);
+  for (let n = 1; n <= 3; n++) {
+    await tippe(page, '.tasten [data-aktion="los"]');
+    await expect(page.locator('.meldung.hinweis')).toContainText('noch nicht', { timeout: 15_000 });
+    await expect(page.locator('.meldung [data-aktion="hilfe"]')).toHaveCount(n < 3 ? 0 : 1);
+    if (n < 3) { await tippe(page, '.tasten [data-aktion="nochmal"]').catch(() => {}); }
+  }
+  await ansicht(page, 'hilfe-angeboten', info);
+  await tippe(page, '.meldung [data-aktion="hilfe"]');
+  await expect(page.locator('.programm .karte:not(.platzhalter)')).toHaveCount(K.lies(f.lv.hilfe).length);
+  await expect(page.locator('.meldung')).toContainText('So kommt der Drache ans Ziel');
+  await tippe(page, '.tasten [data-aktion="los"]');
+  await expect(page.locator('.dialog h2')).toHaveText('Fast geschafft!', { timeout: 15_000 });
+  await expect(page.locator('.dialog p')).toContainText('Mit Hilfe geschafft');
   await expect(page.locator('.punkte .punkt.voll')).toHaveCount(0);
 });
 
